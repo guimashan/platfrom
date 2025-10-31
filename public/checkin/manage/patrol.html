@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巡邏點管理 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/styles/manage.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>📍 巡邏點管理</h1>
+                <div class="header-nav">
+                    <a href="/checkin/manage/dashboard.html" class="nav-link">儀表板</a>
+                    <a href="/checkin/manage/patrol.html" class="nav-link active">巡邏點管理</a>
+                    <a href="/checkin/manage/user.html" class="nav-link">用戶管理</a>
+                    <button id="logoutBtn" class="btn-logout">登出</button>
+                </div>
+            </div>
+        </header>
+
+        <main style="padding: 2rem;">
+            <!-- 測試模式控制 -->
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>🧪 測試模式</h2>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                    <div>
+                        <h3 style="margin: 0 0 0.5rem 0;">GPS 距離驗證</h3>
+                        <p style="margin: 0; color: #666; font-size: 0.95rem;">
+                            開啟後，所有簽到將略過 GPS 距離檢查（用於測試）
+                        </p>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span id="testModeStatus" class="badge">載入中...</span>
+                        <button id="toggleTestMode" class="btn btn-primary" disabled>載入中...</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 巡邏點列表 -->
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>巡邏點列表</h2>
+                    <button id="addPatrolBtn" class="btn btn-primary">+ 新增巡邏點</button>
+                </div>
+
+                <div id="patrolsList" class="data-table">
+                    <p class="loading">載入中...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/編輯巡邏點 Modal -->
+    <div id="patrolModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">新增巡邏點</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            
+            <form id="patrolForm">
+                <div class="form-group">
+                    <label for="patrolName">巡邏點名稱 *</label>
+                    <input type="text" id="patrolName" required placeholder="例如: 正殿">
+                </div>
+
+                <div class="form-group">
+                    <label for="patrolLat">緯度 *</label>
+                    <input type="number" id="patrolLat" step="0.000001" required placeholder="25.147924">
+                    <small>點擊「使用當前位置」自動填入</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="patrolLng">經度 *</label>
+                    <input type="number" id="patrolLng" step="0.000001" required placeholder="121.410296">
+                </div>
+
+                <div class="form-group">
+                    <label for="patrolRadius">容許距離 (公尺) *</label>
+                    <input type="number" id="patrolRadius" value="30" required min="10" max="500">
+                    <small>建議範圍 20-100 公尺</small>
+                </div>
+
+                <button type="button" id="useLocationBtn" class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;">
+                    📍 使用當前位置
+                </button>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- QR Code 顯示 Modal -->
+    <div id="qrModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="qrModalTitle">QR Code</h3>
+                <button id="closeQrModal" class="close-btn">&times;</button>
+            </div>
+            
+            <div style="text-align: center;">
+                <div id="qrCodeContainer" style="margin: 2rem 0;"></div>
+                <p style="color: #666; margin-bottom: 1rem;">掃描此 QR Code 即可簽到</p>
+                <button id="downloadQrBtn" class="btn btn-primary">💾 下載 QR Code</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script type="module" src="/checkin/manage/js/patrol-manage.js"></script>
+</body>
+</html>
