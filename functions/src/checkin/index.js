@@ -114,15 +114,8 @@ exports.verifyCheckinDistance = onCall(
     {region: 'asia-east2'},
     async (request) => {
       try {
-        // 驗證使用者是否已登入
-        if (!request.auth || !request.auth.uid) {
-          throw new HttpsError(
-              'unauthenticated',
-              'User must be authenticated to check in',
-          );
-        }
-
-        const userId = request.auth.uid;
+        // 從請求數據中獲取 userId（測試階段允許跨專案調用）
+        const userId = request.data.userId || (request.auth ? request.auth.uid : 'anonymous');
         const {patrolId, lat, lng, mode, qrCode} = request.data;
         const checkinMode = mode || 'gps'; // 'gps' 或 'qr'
 
