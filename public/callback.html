@@ -52,7 +52,7 @@
 
         async function handleCallback() {
             try {
-                // 從 URL 取得授權碼
+                // 從 URL 取得授權碼和狀態
                 const urlParams = new URLSearchParams(window.location.search);
                 const code = urlParams.get('code');
                 const state = urlParams.get('state');
@@ -66,7 +66,17 @@
                     throw new Error('未收到授權碼');
                 }
 
-                console.log('收到授權碼，準備交換 Firebase Token...');
+                // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
+                const savedState = sessionStorage.getItem('line_login_state');
+                if (!savedState || savedState !== state) {
+                    sessionStorage.removeItem('line_login_state'); // 清除已使用的 state
+                    throw new Error('安全驗證失敗：state 參數不匹配。可能遭受 CSRF 攻擊。');
+                }
+
+                // 驗證成功後立即清除 state（防止重複使用）
+                sessionStorage.removeItem('line_login_state');
+
+                console.log('State 驗證通過，準備交換 Firebase Token...');
 
                 // 呼叫 Cloud Function 交換 Firebase Custom Token
                 const functionUrl = 'https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken';

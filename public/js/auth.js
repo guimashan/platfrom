@@ -42,8 +42,8 @@ onAuthStateChanged(platformAuth, async (user) => {
 // 處理 LINE 登入
 async function handleLineLogin() {
     try {
-        // 產生隨機 state 用於安全驗證
-        const state = Math.random().toString(36).substring(2, 15);
+        // 🔒 產生密碼學安全的隨機 state 用於 CSRF 防護
+        const state = crypto.randomUUID();
         sessionStorage.setItem('line_login_state', state);
 
         // 構建 LINE 授權 URL
