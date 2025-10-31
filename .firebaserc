@@ -1,0 +1,9 @@
+{
+  "projects": {
+    "default": "platform-bc783",
+    "platform": "platform-bc783",
+    "checkin": "checkin-29f7f",
+    "service": "service-b9d4a",
+    "schedule": "schedule-48ff9"
+  }
+}
