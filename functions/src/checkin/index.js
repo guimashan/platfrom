@@ -3,7 +3,7 @@
  * 處理 GPS 簽到與距離驗證
  */
 
-const {onRequest} = require('firebase-functions/v2/https');
+const {onCall, HttpsError} = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
 const {logger} = require('firebase-functions/v2');
 
@@ -35,34 +35,28 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
  * 驗證簽到距離
  * 檢查使用者 GPS 位置是否在巡邏點容許範圍內
  */
-exports.verifyCheckinDistance = onRequest(
-    {region: 'asia-east2', cors: true},
-    async (req, res) => {
+exports.verifyCheckinDistance = onCall(
+    {region: 'asia-east2'},
+    async (request) => {
       try {
-        // 驗證 Firebase ID Token
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-          res.status(401).json({
-            ok: false,
-            code: '2001_NOT_AUTHORIZED',
-            message: 'Missing or invalid authorization header',
-          });
-          return;
+        // 驗證使用者是否已登入
+        if (!request.auth || !request.auth.uid) {
+          throw new HttpsError(
+              'unauthenticated',
+              'User must be authenticated to check in',
+          );
         }
 
-        const idToken = authHeader.split('Bearer ')[1];
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const userId = decodedToken.uid;
+        const userId = request.auth.uid;
+        const {patrolId, lat, lng} = request.data;
 
-        const {patrolId, lat, lng} = req.body;
-
+        // 驗證必要參數
         if (!patrolId || lat === undefined || lng === undefined) {
-          res.status(400).json({
+          return {
             ok: false,
             code: '1000_INVALID_REQUEST',
             message: 'Missing patrolId, lat, or lng',
-          });
-          return;
+          };
         }
 
         // 取得巡邏點資料
@@ -72,12 +66,11 @@ exports.verifyCheckinDistance = onRequest(
             .get();
 
         if (!patrolDoc.exists) {
-          res.status(404).json({
+          return {
             ok: false,
             code: '3000_NOT_FOUND',
             message: 'Patrol point not found',
-          });
-          return;
+          };
         }
 
         const patrolData = patrolDoc.data();
@@ -117,12 +110,12 @@ exports.verifyCheckinDistance = onRequest(
 
           logger.info('簽到成功', {userId, patrolId, distance});
 
-          res.json({
+          return {
             ok: true,
             distanceMeters: distance,
             patrolId: patrolId,
             createdAt: new Date().toISOString(),
-          });
+          };
         } else {
           // 超出範圍
           logger.warn('簽到失敗 - 超出範圍', {
@@ -132,20 +125,23 @@ exports.verifyCheckinDistance = onRequest(
             tolerance,
           });
 
-          res.json({
+          return {
             ok: false,
             code: '1001_OUT_OF_RANGE',
             distanceMeters: distance,
             allowedMeters: tolerance,
-          });
+          };
         }
       } catch (error) {
         logger.error('簽到驗證失敗', error);
-        res.status(500).json({
-          ok: false,
-          code: '4000_INTERNAL_ERROR',
-          message: error.message,
-        });
+        
+        // 如果已經是 HttpsError,直接拋出
+        if (error instanceof HttpsError) {
+          throw error;
+        }
+        
+        // 其他錯誤包裝為 internal error
+        throw new HttpsError('internal', `簽到失敗: ${error.message}`);
       }
     },
 );
