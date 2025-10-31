@@ -20,9 +20,9 @@ const firebaseConfigs = {
     },
     checkin: {
         apiKey: "AIzaSyAnXFLHm7u9Ji0ualJDl9qGQQ1l4zcRnvg",
-        authDomain: "checkin-29f7f.firebaseapp.com",
-        projectId: "checkin-29f7f",
-        storageBucket: "checkin-29f7f.firebasestorage.app",
+        authDomain: "checkin-76c77.firebaseapp.com",
+        projectId: "checkin-76c77",
+        storageBucket: "checkin-76c77.firebasestorage.app",
         messagingSenderId: "264033873783",
         appId: "1:264033873783:web:d871356277e5d06749fb72"
     },
