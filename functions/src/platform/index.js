@@ -93,12 +93,13 @@ exports.generateCustomToken = onRequest(
 
         logger.info('LINE 使用者資料已取得', {lineUserId, displayName});
 
-        // Step 3: 產生 Firebase Custom Token
-        const customToken = await admin.auth().createCustomToken(lineUserId);
-
-        // Step 4: 更新或建立 Firestore 使用者資料
+        // Step 3: 取得或建立使用者資料（需要先取得 roles）
         const userRef = admin.firestore().collection('users').doc(lineUserId);
         const userSnap = await userRef.get();
+        
+        let userRoles = ['user'];
+        
+        // Step 4: 更新或建立 Firestore 使用者資料
 
         if (!userSnap.exists) {
           // 新使用者
@@ -117,9 +118,13 @@ exports.generateCustomToken = onRequest(
           }
           
           await userRef.set(userData);
-          logger.info('新使用者已建立', {lineUserId});
+          userRoles = ['user'];
+          logger.info('新使用者已建立', {lineUserId, roles: userRoles});
         } else {
           // 更新現有使用者
+          const userData = userSnap.data();
+          userRoles = userData.roles || ['user'];
+          
           const updateData = {
             displayName: displayName,
             lastLogin: admin.firestore.FieldValue.serverTimestamp(),
@@ -131,8 +136,15 @@ exports.generateCustomToken = onRequest(
           }
           
           await userRef.update(updateData);
-          logger.info('使用者登入時間已更新', {lineUserId});
+          logger.info('使用者登入時間已更新', {lineUserId, roles: userRoles});
         }
+        
+        // Step 5: 產生包含 roles 的 Firebase Custom Token
+        const customToken = await admin.auth().createCustomToken(lineUserId, {
+          roles: userRoles,
+        });
+        
+        logger.info('Custom Token 已產生', {lineUserId, roles: userRoles});
 
         res.json({
           ok: true,
