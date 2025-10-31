@@ -11,4 +11,5 @@ exports.generateCustomToken = platformFunctions.generateCustomToken;
 exports.updateUserRole = platformFunctions.updateUserRole;
 
 // 導出 Check-in Functions
+exports.initializeDefaultPatrols = checkinFunctions.initializeDefaultPatrols;
 exports.verifyCheckinDistance = checkinFunctions.verifyCheckinDistance;

@@ -17,22 +17,47 @@
 
         <main class="main-content">
             <div id="checkinCard" class="checkin-card">
-                <h2>GPS 簽到</h2>
+                <h2>奉香簽到</h2>
                 
-                <div id="patrolSelect" class="patrol-select">
-                    <label for="patrolDropdown">選擇巡邏點:</label>
-                    <select id="patrolDropdown" class="form-select">
-                        <option value="">載入中...</option>
-                    </select>
+                <!-- 簽到模式切換 -->
+                <div class="mode-tabs">
+                    <button id="gpsModeBtn" class="mode-tab active">📍 GPS 簽到</button>
+                    <button id="qrModeBtn" class="mode-tab">📷 QR Code 簽到</button>
                 </div>
 
-                <div id="locationStatus" class="location-status">
-                    <p>準備開始簽到</p>
+                <!-- GPS 簽到模式 -->
+                <div id="gpsMode" class="mode-content">
+                    <div id="patrolSelect" class="patrol-select">
+                        <label for="patrolDropdown">選擇巡邏點:</label>
+                        <select id="patrolDropdown" class="form-select">
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+
+                    <div id="locationStatus" class="location-status">
+                        <p>準備開始簽到</p>
+                    </div>
+
+                    <button id="checkinBtn" class="btn btn-primary btn-large">
+                        開始 GPS 簽到
+                    </button>
                 </div>
 
-                <button id="checkinBtn" class="btn btn-primary btn-large">
-                    開始簽到
-                </button>
+                <!-- QR Code 簽到模式 -->
+                <div id="qrMode" class="mode-content hidden">
+                    <div id="qrReader" style="width: 100%; max-width: 500px; margin: 20px auto;"></div>
+                    
+                    <div id="qrStatus" class="location-status">
+                        <p>點擊下方按鈕開始掃描</p>
+                    </div>
+
+                    <button id="startQrBtn" class="btn btn-primary btn-large">
+                        📷 開始掃描 QR Code
+                    </button>
+                    <button id="stopQrBtn" class="btn btn-secondary btn-large hidden">
+                        ⏹️ 停止掃描
+                    </button>
+                </div>
 
                 <div id="result" class="result-area hidden"></div>
             </div>
@@ -43,6 +68,9 @@
         </main>
     </div>
 
+    <!-- QR Code Scanner Library -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
     <script type="module" src="/js/firebase-init.js"></script>
     <script type="module" src="/checkin/js/checkin.js"></script>
 </body>

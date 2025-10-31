@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code 生成器 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .qr-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .qr-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .qr-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .qr-code-wrapper {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+
+        .qr-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin: 0.5rem 0;
+        }
+
+        .btn-download {
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+
+        .print-hint {
+            background: #FFF3E0;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>QR Code 生成器</h1>
+            <button id="backBtn" class="btn-logout">返回</button>
+        </header>
+
+        <main class="qr-container">
+            <div class="print-hint">
+                📌 請下載 QR Code 並列印，張貼在對應的巡邏點位置
+            </div>
+
+            <div id="qrGrid" class="qr-grid">
+                <div class="loading">載入巡邏點資料中...</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script type="module">
+        import { platformAuth, checkinDb } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { 
+            collection, 
+            getDocs, 
+            query, 
+            orderBy 
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let currentUser = null;
+
+        // 監聽認證狀態
+        onAuthStateChanged(platformAuth, async (user) => {
+            if (!user) {
+                window.location.href = '/';
+                return;
+            }
+            currentUser = user;
+            await loadPatrols();
+        });
+
+        // 載入巡邏點並生成 QR Code
+        async function loadPatrols() {
+            try {
+                const patrolsRef = collection(checkinDb, 'patrols');
+                const q = query(patrolsRef, orderBy('name'));
+                const snapshot = await getDocs(q);
+                
+                const qrGrid = document.getElementById('qrGrid');
+                qrGrid.innerHTML = '';
+
+                if (snapshot.empty) {
+                    qrGrid.innerHTML = '<div class="loading">尚無巡邏點資料</div>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const qrCode = data.qr || `PATROL_${doc.id}`;
+                    
+                    // 建立卡片
+                    const card = document.createElement('div');
+                    card.className = 'qr-card';
+                    
+                    card.innerHTML = `
+                        <h3>${data.name}</h3>
+                        <div class="qr-info">QR Code: ${qrCode}</div>
+                        <div class="qr-code-wrapper">
+                            <div id="qr-${doc.id}"></div>
+                        </div>
+                        <div class="qr-info">${data.description || ''}</div>
+                        <button class="btn btn-primary btn-download" onclick="downloadQR('${doc.id}', '${data.name}')">
+                            📥 下載 QR Code
+                        </button>
+                    `;
+                    
+                    qrGrid.appendChild(card);
+                    
+                    // 生成 QR Code
+                    new QRCode(document.getElementById(`qr-${doc.id}`), {
+                        text: qrCode,
+                        width: 200,
+                        height: 200,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                });
+                
+            } catch (error) {
+                console.error('載入巡邏點失敗:', error);
+                document.getElementById('qrGrid').innerHTML = 
+                    '<div class="loading">載入失敗，請重新整理頁面</div>';
+            }
+        }
+
+        // 下載 QR Code
+        window.downloadQR = function(patrolId, patrolName) {
+            const qrCanvas = document.querySelector(`#qr-${patrolId} canvas`);
+            if (!qrCanvas) {
+                alert('QR Code 尚未生成');
+                return;
+            }
+            
+            // 轉換為圖片並下載
+            const url = qrCanvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `QRCode_${patrolName}.png`;
+            link.href = url;
+            link.click();
+        };
+
+        // 返回按鈕
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = '/admin/index.html';
+        });
+    </script>
+</body>
+</html>

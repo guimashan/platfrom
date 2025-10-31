@@ -123,14 +123,33 @@ exports.verifyCheckinDistance = onCall(
         }
 
         const userId = request.auth.uid;
-        const {patrolId, lat, lng} = request.data;
+        const {patrolId, lat, lng, mode, qrCode} = request.data;
+        const checkinMode = mode || 'gps'; // 'gps' 或 'qr'
 
         // 驗證必要參數
-        if (!patrolId || lat === undefined || lng === undefined) {
+        if (!patrolId) {
           return {
             ok: false,
             code: '1000_INVALID_REQUEST',
-            message: 'Missing patrolId, lat, or lng',
+            message: 'Missing patrolId',
+          };
+        }
+
+        // GPS 模式需要座標
+        if (checkinMode === 'gps' && (lat === undefined || lng === undefined)) {
+          return {
+            ok: false,
+            code: '1000_INVALID_REQUEST',
+            message: 'GPS mode requires lat and lng',
+          };
+        }
+
+        // QR Code 模式需要 QR Code
+        if (checkinMode === 'qr' && !qrCode) {
+          return {
+            ok: false,
+            code: '1000_INVALID_REQUEST',
+            message: 'QR mode requires qrCode',
           };
         }
 
@@ -149,9 +168,52 @@ exports.verifyCheckinDistance = onCall(
         }
 
         const patrolData = patrolDoc.data();
+        
+        // QR Code 模式：驗證 QR Code 是否匹配
+        if (checkinMode === 'qr') {
+          // 為沒有 qr 欄位的巡邏點生成預設值
+          const expectedQr = patrolData.qr || `PATROL_${patrolId}`;
+          
+          if (expectedQr !== qrCode) {
+            logger.warn('QR Code 不匹配', {
+              userId,
+              patrolId,
+              expectedQr,
+              providedQr: qrCode,
+            });
+            
+            return {
+              ok: false,
+              code: '1002_INVALID_QR_CODE',
+              message: 'QR Code does not match patrol point',
+            };
+          }
+          
+          // QR Code 簽到成功，寫入紀錄
+          const checkinData = {
+            userId: userId,
+            patrolId: patrolId,
+            qrCode: qrCode,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            mode: 'qr',
+          };
+          
+          await admin.firestore()
+              .collection('checkins')
+              .add(checkinData);
+          
+          logger.info('QR Code 簽到成功', {userId, patrolId});
+          
+          return {
+            ok: true,
+            mode: 'qr',
+            patrolId: patrolId,
+            createdAt: new Date().toISOString(),
+          };
+        }
+        
+        // GPS 模式：計算距離並驗證
         const tolerance = patrolData.tolerance || 30; // 預設 30 公尺
-
-        // 計算距離
         const distance = calculateDistance(
             lat,
             lng,
@@ -159,7 +221,7 @@ exports.verifyCheckinDistance = onCall(
             patrolData.lng,
         );
 
-        logger.info('簽到距離計算', {
+        logger.info('GPS 簽到距離計算', {
           userId,
           patrolId,
           distance,
@@ -168,7 +230,7 @@ exports.verifyCheckinDistance = onCall(
 
         // 判斷是否在範圍內
         if (distance <= tolerance) {
-          // 簽到成功,寫入紀錄
+          // GPS 簽到成功，寫入紀錄
           const checkinData = {
             userId: userId,
             patrolId: patrolId,
@@ -176,24 +238,25 @@ exports.verifyCheckinDistance = onCall(
             lng: lng,
             distance: distance,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
-            mode: 'normal',
+            mode: 'gps',
           };
 
           await admin.firestore()
               .collection('checkins')
               .add(checkinData);
 
-          logger.info('簽到成功', {userId, patrolId, distance});
+          logger.info('GPS 簽到成功', {userId, patrolId, distance});
 
           return {
             ok: true,
+            mode: 'gps',
             distanceMeters: distance,
             patrolId: patrolId,
             createdAt: new Date().toISOString(),
           };
         } else {
           // 超出範圍
-          logger.warn('簽到失敗 - 超出範圍', {
+          logger.warn('GPS 簽到失敗 - 超出範圍', {
             userId,
             patrolId,
             distance,
@@ -203,6 +266,7 @@ exports.verifyCheckinDistance = onCall(
           return {
             ok: false,
             code: '1001_OUT_OF_RANGE',
+            mode: 'gps',
             distanceMeters: distance,
             allowedMeters: tolerance,
           };
