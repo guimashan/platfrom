@@ -78,8 +78,8 @@
 
                 console.log('State 驗證通過，準備交換 Firebase Token...');
 
-                // 呼叫 Cloud Function 交換 Firebase Custom Token
-                const functionUrl = 'https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken';
+                // 呼叫 Cloud Function 交換 Firebase Custom Token (2nd Gen)
+                const functionUrl = 'https://generatecustomtoken-4yprhpbawa-df.a.run.app';
                 const redirectUri = window.location.origin + '/callback.html';
 
                 const response = await fetch(functionUrl, {
