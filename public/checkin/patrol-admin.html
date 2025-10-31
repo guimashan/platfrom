@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巡邏點管理 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .settings-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .setting-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: var(--primary-color);
+        }
+
+        .setting-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 30px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .status-inactive {
+            background-color: #9E9E9E;
+            color: white;
+        }
+
+        .patrols-list {
+            margin-top: 1rem;
+        }
+
+        .patrol-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .patrol-info {
+            flex: 1;
+        }
+
+        .patrol-info h4 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        .patrol-info p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>巡邏點管理</h1>
+            <button id="backBtn" class="btn-logout">返回</button>
+        </header>
+
+        <main class="settings-container">
+            <!-- 系統設定 -->
+            <div class="setting-card">
+                <h2>系統設定</h2>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>🧪 測試模式</h3>
+                        <p>開啟後，GPS 簽到將跳過距離驗證（任何位置都可簽到）</p>
+                        <p style="margin-top: 0.5rem;">
+                            <span id="testModeStatus" class="status-badge status-inactive">關閉</span>
+                        </p>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="testModeToggle">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 巡邏點列表 -->
+            <div class="setting-card">
+                <h2>巡邏點列表</h2>
+                <div id="patrolsList" class="patrols-list">
+                    <p style="text-align: center; color: #666;">載入中...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { platformAuth, checkinDb } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { 
+            doc, 
+            getDoc, 
+            setDoc, 
+            collection, 
+            getDocs, 
+            query, 
+            orderBy 
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let currentUser = null;
+
+        // 監聽認證狀態
+        onAuthStateChanged(platformAuth, async (user) => {
+            if (!user) {
+                window.location.href = '/';
+                return;
+            }
+            currentUser = user;
+            await loadSettings();
+            await loadPatrols();
+        });
+
+        // 載入系統設定
+        async function loadSettings() {
+            try {
+                const settingsRef = doc(checkinDb, 'settings', 'system');
+                const settingsSnap = await getDoc(settingsRef);
+                
+                const testMode = settingsSnap.exists() ? 
+                    (settingsSnap.data().testMode || false) : false;
+                
+                document.getElementById('testModeToggle').checked = testMode;
+                updateTestModeStatus(testMode);
+            } catch (error) {
+                console.error('載入設定失敗:', error);
+            }
+        }
+
+        // 載入巡邏點列表
+        async function loadPatrols() {
+            try {
+                const patrolsRef = collection(checkinDb, 'patrols');
+                const q = query(patrolsRef, orderBy('name'));
+                const snapshot = await getDocs(q);
+                
+                const patrolsList = document.getElementById('patrolsList');
+                
+                if (snapshot.empty) {
+                    patrolsList.innerHTML = '<p style="text-align: center; color: #666;">尚無巡邏點</p>';
+                    return;
+                }
+                
+                patrolsList.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const item = document.createElement('div');
+                    item.className = 'patrol-item';
+                    item.innerHTML = `
+                        <div class="patrol-info">
+                            <h4>${data.name}</h4>
+                            <p>${data.description || ''}</p>
+                            <p>📍 ${data.lat}, ${data.lng} (±${data.radius || data.tolerance || 30}m)</p>
+                        </div>
+                        <span class="status-badge ${data.active ? 'status-active' : 'status-inactive'}">
+                            ${data.active ? '啟用' : '停用'}
+                        </span>
+                    `;
+                    patrolsList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('載入巡邏點失敗:', error);
+            }
+        }
+
+        // 更新測試模式狀態顯示
+        function updateTestModeStatus(isEnabled) {
+            const statusEl = document.getElementById('testModeStatus');
+            if (isEnabled) {
+                statusEl.textContent = '開啟';
+                statusEl.className = 'status-badge status-active';
+            } else {
+                statusEl.textContent = '關閉';
+                statusEl.className = 'status-badge status-inactive';
+            }
+        }
+
+        // 切換測試模式
+        document.getElementById('testModeToggle').addEventListener('change', async (e) => {
+            const isEnabled = e.target.checked;
+            
+            try {
+                const settingsRef = doc(checkinDb, 'settings', 'system');
+                await setDoc(settingsRef, {
+                    testMode: isEnabled,
+                    updatedAt: new Date(),
+                    updatedBy: currentUser.uid
+                }, { merge: true });
+                
+                updateTestModeStatus(isEnabled);
+                alert(isEnabled ? '測試模式已開啟（GPS 驗證已關閉）' : '測試模式已關閉（GPS 驗證已啟用）');
+            } catch (error) {
+                console.error('更新設定失敗:', error);
+                alert('更新設定失敗: ' + error.message);
+                e.target.checked = !isEnabled;
+            }
+        });
+
+        // 返回按鈕
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = '/admin/index.html';
+        });
+    </script>
+</body>
+</html>

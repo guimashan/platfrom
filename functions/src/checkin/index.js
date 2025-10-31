@@ -221,15 +221,25 @@ exports.verifyCheckinDistance = onCall(
             patrolData.lng,
         );
 
+        // 從 Firestore 讀取測試模式設定
+        const settingsDoc = await admin.firestore()
+            .collection('settings')
+            .doc('system')
+            .get();
+        
+        const testMode = settingsDoc.exists ? 
+            (settingsDoc.data().testMode || false) : false;
+
         logger.info('GPS 簽到距離計算', {
           userId,
           patrolId,
           distance,
           tolerance,
+          testMode: testMode,
         });
 
-        // 判斷是否在範圍內
-        if (distance <= tolerance) {
+        // 判斷是否在範圍內（測試模式下總是通過）
+        if (testMode || distance <= tolerance) {
           // GPS 簽到成功，寫入紀錄
           const checkinData = {
             userId: userId,
