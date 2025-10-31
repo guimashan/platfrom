@@ -12,7 +12,7 @@
 
 1. **點擊左側的 Git 圖標**（版本控制圖標）
 2. **點擊 "Connect Existing" 按鈕**
-3. **選擇您的 GitHub 倉庫**：`guimashan/platform`
+3. **輸入您的 GitHub 倉庫網址**：`https://github.com/guimashan/platfrom`
 4. **授權 Replit 訪問您的 GitHub**
 5. **確認連接**
 
@@ -20,7 +20,7 @@
 
 ### 驗證推送成功
 
-前往 https://github.com/guimashan/platform 確認最新的 commit 已出現。
+前往 https://github.com/guimashan/platfrom 確認最新的 commit 已出現。
 
 ### 🎯 結果
 
@@ -123,7 +123,7 @@ curl https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken
 ### 問題 1：GitHub 推送失敗
 
 **解決方案**：
-- 確認您的 GitHub 倉庫 `guimashan/platform` 已創建
+- 確認您的 GitHub 倉庫 `guimashan/platfrom` 已創建
 - 檢查 Replit 是否有 GitHub 訪問權限
 
 ### 問題 2：Firebase 部署失敗
