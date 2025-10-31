@@ -19,12 +19,14 @@
 
 ### 四個 Firebase 專案
 
-| 專案 | ID | 用途 |
-|------|-----|------|
-| Platform | platform-bc783 | 登入、角色管理、公告、導流 |
-| Check-in | checkin-29f7f | GPS 簽到、巡邏點管理 |
-| Service | service-b9d4a | 神服服務、法會報名 |
-| Schedule | schedule-48ff9 | 志工排班、出勤統計 |
+| 專案 | ID | 用途 | 狀態 |
+|------|-----|------|------|
+| Platform | platform-bc783 | 登入、角色管理、公告、導流 | ✅ 已部署 |
+| Check-in | checkin-76c77 | GPS 簽到、巡邏點管理 | ✅ 已部署 |
+| Service | service-b9d4a | 神服服務、法會報名 | 待開發 |
+| Schedule | schedule-48ff9 | 志工排班、出勤統計 | 待開發 |
+
+**注意**: Check-in 專案已從 `checkin-29f7f`（已刪除）遷移到 `checkin-76c77`（2025-10-31）
 
 ## V3 架構變更
 
@@ -152,7 +154,18 @@ npm run emulators
 - Callback URL: https://go.guimashan.org.tw/__/auth/handler
 
 ## 最近變更
-- 2025-10-31: 初始化專案,完成 Platform 和 Check-in 模組基礎功能
+
+### 2025-10-31 部署到生產環境
+- ✅ 前端推送到 GitHub (guimashan/platfrom)
+- ✅ Vercel 自動部署 (https://guimashan.vercel.app)
+- ✅ Platform Functions 部署到 platform-bc783
+  - generateCustomToken (LINE OAuth 支援)
+  - updateUserRole (角色管理)
+- ✅ Check-in Functions 部署到 checkin-76c77
+  - verifyCheckinDistance (GPS 簽到驗證)
+- ⚠️ Check-in 專案遷移: checkin-29f7f → checkin-76c77
+- ✅ Firebase 專案升級到 Blaze 方案
+- ✅ 初始化專案,完成 Platform 和 Check-in 模組基礎功能
 
 ## 注意事項
 - 嚴禁將 API Key 硬編碼在程式碼中
