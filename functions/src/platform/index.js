@@ -89,7 +89,7 @@ exports.generateCustomToken = onRequest(
         const profile = await profileResponse.json();
         const lineUserId = profile.userId;
         const displayName = profile.displayName;
-        const pictureUrl = profile.pictureUrl;
+        const pictureUrl = profile.pictureUrl || null;
 
         logger.info('LINE 使用者資料已取得', {lineUserId, displayName});
 
@@ -102,23 +102,35 @@ exports.generateCustomToken = onRequest(
 
         if (!userSnap.exists) {
           // 新使用者
-          await userRef.set({
+          const userData = {
             displayName: displayName,
             lineUserId: lineUserId,
-            pictureUrl: pictureUrl,
             roles: ['user'],
             active: true,
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             lastLogin: admin.firestore.FieldValue.serverTimestamp(),
-          });
+          };
+          
+          // 只在有大頭貼時才加入 pictureUrl
+          if (pictureUrl) {
+            userData.pictureUrl = pictureUrl;
+          }
+          
+          await userRef.set(userData);
           logger.info('新使用者已建立', {lineUserId});
         } else {
           // 更新現有使用者
-          await userRef.update({
+          const updateData = {
             displayName: displayName,
-            pictureUrl: pictureUrl,
             lastLogin: admin.firestore.FieldValue.serverTimestamp(),
-          });
+          };
+          
+          // 只在有大頭貼時才更新 pictureUrl
+          if (pictureUrl) {
+            updateData.pictureUrl = pictureUrl;
+          }
+          
+          await userRef.update(updateData);
           logger.info('使用者登入時間已更新', {lineUserId});
         }
 
