@@ -1,0 +1,22 @@
+{
+  "name": "goline-functions",
+  "version": "1.0.0",
+  "description": "Cloud Functions for 龜馬山 goLine 平台",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0"
+  }
+}

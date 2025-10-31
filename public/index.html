@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>龜馬山 goLine 平台</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>龜馬山 goLine 平台</h1>
+            <p class="subtitle">紫皇天乙真慶宮數位化管理系統</p>
+        </header>
+
+        <main class="main-content">
+            <div class="welcome-card">
+                <h2>歡迎使用</h2>
+                <p>請使用 LINE 帳號登入系統</p>
+                <button id="lineLoginBtn" class="btn btn-primary">
+                    LINE 登入
+                </button>
+            </div>
+
+            <div id="loadingIndicator" class="loading hidden">
+                <div class="spinner"></div>
+                <p>登入中...</p>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 紫皇天乙真慶宮 版權所有</p>
+        </footer>
+    </div>
+
+    <script type="module" src="/js/firebase-init.js"></script>
+    <script type="module" src="/js/auth.js"></script>
+</body>
+</html>

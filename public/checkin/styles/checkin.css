@@ -1,0 +1,126 @@
+/* 奉香簽到模組樣式 */
+
+.btn-logout {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-logout:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.checkin-card {
+    background: var(--bg-white);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.checkin-card h2 {
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.patrol-select {
+    margin-bottom: 1.5rem;
+}
+
+.patrol-select label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid var(--bg-gray);
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: border-color 0.3s ease;
+}
+
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.location-status {
+    background: var(--bg-gray);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.location-status.active {
+    background: #E8F5E9;
+    color: var(--success-color);
+}
+
+.location-status.error {
+    background: #FFEBEE;
+    color: var(--error-color);
+}
+
+.btn-large {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+}
+
+.result-area {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.result-area.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.result-area.error {
+    background: var(--error-color);
+    color: white;
+}
+
+.distance-info {
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+.history-link {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.history-link a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.history-link a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .checkin-card {
+        padding: 1.5rem;
+        margin: 1rem;
+    }
+}

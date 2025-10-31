@@ -1,0 +1,18 @@
+{
+  "name": "guimashan-goline-platform",
+  "version": "1.0.0",
+  "description": "龜馬山 goLine 平台 - 整合 LINE 登入的多模組 Firebase 管理系統",
+  "main": "index.js",
+  "scripts": {
+    "emulators": "firebase emulators:start",
+    "deploy:platform": "firebase deploy --project platform-bc783 --only functions",
+    "deploy:checkin": "firebase deploy --project checkin-29f7f --only functions",
+    "serve": "cd public && python3 -m http.server 5000"
+  },
+  "keywords": ["firebase", "line-login", "temple-management"],
+  "author": "guimashan-dev",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase-tools": "^13.0.0"
+  }
+}
