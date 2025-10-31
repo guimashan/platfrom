@@ -3,7 +3,7 @@
  * 處理 GPS 簽到功能
  */
 
-import { platformAuth, checkinDb, checkinFunctions } from '/js/firebase-init.js';
+import { platformAuth, checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { 
     collection, 
@@ -83,24 +83,36 @@ async function handleCheckin() {
         
         statusEl.textContent = `位置已取得 (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
         
-        // 呼叫 Cloud Function 驗證簽到
-        const verifyCheckin = httpsCallable(checkinFunctions, 'verifyCheckinDistance');
-        const result = await verifyCheckin({
-            userId: currentUser.uid,
-            patrolId: patrolId,
-            lat: latitude,
-            lng: longitude
+        // 獲取 Platform ID Token 進行跨專案認證
+        const idToken = await platformAuth.currentUser.getIdToken();
+        
+        // 呼叫跨專案認證 API
+        const response = await fetch(API_ENDPOINTS.verifyCheckinV2, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                patrolId: patrolId,
+                lat: latitude,
+                lng: longitude,
+                mode: 'gps'
+            })
         });
         
-        if (result.data.ok) {
+        const result = await response.json();
+        
+        if (result.ok) {
+            const testModeText = result.testMode ? '<br>(測試模式)' : '';
             showResult(
-                `簽到成功!<br>距離: ${result.data.distanceMeters.toFixed(1)} 公尺`,
+                `簽到成功!<br>距離: ${result.distanceMeters.toFixed(1)} 公尺${testModeText}`,
                 'success'
             );
             statusEl.textContent = '簽到完成';
         } else {
             showResult(
-                `簽到失敗: ${result.data.code}<br>距離: ${result.data.distanceMeters.toFixed(1)} 公尺<br>容許範圍: ${result.data.allowedMeters} 公尺`,
+                `簽到失敗: ${result.code}<br>距離: ${result.distanceMeters ? result.distanceMeters.toFixed(1) : 'N/A'} 公尺<br>容許範圍: ${result.allowedMeters || 'N/A'} 公尺`,
                 'error'
             );
             statusEl.textContent = '超出簽到範圍';
@@ -279,16 +291,26 @@ async function onQRCodeScanned(decodedText, decodedResult) {
             throw new Error('找不到對應的巡邏點');
         }
         
-        // 呼叫 Cloud Function 進行 QR Code 簽到
-        const verifyCheckin = httpsCallable(checkinFunctions, 'verifyCheckinDistance');
-        const result = await verifyCheckin({
-            userId: currentUser.uid,
-            patrolId: patrol.id,
-            mode: 'qr',
-            qrCode: qrCode
+        // 獲取 Platform ID Token 進行跨專案認證
+        const idToken = await platformAuth.currentUser.getIdToken();
+        
+        // 呼叫跨專案認證 API 進行 QR Code 簽到
+        const response = await fetch(API_ENDPOINTS.verifyCheckinV2, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                patrolId: patrol.id,
+                mode: 'qr',
+                qrCode: qrCode
+            })
         });
         
-        if (result.data.ok) {
+        const result = await response.json();
+        
+        if (result.ok) {
             showResult(
                 `✅ QR Code 簽到成功!<br>巡邏點: ${patrol.name}`,
                 'success'
@@ -297,7 +319,7 @@ async function onQRCodeScanned(decodedText, decodedResult) {
             qrStatus.className = 'location-status';
         } else {
             showResult(
-                `❌ 簽到失敗: ${result.data.message || result.data.code}`,
+                `❌ 簽到失敗: ${result.message || result.code}`,
                 'error'
             );
             qrStatus.innerHTML = '<p>簽到失敗</p>';

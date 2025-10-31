@@ -64,6 +64,12 @@ export const serviceFunctions = getFunctions(serviceApp, 'asia-east2');
 export const scheduleDb = getFirestore(scheduleApp);
 export const scheduleFunctions = getFunctions(scheduleApp, 'asia-east2');
 
+// API Endpoints 配置
+export const API_ENDPOINTS = {
+    // 跨專案認證簽到 API (HTTP endpoint)
+    verifyCheckinV2: 'https://asia-east2-checkin-76c77.cloudfunctions.net/verifyCheckinV2'
+};
+
 // 開發環境設定 - 使用 Emulator
 if (window.location.hostname === 'localhost' || window.location.hostname.includes('replit')) {
     // 注意: Emulator 設定需要在實際部署時移除

@@ -3,7 +3,7 @@
  * 處理 GPS 簽到與距離驗證
  */
 
-const {onCall, HttpsError} = require('firebase-functions/v2/https');
+const {onCall, onRequest, HttpsError} = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
 const {logger} = require('firebase-functions/v2');
 
@@ -11,6 +11,11 @@ const {logger} = require('firebase-functions/v2');
 if (admin.apps.length === 0) {
   admin.initializeApp();
 }
+
+// 初始化 Platform Admin (用於跨專案驗證)
+const platformAuth = admin.initializeApp({
+  projectId: 'platform-bc783',
+}, 'platform').auth();
 
 /**
  * 計算兩個 GPS 座標之間的距離 (公尺)
@@ -114,8 +119,16 @@ exports.verifyCheckinDistance = onCall(
     {region: 'asia-east2'},
     async (request) => {
       try {
-        // 從請求數據中獲取 userId（測試階段允許跨專案調用）
-        const userId = request.data.userId || (request.auth ? request.auth.uid : 'anonymous');
+        // 必須經過認證
+        if (!request.auth || !request.auth.uid) {
+          throw new HttpsError(
+              'unauthenticated',
+              'User must be authenticated to check in',
+          );
+        }
+
+        // 使用認證的 UID 作為 userId，忽略傳入的 userId 防止偽造
+        const userId = request.auth.uid;
         const {patrolId, lat, lng, mode, qrCode} = request.data;
         const checkinMode = mode || 'gps'; // 'gps' 或 'qr'
 
@@ -284,6 +297,211 @@ exports.verifyCheckinDistance = onCall(
         
         // 其他錯誤包裝為 internal error
         throw new HttpsError('internal', `簽到失敗: ${error.message}`);
+      }
+    },
+);
+
+/**
+ * 跨專案認證版本的簽到驗證 (HTTP Endpoint)
+ * 接受來自 platform 專案的 ID Token 進行認證
+ */
+exports.verifyCheckinV2 = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        // 只接受 POST 請求
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            code: '1000_METHOD_NOT_ALLOWED',
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        // 從 Authorization header 取得 ID Token
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          res.status(401).json({
+            ok: false,
+            code: '1000_UNAUTHORIZED',
+            message: 'Missing or invalid Authorization header',
+          });
+          return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+
+        // 使用 Platform Admin 驗證 ID Token
+        let decodedToken;
+        try {
+          decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+          logger.error('ID Token 驗證失敗', error);
+          res.status(401).json({
+            ok: false,
+            code: '1000_INVALID_TOKEN',
+            message: 'Invalid ID Token',
+          });
+          return;
+        }
+
+        const userId = decodedToken.uid;
+        const {patrolId, lat, lng, mode, qrCode} = req.body;
+        const checkinMode = mode || 'gps';
+
+        // 驗證必要參數
+        if (!patrolId) {
+          res.status(400).json({
+            ok: false,
+            code: '1000_INVALID_REQUEST',
+            message: 'Missing patrolId',
+          });
+          return;
+        }
+
+        // GPS 模式需要座標
+        if (checkinMode === 'gps' && (lat === undefined || lng === undefined)) {
+          res.status(400).json({
+            ok: false,
+            code: '1000_INVALID_REQUEST',
+            message: 'GPS mode requires lat and lng',
+          });
+          return;
+        }
+
+        // QR Code 模式需要 QR Code
+        if (checkinMode === 'qr' && !qrCode) {
+          res.status(400).json({
+            ok: false,
+            code: '1000_INVALID_REQUEST',
+            message: 'QR mode requires qrCode',
+          });
+          return;
+        }
+
+        // 取得巡邏點資料
+        const patrolDoc = await admin.firestore()
+            .collection('patrols')
+            .doc(patrolId)
+            .get();
+
+        if (!patrolDoc.exists) {
+          res.status(404).json({
+            ok: false,
+            code: '3000_NOT_FOUND',
+            message: 'Patrol point not found',
+          });
+          return;
+        }
+
+        const patrolData = patrolDoc.data();
+
+        // 檢查測試模式
+        const settingsDoc = await admin.firestore()
+            .collection('settings')
+            .doc('system')
+            .get();
+        const testMode = settingsDoc.exists ? settingsDoc.data().testMode : false;
+
+        // QR Code 模式
+        if (checkinMode === 'qr') {
+          const expectedQr = patrolData.qr || `PATROL_${patrolId}`;
+
+          if (expectedQr !== qrCode) {
+            logger.warn('QR Code 不匹配', {userId, patrolId});
+            res.status(200).json({
+              ok: false,
+              code: '1002_INVALID_QR_CODE',
+              message: 'QR Code does not match patrol point',
+            });
+            return;
+          }
+
+          // QR Code 簽到成功
+          const checkinData = {
+            userId: userId,
+            patrolId: patrolId,
+            qrCode: qrCode,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            mode: 'qr',
+          };
+
+          await admin.firestore().collection('checkins').add(checkinData);
+          logger.info('QR Code 簽到成功', {userId, patrolId});
+
+          res.status(200).json({
+            ok: true,
+            mode: 'qr',
+            patrolId: patrolId,
+          });
+          return;
+        }
+
+        // GPS 模式
+        const distance = calculateDistance(
+            lat,
+            lng,
+            patrolData.lat,
+            patrolData.lng,
+        );
+
+        const tolerance = patrolData.tolerance || 50;
+
+        // 測試模式下總是允許簽到
+        if (testMode || distance <= tolerance) {
+          const checkinData = {
+            userId: userId,
+            patrolId: patrolId,
+            location: new admin.firestore.GeoPoint(lat, lng),
+            distance: distance,
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            mode: 'gps',
+            testMode: testMode,
+          };
+
+          await admin.firestore().collection('checkins').add(checkinData);
+
+          logger.info('GPS 簽到成功', {
+            userId,
+            patrolId,
+            distance,
+            testMode,
+          });
+
+          res.status(200).json({
+            ok: true,
+            mode: 'gps',
+            distanceMeters: distance,
+            patrolId: patrolId,
+            testMode: testMode,
+          });
+        } else {
+          logger.warn('GPS 簽到失敗 - 超出範圍', {
+            userId,
+            patrolId,
+            distance,
+            tolerance,
+          });
+
+          res.status(200).json({
+            ok: false,
+            code: '1001_OUT_OF_RANGE',
+            mode: 'gps',
+            distanceMeters: distance,
+            allowedMeters: tolerance,
+          });
+        }
+      } catch (error) {
+        logger.error('簽到驗證失敗', error);
+        res.status(500).json({
+          ok: false,
+          code: '5000_INTERNAL_ERROR',
+          message: `簽到失敗: ${error.message}`,
+        });
       }
     },
 );
