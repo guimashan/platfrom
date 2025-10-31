@@ -36,7 +36,7 @@ onAuthStateChanged(platformAuth, async (user) => {
         const userData = userDoc.data();
         const role = userData.role || 'user';
         
-        if (role !== 'admin' && role !== 'manager') {
+        if (role !== 'admin' && role !== 'SuperAdmin') {
             alert('您沒有權限存取此頁面');
             window.location.href = '/';
             return;

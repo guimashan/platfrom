@@ -30,8 +30,8 @@ onAuthStateChanged(platformAuth, async (user) => {
         const userData = userDoc.data();
         const role = userData.role || 'user';
 
-        // 檢查是否為管理員
-        if (role !== 'admin' && role !== 'manager') {
+        // 檢查是否有管理權限
+        if (role !== 'poweruser' && role !== 'admin' && role !== 'SuperAdmin') {
             showError(`您目前的角色為「${getRoleName(role)}」，無法存取管理功能。`);
             return;
         }
@@ -55,9 +55,9 @@ function showError(message) {
 
 function getRoleName(role) {
     const roleNames = {
-        'admin': '系統管理員',
-        'manager': '管理者',
-        'volunteer': '志工',
+        'SuperAdmin': '超級管理員',
+        'admin': '管理員',
+        'poweruser': '進階用戶',
         'user': '一般用戶'
     };
     return roleNames[role] || role;

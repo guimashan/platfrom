@@ -37,7 +37,7 @@ onAuthStateChanged(platformAuth, async (user) => {
         const userData = userDoc.data();
         const role = userData.role || 'user';
         
-        if (role !== 'admin' && role !== 'manager') {
+        if (role !== 'admin' && role !== 'SuperAdmin') {
             alert('您沒有權限存取此頁面');
             window.location.href = '/';
             return;
@@ -135,9 +135,9 @@ function renderUsers() {
 
 function getRoleName(role) {
     const roleNames = {
-        'admin': '系統管理員',
-        'manager': '管理者',
-        'volunteer': '志工',
+        'SuperAdmin': '超級管理員',
+        'admin': '管理員',
+        'poweruser': '進階用戶',
         'user': '一般用戶'
     };
     return roleNames[role] || role;
@@ -145,9 +145,9 @@ function getRoleName(role) {
 
 function getRoleBadge(role) {
     const badges = {
-        'admin': '<span class="badge danger">系統管理員</span>',
-        'manager': '<span class="badge warning">管理者</span>',
-        'volunteer': '<span class="badge info">志工</span>',
+        'SuperAdmin': '<span class="badge danger">超級管理員</span>',
+        'admin': '<span class="badge warning">管理員</span>',
+        'poweruser': '<span class="badge info">進階用戶</span>',
         'user': '<span class="badge">一般用戶</span>'
     };
     return badges[role] || `<span class="badge">${role}</span>`;
