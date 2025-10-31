@@ -32,6 +32,81 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
+ * 初始化預設巡邏點資料
+ * 建立辦公室等預設巡邏點
+ */
+exports.initializeDefaultPatrols = onCall(
+    {region: 'asia-east2'},
+    async (request) => {
+      try {
+        // 驗證使用者是否已登入且為管理員
+        if (!request.auth || !request.auth.uid) {
+          throw new HttpsError(
+              'unauthenticated',
+              'User must be authenticated',
+          );
+        }
+
+        // 檢查是否已有巡邏點資料
+        const patrolsSnapshot = await admin.firestore()
+            .collection('patrols')
+            .get();
+
+        if (!patrolsSnapshot.empty) {
+          return {
+            ok: true,
+            message: '巡邏點資料已存在',
+            count: patrolsSnapshot.size,
+          };
+        }
+
+        // 建立預設巡邏點：辦公室
+        // TODO: 請將經緯度更新為實際的辦公室位置
+        const defaultPatrols = [
+          {
+            name: '辦公室',
+            lat: 24.1375,   // 龜馬山附近（請更新為實際座標）
+            lng: 120.6736,  // 龜馬山附近（請更新為實際座標）
+            tolerance: 50,  // 容許範圍 50 公尺
+            active: true,
+            description: '龜馬山辦公室',
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+        ];
+
+        // 批次寫入
+        const batch = admin.firestore().batch();
+        defaultPatrols.forEach((patrol) => {
+          const docRef = admin.firestore().collection('patrols').doc();
+          batch.set(docRef, patrol);
+        });
+
+        await batch.commit();
+
+        logger.info('預設巡邏點已初始化', {
+          userId: request.auth.uid,
+          count: defaultPatrols.length,
+        });
+
+        return {
+          ok: true,
+          message: '預設巡邏點已建立',
+          count: defaultPatrols.length,
+          patrols: defaultPatrols.map((p) => p.name),
+        };
+      } catch (error) {
+        logger.error('初始化巡邏點失敗', error);
+        
+        if (error instanceof HttpsError) {
+          throw error;
+        }
+        
+        throw new HttpsError('internal', `初始化失敗: ${error.message}`);
+      }
+    },
+);
+
+/**
  * 驗證簽到距離
  * 檢查使用者 GPS 位置是否在巡邏點容許範圍內
  */
