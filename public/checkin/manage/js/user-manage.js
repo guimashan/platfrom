@@ -8,6 +8,7 @@ import {
     collection, 
     doc,
     getDocs,
+    getDoc,
     updateDoc,
     query,
     where
@@ -24,8 +25,31 @@ onAuthStateChanged(platformAuth, async (user) => {
         window.location.href = '/checkin/manage/index.html';
         return;
     }
-    currentUser = user;
-    await loadUsers();
+    
+    try {
+        const userDoc = await getDoc(doc(platformDb, 'users', user.uid));
+        if (!userDoc.exists()) {
+            alert('找不到用戶資料');
+            window.location.href = '/';
+            return;
+        }
+        
+        const userData = userDoc.data();
+        const role = userData.role || 'user';
+        
+        if (role !== 'admin' && role !== 'manager') {
+            alert('您沒有權限存取此頁面');
+            window.location.href = '/';
+            return;
+        }
+        
+        currentUser = user;
+        await loadUsers();
+    } catch (error) {
+        console.error('權限檢查失敗:', error);
+        alert('權限驗證失敗');
+        window.location.href = '/';
+    }
 });
 
 async function loadUsers() {

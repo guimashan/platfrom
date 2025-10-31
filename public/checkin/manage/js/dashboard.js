@@ -11,6 +11,8 @@ import {
     orderBy,
     limit,
     getDocs,
+    getDoc,
+    doc,
     Timestamp
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
@@ -30,8 +32,31 @@ onAuthStateChanged(platformAuth, async (user) => {
         window.location.href = '/checkin/manage/index.html';
         return;
     }
-    currentUser = user;
-    await init();
+    
+    try {
+        const userDoc = await getDoc(doc(platformDb, 'users', user.uid));
+        if (!userDoc.exists()) {
+            alert('找不到用戶資料');
+            window.location.href = '/';
+            return;
+        }
+        
+        const userData = userDoc.data();
+        const role = userData.role || 'user';
+        
+        if (role !== 'admin' && role !== 'manager') {
+            alert('您沒有權限存取此頁面');
+            window.location.href = '/';
+            return;
+        }
+        
+        currentUser = user;
+        await init();
+    } catch (error) {
+        console.error('權限檢查失敗:', error);
+        alert('權限驗證失敗');
+        window.location.href = '/';
+    }
 });
 
 async function init() {

@@ -2,7 +2,7 @@
  * 巡邏點管理
  */
 
-import { platformAuth, checkinDb } from '/js/firebase-init.js';
+import { platformAuth, platformDb, checkinDb } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { 
     collection, 
@@ -24,8 +24,31 @@ onAuthStateChanged(platformAuth, async (user) => {
         window.location.href = '/checkin/manage/index.html';
         return;
     }
-    currentUser = user;
-    await init();
+    
+    try {
+        const userDoc = await getDoc(doc(platformDb, 'users', user.uid));
+        if (!userDoc.exists()) {
+            alert('找不到用戶資料');
+            window.location.href = '/';
+            return;
+        }
+        
+        const userData = userDoc.data();
+        const role = userData.role || 'user';
+        
+        if (role !== 'admin' && role !== 'manager') {
+            alert('您沒有權限存取此頁面');
+            window.location.href = '/';
+            return;
+        }
+        
+        currentUser = user;
+        await init();
+    } catch (error) {
+        console.error('權限檢查失敗:', error);
+        alert('權限驗證失敗');
+        window.location.href = '/';
+    }
 });
 
 async function init() {
