@@ -28,11 +28,16 @@ onAuthStateChanged(platformAuth, async (user) => {
         }
 
         const userData = userDoc.data();
-        const role = userData.role || 'user';
+        const roles = userData.roles || [];
 
         // 檢查是否有管理權限
-        if (role !== 'poweruser' && role !== 'admin' && role !== 'SuperAdmin') {
-            showError(`您目前的角色為「${getRoleName(role)}」，無法存取管理功能。`);
+        const hasPermission = roles.some(role => 
+            role === 'poweruser' || role === 'admin' || role === 'SuperAdmin'
+        );
+        
+        if (!hasPermission) {
+            const roleNames = roles.map(r => getRoleName(r)).join(', ') || '一般用戶';
+            showError(`您目前的角色為「${roleNames}」，無法存取管理功能。`);
             return;
         }
 

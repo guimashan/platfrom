@@ -34,9 +34,13 @@ onAuthStateChanged(platformAuth, async (user) => {
         }
         
         const userData = userDoc.data();
-        const role = userData.role || 'user';
+        const roles = userData.roles || [];
         
-        if (role !== 'admin' && role !== 'SuperAdmin') {
+        const hasPermission = roles.some(role => 
+            role === 'admin' || role === 'SuperAdmin'
+        );
+        
+        if (!hasPermission) {
             alert('您沒有權限存取此頁面');
             window.location.href = '/';
             return;

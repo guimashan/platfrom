@@ -35,9 +35,13 @@ onAuthStateChanged(platformAuth, async (user) => {
         }
         
         const userData = userDoc.data();
-        const role = userData.role || 'user';
+        const roles = userData.roles || [];
         
-        if (role !== 'admin' && role !== 'SuperAdmin') {
+        const hasPermission = roles.some(role => 
+            role === 'admin' || role === 'SuperAdmin'
+        );
+        
+        if (!hasPermission) {
             alert('您沒有權限存取此頁面');
             window.location.href = '/';
             return;
@@ -107,9 +111,11 @@ function renderUsers() {
     `;
     
     filteredUsers.forEach(user => {
-        const role = user.role || 'user';
-        const roleName = getRoleName(role);
-        const roleBadge = getRoleBadge(role);
+        const roles = user.roles || [];
+        const roleNames = roles.map(r => getRoleName(r)).join(', ') || '一般用戶';
+        const roleBadges = roles.length > 0 
+            ? roles.map(r => getRoleBadge(r)).join(' ') 
+            : '<span class="badge">一般用戶</span>';
         const statusBadge = user.active !== false ? '<span class="badge success">啟用</span>' : '<span class="badge danger">停用</span>';
         
         html += `
@@ -118,7 +124,7 @@ function renderUsers() {
                     <strong>${user.displayName || '未設定'}</strong><br>
                     <small style="color: #666; font-family: monospace;">${user.id}</small>
                 </td>
-                <td>${roleBadge}</td>
+                <td>${roleBadges}</td>
                 <td>${user.email || 'N/A'}</td>
                 <td>${statusBadge}</td>
                 <td>
@@ -181,7 +187,13 @@ function editUser(userId) {
     
     document.getElementById('editUserName').textContent = user.displayName || '未設定';
     document.getElementById('editUserId').textContent = userId;
-    document.getElementById('userRole').value = user.role || 'user';
+    
+    const roles = user.roles || [];
+    const select = document.getElementById('userRole');
+    Array.from(select.options).forEach(option => {
+        option.selected = roles.includes(option.value);
+    });
+    
     document.getElementById('userActive').checked = user.active !== false;
     
     document.getElementById('editUserModal').classList.remove('hidden');
@@ -197,12 +209,13 @@ async function saveUserChanges(event) {
     
     if (!editingUserId) return;
     
-    const role = document.getElementById('userRole').value;
+    const select = document.getElementById('userRole');
+    const selectedRoles = Array.from(select.selectedOptions).map(opt => opt.value);
     const active = document.getElementById('userActive').checked;
     
     try {
         await updateDoc(doc(platformDb, 'users', editingUserId), {
-            role,
+            roles: selectedRoles,
             active,
             updatedAt: new Date(),
             updatedBy: currentUser.uid

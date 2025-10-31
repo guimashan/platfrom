@@ -55,14 +55,15 @@
 
             <form id="editUserForm">
                 <div class="form-group">
-                    <label for="userRole">角色 *</label>
-                    <select id="userRole" required>
+                    <label for="userRole">角色 * (可多選)</label>
+                    <select id="userRole" required multiple style="height: 120px;">
                         <option value="user">一般用戶</option>
                         <option value="poweruser">進階用戶</option>
                         <option value="admin">管理員</option>
                         <option value="SuperAdmin">超級管理員</option>
                     </select>
                     <small>
+                        按住 Ctrl (Windows) 或 Cmd (Mac) 可多選<br>
                         <strong>一般用戶：</strong>只能簽到和查看自己的記錄<br>
                         <strong>進階用戶：</strong>可以查看簽到儀表板和所有記錄<br>
                         <strong>管理員：</strong>可以管理巡邏點和用戶角色<br>
