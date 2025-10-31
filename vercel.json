@@ -1,0 +1,34 @@
+{
+  "buildCommand": null,
+  "outputDirectory": "public",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/checkin/:path*",
+      "destination": "/checkin/:path*"
+    },
+    {
+      "source": "/service/:path*",
+      "destination": "/service/:path*"
+    },
+    {
+      "source": "/schedule/:path*",
+      "destination": "/schedule/:path*"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    }
+  ]
+}
