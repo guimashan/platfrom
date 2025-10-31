@@ -4,8 +4,13 @@
  */
 
 const {onRequest} = require('firebase-functions/v2/https');
+const {defineSecret} = require('firebase-functions/params');
 const admin = require('firebase-admin');
 const {logger} = require('firebase-functions/v2');
+
+// 定義 LINE 憑證為 Secrets
+const lineChannelId = defineSecret('LINE_CHANNEL_ID');
+const lineChannelSecret = defineSecret('LINE_CHANNEL_SECRET');
 
 // 初始化 Firebase Admin (只初始化一次)
 if (admin.apps.length === 0) {
@@ -13,32 +18,118 @@ if (admin.apps.length === 0) {
 }
 
 /**
- * 產生 Firebase Custom Token
- * 用於 LIFF 登入流程
+ * LINE 登入授權碼交換 + Firebase Custom Token 產生
+ * 方案 B: 使用 LINE Login Web API
  */
 exports.generateCustomToken = onRequest(
-    {region: 'asia-east2', cors: true},
+    {
+      region: 'asia-east2',
+      cors: true,
+      secrets: [lineChannelId, lineChannelSecret],
+    },
     async (req, res) => {
       try {
-        const {lineUserId} = req.body;
+        const {code, redirectUri} = req.body;
 
-        if (!lineUserId) {
+        if (!code || !redirectUri) {
           res.status(400).json({
             ok: false,
             code: '1000_INVALID_REQUEST',
-            message: 'Missing lineUserId',
+            message: 'Missing code or redirectUri',
           });
           return;
         }
 
-        // 產生 Custom Token
+        // Step 1: 使用授權碼向 LINE 交換 Access Token
+        const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: redirectUri,
+            client_id: lineChannelId.value(),
+            client_secret: lineChannelSecret.value(),
+          }),
+        });
+
+        if (!tokenResponse.ok) {
+          const errorData = await tokenResponse.json();
+          logger.error('LINE Token 交換失敗', errorData);
+          res.status(400).json({
+            ok: false,
+            code: '1001_LINE_TOKEN_ERROR',
+            message: errorData.error_description || 'LINE token exchange failed',
+          });
+          return;
+        }
+
+        const tokenData = await tokenResponse.json();
+        const accessToken = tokenData.access_token;
+
+        // Step 2: 使用 Access Token 取得使用者資料
+        const profileResponse = await fetch('https://api.line.me/v2/profile', {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!profileResponse.ok) {
+          logger.error('取得 LINE Profile 失敗');
+          res.status(400).json({
+            ok: false,
+            code: '1002_LINE_PROFILE_ERROR',
+            message: 'Failed to get LINE profile',
+          });
+          return;
+        }
+
+        const profile = await profileResponse.json();
+        const lineUserId = profile.userId;
+        const displayName = profile.displayName;
+        const pictureUrl = profile.pictureUrl;
+
+        logger.info('LINE 使用者資料已取得', {lineUserId, displayName});
+
+        // Step 3: 產生 Firebase Custom Token
         const customToken = await admin.auth().createCustomToken(lineUserId);
 
-        logger.info('Custom Token 已產生', {lineUserId});
+        // Step 4: 更新或建立 Firestore 使用者資料
+        const userRef = admin.firestore().collection('users').doc(lineUserId);
+        const userSnap = await userRef.get();
+
+        if (!userSnap.exists) {
+          // 新使用者
+          await userRef.set({
+            displayName: displayName,
+            lineUserId: lineUserId,
+            pictureUrl: pictureUrl,
+            roles: ['user'],
+            active: true,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          logger.info('新使用者已建立', {lineUserId});
+        } else {
+          // 更新現有使用者
+          await userRef.update({
+            displayName: displayName,
+            pictureUrl: pictureUrl,
+            lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+          });
+          logger.info('使用者登入時間已更新', {lineUserId});
+        }
 
         res.json({
           ok: true,
           firebaseCustomToken: customToken,
+          profile: {
+            lineUserId: lineUserId,
+            displayName: displayName,
+            pictureUrl: pictureUrl,
+          },
         });
       } catch (error) {
         logger.error('產生 Custom Token 失敗', error);

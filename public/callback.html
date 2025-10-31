@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE 登入處理中...</title>
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .callback-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 80vh;
+            text-align: center;
+        }
+        .spinner {
+            border: 4px solid rgba(138, 43, 226, 0.1);
+            border-left-color: #8a2be2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error-message {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="callback-container">
+            <div class="spinner"></div>
+            <h2>LINE 登入處理中...</h2>
+            <p>請稍候，正在完成登入流程</p>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { platformAuth } from '/js/firebase-init.js';
+        import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        async function handleCallback() {
+            try {
+                // 從 URL 取得授權碼
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                const state = urlParams.get('state');
+                const error = urlParams.get('error');
+
+                if (error) {
+                    throw new Error(`LINE 授權失敗: ${error}`);
+                }
+
+                if (!code) {
+                    throw new Error('未收到授權碼');
+                }
+
+                console.log('收到授權碼，準備交換 Firebase Token...');
+
+                // 呼叫 Cloud Function 交換 Firebase Custom Token
+                const functionUrl = 'https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken';
+                const redirectUri = window.location.origin + '/callback.html';
+
+                const response = await fetch(functionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        redirectUri: redirectUri
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!data.ok) {
+                    throw new Error(data.message || '登入失敗');
+                }
+
+                console.log('Firebase Custom Token 已取得，準備登入...');
+
+                // 使用 Custom Token 登入 Firebase
+                await signInWithCustomToken(platformAuth, data.firebaseCustomToken);
+
+                console.log('Firebase 登入成功！');
+
+                // 導向首頁（auth.js 會自動處理角色導向）
+                window.location.href = '/';
+
+            } catch (error) {
+                console.error('處理回調失敗:', error);
+                const errorDiv = document.getElementById('errorMessage');
+                errorDiv.textContent = error.message;
+                errorDiv.style.display = 'block';
+
+                // 3 秒後導回登入頁
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            }
+        }
+
+        handleCallback();
+    </script>
+</body>
+</html>

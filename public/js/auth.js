@@ -10,9 +10,6 @@ import {
 } from './firebase-init.js';
 
 import { 
-    signInWithPopup,
-    OAuthProvider,
-    signInWithCustomToken,
     onAuthStateChanged
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
@@ -27,8 +24,9 @@ import {
     httpsCallable
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
-// LINE OAuth Provider
-const lineProvider = new OAuthProvider('oidc.line');
+// LINE Login Web API 設定
+const LINE_CHANNEL_ID = '2008269293';
+const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
 
 // 監聽認證狀態
 onAuthStateChanged(platformAuth, async (user) => {
@@ -43,59 +41,29 @@ onAuthStateChanged(platformAuth, async (user) => {
 
 // 處理 LINE 登入
 async function handleLineLogin() {
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const loginBtn = document.getElementById('lineLoginBtn');
-    
     try {
-        loadingIndicator?.classList.remove('hidden');
-        loginBtn?.classList.add('hidden');
+        // 產生隨機 state 用於安全驗證
+        const state = Math.random().toString(36).substring(2, 15);
+        sessionStorage.setItem('line_login_state', state);
 
-        // 使用 LINE OAuth Provider
-        const result = await signInWithPopup(platformAuth, lineProvider);
-        const user = result.user;
-        
-        console.log('LINE 登入成功:', user.uid);
-        
-        // 更新使用者資料
-        await updateUserData(user);
+        // 構建 LINE 授權 URL
+        const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
+        lineAuthUrl.searchParams.append('response_type', 'code');
+        lineAuthUrl.searchParams.append('client_id', LINE_CHANNEL_ID);
+        lineAuthUrl.searchParams.append('redirect_uri', LINE_CALLBACK_URL);
+        lineAuthUrl.searchParams.append('state', state);
+        lineAuthUrl.searchParams.append('scope', 'profile openid');
+
+        // 導向 LINE 授權頁面
+        window.location.href = lineAuthUrl.toString();
         
     } catch (error) {
         console.error('LINE 登入失敗:', error);
         alert('登入失敗: ' + error.message);
-        loadingIndicator?.classList.add('hidden');
-        loginBtn?.classList.remove('hidden');
     }
 }
 
-// 更新使用者資料到 Firestore
-async function updateUserData(user) {
-    try {
-        const userRef = doc(platformDb, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (!userSnap.exists()) {
-            // 新使用者,建立基本資料
-            await setDoc(userRef, {
-                displayName: user.displayName || 'LINE 使用者',
-                lineUserId: user.providerData[0]?.uid || '',
-                email: user.email || '',
-                roles: ['user'], // V3 架構: 使用陣列
-                active: true,
-                createdAt: serverTimestamp(),
-                lastLogin: serverTimestamp()
-            });
-            console.log('新使用者資料已建立');
-        } else {
-            // 更新最後登入時間
-            await setDoc(userRef, {
-                lastLogin: serverTimestamp()
-            }, { merge: true });
-            console.log('使用者登入時間已更新');
-        }
-    } catch (error) {
-        console.error('更新使用者資料失敗:', error);
-    }
-}
+// 更新使用者資料功能已移至 Cloud Function (generateCustomToken)
 
 // 處理使用者登入後的導向
 async function handleUserLogin(user) {
