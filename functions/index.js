@@ -13,3 +13,4 @@ exports.updateUserRole = platformFunctions.updateUserRole;
 // 導出 Check-in Functions
 exports.initializeDefaultPatrols = checkinFunctions.initializeDefaultPatrols;
 exports.verifyCheckinDistance = checkinFunctions.verifyCheckinDistance;
+exports.verifyCheckinV2 = checkinFunctions.verifyCheckinV2;
