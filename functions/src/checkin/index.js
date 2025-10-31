@@ -219,7 +219,7 @@ exports.verifyCheckinDistance = onCall(
         }
         
         // GPS 模式：計算距離並驗證
-        const tolerance = patrolData.tolerance || 30; // 預設 30 公尺
+        const tolerance = patrolData.radius || 50; // 預設 50 公尺
         const distance = calculateDistance(
             lat,
             lng,
@@ -449,7 +449,7 @@ exports.verifyCheckinV2 = onRequest(
             patrolData.lng,
         );
 
-        const tolerance = patrolData.tolerance || 50;
+        const tolerance = patrolData.radius || 50;
 
         // 測試模式下總是允許簽到
         if (testMode || distance <= tolerance) {
