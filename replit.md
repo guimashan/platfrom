@@ -155,11 +155,26 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-10-31 LINE Login Web API 整合（方案 B）
+- ✅ 實作安全的 LINE Login Web API 整合
+  - 使用 crypto.randomUUID() 生成 CSRF-resistant state
+  - 在 callback 驗證 state 參數防止 CSRF 攻擊
+  - State 使用後立即清除防止重複使用
+- ✅ 更新 generateCustomToken Function
+  - 支援 LINE 授權碼交換
+  - 自動取得 LINE 使用者資料
+  - 產生 Firebase Custom Token
+  - 自動建立/更新 Firestore 使用者資料（roles 陣列）
+- ✅ 新增 callback.html 處理 LINE 授權回調
+- ✅ 更新 auth.js 使用 LINE Login Web API
+- ✅ 移除 Firebase OAuthProvider 依賴
+- ✅ 整合 LINE Secrets 管理（LINE_CHANNEL_ID, LINE_CHANNEL_SECRET）
+
 ### 2025-10-31 部署到生產環境
 - ✅ 前端推送到 GitHub (guimashan/platfrom)
 - ✅ Vercel 自動部署 (https://guimashan.vercel.app)
 - ✅ Platform Functions 部署到 platform-bc783
-  - generateCustomToken (LINE OAuth 支援)
+  - generateCustomToken (LINE Login Web API 整合)
   - updateUserRole (角色管理)
 - ✅ Check-in Functions 部署到 checkin-76c77
   - verifyCheckinDistance (GPS 簽到驗證)
