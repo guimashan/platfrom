@@ -31,3 +31,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# Attached assets (screenshots, internal docs)
+attached_assets/
