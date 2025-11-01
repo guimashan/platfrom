@@ -194,6 +194,16 @@
     justify-content: flex-end;
 }
 
+.filter-actions .btn {
+    margin-top: 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.filter-actions .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #D4AF37;
+}
+
 /* 表格樣式 */
 .data-table {
     width: 100%;
