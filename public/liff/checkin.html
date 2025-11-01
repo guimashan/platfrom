@@ -324,6 +324,15 @@
                     message: error.message,
                     stack: error.stack
                 });
+                // 显示详细错误信息到页面
+                const errorDiv = document.createElement('div');
+                errorDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ffebee;color:#c62828;padding:15px;font-size:12px;z-index:9999;max-height:50vh;overflow-y:auto;';
+                errorDiv.innerHTML = `
+                    <strong>🔍 调试信息：</strong><br>
+                    错误: ${error.message}<br>
+                    ${error.stack ? '堆栈: ' + error.stack.substring(0, 200) : ''}
+                `;
+                document.body.insertBefore(errorDiv, document.body.firstChild);
                 throw error;
             }
         }
