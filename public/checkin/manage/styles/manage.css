@@ -14,11 +14,12 @@
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .header h1 {
