@@ -7,6 +7,7 @@ const {onRequest} = require('firebase-functions/v2/https');
 const {defineSecret} = require('firebase-functions/params');
 const {logger} = require('firebase-functions');
 const line = require('@line/bot-sdk');
+const express = require('express');
 
 // LINE Messaging API 憑證 (需要在 Firebase Console 設定)
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
@@ -172,25 +173,23 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       return;
     }
 
-    // ✅ 生產環境已啟用簽名驗證
-    // 使用原始請求體進行簽名驗證
-    const bodyString = req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body);
+    // ✅ 使用原始請求體進行簽名驗證
+    // Cloud Functions v2 自動提供 req.rawBody (Buffer)
+    const body = req.rawBody.toString('utf8');
+    
     try {
-      const isValid = line.validateSignature(bodyString, channelSecret, signature);
+      const isValid = line.validateSignature(body, channelSecret, signature);
       if (!isValid) {
-        logger.error('❌ 簽名驗證失敗', {
-          bodyLength: bodyString.length,
-          signature: signature.substring(0, 20) + '...'
-        });
+        logger.error('❌ 簽名驗證失敗');
         res.status(401).send('Unauthorized: Invalid signature');
         return;
       }
+      logger.info('✅ Webhook 簽名驗證成功');
     } catch (error) {
       logger.error('❌ 簽名驗證錯誤:', error);
       res.status(401).send('Unauthorized: Signature validation error');
       return;
     }
-    logger.info('✅ Webhook 簽名驗證成功');
 
     // 處理事件
     const events = req.body.events || [];
