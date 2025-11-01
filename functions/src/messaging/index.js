@@ -7,6 +7,7 @@ const {onRequest} = require('firebase-functions/v2/https');
 const {defineSecret} = require('firebase-functions/params');
 const {logger} = require('firebase-functions');
 const crypto = require('crypto');
+const express = require('express');
 
 // LINE Messaging API 憑證 (需要在 Firebase Console 設定)
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
@@ -161,80 +162,121 @@ function handleTextMessage(text) {
 
 /**
  * LINE Messaging API Webhook 處理器
+ * 使用 Express 來保存原始請求體以驗證簽名
  */
+
+// 創建 Express 應用
+const app = express();
+
+// 使用 express.json() 並保存原始請求體
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf.toString('utf8');
+  },
+}));
+
+// Webhook 路由
+app.post('/', async (req, res) => {
+  try {
+    // 獲取簽名
+    const signature = req.headers['x-line-signature'];
+
+    if (!signature) {
+      logger.error('缺少 x-line-signature header');
+      res.status(401).send('Unauthorized: Missing signature');
+      return;
+    }
+
+    // 驗證簽名（使用原始請求體）
+    const isValid = validateSignature(
+        req.rawBody,
+        signature,
+        lineChannelSecret.value(),
+    );
+
+    if (!isValid) {
+      logger.error('簽名驗證失敗');
+      res.status(401).send('Unauthorized: Invalid signature');
+      return;
+    }
+
+    logger.info('簽名驗證成功');
+
+    // 處理事件
+    const events = req.body.events || [];
+
+    // LINE 驗證請求會發送空事件列表
+    if (events.length === 0) {
+      logger.info('收到空事件列表（LINE 驗證請求）');
+      res.status(200).send('OK');
+      return;
+    }
+
+    // 處理每個事件
+    for (const event of events) {
+      logger.info('處理事件:', {
+        type: event.type,
+        source: event.source,
+      });
+
+      // 處理文字訊息事件
+      if (event.type === 'message' && event.message.type === 'text') {
+        const replyToken = event.replyToken;
+        const userMessage = event.message.text;
+
+        logger.info('收到文字訊息:', userMessage);
+
+        // 產生回覆訊息
+        const replyContent = handleTextMessage(userMessage);
+
+        // 回覆給用戶
+        await replyMessage(
+            replyToken,
+            [replyContent],
+            lineChannelAccessToken.value(),
+        );
+
+        logger.info('已回覆訊息');
+      }
+
+      // 處理加入好友事件
+      if (event.type === 'follow') {
+        const replyToken = event.replyToken;
+
+        logger.info('用戶加入好友');
+
+        await replyMessage(
+            replyToken,
+            [
+              {
+                type: 'text',
+                text: '歡迎使用龜馬山 goLine 平台！\n\n' +
+                      '您可以輸入以下指令：\n' +
+                      '• 「奉香簽到」- 開啟簽到系統\n' +
+                      '• 「神務服務」- 開啟服務系統\n' +
+                      '• 「排班系統」- 開啟排班系統\n' +
+                      '• 「幫助」- 顯示說明',
+              },
+            ],
+            lineChannelAccessToken.value(),
+        );
+      }
+    }
+
+    res.status(200).send('OK');
+  } catch (error) {
+    logger.error('處理 Webhook 失敗:', error);
+    logger.error('Error stack:', error.stack);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// 導出 Cloud Function
 exports.lineWebhook = onRequest(
     {
       region: 'asia-east2',
       secrets: [lineChannelSecret, lineChannelAccessToken],
+      cors: true,
     },
-    async (req, res) => {
-      // 只接受 POST 請求
-      if (req.method !== 'POST') {
-        res.status(405).send('Method Not Allowed');
-        return;
-      }
-
-      try {
-        // 驗證簽名
-        const signature = req.headers['x-line-signature'];
-        const body = JSON.stringify(req.body);
-
-        if (!validateSignature(body, signature, lineChannelSecret.value())) {
-          logger.error('Invalid signature');
-          res.status(401).send('Unauthorized');
-          return;
-        }
-
-        // 處理事件
-        const events = req.body.events || [];
-
-        for (const event of events) {
-          logger.info('收到事件:', event);
-
-          // 只處理訊息事件
-          if (event.type === 'message' && event.message.type === 'text') {
-            const replyToken = event.replyToken;
-            const userMessage = event.message.text;
-
-            // 產生回覆訊息
-            const replyMessage_content = handleTextMessage(userMessage);
-
-            // 回覆給用戶
-            await replyMessage(
-                replyToken,
-                [replyMessage_content],
-                lineChannelAccessToken.value(),
-            );
-
-            logger.info('已回覆訊息');
-          }
-
-          // 處理加入好友事件
-          if (event.type === 'follow') {
-            const replyToken = event.replyToken;
-
-            await replyMessage(
-                replyToken,
-                [
-                  {
-                    type: 'text',
-                    text: '歡迎使用龜馬山 goLine 平台！\n\n' +
-                          '您可以輸入以下指令：\n' +
-                          '• 「奉香簽到」- 開啟簽到系統\n' +
-                          '• 「神務服務」- 開啟服務系統\n' +
-                          '• 「排班系統」- 開啟排班系統\n' +
-                          '• 「幫助」- 顯示說明',
-                  },
-                ],
-                lineChannelAccessToken.value(),
-            );
-          }
-        }
-
-        res.status(200).send('OK');
-      } catch (error) {
-        logger.error('處理 Webhook 失敗:', error);
-        res.status(500).send('Internal Server Error');
-      }
-    },
+    app,
 );

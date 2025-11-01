@@ -32,14 +32,18 @@
    ```
 6. 点击 **Update** 保存
 
-### 步骤 2：设置 Messaging API Webhook
+### 步骤 2：设置 Messaging API Webhook ✅ 已修复
 
 1. 前往您的 **Messaging API Channel** (ID: 2008221557)
 2. 点击 **Messaging API** 标签
 3. 在 **Webhook settings** 区域：
-   - **Webhook URL**: 输入
+   - **Webhook URL**: 输入以下任一 URL（两个都可以使用）：
      ```
      https://asia-east2-platform-bc783.cloudfunctions.net/lineWebhook
+     ```
+     或
+     ```
+     https://linewebhook-4yprhpbawa-df.a.run.app
      ```
    - 点击 **Update**
    - 点击 **Verify** 验证（应该显示成功 ✅）
