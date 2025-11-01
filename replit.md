@@ -209,11 +209,17 @@ npm run emulators
   - 支援發送訊息到聊天室
 - ✅ 建立 LINE Messaging API Webhook
   - functions/src/messaging/index.js
-  - lineWebhook Function (asia-east2)
+  - lineWebhook Function 已部署 (asia-east2)
+  - Webhook URL: https://asia-east2-platform-bc783.cloudfunctions.net/lineWebhook
   - 支援關鍵字回覆 LIFF URL
   - 關鍵字：奉香簽到、神務服務、排班系統、幫助
+- ✅ 配置完成
+  - LIFF ID: 2008269293-Nl2pZBpV（已更新到代碼）
+  - Messaging API Channel ID: 2008221557
+  - Firebase Secrets 已設定（LINE_MESSAGING_CHANNEL_SECRET, LINE_MESSAGING_ACCESS_TOKEN）
 - ✅ 完整設定文件
   - LIFF_SETUP_GUIDE.md - 詳細設定步驟
+  - LINE_配置清單.md - 簡易配置清單
   - 包含測試和疑難排解指南
 
 ### 2025-11-01 完整平台架構重構（第一、二階段樣本）

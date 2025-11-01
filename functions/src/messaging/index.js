@@ -12,11 +12,11 @@ const crypto = require('crypto');
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 
-// LIFF App IDs (部署後需要更新這些值)
+// LIFF App IDs
 const LIFF_IDS = {
-  checkin: process.env.LIFF_CHECKIN_ID || '2008269293-AbcdEfgh',
-  service: process.env.LIFF_SERVICE_ID || '2008269293-12345678',
-  schedule: process.env.LIFF_SCHEDULE_ID || '2008269293-87654321',
+  checkin: '2008269293-Nl2pZBpV',
+  service: '2008269293-Nl2pZBpV', // 暫用簽到 LIFF，建議另建專屬 LIFF App
+  schedule: '2008269293-Nl2pZBpV', // 暫用簽到 LIFF，建議另建專屬 LIFF App
 };
 
 /**
