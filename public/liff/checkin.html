@@ -392,12 +392,16 @@
                 if (result.ok) {
                     status.innerHTML = `<p style="color: #10b981;">✅ 簽到成功！${selectedPatrol.name}</p>`;
                     
-                    // 发送消息到 LINE 聊天
+                    // 尝试发送消息到 LINE 聊天（如果失败也不影响签到）
                     if (liff.isInClient()) {
-                        await liff.sendMessages([{
-                            type: 'text',
-                            text: `✅ 簽到成功！\n地點：${selectedPatrol.name}\n時間：${new Date().toLocaleString('zh-TW')}`
-                        }]);
+                        try {
+                            await liff.sendMessages([{
+                                type: 'text',
+                                text: `✅ 簽到成功！\n地點：${selectedPatrol.name}\n時間：${new Date().toLocaleString('zh-TW')}`
+                            }]);
+                        } catch (sendError) {
+                            console.log('發送訊息失敗（不影響簽到）:', sendError.message);
+                        }
                     }
                     
                     setTimeout(() => closeLiffWindow(), 2000);
