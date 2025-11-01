@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神務服務 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-left">
+                <h1>📋 神務服務</h1>
+                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: #666;"></p>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="window.location.href='/'">🏠 首頁</button>
+                <button id="logoutBtn" class="btn-logout">登出</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="welcome-card" style="text-align: center; padding: 60px 20px;">
+                <h2 style="font-size: 48px; margin-bottom: 20px;">🚧</h2>
+                <h3 style="color: #666; margin-bottom: 30px;">神務服務系統開發中</h3>
+                <p style="color: #999; line-height: 1.8;">
+                    此模組將提供法會報名、服務單管理等功能<br>
+                    預計於第三階段開發完成
+                </p>
+                <button class="btn btn-primary" onclick="window.location.href='/'" style="margin-top: 30px;">
+                    返回首頁
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAuth, logout } from '/js/auth-guard.js';
+
+        (async function init() {
+            try {
+                const { userData } = await checkAuth({
+                    requiredRoles: ['poweruser', 'admin_service', 'superadmin'],
+                    onSuccess: ({ userData }) => {
+                        const userName = document.getElementById('userName');
+                        if (userName) {
+                            userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
+                        }
+                    }
+                });
+
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+
+            } catch (error) {
+                console.error('初始化失敗:', error);
+            }
+        })();
+    </script>
+</body>
+</html>

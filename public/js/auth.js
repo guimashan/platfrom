@@ -91,23 +91,113 @@ async function handleUserLogin(user) {
 
 // 根據角色導向
 function redirectByRole(roles) {
-    // 如果在首頁,根據角色導向
-    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-        if (roles.includes('superadmin')) {
-            window.location.href = '/admin/dashboard.html';
-        } else if (roles.includes('admin_checkin') || roles.includes('admin_service') || roles.includes('admin_schedule')) {
-            window.location.href = '/admin/index.html';
-        } else if (roles.includes('poweruser')) {
-            window.location.href = '/service/index.html';
-        } else {
-            window.location.href = '/checkin/index.html';
+    const currentPath = window.location.pathname;
+    
+    // 如果在首頁,顯示模組選單而不是自動導向
+    if (currentPath === '/' || currentPath === '/index.html') {
+        showModuleGrid(roles);
+        return;
+    }
+}
+
+// 顯示模組選單
+function showModuleGrid(roles) {
+    const loginCard = document.getElementById('loginCard');
+    const moduleGrid = document.getElementById('moduleGrid');
+    const userInfo = document.getElementById('userInfo');
+    
+    if (loginCard) loginCard.style.display = 'none';
+    if (moduleGrid) moduleGrid.classList.add('active');
+    if (userInfo) {
+        userInfo.classList.add('active');
+        updateUserInfo();
+    }
+    
+    // 根據角色控制可見模組
+    const modules = document.querySelectorAll('.module-card');
+    modules.forEach(card => {
+        const module = card.dataset.module;
+        let canAccess = false;
+        
+        if (module === 'checkin') {
+            canAccess = true;
+        } else if (module === 'service') {
+            canAccess = roles.includes('poweruser') || roles.includes('admin_service') || roles.includes('superadmin');
+        } else if (module === 'schedule') {
+            canAccess = roles.includes('admin_schedule') || roles.includes('superadmin');
+        } else if (module === 'manage') {
+            canAccess = roles.includes('admin_checkin') || roles.includes('admin_service') || 
+                       roles.includes('admin_schedule') || roles.includes('superadmin');
         }
+        
+        if (canAccess) {
+            card.style.display = 'block';
+            card.addEventListener('click', () => handleModuleClick(module));
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// 處理模組點擊
+function handleModuleClick(module) {
+    const routes = {
+        'checkin': '/checkin/index.html',
+        'service': '/service/index.html',
+        'schedule': '/schedule/index.html',
+        'manage': '/manage/index.html'
+    };
+    
+    if (routes[module]) {
+        window.location.href = routes[module];
+    }
+}
+
+// 更新使用者資訊顯示
+async function updateUserInfo() {
+    try {
+        const user = platformAuth.currentUser;
+        if (!user) return;
+        
+        const userRef = doc(platformDb, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+            const userData = userSnap.data();
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const userRoles = document.getElementById('userRoles');
+            
+            if (userName) userName.textContent = userData.displayName || '使用者';
+            if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.png';
+            if (userRoles) {
+                const roleNames = {
+                    'user': '一般使用者',
+                    'poweruser': '進階使用者',
+                    'admin_checkin': '簽到管理員',
+                    'admin_service': '神務管理員',
+                    'admin_schedule': '排班管理員',
+                    'superadmin': '超級管理員'
+                };
+                const roles = userData.roles || ['user'];
+                const roleText = roles.map(r => roleNames[r] || r).join(', ');
+                userRoles.textContent = `權限: ${roleText}`;
+            }
+        }
+    } catch (error) {
+        console.error('更新使用者資訊失敗:', error);
     }
 }
 
 // 顯示登入頁面
 function showLoginPage() {
-    // 已在首頁,不需要重定向
+    const loginCard = document.getElementById('loginCard');
+    const moduleGrid = document.getElementById('moduleGrid');
+    const userInfo = document.getElementById('userInfo');
+    
+    if (loginCard) loginCard.style.display = 'block';
+    if (moduleGrid) moduleGrid.classList.remove('active');
+    if (userInfo) userInfo.classList.remove('active');
 }
 
 // 登出功能
@@ -120,11 +210,17 @@ export async function logout() {
     }
 }
 
-// 綁定登入按鈕事件
+// 綁定事件
 document.addEventListener('DOMContentLoaded', () => {
     const loginBtn = document.getElementById('lineLoginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
     if (loginBtn) {
         loginBtn.addEventListener('click', handleLineLogin);
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
     }
 });
 

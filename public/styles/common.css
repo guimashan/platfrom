@@ -148,6 +148,146 @@ body {
     color: white;
 }
 
+/* 新增：次要按鈕樣式 */
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger, .btn-logout {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover, .btn-logout:hover {
+    background: #c82333;
+}
+
+/* 新增：Header 樣式優化 */
+.header-left h1,
+.header-left p {
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* 新增：管理容器樣式 */
+.manage-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* 新增：功能卡片樣式 */
+.function-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.function-card {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.function-card:hover:not(.disabled) {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.2);
+    border-color: var(--primary-color);
+}
+
+.function-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.function-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.function-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.function-desc {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.function-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--success-color);
+    color: white;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.function-card.disabled .function-badge {
+    background: #999;
+}
+
+/* 新增：使用者資訊樣式 */
+.user-info {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-details h3 {
+    margin: 0 0 5px 0;
+    color: #333;
+}
+
+.user-roles {
+    color: #666;
+    font-size: 14px;
+}
+
 /* 響應式設計 */
 @media (max-width: 768px) {
     .header h1 {
@@ -160,5 +300,20 @@ body {
     
     .welcome-card {
         padding: 2rem 1.5rem;
+    }
+    
+    .page-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+    
+    .function-grid {
+        grid-template-columns: 1fr;
     }
 }

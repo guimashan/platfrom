@@ -11,8 +11,14 @@
 <body>
     <div class="container">
         <header class="header">
-            <h1>奉香簽到</h1>
-            <button id="logoutBtn" class="btn-logout">登出</button>
+            <div class="header-left">
+                <h1>🙏 奉香簽到</h1>
+                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: #666;"></p>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="window.location.href='/'">🏠 首頁</button>
+                <button id="logoutBtn" class="btn-logout">登出</button>
+            </div>
         </header>
 
         <main class="main-content">

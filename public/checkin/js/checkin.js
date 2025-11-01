@@ -3,8 +3,8 @@
  * 處理 GPS 簽到功能
  */
 
-import { platformAuth, checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
+import { checkAuth, logout, displayUserInfo } from '/js/auth-guard.js';
 import { 
     collection, 
     getDocs, 
@@ -12,23 +12,41 @@ import {
     orderBy 
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
-import { logout } from '/js/auth.js';
 
 let currentUser = null;
 let patrols = [];
 let html5QrcodeScanner = null;
-let currentMode = 'gps'; // 'gps' or 'qr'
+let currentMode = 'gps';
 
-// 監聽認證狀態
-onAuthStateChanged(platformAuth, async (user) => {
-    if (!user) {
-        window.location.href = '/';
-        return;
+// 初始化頁面
+(async function init() {
+    try {
+        const { user, userData } = await checkAuth({
+            requiredRoles: ['user', 'poweruser', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
+            onSuccess: ({ user, userData }) => {
+                currentUser = user;
+                const userName = document.getElementById('userName');
+                if (userName) {
+                    userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
+                }
+            }
+        });
+        
+        await loadPatrols();
+        initializeModeSwitch();
+        initializeLogoutButton();
+        
+    } catch (error) {
+        console.error('初始化失敗:', error);
     }
-    currentUser = user;
-    await loadPatrols();
-    initializeModeSwitch();
-});
+})();
+
+function initializeLogoutButton() {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+}
 
 // 載入巡邏點列表
 async function loadPatrols() {

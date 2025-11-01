@@ -47,23 +47,41 @@
 ```
 .
 ├── public/                 # 前端靜態文件
-│   ├── index.html         # 登入首頁
-│   ├── checkin/           # 奉香簽到模組
-│   ├── service/           # 神服服務模組 (待開發)
-│   ├── schedule/          # 排班系統模組 (待開發)
-│   ├── admin/             # 管理後台
+│   ├── index.html         # 統一 LINE Login 入口 + 模組選單
+│   ├── callback.html      # LINE OAuth 回調處理
+│   ├── manage/            # 後台管理總覽
+│   │   └── index.html     # 管理模組選單
+│   ├── checkin/           # 奉香簽到模組（第一階段樣本）
+│   │   ├── index.html     # 簽到前端
+│   │   ├── history.html   # 簽到紀錄
+│   │   ├── manage/        # 簽到後台（第二階段樣本）
+│   │   │   ├── index.html      # 後台入口
+│   │   │   ├── dashboard.html  # 儀表板
+│   │   │   ├── patrol.html     # 巡邏點管理
+│   │   │   └── user.html       # 使用者管理
+│   │   ├── js/            # 簽到 JavaScript
+│   │   └── styles/        # 簽到樣式
+│   ├── service/           # 神務服務模組（第三階段）
+│   │   └── index.html     # 服務前端（樣板）
+│   ├── schedule/          # 排班系統模組（第四階段）
+│   │   └── index.html     # 排班前端（樣板）
 │   ├── js/                # 共用 JavaScript
+│   │   ├── firebase-init.js    # Firebase 初始化
+│   │   ├── auth.js            # LINE Login 處理
+│   │   └── auth-guard.js      # 共用認證模組 ⭐
 │   └── styles/            # 共用樣式
+│       └── common.css     # 通用樣式
 ├── functions/             # Cloud Functions
 │   ├── src/
 │   │   ├── platform/      # Platform Functions
+│   │   │   └── index.js   # LINE OAuth + Custom Token
 │   │   ├── checkin/       # Check-in Functions
+│   │   │   └── index.js   # GPS 簽到驗證
 │   │   ├── service/       # Service Functions (待開發)
 │   │   └── schedule/      # Schedule Functions (待開發)
 │   └── index.js           # Functions 入口點
 ├── firebase.json          # Firebase 配置
 └── package.json           # 專案依賴
-
 ```
 
 ## 開發環境
@@ -90,12 +108,12 @@ npm run emulators
 
 ## 功能模組狀態
 
-### ✅ 已完成
-1. **專案架構設定**
-   - Node.js 20.x 環境
-   - Firebase 配置
-   - 前端目錄結構
-   - Functions 基礎架構
+### ✅ 第一、二階段已完成（樣本）
+1. **統一平台架構**
+   - LINE OAuth 2.0 登入入口
+   - 模組選單系統（角色控制）
+   - 後台管理總覽
+   - 共用認證守衛 (auth-guard.js)
 
 2. **Platform 模組 (平台層)**
    - LINE OAuth 2.0 登入整合
@@ -103,25 +121,31 @@ npm run emulators
    - 角色導向系統
    - updateUserRole Function (支援 roles 陣列)
 
-3. **Check-in 模組 (奉香簽到)**
-   - GPS 簽到前端介面
-   - 巡邏點選擇
-   - verifyCheckinDistance Function
-   - Haversine 距離計算
-   - 簽到紀錄查詢
+2. **奉香簽到模組（完整樣本）**
+   - **前端（第一階段）**:
+     - GPS 雙模式簽到（GPS + QR Code）
+     - 巡邏點選擇
+     - 簽到紀錄查詢
+   - **後台（第二階段）**:
+     - 儀表板（統計分析、CSV 匯出）
+     - 巡邏點管理（CRUD、測試模式、QR Code）
+     - 使用者管理（角色權限）
 
-4. **管理後台**
-   - 動態儀表板 (根據 roles 顯示模組)
-   - 基本導航結構
+3. **Cloud Functions**
+   - Platform: LINE Token Exchange + Custom Token
+   - Check-in: GPS 距離驗證（Haversine）
 
-### 🚧 進行中
-- 巡邏點管理介面 (admin_checkin 可新增/編輯巡邏點)
+### 📋 第三、四階段待開發
+- **Service 模組（第三階段）**
+  - 法會報名系統
+  - 服務單管理
+  - 參與統計
+- **Schedule 模組（第四階段）**
+  - 志工排班
+  - 出勤統計
+  - 班表調整
 
-### 📋 待開發
-- Service 模組 (神服服務)
-- Schedule 模組 (排班系統)
-- 使用者角色管理介面
-- Firebase Emulator 完整設定
+**注意**: Service 和 Schedule 模組已預留架構，可複製 Check-in 樣板快速開發
 
 ## 用戶偏好
 
@@ -154,6 +178,31 @@ npm run emulators
 - Callback URL: https://go.guimashan.org.tw/__/auth/handler
 
 ## 最近變更
+
+### 2025-11-01 完整平台架構重構（第一、二階段樣本）
+- ✅ 重構統一 LINE Login 入口頁面 (/index.html)
+  - 登入後顯示模組選單（根據角色控制可見性）
+  - 顯示使用者資訊和頭像
+  - 支援四個模組：奉香簽到、神務服務、排班系統、系統管理
+- ✅ 建立後台管理總覽 (/manage/index.html)
+  - 根據管理員角色顯示可管理的模組
+  - 提供快速導航至各模組管理頁面
+- ✅ 建立共用認證模組 (auth-guard.js)
+  - 提供 checkAuth 函數進行統一認證檢查
+  - 支援角色權限驗證
+  - 可複製至其他模組使用
+- ✅ 重構奉香簽到模組
+  - 前端 (/checkin/index.html) 整合 auth-guard
+  - 後台入口 (/checkin/manage/index.html) 使用統一認證
+  - 後台包含：儀表板、巡邏點管理、使用者管理
+- ✅ 建立模組樣板
+  - Service 模組前端 (/service/index.html)
+  - Schedule 模組前端 (/schedule/index.html)
+  - 為第三、四階段預留標準架構
+- ✅ 優化共用樣式 (common.css)
+  - 新增管理頁面樣式
+  - 新增功能卡片樣式
+  - 支援響應式設計
 
 ### 2025-10-31 LINE Login Web API 整合（方案 B）
 - ✅ 實作安全的 LINE Login Web API 整合

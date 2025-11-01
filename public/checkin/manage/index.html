@@ -6,103 +6,106 @@
     <title>奉香簽到管理 - 龜馬山 goLine</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
-        }
-
-        .auth-card {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-
-        .auth-card h1 {
-            margin: 0 0 1rem 0;
-            color: #333;
-            font-size: 2rem;
-        }
-
-        .auth-card .subtitle {
-            color: #666;
-            margin-bottom: 2rem;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 2rem auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .error-message {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin: 2rem 0;
-            border-left: 4px solid #f5c6cb;
-        }
-
-        .error-message h3 {
-            margin: 0 0 0.5rem 0;
-        }
-
-        .back-link {
-            margin-top: 2rem;
-        }
-
-        .back-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="/checkin/manage/styles/manage.css">
 </head>
 <body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <h1>🛡️ 奉香簽到管理</h1>
-            <p class="subtitle">正在驗證您的身份...</p>
-            
-            <div id="loadingArea">
-                <div class="loading-spinner"></div>
-                <p>請稍候</p>
+    <div class="manage-container">
+        <div class="page-header">
+            <div class="header-left">
+                <h1>🙏 奉香簽到管理</h1>
+                <p style="color: #666; margin: 5px 0 0 0;">管理巡邏點、查看統計、管理使用者</p>
             </div>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="window.location.href='/manage/index.html'">
+                    ⚙️ 管理首頁
+                </button>
+                <button class="btn-secondary" onclick="window.location.href='/'">
+                    🏠 首頁
+                </button>
+                <button id="logoutBtn" class="btn-danger">登出</button>
+            </div>
+        </div>
 
-            <div id="errorArea" style="display: none;">
-                <div class="error-message">
-                    <h3>⚠️ 權限不足</h3>
-                    <p id="errorMessage"></p>
-                </div>
-                <div class="back-link">
-                    <a href="/">← 返回首頁</a>
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p>載入管理功能...</p>
+        </div>
+
+        <div id="userInfo" class="user-info" style="display: none;">
+            <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+            <div class="user-details">
+                <h3 id="userName"></h3>
+                <div id="userRoles" class="user-roles"></div>
+            </div>
+        </div>
+
+        <div id="manageContent" class="manage-content" style="display: none;">
+            <div class="function-grid">
+                <a href="/checkin/manage/dashboard.html" class="function-card">
+                    <div class="function-icon">📊</div>
+                    <div class="function-title">儀表板</div>
+                    <div class="function-desc">簽到統計與數據分析</div>
+                    <div class="function-badge">✓ 已上線</div>
+                </a>
+
+                <a href="/checkin/manage/patrol.html" class="function-card">
+                    <div class="function-icon">📍</div>
+                    <div class="function-title">巡邏點管理</div>
+                    <div class="function-desc">新增、編輯、刪除巡邏點</div>
+                    <div class="function-badge">✓ 已上線</div>
+                </a>
+
+                <a href="/checkin/manage/user.html" class="function-card">
+                    <div class="function-icon">👥</div>
+                    <div class="function-title">使用者管理</div>
+                    <div class="function-desc">管理使用者角色權限</div>
+                    <div class="function-badge">✓ 已上線</div>
+                </a>
+
+                <div class="function-card disabled">
+                    <div class="function-icon">📋</div>
+                    <div class="function-title">簽到紀錄</div>
+                    <div class="function-desc">詳細簽到記錄管理</div>
+                    <div class="function-badge">開發中</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="/checkin/manage/js/auth-check.js"></script>
+    <script type="module">
+        import { checkAuth, logout, displayUserInfo } from '/js/auth-guard.js';
+
+        (async function init() {
+            try {
+                const { user, userData, roles } = await checkAuth({
+                    requiredRoles: ['admin_checkin', 'superadmin'],
+                    onSuccess: ({ userData }) => {
+                        const userInfo = document.getElementById('userInfo');
+                        const userName = document.getElementById('userName');
+                        const userAvatar = document.getElementById('userAvatar');
+                        const userRoles = document.getElementById('userRoles');
+
+                        displayUserInfo(userData, {
+                            nameElement: userName,
+                            avatarElement: userAvatar,
+                            rolesElement: userRoles
+                        });
+
+                        userInfo.style.display = 'flex';
+                    }
+                });
+
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('manageContent').style.display = 'block';
+
+                document.getElementById('logoutBtn').addEventListener('click', logout);
+
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                document.getElementById('loadingIndicator').innerHTML = 
+                    '<p style="color: #dc3545;">⚠️ 載入失敗: ' + error.message + '</p>';
+            }
+        })();
+    </script>
 </body>
 </html>
