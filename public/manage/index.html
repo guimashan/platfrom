@@ -278,9 +278,22 @@
                 );
 
                 if (accessibleModules.length === 0) {
-                    document.getElementById('loadingIndicator').innerHTML = 
-                        '<p style="color: #dc3545;">⚠️ 您沒有管理權限</p>' +
-                        '<button class="btn btn-home" onclick="window.location.href=\'/\'">回首頁</button>';
+                    document.getElementById('loadingIndicator').innerHTML = `
+                        <div style="background: white; padding: 3rem; border-radius: var(--radius-lg); max-width: 500px; margin: 2rem auto; text-align: center; box-shadow: var(--shadow-md);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+                            <h2 style="color: var(--primary-gold-dark); margin-bottom: 1rem;">無權限訪問</h2>
+                            <p style="color: var(--text-secondary); margin-bottom: 2rem; line-height: 1.6;">
+                                您目前沒有任何模組的管理權限。<br>
+                                如需申請權限，請聯繫系統管理員。
+                            </p>
+                            <div style="display: flex; gap: 1rem; justify-content: center;">
+                                <button class="btn btn-primary" onclick="window.location.href='/'">
+                                    🏠 回到首頁
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    document.getElementById('userInfo').style.display = 'flex';
                     return;
                 }
 
