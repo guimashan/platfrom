@@ -61,7 +61,7 @@ async function handleLineLogin() {
         lineAuthUrl.searchParams.append('client_id', LINE_CHANNEL_ID);
         lineAuthUrl.searchParams.append('redirect_uri', LINE_CALLBACK_URL);
         lineAuthUrl.searchParams.append('state', state);
-        lineAuthUrl.searchParams.append('scope', 'profile openid');
+        lineAuthUrl.searchParams.append('scope', 'profile openid email');
 
         // 導向 LINE 授權頁面
         window.location.href = lineAuthUrl.toString();

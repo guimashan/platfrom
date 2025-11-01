@@ -68,6 +68,7 @@ exports.generateCustomToken = onRequest(
 
         const tokenData = await tokenResponse.json();
         const accessToken = tokenData.access_token;
+        const idToken = tokenData.id_token;
 
         // Step 2: 使用 Access Token 取得使用者資料
         const profileResponse = await fetch('https://api.line.me/v2/profile', {
@@ -91,7 +92,32 @@ exports.generateCustomToken = onRequest(
         const displayName = profile.displayName;
         const pictureUrl = profile.pictureUrl || null;
 
-        logger.info('LINE 使用者資料已取得', {lineUserId, displayName});
+        // Step 2.5: 驗證 ID Token 並取得 Email (如果有請求 email scope)
+        let userEmail = null;
+        if (idToken) {
+          try {
+            const verifyResponse = await fetch('https://api.line.me/oauth2/v2.1/verify', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams({
+                id_token: idToken,
+                client_id: lineChannelId.value(),
+              }),
+            });
+
+            if (verifyResponse.ok) {
+              const verifyData = await verifyResponse.json();
+              userEmail = verifyData.email || null;
+              logger.info('從 ID Token 取得 Email', {email: userEmail});
+            }
+          } catch (emailError) {
+            logger.warn('無法取得 Email', emailError);
+          }
+        }
+
+        logger.info('LINE 使用者資料已取得', {lineUserId, displayName, email: userEmail});
 
         // Step 3: 取得或建立使用者資料（需要先取得 roles）
         const userRef = admin.firestore().collection('users').doc(lineUserId);
@@ -117,9 +143,14 @@ exports.generateCustomToken = onRequest(
             userData.pictureUrl = pictureUrl;
           }
           
+          // 只在有 Email 時才加入 email
+          if (userEmail) {
+            userData.email = userEmail;
+          }
+          
           await userRef.set(userData);
           userRoles = ['user'];
-          logger.info('新使用者已建立', {lineUserId, roles: userRoles});
+          logger.info('新使用者已建立', {lineUserId, roles: userRoles, email: userEmail});
         } else {
           // 更新現有使用者
           const userData = userSnap.data();
@@ -135,8 +166,13 @@ exports.generateCustomToken = onRequest(
             updateData.pictureUrl = pictureUrl;
           }
           
+          // 只在有 Email 時才更新 email
+          if (userEmail) {
+            updateData.email = userEmail;
+          }
+          
           await userRef.update(updateData);
-          logger.info('使用者登入時間已更新', {lineUserId, roles: userRoles});
+          logger.info('使用者登入時間已更新', {lineUserId, roles: userRoles, email: userEmail});
         }
         
         // Step 5: 產生包含 roles 的 Firebase Custom Token
