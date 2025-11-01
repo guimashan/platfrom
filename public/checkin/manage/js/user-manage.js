@@ -364,8 +364,13 @@ window.viewUserStats = viewUserStats;
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    document.getElementById('refreshBtn')?.addEventListener('click', loadUsers);
+    document.getElementById('searchBtn')?.addEventListener('click', filterUsers);
     document.getElementById('searchInput')?.addEventListener('input', filterUsers);
+    document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            filterUsers();
+        }
+    });
     document.getElementById('closeModal')?.addEventListener('click', closeEditModal);
     document.getElementById('cancelBtn')?.addEventListener('click', closeEditModal);
     document.getElementById('editUserForm')?.addEventListener('submit', saveUserChanges);
