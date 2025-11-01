@@ -1,15 +1,20 @@
-/* 龜馬山 goLine 平台 - 共用樣式 */
+/* 龜馬山 goLine 平台 - Hi-fi UI 金配色主題 */
 
 :root {
-    --primary-color: #8A2BE2;
-    --secondary-color: #FFD700;
+    --primary-gold: #D4AF37;
+    --primary-gold-dark: #B8941F;
+    --primary-gold-light: #E8C547;
+    --bg-cream: #F5F0E8;
     --bg-white: #FFFFFF;
-    --bg-gray: #F5F5F5;
-    --success-color: #2ECC71;
-    --error-color: #E74C3C;
-    --warning-color: #F1C40F;
-    --text-primary: #333333;
-    --text-secondary: #666666;
+    --bg-card: #FFF9F0;
+    --text-primary: #2C2416;
+    --text-secondary: #6B5D4F;
+    --shadow-sm: 0 2px 8px rgba(212, 175, 55, 0.1);
+    --shadow-md: 0 4px 16px rgba(212, 175, 55, 0.15);
+    --shadow-lg: 0 8px 24px rgba(212, 175, 55, 0.2);
+    --radius-sm: 12px;
+    --radius-md: 16px;
+    --radius-lg: 20px;
 }
 
 * {
@@ -19,198 +24,274 @@
 }
 
 body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background-color: var(--bg-gray);
+    font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--bg-cream);
     color: var(--text-primary);
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
 }
 
 .container {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-color: var(--bg-cream);
 }
 
+/* 頂部導航欄 */
 .header {
-    background: linear-gradient(135deg, var(--primary-color), #6A1BB2);
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
     color: white;
-    padding: 2rem;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 1.5rem;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .header h1 {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 0;
 }
 
-.subtitle {
-    font-size: 1rem;
+.header-left h1 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.header-left p {
+    margin: 0.25rem 0 0 0;
+    font-size: 0.9rem;
     opacity: 0.9;
 }
 
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    opacity: 0.95;
+    margin-top: 0.25rem;
+}
+
+/* 主內容區 */
 .main-content {
     flex: 1;
-    padding: 2rem;
+    padding: 1.5rem;
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
 }
 
+/* 歡迎卡片 */
 .welcome-card {
-    background: var(--bg-white);
-    border-radius: 12px;
-    padding: 3rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 3rem 2rem;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    margin-top: 3rem;
+    box-shadow: var(--shadow-md);
+    margin: 2rem auto;
+    max-width: 500px;
 }
 
 .welcome-card h2 {
-    color: var(--primary-color);
+    color: var(--primary-gold-dark);
     margin-bottom: 1rem;
+    font-size: 1.8rem;
 }
 
+/* 按鈕樣式 */
 .btn {
-    padding: 12px 32px;
+    padding: 0.875rem 1.75rem;
     border: none;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
+    font-family: 'Noto Sans TC', sans-serif;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.btn:active {
+    transform: scale(0.98);
 }
 
 .btn-primary {
-    background-color: #06C755;
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
     color: white;
     margin-top: 1.5rem;
 }
 
 .btn-primary:hover {
-    background-color: #05B04B;
+    background: linear-gradient(135deg, var(--primary-gold-light), var(--primary-gold));
+    box-shadow: var(--shadow-md);
 }
 
-.loading {
-    text-align: center;
-    padding: 2rem;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid var(--bg-gray);
-    border-top-color: var(--primary-color);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.hidden {
-    display: none !important;
-}
-
-.footer {
-    background-color: var(--text-primary);
-    color: white;
-    padding: 1.5rem;
-    text-align: center;
-}
-
-.alert {
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1rem 0;
-}
-
-.alert-success {
-    background-color: var(--success-color);
-    color: white;
-}
-
-.alert-error {
-    background-color: var(--error-color);
-    color: white;
-}
-
-.alert-warning {
-    background-color: var(--warning-color);
-    color: white;
-}
-
-/* 新增：次要按鈕樣式 */
 .btn-secondary {
-    background: #6c757d;
-    color: white;
+    background: white;
+    color: var(--primary-gold-dark);
+    border: 2px solid var(--primary-gold);
 }
 
 .btn-secondary:hover {
-    background: #5a6268;
+    background: var(--bg-card);
 }
 
 .btn-danger, .btn-logout {
-    background: #dc3545;
+    background: #8B4513;
     color: white;
 }
 
 .btn-danger:hover, .btn-logout:hover {
-    background: #c82333;
+    background: #6B3410;
 }
 
-/* 新增：Header 樣式優化 */
-.header-left h1,
-.header-left p {
-    margin: 0;
+/* 模組網格 */
+.module-grid {
+    display: none;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
 }
 
-.header-actions {
+.module-grid.active {
+    display: grid;
+}
+
+.module-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.module-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-gold);
+    background: white;
+}
+
+.module-icon {
+    font-size: 3rem;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
+}
+
+.module-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.module-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* 使用者資訊卡片 */
+.user-info {
+    background: white;
+    padding: 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 1rem;
 }
 
-/* 新增：管理容器樣式 */
+.user-info.active {
+    display: flex;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-gold);
+    box-shadow: var(--shadow-sm);
+}
+
+.user-details h3 {
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.user-roles {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* 管理容器 */
 .manage-container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 1.5rem;
     min-height: 100vh;
+    background-color: var(--bg-cream);
 }
 
 .page-header {
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+    color: white;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 2px solid var(--primary-color);
 }
 
-/* 新增：功能卡片樣式 */
+.page-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.page-header p {
+    margin: 0.25rem 0 0 0;
+    opacity: 0.95;
+    font-size: 0.9rem;
+}
+
+/* 功能網格 */
 .function-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
 }
 
 .function-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 2rem 1.5rem;
     text-align: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s ease;
     border: 2px solid transparent;
     text-decoration: none;
     color: inherit;
@@ -218,93 +299,184 @@ body {
 }
 
 .function-card:hover:not(.disabled) {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.2);
-    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-gold);
+    background: white;
 }
 
 .function-card.disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .function-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-gold);
 }
 
 .function-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 10px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
 }
 
 .function-desc {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 15px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.5;
 }
 
 .function-badge {
     display: inline-block;
-    padding: 4px 12px;
-    background: var(--success-color);
+    padding: 0.375rem 0.875rem;
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
     color: white;
-    border-radius: 12px;
-    font-size: 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
 }
 
 .function-card.disabled .function-badge {
     background: #999;
 }
 
-/* 新增：使用者資訊樣式 */
-.user-info {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 15px;
+/* 載入動畫 */
+.loading {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: var(--text-secondary);
 }
 
-.user-avatar {
+.spinner {
     width: 50px;
     height: 50px;
+    border: 4px solid var(--bg-card);
+    border-top-color: var(--primary-gold);
     border-radius: 50%;
-    object-fit: cover;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1.5rem;
 }
 
-.user-details h3 {
-    margin: 0 0 5px 0;
-    color: #333;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-.user-roles {
-    color: #666;
-    font-size: 14px;
+/* 隱藏元素 */
+.hidden {
+    display: none !important;
+}
+
+/* 頁尾 */
+.footer {
+    background: var(--text-primary);
+    color: white;
+    padding: 1.5rem;
+    text-align: center;
+    margin-top: auto;
+}
+
+/* 警告提示 */
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-sm);
+    margin: 1rem 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.alert-success {
+    background: #E8F5E9;
+    color: #2E7D32;
+    border-left: 4px solid #4CAF50;
+}
+
+.alert-error {
+    background: #FFEBEE;
+    color: #C62828;
+    border-left: 4px solid #F44336;
+}
+
+.alert-warning {
+    background: #FFF3E0;
+    color: #E65100;
+    border-left: 4px solid #FF9800;
+}
+
+/* 底部導航欄（手機版） */
+.bottom-nav {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(212, 175, 55, 0.1);
+    padding: 0.75rem 0;
+    z-index: 100;
+}
+
+.bottom-nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    transition: color 0.3s;
+}
+
+.bottom-nav-item.active {
+    color: var(--primary-gold);
+}
+
+.bottom-nav-item .icon {
+    font-size: 1.5rem;
 }
 
 /* 響應式設計 */
 @media (max-width: 768px) {
     .header h1 {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
     }
     
     .main-content {
         padding: 1rem;
+        padding-bottom: 5rem;
     }
     
     .welcome-card {
         padding: 2rem 1.5rem;
     }
     
+    .module-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.875rem;
+    }
+    
+    .module-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .module-icon {
+        font-size: 2.5rem;
+    }
+    
     .page-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 1rem;
         align-items: flex-start;
     }
     
@@ -315,5 +487,24 @@ body {
     
     .function-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .bottom-nav {
+        display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-size: 0.95rem;
+    }
+    
+    .module-title {
+        font-size: 1rem;
+    }
+    
+    .module-desc {
+        font-size: 0.8rem;
     }
 }

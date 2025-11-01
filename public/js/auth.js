@@ -105,13 +105,15 @@ function showModuleGrid(roles) {
     const loginCard = document.getElementById('loginCard');
     const moduleGrid = document.getElementById('moduleGrid');
     const userInfo = document.getElementById('userInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
     
     if (loginCard) loginCard.style.display = 'none';
     if (moduleGrid) moduleGrid.classList.add('active');
     if (userInfo) {
-        userInfo.classList.add('active');
+        userInfo.style.display = 'flex';
         updateUserInfo();
     }
+    if (logoutBtn) logoutBtn.style.display = 'block';
     
     // 根據角色控制可見模組
     const modules = document.querySelectorAll('.module-card');
@@ -194,10 +196,12 @@ function showLoginPage() {
     const loginCard = document.getElementById('loginCard');
     const moduleGrid = document.getElementById('moduleGrid');
     const userInfo = document.getElementById('userInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
     
     if (loginCard) loginCard.style.display = 'block';
     if (moduleGrid) moduleGrid.classList.remove('active');
-    if (userInfo) userInfo.classList.remove('active');
+    if (userInfo) userInfo.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'none';
 }
 
 // 登出功能

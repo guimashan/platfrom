@@ -3,109 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>龜馬山 goLine 平台</title>
+    <title>龜馬山 goLine</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <style>
-        .module-grid {
-            display: none;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .module-grid.active {
-            display: grid;
-        }
-        .module-card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 16px rgba(138, 43, 226, 0.2);
-            border-color: #8A2BE2;
-        }
-        .module-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-        .module-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        .module-desc {
-            font-size: 14px;
-            color: #666;
-        }
-        .user-info {
-            display: none;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .user-info.active {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .user-details {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-        .btn-logout {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .btn-logout:hover {
-            background: #c82333;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
-            <h1>龜馬山 goLine 平台</h1>
-            <p class="subtitle">紫皇天乙真慶宮數位化管理系統</p>
+            <div>
+                <h1>🏯 goLine</h1>
+                <p class="subtitle">紫皇天乙真慶宮</p>
+            </div>
+            <button id="logoutBtn" class="btn-logout" style="display: none;">登出</button>
         </header>
 
         <main class="main-content">
-            <div id="userInfo" class="user-info">
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" alt="使用者頭像">
                 <div class="user-details">
-                    <img id="userAvatar" class="user-avatar" alt="使用者頭像">
-                    <div>
-                        <div id="userName" style="font-weight: 700; margin-bottom: 5px;"></div>
-                        <div id="userRoles" style="font-size: 14px; color: #666;"></div>
-                    </div>
+                    <h3 id="userName"></h3>
+                    <div id="userRoles" class="user-roles"></div>
                 </div>
-                <button id="logoutBtn" class="btn-logout">登出</button>
             </div>
 
             <div id="loginCard" class="welcome-card">
-                <h2>歡迎使用</h2>
-                <p>請使用 LINE 帳號登入系統</p>
+                <h2>歡迎</h2>
+                <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
                 <button id="lineLoginBtn" class="btn btn-primary">
                     LINE 登入
                 </button>
@@ -113,13 +38,13 @@
 
             <div id="moduleGrid" class="module-grid">
                 <div class="module-card" data-module="checkin">
-                    <div class="module-icon">🙏</div>
+                    <div class="module-icon">⛩️</div>
                     <div class="module-title">奉香簽到</div>
                     <div class="module-desc">GPS 定位簽到系統</div>
                 </div>
                 
                 <div class="module-card" data-module="service">
-                    <div class="module-icon">📋</div>
+                    <div class="module-icon">🙏</div>
                     <div class="module-title">神務服務</div>
                     <div class="module-desc">法會報名與服務管理</div>
                 </div>
@@ -143,9 +68,26 @@
             </div>
         </main>
 
-        <footer class="footer">
-            <p>&copy; 2025 紫皇天乙真慶宮 版權所有</p>
-        </footer>
+        <div class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="/" class="bottom-nav-item active">
+                    <span class="icon">🏠</span>
+                    <span>首頁</span>
+                </a>
+                <a href="/checkin/index.html" class="bottom-nav-item">
+                    <span class="icon">⛩️</span>
+                    <span>簽到</span>
+                </a>
+                <a href="/checkin/history.html" class="bottom-nav-item">
+                    <span class="icon">📋</span>
+                    <span>歷程表</span>
+                </a>
+                <a href="/manage/index.html" class="bottom-nav-item">
+                    <span class="icon">🔔</span>
+                    <span>通知中心</span>
+                </a>
+            </div>
+        </div>
     </div>
 
     <script type="module" src="/js/firebase-init.js"></script>
