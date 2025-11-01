@@ -172,27 +172,21 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       return;
     }
 
-    // ⚠️  暫時跳過簽名驗證以便測試功能
-    // TODO: 在生產環境部署前必須啟用簽名驗證
-    logger.warn('⚠️  簽名驗證已禁用（僅用於測試）');
-    
-    // 正式環境請啟用以下代碼：
-    /*
+    // ✅ 生產環境已啟用簽名驗證
     const bodyString = JSON.stringify(req.body);
     try {
       const isValid = line.validateSignature(bodyString, channelSecret, signature);
       if (!isValid) {
-        logger.error('簽名驗證失敗');
+        logger.error('❌ 簽名驗證失敗');
         res.status(401).send('Unauthorized: Invalid signature');
         return;
       }
     } catch (error) {
-      logger.error('簽名驗證錯誤:', error);
+      logger.error('❌ 簽名驗證錯誤:', error);
       res.status(401).send('Unauthorized: Signature validation error');
       return;
     }
-    logger.info('簽名驗證成功');
-    */
+    logger.info('✅ Webhook 簽名驗證成功');
 
     // 處理事件
     const events = req.body.events || [];
