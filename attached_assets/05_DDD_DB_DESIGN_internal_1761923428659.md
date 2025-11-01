@@ -29,8 +29,8 @@ Visibility: internal-only
 | 模組 | 集合名稱 | 說明 | 所屬專案 |
 |------|-----------|------|-----------|
 | 使用者 | `users` | 儲存 LINE 登入者資訊、角色與狀態 | **platform-bc783** |
-| 奉香簽到 | `checkins` | 使用者簽到紀錄 | **checkin-29f7f** |
-| 巡邏點 | `patrols` | 奉香地點座標 | **checkin-29f7f** |
+| 奉香簽到 | `checkins` | 使用者簽到紀錄 | **checkin-76c77** |
+| 巡邏點 | `patrols` | 奉香地點座標 | **checkin-76c77** |
 | 神服服務 | `services` | 點燈 / 法會報名資料 | **service-b9d4a** |
 | 排班 | `schedules` | 志工班表與出勤狀況 | **schedule-48ff9** |
 | 系統公告 | `globalConfig` | 全域設定與公告 | **platform-bc783** |
@@ -57,7 +57,7 @@ Visibility: internal-only
 
 ### 3.2 checkins（奉香簽到）
 **Firestore 路徑：** `checkins/{checkinId}`  
-**所屬專案：** `checkin-29f7f`
+**所屬專案：** `checkin-76c77`
 
 | 欄位 | 型別 | 說明 |
 |------|------|------|
@@ -74,7 +74,7 @@ Visibility: internal-only
 
 ### 3.3 patrols（巡邏點）
 **Firestore 路徑：** `patrols/{patrolId}`  
-**所屬專案：** `checkin-29f7f`
+**所屬專案：** `checkin-76c77`
 
 | 欄位 | 型別 | 說明 |
 |------|------|------|
@@ -140,8 +140,8 @@ Visibility: internal-only
 
 ```text
 users (platform-bc783)
- ├── checkins (checkin-29f7f)
- │      ↳ patrols (checkin-29f7f)
+ ├── checkins (checkin-76c77)
+ │      ↳ patrols (checkin-76c77)
  ├── services (service-b9d4a)
  └── schedules (schedule-48ff9)
  ```

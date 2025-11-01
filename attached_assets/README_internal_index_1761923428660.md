@@ -55,7 +55,7 @@ Visibility: internal-only
 - **主要登入來源：** LINE OAuth (OIDC)  
 - **主要專案：**
   - `platform-bc783` (登入 / 管理)
-  - `checkin-29f7f`
+  - `checkin-76c77`
   - `service-b9d4a`
   - `schedule-48ff9`
 

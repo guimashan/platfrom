@@ -17,7 +17,7 @@ Visibility: internal-only
 | 模組 | Firebase 專案 ID | 功能概述 |
 |------|------------------|-----------|
 | 平台層（Platform） | **platform-bc783** | 提供 LINE 登入、角色管理、全域設定、公告及跨模組導流。 |
-| 奉香簽到（Check-in） | **checkin-29f7f** | GPS 驗證簽到、巡邏點管理、簽到紀錄與查詢。 |
+| 奉香簽到（Check-in） | **checkin-76c77** | GPS 驗證簽到、巡邏點管理、簽到紀錄與查詢。 |
 | 神服服務（Service） | **service-b9d4a** | 點燈、法會報名、香油錢登錄與報表。 |
 | 排班系統（Schedule） | **schedule-48ff9** | 志願者排班、出勤統計、表單匯出。 |
 
