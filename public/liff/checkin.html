@@ -381,8 +381,9 @@
                     },
                     body: JSON.stringify({
                         patrolId: selectedPatrol.id,
-                        latitude,
-                        longitude
+                        lat: latitude,
+                        lng: longitude,
+                        mode: 'gps'
                     })
                 });
                 
