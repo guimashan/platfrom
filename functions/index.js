@@ -9,6 +9,7 @@ const messagingFunctions = require('./src/messaging');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
+exports.generateCustomTokenFromLiff = platformFunctions.generateCustomTokenFromLiff;
 exports.updateUserRole = platformFunctions.updateUserRole;
 
 // 導出 Check-in Functions

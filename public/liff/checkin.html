@@ -290,7 +290,7 @@
                 
                 // Firebase 认证
                 const idToken = liff.getIDToken();
-                const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken', {
+                const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomTokenFromLiff', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

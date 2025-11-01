@@ -18,6 +18,96 @@ if (admin.apps.length === 0) {
 }
 
 /**
+ * LIFF ID Token 交換 Firebase Custom Token
+ * 用於 LIFF App 認證
+ */
+exports.generateCustomTokenFromLiff = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        const {liffIdToken, lineUserId, displayName, pictureUrl} = req.body;
+
+        if (!liffIdToken || !lineUserId) {
+          res.status(400).json({
+            ok: false,
+            message: 'Missing liffIdToken or lineUserId',
+          });
+          return;
+        }
+
+        logger.info('收到 LIFF Token 交換請求', {lineUserId, displayName});
+
+        // 取得或建立使用者資料
+        const userRef = admin.firestore().collection('users').doc(lineUserId);
+        const userSnap = await userRef.get();
+
+        let userRoles = ['user'];
+
+        if (!userSnap.exists) {
+          // 新使用者
+          const userData = {
+            displayName: displayName,
+            lineUserId: lineUserId,
+            roles: ['user'],
+            active: true,
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+          };
+
+          if (pictureUrl) {
+            userData.pictureUrl = pictureUrl;
+          }
+
+          await userRef.set(userData);
+          logger.info('新使用者已建立', {lineUserId});
+        } else {
+          // 更新現有使用者
+          const userData = userSnap.data();
+          userRoles = userData.roles || ['user'];
+
+          const updateData = {
+            displayName: displayName,
+            lastLogin: admin.firestore.FieldValue.serverTimestamp(),
+          };
+
+          if (pictureUrl) {
+            updateData.pictureUrl = pictureUrl;
+          }
+
+          await userRef.update(updateData);
+          logger.info('使用者登入時間已更新', {lineUserId});
+        }
+
+        // 產生 Firebase Custom Token
+        const customToken = await admin.auth().createCustomToken(lineUserId, {
+          roles: userRoles,
+        });
+
+        logger.info('Custom Token 已產生 (LIFF)', {lineUserId, roles: userRoles});
+
+        res.json({
+          ok: true,
+          customToken: customToken,
+          profile: {
+            lineUserId: lineUserId,
+            displayName: displayName,
+            pictureUrl: pictureUrl,
+          },
+        });
+      } catch (error) {
+        logger.error('LIFF Token 交換失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: error.message,
+        });
+      }
+    },
+);
+
+/**
  * LINE 登入授權碼交換 + Firebase Custom Token 產生
  * 方案 B: 使用 LINE Login Web API
  */
