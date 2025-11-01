@@ -50,6 +50,14 @@ async function loadPatrols() {
         });
         
         patrols = result.patrols || [];
+        
+        // 自定義排序：辦公室排第一，其他按名稱排序
+        patrols.sort((a, b) => {
+            if (a.name === '辦公室') return -1;
+            if (b.name === '辦公室') return 1;
+            return a.name.localeCompare(b.name, 'zh-TW');
+        });
+        
         const dropdown = document.getElementById('patrolDropdown');
         dropdown.innerHTML = '<option value="">請選擇巡邏點 ▼</option>';
         
