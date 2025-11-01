@@ -141,9 +141,11 @@ function renderUsers() {
 
 function getRoleName(role) {
     const roleNames = {
-        'SuperAdmin': '超級管理員',
-        'admin': '管理員',
-        'poweruser': '進階用戶',
+        'superadmin': '超級管理員',
+        'admin_checkin': '簽到管理員',
+        'admin_service': '神務管理員',
+        'admin_schedule': '排班管理員',
+        'poweruser_checkin': '簽到幹部',
         'user': '一般用戶'
     };
     return roleNames[role] || role;
@@ -151,9 +153,11 @@ function getRoleName(role) {
 
 function getRoleBadge(role) {
     const badges = {
-        'SuperAdmin': '<span class="badge danger">超級管理員</span>',
-        'admin': '<span class="badge warning">管理員</span>',
-        'poweruser': '<span class="badge info">進階用戶</span>',
+        'superadmin': '<span class="badge danger">超級管理員</span>',
+        'admin_checkin': '<span class="badge warning">簽到管理員</span>',
+        'admin_service': '<span class="badge warning">神務管理員</span>',
+        'admin_schedule': '<span class="badge warning">排班管理員</span>',
+        'poweruser_checkin': '<span class="badge info">簽到幹部</span>',
         'user': '<span class="badge">一般用戶</span>'
     };
     return badges[role] || `<span class="badge">${role}</span>`;

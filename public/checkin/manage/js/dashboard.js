@@ -45,7 +45,7 @@ onAuthStateChanged(platformAuth, async (user) => {
         const roles = userData.roles || [];
         
         const hasPermission = roles.some(role => 
-            role === 'poweruser' || role === 'admin_checkin' || role === 'superadmin'
+            role === 'poweruser_checkin' || role === 'admin_checkin' || role === 'superadmin'
         );
         
         if (!hasPermission) {

@@ -22,7 +22,7 @@ let currentMode = 'gps';
 (async function init() {
     try {
         const { user, userData } = await checkAuth({
-            requiredRoles: ['user', 'poweruser', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
+            requiredRoles: ['user', 'poweruser_checkin', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
             onSuccess: ({ user, userData }) => {
                 currentUser = user;
                 const userName = document.getElementById('userName');

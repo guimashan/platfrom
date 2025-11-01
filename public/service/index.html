@@ -14,8 +14,7 @@
                 <h1>📋 神務服務</h1>
                 <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: #666;"></p>
             </div>
-            <div class="header-actions" style="display: flex; gap: 10px;">
-                <button class="btn-secondary" onclick="window.location.href='/'">🏠 首頁</button>
+            <div class="header-actions">
                 <button id="logoutBtn" class="btn-logout">登出</button>
             </div>
         </header>
@@ -41,7 +40,7 @@
         (async function init() {
             try {
                 const { userData } = await checkAuth({
-                    requiredRoles: ['poweruser', 'admin_service', 'superadmin'],
+                    requiredRoles: ['poweruser_service', 'admin_service', 'superadmin'],
                     onSuccess: ({ userData }) => {
                         const userName = document.getElementById('userName');
                         if (userName) {

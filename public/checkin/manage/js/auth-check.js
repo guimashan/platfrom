@@ -32,7 +32,7 @@ onAuthStateChanged(platformAuth, async (user) => {
 
         // 檢查是否有管理權限
         const hasPermission = roles.some(role => 
-            role === 'poweruser' || role === 'admin_checkin' || role === 'superadmin'
+            role === 'poweruser_checkin' || role === 'admin_checkin' || role === 'superadmin'
         );
         
         if (!hasPermission) {
@@ -64,7 +64,7 @@ function getRoleName(role) {
         'admin_checkin': '簽到管理員',
         'admin_service': '神務管理員',
         'admin_schedule': '排班管理員',
-        'poweruser': '進階用戶',
+        'poweruser_checkin': '簽到幹部',
         'user': '一般用戶'
     };
     return roleNames[role] || role;

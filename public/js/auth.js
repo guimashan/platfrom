@@ -124,7 +124,7 @@ function showModuleGrid(roles) {
         if (module === 'checkin') {
             canAccess = true;
         } else if (module === 'service') {
-            canAccess = roles.includes('poweruser') || roles.includes('admin_service') || roles.includes('superadmin');
+            canAccess = roles.includes('poweruser_service') || roles.includes('admin_service') || roles.includes('superadmin');
         } else if (module === 'schedule') {
             canAccess = roles.includes('admin_schedule') || roles.includes('superadmin');
         } else if (module === 'manage') {
@@ -175,7 +175,9 @@ async function updateUserInfo() {
             if (userRoles) {
                 const roleNames = {
                     'user': '一般使用者',
-                    'poweruser': '進階使用者',
+                    'poweruser_checkin': '簽到幹部',
+                    'poweruser_service': '神務幹部',
+                    'poweruser_schedule': '排班幹部',
                     'admin_checkin': '簽到管理員',
                     'admin_service': '神務管理員',
                     'admin_schedule': '排班管理員',
