@@ -13,9 +13,11 @@ if (admin.apps.length === 0) {
 }
 
 // 初始化 Platform Admin (用於跨專案驗證)
-const platformAuth = admin.initializeApp({
+const platformApp = admin.initializeApp({
   projectId: 'platform-bc783',
-}, 'platform').auth();
+}, 'platform');
+const platformAuth = platformApp.auth();
+const platformDb = platformApp.firestore();
 
 /**
  * 計算兩個 GPS 座標之間的距離 (公尺)
