@@ -629,19 +629,36 @@ exports.getCheckinHistory = onRequest(
             .limit(limit)
             .get();
 
-        const checkins = checkinsSnapshot.docs.map(doc => {
+        // 查詢巡邏點名稱
+        const checkins = await Promise.all(checkinsSnapshot.docs.map(async doc => {
           const data = doc.data();
+          
+          // 查詢巡邏點名稱
+          let patrolName = data.patrolId;
+          try {
+            const patrolDoc = await admin.firestore()
+                .collection('patrols')
+                .doc(data.patrolId)
+                .get();
+            if (patrolDoc.exists) {
+              patrolName = patrolDoc.data().name || data.patrolId;
+            }
+          } catch (error) {
+            logger.warn('查詢巡邏點名稱失敗', { patrolId: data.patrolId, error: error.message });
+          }
+          
           return {
             id: doc.id,
             userId: data.userId,
             patrolId: data.patrolId,
+            patrolName: patrolName,
             timestamp: data.timestamp,
             mode: data.mode,
             distance: data.distance,
             testMode: data.testMode,
             location: data.location,
           };
-        });
+        }));
 
         logger.info('簽到紀錄已取得', {
           userId,
