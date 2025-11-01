@@ -51,10 +51,29 @@ async function replyMessage(replyToken, messages, accessToken) {
  * 處理文字訊息
  */
 function handleTextMessage(text) {
-  text = text.trim().toLowerCase();
+  const originalText = text.trim();
+  text = originalText.toLowerCase();
 
-  // 奉香簽到
-  if (text.includes('奉香') || text.includes('簽到') || text.includes('打卡')) {
+  // 幫助訊息（優先處理，避免被其他規則攔截）
+  if (text === '幫助' || text === 'help' || text === '?' || text === '指令') {
+    return {
+      type: 'text',
+      text: '📱 龜馬山 goLine 平台\n\n' +
+            '可用指令：\n' +
+            '• 「奉香簽到」- 開啟簽到系統\n' +
+            '• 「神務」- 開啟服務系統\n' +
+            '• 「排班」- 開啟排班系統\n' +
+            '• 「幫助」- 顯示此訊息',
+    };
+  }
+
+  // 忽略系統自動產生的訊息（包含 emoji 或特殊符號開頭）
+  if (text.startsWith('✅') || text.startsWith('❌') || text.startsWith('⚠️')) {
+    return null; // 不回覆
+  }
+
+  // 奉香簽到（精確匹配關鍵詞）
+  if (text === '奉香簽到' || text === '奉香' || text === '簽到' || text === '打卡') {
     return {
       type: 'template',
       altText: '開啟奉香簽到',
@@ -72,8 +91,8 @@ function handleTextMessage(text) {
     };
   }
 
-  // 神務服務
-  if (text.includes('神務') || text.includes('服務') || text.includes('法會')) {
+  // 神務服務（精確匹配關鍵詞）
+  if (text === '神務服務' || text === '神務' || text === '服務' || text === '法會') {
     return {
       type: 'template',
       altText: '開啟神務服務',
@@ -91,8 +110,8 @@ function handleTextMessage(text) {
     };
   }
 
-  // 排班系統
-  if (text.includes('排班') || text.includes('班表') || text.includes('志工')) {
+  // 排班系統（精確匹配關鍵詞）
+  if (text === '排班系統' || text === '排班' || text === '班表' || text === '志工') {
     return {
       type: 'template',
       altText: '開啟排班系統',
@@ -110,45 +129,8 @@ function handleTextMessage(text) {
     };
   }
 
-  // 幫助訊息
-  if (text.includes('幫助') || text.includes('help') || text === '?') {
-    return {
-      type: 'text',
-      text: '📱 龜馬山 goLine 平台\n\n' +
-            '可用指令：\n' +
-            '• 「奉香簽到」- 開啟簽到系統\n' +
-            '• 「神務服務」- 開啟服務系統\n' +
-            '• 「排班系統」- 開啟排班系統\n' +
-            '• 「幫助」- 顯示此訊息',
-    };
-  }
-
-  // 功能選單
-  return {
-    type: 'template',
-    altText: '龜馬山 goLine 平台',
-    template: {
-      type: 'buttons',
-      text: '請選擇服務',
-      actions: [
-        {
-          type: 'uri',
-          label: '🙏 奉香簽到',
-          uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
-        },
-        {
-          type: 'uri',
-          label: '⚡ 神務服務',
-          uri: `https://liff.line.me/${LIFF_IDS.service}`,
-        },
-        {
-          type: 'uri',
-          label: '📅 排班系統',
-          uri: `https://liff.line.me/${LIFF_IDS.schedule}`,
-        },
-      ],
-    },
-  };
+  // 其他訊息不回覆（避免打擾用戶）
+  return null;
 }
 
 /**
@@ -205,14 +187,17 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
         // 產生回覆訊息
         const replyContent = handleTextMessage(userMessage);
 
-        // 回覆給用戶
-        await replyMessage(
-            replyToken,
-            [replyContent],
-            accessToken,
-        );
-
-        logger.info('已回覆訊息');
+        // 只在有回覆內容時才回覆
+        if (replyContent) {
+          await replyMessage(
+              replyToken,
+              [replyContent],
+              accessToken,
+          );
+          logger.info('已回覆訊息');
+        } else {
+          logger.info('無需回覆此訊息');
+        }
       }
 
       // 處理加入好友事件
