@@ -136,7 +136,11 @@ function renderUsers() {
                         <small style="color: #666; font-size: 0.8rem; font-family: monospace;">${user.id.substring(0, 12)}...</small>
                     </div>
                 </td>
-                <td>${roleBadges}</td>
+                <td>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 250px;">
+                        ${roleBadges}
+                    </div>
+                </td>
                 <td>${user.email || 'N/A'}</td>
                 <td>${statusBadge}</td>
                 <td>
