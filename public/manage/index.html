@@ -311,7 +311,7 @@
             const userRoles = document.getElementById('userRoles');
 
             if (userName) userName.textContent = userData.displayName || '管理員';
-            if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.png';
+            if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.svg';
             if (userRoles) {
                 const roleNames = {
                     'admin_checkin': '簽到管理員',

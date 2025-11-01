@@ -180,7 +180,7 @@ async function updateUserInfo() {
             const userRoles = document.getElementById('userRoles');
             
             if (userName) userName.textContent = userData.displayName || '使用者';
-            if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.png';
+            if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.svg';
             if (userRoles) {
                 const roleNames = {
                     'user': '一般使用者',

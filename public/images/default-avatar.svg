@@ -1,0 +1,21 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 金色渐变背景 -->
+  <defs>
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8C547;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D4AF37;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 圆形背景 -->
+  <circle cx="100" cy="100" r="100" fill="url(#goldGradient)"/>
+  
+  <!-- 用户图标 (白色) -->
+  <g transform="translate(100, 100)">
+    <!-- 头部 -->
+    <circle cx="0" cy="-15" r="28" fill="white" opacity="0.95"/>
+    <!-- 身体 -->
+    <path d="M -45 55 Q -45 15 -35 5 Q -20 -5 0 -5 Q 20 -5 35 5 Q 45 15 45 55 Z" 
+          fill="white" opacity="0.95"/>
+  </g>
+</svg>
