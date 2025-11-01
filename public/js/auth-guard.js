@@ -170,9 +170,12 @@ export function displayUserInfo(userData, elements = {}) {
         nameElement.textContent = userData.displayName || '使用者';
     }
 
-    if (avatarElement && userData.pictureUrl) {
-        avatarElement.src = userData.pictureUrl;
+    if (avatarElement) {
+        avatarElement.src = userData.pictureUrl || '/images/default-avatar.svg';
         avatarElement.alt = userData.displayName || '使用者頭像';
+        avatarElement.onerror = function() {
+            this.src = '/images/default-avatar.svg';
+        };
     }
 
     if (rolesElement) {
