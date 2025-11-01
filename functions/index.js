@@ -5,6 +5,7 @@
 
 const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
+const messagingFunctions = require('./src/messaging');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -21,3 +22,6 @@ exports.updateTestMode = checkinFunctions.updateTestMode;
 exports.savePatrol = checkinFunctions.savePatrol;
 exports.deletePatrol = checkinFunctions.deletePatrol;
 exports.getDashboardStats = checkinFunctions.getDashboardStats;
+
+// 導出 LINE Messaging API Functions
+exports.lineWebhook = messagingFunctions.lineWebhook;

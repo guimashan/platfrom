@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班系統 - 龜馬山 LIFF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .liff-header {
+            background: linear-gradient(135deg, #8A2BE2 0%, #9370DB 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .liff-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+        .user-badge img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        .coming-soon {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+        .coming-soon h2 {
+            color: #8A2BE2;
+            margin-bottom: 1rem;
+        }
+        .coming-soon p {
+            color: #666;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="liff-header">
+            <h1>📅 排班系統</h1>
+            <div class="user-badge">
+                <img id="userAvatar" src="/images/default-avatar.svg" alt="用戶頭像">
+                <span id="userName">載入中...</span>
+            </div>
+            <button class="close-btn" onclick="closeWindow()">關閉</button>
+        </header>
+
+        <main class="main-content">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>正在初始化...</p>
+            </div>
+
+            <div id="scheduleContent" class="coming-soon" style="display: none;">
+                <h2>🚧 即將推出</h2>
+                <p>排班系統功能正在開發中</p>
+                <p style="margin-top: 2rem;">即將提供以下服務：</p>
+                <ul style="text-align: left; max-width: 300px; margin: 1rem auto;">
+                    <li>志工排班</li>
+                    <li>出勤統計</li>
+                    <li>班表調整</li>
+                    <li>出席確認</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    
+    <script type="module">
+        import { initLiff, getLiffProfile, closeLiffWindow } from '/js/liff-init.js';
+        import { platformAuth } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        const LIFF_ID = '__LIFF_SCHEDULE_ID__';
+
+        window.closeWindow = closeLiffWindow;
+
+        async function init() {
+            try {
+                const liffData = await initLiff(LIFF_ID);
+                
+                if (!liffData) {
+                    return;
+                }
+
+                onAuthStateChanged(platformAuth, async (user) => {
+                    if (user) {
+                        const profile = getLiffProfile();
+                        
+                        document.getElementById('userName').textContent = profile.displayName;
+                        document.getElementById('userAvatar').src = profile.pictureUrl || '/images/default-avatar.svg';
+                        
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                        document.getElementById('scheduleContent').style.display = 'block';
+                    }
+                });
+
+            } catch (error) {
+                console.error('初始化失敗:', error);
+                alert('系統初始化失敗，請稍後再試');
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
