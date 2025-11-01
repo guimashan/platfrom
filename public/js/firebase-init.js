@@ -67,7 +67,18 @@ export const scheduleFunctions = getFunctions(scheduleApp, 'asia-east2');
 // API Endpoints 配置
 export const API_ENDPOINTS = {
     // 跨專案認證簽到 API (HTTP endpoint)
-    verifyCheckinV2: 'https://asia-east2-checkin-76c77.cloudfunctions.net/verifyCheckinV2'
+    verifyCheckinV2: 'https://asia-east2-checkin-76c77.cloudfunctions.net/verifyCheckinV2',
+    // 巡邏點管理 API
+    getPatrols: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getPatrols',
+    savePatrol: 'https://asia-east2-checkin-76c77.cloudfunctions.net/savePatrol',
+    deletePatrol: 'https://asia-east2-checkin-76c77.cloudfunctions.net/deletePatrol',
+    // 簽到紀錄 API
+    getCheckinHistory: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getCheckinHistory',
+    // 儀表板 API
+    getDashboardStats: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getDashboardStats',
+    // 測試模式 API
+    getTestModeStatus: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getTestModeStatus',
+    updateTestMode: 'https://asia-east2-checkin-76c77.cloudfunctions.net/updateTestMode'
 };
 
 // 開發環境設定 - 使用 Emulator

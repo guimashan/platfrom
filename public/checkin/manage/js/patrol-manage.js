@@ -2,18 +2,11 @@
  * 巡邏點管理
  */
 
-import { platformAuth, platformDb, checkinDb } from '/js/firebase-init.js';
+import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { 
-    collection, 
-    doc,
-    getDocs,
-    getDoc,
-    setDoc,
-    updateDoc,
-    deleteDoc
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
+import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let patrols = [];
@@ -62,9 +55,11 @@ async function init() {
 
 async function loadTestModeStatus() {
     try {
-        const settingsDoc = await getDoc(doc(checkinDb, 'settings', 'system'));
-        const testMode = settingsDoc.exists() ? settingsDoc.data().testMode === true : false;
+        const result = await callAPI(API_ENDPOINTS.getTestModeStatus, {
+            method: 'GET'
+        });
         
+        const testMode = result.testMode || false;
         updateTestModeUI(testMode);
     } catch (error) {
         console.error('載入測試模式失敗:', error);
@@ -102,14 +97,15 @@ async function toggleTestMode() {
     toggleBtn.textContent = '處理中...';
     
     try {
-        await setDoc(doc(checkinDb, 'settings', 'system'), {
-            testMode: !currentStatus,
-            updatedAt: new Date(),
-            updatedBy: currentUser.uid
+        const result = await callAPI(API_ENDPOINTS.updateTestMode, {
+            method: 'POST',
+            body: JSON.stringify({
+                testMode: !currentStatus
+            })
         });
         
-        updateTestModeUI(!currentStatus);
-        alert(`測試模式已${!currentStatus ? '開啟' : '關閉'}`);
+        updateTestModeUI(result.testMode);
+        alert(`測試模式已${result.testMode ? '開啟' : '關閉'}`);
     } catch (error) {
         console.error('切換測試模式失敗:', error);
         alert('操作失敗，請稍後再試');
@@ -121,17 +117,11 @@ async function loadPatrols() {
     const patrolsList = document.getElementById('patrolsList');
     
     try {
-        const patrolsRef = collection(checkinDb, 'patrols');
-        const snapshot = await getDocs(patrolsRef);
-        
-        patrols = [];
-        snapshot.forEach(doc => {
-            patrols.push({
-                id: doc.id,
-                ...doc.data()
-            });
+        const result = await callAPI(API_ENDPOINTS.getPatrols, {
+            method: 'GET'
         });
         
+        patrols = result.patrols || [];
         renderPatrols();
     } catch (error) {
         console.error('載入巡邏點失敗:', error);
@@ -227,18 +217,17 @@ async function savePatrol(event) {
             lat,
             lng,
             radius,
-            updatedAt: new Date(),
-            updatedBy: currentUser.uid
+            active: true
         };
         
         if (editingPatrolId) {
-            await updateDoc(doc(checkinDb, 'patrols', editingPatrolId), patrolData);
-        } else {
-            const newId = name.toLowerCase().replace(/\s+/g, '-');
-            patrolData.createdAt = new Date();
-            patrolData.createdBy = currentUser.uid;
-            await setDoc(doc(checkinDb, 'patrols', newId), patrolData);
+            patrolData.id = editingPatrolId;
         }
+        
+        await callAPI(API_ENDPOINTS.savePatrol, {
+            method: 'POST',
+            body: JSON.stringify(patrolData)
+        });
         
         closePatrolModal();
         await loadPatrols();
@@ -258,7 +247,11 @@ async function deletePatrol(patrolId) {
     }
     
     try {
-        await deleteDoc(doc(checkinDb, 'patrols', patrolId));
+        await callAPI(API_ENDPOINTS.deletePatrol, {
+            method: 'POST',
+            body: JSON.stringify({ patrolId })
+        });
+        
         await loadPatrols();
         alert('刪除成功');
     } catch (error) {

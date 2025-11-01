@@ -3,15 +3,9 @@
  * 處理 GPS 簽到功能
  */
 
-import { platformAuth, checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
 import { checkAuth, logout, displayUserInfo } from '/js/auth-guard.js';
-import { 
-    collection, 
-    getDocs, 
-    query, 
-    orderBy 
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let patrols = [];
@@ -51,23 +45,18 @@ function initializeLogoutButton() {
 // 載入巡邏點列表
 async function loadPatrols() {
     try {
-        const patrolsRef = collection(checkinDb, 'patrols');
-        const q = query(patrolsRef, orderBy('name'));
-        const snapshot = await getDocs(q);
+        const result = await callAPI(API_ENDPOINTS.getPatrols, {
+            method: 'GET'
+        });
         
-        patrols = [];
+        patrols = result.patrols || [];
         const dropdown = document.getElementById('patrolDropdown');
         dropdown.innerHTML = '<option value="">請選擇巡邏點</option>';
         
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            // 為缺少 qr 欄位的巡邏點生成預設值
-            const qrCode = data.qr || `PATROL_${doc.id}`;
-            patrols.push({ id: doc.id, ...data, qr: qrCode });
-            
+        patrols.forEach(patrol => {
             const option = document.createElement('option');
-            option.value = doc.id;
-            option.textContent = data.name;
+            option.value = patrol.id;
+            option.textContent = patrol.name;
             dropdown.appendChild(option);
         });
         

@@ -2,17 +2,10 @@
  * 簽到紀錄頁面
  */
 
-import { platformAuth, checkinDb } from '/js/firebase-init.js';
+import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { 
-    collection, 
-    query, 
-    where,
-    orderBy,
-    limit,
-    getDocs
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
+import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 
@@ -33,32 +26,29 @@ async function loadHistory() {
     try {
         historyList.innerHTML = '<p>載入中...</p>';
         
-        const checkinsRef = collection(checkinDb, 'checkins');
-        const q = query(
-            checkinsRef,
-            where('userId', '==', currentUser.uid),
-            orderBy('timestamp', 'desc'),
-            limit(50)
-        );
+        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=50', {
+            method: 'GET'
+        });
         
-        const snapshot = await getDocs(q);
+        const checkins = result.checkins || [];
         
-        if (snapshot.empty) {
+        if (checkins.length === 0) {
             historyList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
             return;
         }
         
-        let html = '<div class="history-table"><table><thead><tr><th>時間</th><th>巡邏點</th><th>距離</th></tr></thead><tbody>';
+        let html = '<div class="history-table"><table><thead><tr><th>時間</th><th>巡邏點</th><th>模式</th><th>距離</th></tr></thead><tbody>';
         
-        snapshot.forEach(doc => {
-            const data = doc.data();
-            const timestamp = data.timestamp?.toDate() || new Date();
-            const distance = data.distance?.toFixed(1) || 'N/A';
+        checkins.forEach(checkin => {
+            const timestamp = checkin.timestamp?.toDate ? checkin.timestamp.toDate() : new Date(checkin.timestamp?._seconds * 1000 || Date.now());
+            const distance = checkin.distance ? checkin.distance.toFixed(1) : 'N/A';
+            const mode = checkin.mode === 'qr' ? 'QR' : 'GPS';
             
             html += `
                 <tr>
                     <td>${formatDateTime(timestamp)}</td>
-                    <td>${data.patrolId}</td>
+                    <td>${checkin.patrolName || checkin.patrolId}</td>
+                    <td>${mode}</td>
                     <td>${distance} m</td>
                 </tr>
             `;

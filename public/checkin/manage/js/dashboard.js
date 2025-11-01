@@ -2,20 +2,11 @@
  * 奉香簽到儀表板
  */
 
-import { platformAuth, platformDb, checkinDb } from '/js/firebase-init.js';
+import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { 
-    collection, 
-    query, 
-    where,
-    orderBy,
-    limit,
-    getDocs,
-    getDoc,
-    doc,
-    Timestamp
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
+import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allRecords = [];
@@ -65,63 +56,50 @@ onAuthStateChanged(platformAuth, async (user) => {
 
 async function init() {
     try {
-        await Promise.all([
-            loadPatrols(),
-            loadUsers(),
-            loadAllRecords()
-        ]);
-        calculateStats();
-        renderRecords();
+        const result = await callAPI(API_ENDPOINTS.getDashboardStats, {
+            method: 'GET'
+        });
+        
+        const stats = result.stats || {};
+        
+        document.getElementById('totalPatrols').textContent = stats.totalPatrols || 0;
+        document.getElementById('todayCheckins').textContent = stats.todayCheckins || 0;
+        
+        const recentList = document.getElementById('recentList');
+        if (stats.recentCheckins && stats.recentCheckins.length > 0) {
+            let html = '<ul>';
+            stats.recentCheckins.forEach(checkin => {
+                const timestamp = checkin.timestamp?.toDate ? checkin.timestamp.toDate() : new Date(checkin.timestamp?._seconds * 1000 || Date.now());
+                const mode = checkin.mode === 'qr' ? 'QR' : 'GPS';
+                html += `<li>${formatDateTime(timestamp)} - ${checkin.patrolName} (${mode})</li>`;
+            });
+            html += '</ul>';
+            recentList.innerHTML = html;
+        } else {
+            recentList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
+        }
     } catch (error) {
         console.error('初始化失敗:', error);
         alert('載入資料失敗，請重新整理頁面');
     }
 }
 
-async function loadPatrols() {
-    const patrolsRef = collection(checkinDb, 'patrols');
-    const snapshot = await getDocs(patrolsRef);
-    
-    snapshot.forEach(doc => {
-        patrolsList[doc.id] = doc.data();
-    });
+function formatDateTime(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
 
-    const patrolFilter = document.getElementById('patrolFilter');
-    Object.keys(patrolsList).forEach(id => {
-        const option = document.createElement('option');
-        option.value = id;
-        option.textContent = patrolsList[id].name || id;
-        patrolFilter.appendChild(option);
-    });
+async function loadPatrols() {
 }
 
 async function loadUsers() {
-    const usersRef = collection(platformDb, 'users');
-    const snapshot = await getDocs(usersRef);
-    
-    snapshot.forEach(doc => {
-        usersMap[doc.id] = doc.data();
-    });
 }
 
 async function loadAllRecords() {
-    const recordsList = document.getElementById('recordsList');
-    recordsList.innerHTML = '<p class="loading">載入簽到記錄中...</p>';
-
-    const checkinsRef = collection(checkinDb, 'checkins');
-    const q = query(checkinsRef, orderBy('timestamp', 'desc'), limit(1000));
-    
-    const snapshot = await getDocs(q);
-    
-    allRecords = [];
-    snapshot.forEach(doc => {
-        allRecords.push({
-            id: doc.id,
-            ...doc.data()
-        });
-    });
-
-    filteredRecords = [...allRecords];
 }
 
 function calculateStats() {

@@ -505,3 +505,473 @@ exports.verifyCheckinV2 = onRequest(
       }
     },
 );
+
+/**
+ * 驗證 Platform ID Token 的輔助函數
+ */
+async function verifyPlatformToken(req, res) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    res.status(401).json({
+      ok: false,
+      code: '1000_UNAUTHORIZED',
+      message: 'Missing or invalid Authorization header',
+    });
+    return null;
+  }
+
+  const idToken = authHeader.split('Bearer ')[1];
+
+  try {
+    const decodedToken = await platformAuth.verifyIdToken(idToken);
+    return decodedToken;
+  } catch (error) {
+    logger.error('ID Token 驗證失敗', error);
+    res.status(401).json({
+      ok: false,
+      code: '1000_INVALID_TOKEN',
+      message: 'Invalid ID Token',
+    });
+    return null;
+  }
+}
+
+/**
+ * 獲取巡邏點列表 (HTTP Endpoint)
+ */
+exports.getPatrols = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'GET') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only GET method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const patrolsSnapshot = await admin.firestore()
+            .collection('patrols')
+            .orderBy('name')
+            .get();
+
+        const patrols = [];
+        patrolsSnapshot.forEach((doc) => {
+          const data = doc.data();
+          patrols.push({
+            id: doc.id,
+            ...data,
+            qr: data.qr || `PATROL_${doc.id}`,
+          });
+        });
+
+        logger.info('巡邏點列表已取得', {
+          userId: decodedToken.uid,
+          count: patrols.length,
+        });
+
+        res.status(200).json({
+          ok: true,
+          patrols: patrols,
+        });
+      } catch (error) {
+        logger.error('獲取巡邏點列表失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `獲取巡邏點列表失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 獲取簽到紀錄 (HTTP Endpoint)
+ */
+exports.getCheckinHistory = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'GET') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only GET method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const userId = decodedToken.uid;
+        const limit = parseInt(req.query.limit) || 50;
+
+        const checkinsSnapshot = await admin.firestore()
+            .collection('checkins')
+            .where('userId', '==', userId)
+            .orderBy('timestamp', 'desc')
+            .limit(limit)
+            .get();
+
+        const checkins = [];
+        for (const doc of checkinsSnapshot.docs) {
+          const data = doc.data();
+          
+          let patrolName = '未知巡邏點';
+          if (data.patrolId) {
+            const patrolDoc = await admin.firestore()
+                .collection('patrols')
+                .doc(data.patrolId)
+                .get();
+            if (patrolDoc.exists) {
+              patrolName = patrolDoc.data().name;
+            }
+          }
+
+          checkins.push({
+            id: doc.id,
+            patrolId: data.patrolId,
+            patrolName: patrolName,
+            timestamp: data.timestamp,
+            mode: data.mode,
+            distance: data.distance,
+            testMode: data.testMode,
+          });
+        }
+
+        logger.info('簽到紀錄已取得', {
+          userId,
+          count: checkins.length,
+        });
+
+        res.status(200).json({
+          ok: true,
+          checkins: checkins,
+        });
+      } catch (error) {
+        logger.error('獲取簽到紀錄失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `獲取簽到紀錄失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 獲取測試模式狀態 (HTTP Endpoint)
+ */
+exports.getTestModeStatus = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'GET') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only GET method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const settingsDoc = await admin.firestore()
+            .collection('settings')
+            .doc('system')
+            .get();
+
+        const testMode = settingsDoc.exists ?
+            (settingsDoc.data().testMode || false) : false;
+
+        res.status(200).json({
+          ok: true,
+          testMode: testMode,
+        });
+      } catch (error) {
+        logger.error('獲取測試模式狀態失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `獲取測試模式狀態失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 更新測試模式 (HTTP Endpoint)
+ */
+exports.updateTestMode = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const {testMode} = req.body;
+
+        if (typeof testMode !== 'boolean') {
+          res.status(400).json({
+            ok: false,
+            message: 'testMode must be a boolean',
+          });
+          return;
+        }
+
+        await admin.firestore()
+            .collection('settings')
+            .doc('system')
+            .set({testMode: testMode}, {merge: true});
+
+        logger.info('測試模式已更新', {
+          userId: decodedToken.uid,
+          testMode,
+        });
+
+        res.status(200).json({
+          ok: true,
+          testMode: testMode,
+        });
+      } catch (error) {
+        logger.error('更新測試模式失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `更新測試模式失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 儲存巡邏點 (新增或更新) (HTTP Endpoint)
+ */
+exports.savePatrol = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const {id, name, lat, lng, radius, qr, active} = req.body;
+
+        if (!name || lat === undefined || lng === undefined || !radius) {
+          res.status(400).json({
+            ok: false,
+            message: 'Missing required fields: name, lat, lng, radius',
+          });
+          return;
+        }
+
+        const patrolData = {
+          name,
+          lat: parseFloat(lat),
+          lng: parseFloat(lng),
+          radius: parseInt(radius),
+          qr: qr || '',
+          active: active !== false,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        };
+
+        let patrolId;
+        if (id) {
+          await admin.firestore()
+              .collection('patrols')
+              .doc(id)
+              .set(patrolData, {merge: true});
+          patrolId = id;
+          logger.info('巡邏點已更新', {userId: decodedToken.uid, patrolId});
+        } else {
+          patrolData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+          const docRef = await admin.firestore()
+              .collection('patrols')
+              .add(patrolData);
+          patrolId = docRef.id;
+          logger.info('巡邏點已新增', {userId: decodedToken.uid, patrolId});
+        }
+
+        res.status(200).json({
+          ok: true,
+          patrolId: patrolId,
+        });
+      } catch (error) {
+        logger.error('儲存巡邏點失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `儲存巡邏點失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 刪除巡邏點 (HTTP Endpoint)
+ */
+exports.deletePatrol = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const {patrolId} = req.body;
+
+        if (!patrolId) {
+          res.status(400).json({
+            ok: false,
+            message: 'Missing patrolId',
+          });
+          return;
+        }
+
+        await admin.firestore()
+            .collection('patrols')
+            .doc(patrolId)
+            .delete();
+
+        logger.info('巡邏點已刪除', {
+          userId: decodedToken.uid,
+          patrolId,
+        });
+
+        res.status(200).json({
+          ok: true,
+        });
+      } catch (error) {
+        logger.error('刪除巡邏點失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `刪除巡邏點失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 獲取儀表板統計 (HTTP Endpoint)
+ */
+exports.getDashboardStats = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'GET') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only GET method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [
+          patrolsSnapshot,
+          todayCheckinsSnapshot,
+          allCheckinsSnapshot,
+        ] = await Promise.all([
+          admin.firestore().collection('patrols').get(),
+          admin.firestore()
+              .collection('checkins')
+              .where('timestamp', '>=', admin.firestore.Timestamp.fromDate(today))
+              .get(),
+          admin.firestore()
+              .collection('checkins')
+              .orderBy('timestamp', 'desc')
+              .limit(10)
+              .get(),
+        ]);
+
+        const recentCheckins = [];
+        for (const doc of allCheckinsSnapshot.docs) {
+          const data = doc.data();
+          
+          let patrolName = '未知巡邏點';
+          if (data.patrolId) {
+            const patrolDoc = await admin.firestore()
+                .collection('patrols')
+                .doc(data.patrolId)
+                .get();
+            if (patrolDoc.exists) {
+              patrolName = patrolDoc.data().name;
+            }
+          }
+
+          recentCheckins.push({
+            id: doc.id,
+            userId: data.userId,
+            patrolName: patrolName,
+            timestamp: data.timestamp,
+            mode: data.mode,
+          });
+        }
+
+        const stats = {
+          totalPatrols: patrolsSnapshot.size,
+          todayCheckins: todayCheckinsSnapshot.size,
+          recentCheckins: recentCheckins,
+        };
+
+        res.status(200).json({
+          ok: true,
+          stats: stats,
+        });
+      } catch (error) {
+        logger.error('獲取儀表板統計失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `獲取儀表板統計失敗: ${error.message}`,
+        });
+      }
+    },
+);
