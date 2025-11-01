@@ -39,6 +39,11 @@ export async function checkAuth(options = {}) {
             try {
                 if (!user) {
                     if (redirectToLogin) {
+                        // 💾 記住用戶原本想去的頁面
+                        const returnUrl = window.location.pathname + window.location.search;
+                        if (returnUrl !== '/' && returnUrl !== '/index.html') {
+                            sessionStorage.setItem('line_login_return_url', returnUrl);
+                        }
                         window.location.href = '/';
                     }
                     if (onFail) onFail({ error: 'NOT_AUTHENTICATED' });
@@ -53,6 +58,11 @@ export async function checkAuth(options = {}) {
                     if (redirectToLogin) {
                         alert('使用者資料不存在，請重新登入');
                         await platformAuth.signOut();
+                        // 💾 記住用戶原本想去的頁面
+                        const returnUrl = window.location.pathname + window.location.search;
+                        if (returnUrl !== '/' && returnUrl !== '/index.html') {
+                            sessionStorage.setItem('line_login_return_url', returnUrl);
+                        }
                         window.location.href = '/';
                     }
                     if (onFail) onFail({ error: 'USER_NOT_FOUND' });
@@ -71,6 +81,7 @@ export async function checkAuth(options = {}) {
                     if (!hasRequiredRole) {
                         if (redirectToLogin) {
                             alert('您沒有存取此頁面的權限');
+                            // 權限不足時不記錄返回URL，因為用戶不應該回到這個頁面
                             window.location.href = '/';
                         }
                         if (onFail) onFail({ 
