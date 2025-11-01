@@ -46,11 +46,9 @@ async function handleLineLogin() {
         const state = crypto.randomUUID();
         sessionStorage.setItem('line_login_state', state);
         
-        // 💾 記住用戶原本想去的頁面
+        // 💾 記住用戶原本想去的頁面（包括首頁）
         const returnUrl = window.location.pathname + window.location.search;
-        if (returnUrl !== '/' && returnUrl !== '/index.html') {
-            sessionStorage.setItem('line_login_return_url', returnUrl);
-        }
+        sessionStorage.setItem('line_login_return_url', returnUrl);
 
         // 構建 LINE 授權 URL
         const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
