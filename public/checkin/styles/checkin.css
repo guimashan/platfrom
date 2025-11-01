@@ -50,7 +50,7 @@
 .form-select {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid #D1C4E9;
+    border: 2px solid #D4AF37;
     border-radius: 8px;
     font-size: 1rem;
     font-family: 'Noto Sans TC', sans-serif;
@@ -61,12 +61,12 @@
 
 .form-select:focus {
     outline: none;
-    border-color: #D4AF37;
+    border-color: #C19B2B;
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
 .form-select:hover {
-    border-color: #B39DDB;
+    border-color: #C19B2B;
 }
 
 .form-select option {
@@ -149,7 +149,7 @@
 .mode-tab {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid #B39DDB;
+    border: 2px solid #D4AF37;
     background: transparent;
     color: #333;
     border-radius: 8px;
@@ -160,8 +160,8 @@
 }
 
 .mode-tab:hover {
-    border-color: #9575CD;
-    background: rgba(179, 157, 219, 0.1);
+    border-color: #C19B2B;
+    background: rgba(212, 175, 55, 0.1);
 }
 
 .mode-tab.active {
