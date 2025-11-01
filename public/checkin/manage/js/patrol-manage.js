@@ -337,14 +337,14 @@ function useCurrentLocation() {
             document.getElementById('patrolLat').value = position.coords.latitude.toFixed(6);
             document.getElementById('patrolLng').value = position.coords.longitude.toFixed(6);
             btn.disabled = false;
-            btn.textContent = '📍 使用當前位置';
+            btn.textContent = '使用當前位置';
             alert('已自動填入當前位置');
         },
         (error) => {
             console.error('定位失敗:', error);
             alert('定位失敗，請手動輸入座標');
             btn.disabled = false;
-            btn.textContent = '📍 使用當前位置';
+            btn.textContent = '使用當前位置';
         }
     );
 }
