@@ -648,48 +648,19 @@ exports.getCheckinHistory = onRequest(
               .get();
         }
 
-        const checkins = [];
-        for (const doc of checkinsSnapshot.docs) {
+        const checkins = checkinsSnapshot.docs.map(doc => {
           const data = doc.data();
-          
-          let patrolName = '未知巡邏點';
-          if (data.patrolId) {
-            const patrolDoc = await admin.firestore()
-                .collection('patrols')
-                .doc(data.patrolId)
-                .get();
-            if (patrolDoc.exists) {
-              patrolName = patrolDoc.data().name;
-            }
-          }
-          
-          // 獲取用戶名稱
-          let userName = '未知用戶';
-          if (data.userId) {
-            try {
-              const userDoc = await platformDb.collection('users')
-                  .doc(data.userId)
-                  .get();
-              if (userDoc.exists) {
-                userName = userDoc.data().displayName || '未知用戶';
-              }
-            } catch (error) {
-              logger.error('獲取用戶資料失敗', {userId: data.userId, error});
-            }
-          }
-
-          checkins.push({
+          return {
             id: doc.id,
             userId: data.userId,
-            userName: userName,
             patrolId: data.patrolId,
-            patrolName: patrolName,
             timestamp: data.timestamp,
             mode: data.mode,
             distance: data.distance,
             testMode: data.testMode,
-          });
-        }
+            location: data.location,
+          };
+        });
 
         logger.info('簽到紀錄已取得', {
           userId,
