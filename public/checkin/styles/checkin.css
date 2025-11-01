@@ -34,12 +34,15 @@
 
 .patrol-select {
     margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .patrol-select label {
-    display: block;
-    margin-bottom: 0.5rem;
     font-weight: 500;
+    white-space: nowrap;
+    min-width: fit-content;
 }
 
 .form-select {
@@ -58,11 +61,14 @@
 }
 
 .location-status {
-    background: var(--bg-gray);
+    background: #E3F2FD;
+    border: 2px solid #90CAF9;
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
     text-align: center;
+    color: #1976D2;
+    font-weight: 500;
 }
 
 .location-status.active {
@@ -128,8 +134,9 @@
 .mode-tab {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid var(--bg-gray);
-    background: white;
+    border: 2px solid #B39DDB;
+    background: #EDE7F6;
+    color: #333;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
@@ -139,7 +146,7 @@
 
 .mode-tab:hover {
     border-color: var(--primary-color);
-    background: rgba(138, 43, 226, 0.05);
+    background: #D1C4E9;
 }
 
 .mode-tab.active {
@@ -198,5 +205,11 @@
     .mode-tab {
         font-size: 0.9rem;
         padding: 0.6rem 0.5rem;
+    }
+    
+    .patrol-select {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
     }
 }
