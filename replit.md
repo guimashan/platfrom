@@ -173,14 +173,48 @@ npm run emulators
 - Vercel 團隊: guimashan's projects
 - Vercel 專案 ID: prj_FwuUrTa2m4MaMocVnb2wAGB8CPyy
 
-## LINE 登入資訊
+## LINE 整合資訊
+
+### LINE Login (OAuth 2.0)
 - Channel ID: 2008269293
+- Channel Type: LINE Login
 - Callback URLs: 
   - 正式: https://go.guimashan.org.tw/callback.html
   - 備用: https://guimashan.vercel.app/callback.html
   - 測試: http://localhost:5000/callback.html
 
+### LINE LIFF (Front-end Framework)
+使用同一個 LINE Login Channel (2008269293)
+- 奉香簽到 LIFF App: /liff/checkin.html
+- 神務服務 LIFF App: /liff/service.html
+- 排班系統 LIFF App: /liff/schedule.html
+- LIFF IDs: 需在 LINE Developers Console 建立後更新
+
+### LINE Messaging API (官方帳號)
+- 需建立 Messaging API Channel
+- Webhook URL: https://asia-east2-platform-bc783.cloudfunctions.net/lineWebhook
+- 支援關鍵字觸發 LIFF App
+
 ## 最近變更
+
+### 2025-11-01 LIFF 整合（LINE Front-end Framework）
+- ✅ 建立 LIFF 專用頁面
+  - /liff/checkin.html - 奉香簽到 LIFF App
+  - /liff/service.html - 神務服務 LIFF App
+  - /liff/schedule.html - 排班系統 LIFF App
+- ✅ 建立 LIFF 初始化模組 (liff-init.js)
+  - LIFF SDK 整合
+  - 自動 LINE 用戶認證
+  - Firebase Authentication 整合
+  - 支援發送訊息到聊天室
+- ✅ 建立 LINE Messaging API Webhook
+  - functions/src/messaging/index.js
+  - lineWebhook Function (asia-east2)
+  - 支援關鍵字回覆 LIFF URL
+  - 關鍵字：奉香簽到、神務服務、排班系統、幫助
+- ✅ 完整設定文件
+  - LIFF_SETUP_GUIDE.md - 詳細設定步驟
+  - 包含測試和疑難排解指南
 
 ### 2025-11-01 完整平台架構重構（第一、二階段樣本）
 - ✅ 重構統一 LINE Login 入口頁面 (/index.html)
