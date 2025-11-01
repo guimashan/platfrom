@@ -100,6 +100,7 @@ function renderUsers() {
         <table>
             <thead>
                 <tr>
+                    <th style="width: 60px;"></th>
                     <th>用戶名稱</th>
                     <th>角色</th>
                     <th>Email</th>
@@ -118,11 +119,22 @@ function renderUsers() {
             : '<span class="badge">一般用戶</span>';
         const statusBadge = user.active !== false ? '<span class="badge success">啟用</span>' : '<span class="badge danger">停用</span>';
         
+        const avatarUrl = user.photoURL || '/images/default-avatar.svg';
+        const displayName = user.displayName || user.email || '未設定名稱';
+        
         html += `
             <tr>
+                <td style="padding: 0.5rem; text-align: center;">
+                    <img src="${avatarUrl}" 
+                         alt="${displayName}" 
+                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;"
+                         onerror="this.src='/images/default-avatar.svg'">
+                </td>
                 <td>
-                    <strong>${user.displayName || '未設定'}</strong><br>
-                    <small style="color: #666; font-family: monospace;">${user.id}</small>
+                    <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+                        <strong style="font-size: 1rem;">${displayName}</strong>
+                        <small style="color: #666; font-size: 0.8rem; font-family: monospace;">${user.id.substring(0, 12)}...</small>
+                    </div>
                 </td>
                 <td>${roleBadges}</td>
                 <td>${user.email || 'N/A'}</td>
