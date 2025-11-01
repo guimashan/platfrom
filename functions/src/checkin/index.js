@@ -798,7 +798,7 @@ exports.savePatrol = onRequest(
         const decodedToken = await verifyPlatformToken(req, res);
         if (!decodedToken) return;
 
-        const {id, name, lat, lng, radius, qr, active} = req.body;
+        const {id, name, lat, lng, radius, qr, active, skipDistanceCheck} = req.body;
 
         if (!name || lat === undefined || lng === undefined || !radius) {
           res.status(400).json({
@@ -815,6 +815,7 @@ exports.savePatrol = onRequest(
           radius: parseInt(radius),
           qr: qr || '',
           active: active !== false,
+          skipDistanceCheck: skipDistanceCheck || false,
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 

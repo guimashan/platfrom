@@ -240,7 +240,10 @@ async function savePatrol(event) {
         });
         
         closePatrolModal();
+        
+        // 立即重新加載列表以顯示最新狀態
         await loadPatrols();
+        
         alert('儲存成功');
     } catch (error) {
         console.error('儲存失敗:', error);
