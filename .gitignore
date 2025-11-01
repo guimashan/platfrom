@@ -34,3 +34,4 @@ Thumbs.db
 
 # Attached assets (screenshots, internal docs)
 attached_assets/
+.vercel
