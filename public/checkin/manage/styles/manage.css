@@ -7,10 +7,10 @@
 }
 
 .header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #D4AF37, #B8941F);
     color: white;
     padding: 1.5rem 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
 }
 
 .header-content {
@@ -38,8 +38,9 @@
     text-decoration: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
-    transition: background 0.3s;
+    transition: all 0.3s;
     font-weight: 500;
+    background: transparent;
 }
 
 .nav-link:hover {
@@ -47,7 +48,8 @@
 }
 
 .nav-link.active {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.25);
+    border: 1px solid rgba(255,255,255,0.3);
 }
 
 /* 管理卡片 */
@@ -83,41 +85,53 @@
 }
 
 .stat-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: #FFF9F0;
+    color: #2C2416;
     padding: 1.5rem;
     border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+    border: 2px solid #D4AF37;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
 }
 
 .stat-card.green {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    background: #FFF9F0;
+    border-color: #D4AF37;
 }
 
 .stat-card.orange {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    background: #FFF9F0;
+    border-color: #D4AF37;
 }
 
 .stat-card.blue {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    background: #FFF9F0;
+    border-color: #D4AF37;
 }
 
 .stat-label {
     font-size: 0.9rem;
-    opacity: 0.9;
+    color: #6B5D4F;
     margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
 .stat-value {
     font-size: 2.5rem;
     font-weight: 700;
     margin: 0;
+    color: #D4AF37;
 }
 
 .stat-trend {
     font-size: 0.85rem;
     margin-top: 0.5rem;
-    opacity: 0.9;
+    color: #6B5D4F;
 }
 
 /* 篩選區域 */
