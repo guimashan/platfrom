@@ -61,23 +61,25 @@
 }
 
 .location-status {
-    background: #E3F2FD;
-    border: 2px solid #90CAF9;
+    background: #E0F7FA;
+    border: 2px solid #80DEEA;
     padding: 1rem;
     border-radius: 8px;
     margin-bottom: 1.5rem;
     text-align: center;
-    color: #1976D2;
+    color: #00695C;
     font-weight: 500;
 }
 
 .location-status.active {
-    background: #E8F5E9;
-    color: var(--success-color);
+    background: #E0F7FA;
+    border-color: #4DD0E1;
+    color: #00695C;
 }
 
 .location-status.error {
     background: #FFEBEE;
+    border-color: #EF9A9A;
     color: var(--error-color);
 }
 
@@ -134,8 +136,8 @@
 .mode-tab {
     flex: 1;
     padding: 0.75rem 1rem;
-    border: 2px solid #B39DDB;
-    background: #EDE7F6;
+    border: 2px solid #D1C4E9;
+    background: #F3F0FF;
     color: #333;
     border-radius: 8px;
     cursor: pointer;
@@ -145,14 +147,15 @@
 }
 
 .mode-tab:hover {
-    border-color: var(--primary-color);
-    background: #D1C4E9;
+    border-color: #B39DDB;
+    background: #E8E0FF;
 }
 
 .mode-tab.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: #F3F0FF;
+    color: #333;
+    border-color: #B39DDB;
+    font-weight: 600;
 }
 
 /* 模式內容區域 */
