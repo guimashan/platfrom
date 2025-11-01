@@ -1,9 +1,13 @@
 /* 奉香簽到模組樣式 */
 
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-home,
 .btn-logout {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
     background: rgba(255,255,255,0.2);
     color: white;
     border: 1px solid white;
@@ -11,8 +15,10 @@
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
+.btn-home:hover,
 .btn-logout:hover {
     background: rgba(255,255,255,0.3);
 }
