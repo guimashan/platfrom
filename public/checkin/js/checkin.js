@@ -3,7 +3,7 @@
  * 處理 GPS 簽到功能
  */
 
-import { checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, checkinDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
 import { checkAuth, logout, displayUserInfo } from '/js/auth-guard.js';
 import { 
     collection, 
