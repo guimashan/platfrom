@@ -107,6 +107,10 @@ function redirectByRole(roles) {
         showModuleGrid(roles);
         return;
     }
+    
+    // 其他頁面：用戶已經在目標頁面，不需要重定向
+    // 各頁面的 auth-guard 會自行處理權限檢查
+    console.log('使用者已在頁面:', currentPath);
 }
 
 // 顯示模組選單
