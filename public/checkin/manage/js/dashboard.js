@@ -211,7 +211,6 @@ function applyFilters() {
     const endDate = document.getElementById('endDate').value;
     const patrolId = document.getElementById('patrolFilter').value;
     const method = document.getElementById('methodFilter').value;
-    const testMode = document.getElementById('testModeFilter').value;
     const userSearch = document.getElementById('userSearch').value.toLowerCase();
 
     filteredRecords = allRecords.filter(record => {
@@ -237,13 +236,6 @@ function applyFilters() {
             const recordMode = record.mode || 'gps';
             if (method === 'qrcode' && recordMode !== 'qr') return false;
             if (method === 'gps' && recordMode !== 'gps') return false;
-        }
-
-        // 測試模式篩選
-        if (testMode) {
-            const isTestMode = record.testMode === true;
-            if (testMode === 'true' && !isTestMode) return false;
-            if (testMode === 'false' && isTestMode) return false;
         }
 
         // 用戶搜尋
@@ -394,7 +386,6 @@ function resetFilters() {
     document.getElementById('endDate').value = '';
     document.getElementById('patrolFilter').value = '';
     document.getElementById('methodFilter').value = '';
-    document.getElementById('testModeFilter').value = '';
     document.getElementById('userSearch').value = '';
     
     filteredRecords = [...allRecords];
