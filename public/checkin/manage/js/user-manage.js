@@ -209,9 +209,9 @@ function editUser(userId) {
     document.getElementById('editUserId').textContent = userId;
     
     const roles = user.roles || [];
-    const select = document.getElementById('userRole');
-    Array.from(select.options).forEach(option => {
-        option.selected = roles.includes(option.value);
+    const checkboxes = document.querySelectorAll('.role-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = roles.includes(checkbox.value);
     });
     
     document.getElementById('userActive').checked = user.active !== false;
@@ -229,9 +229,14 @@ async function saveUserChanges(event) {
     
     if (!editingUserId) return;
     
-    const select = document.getElementById('userRole');
-    const selectedRoles = Array.from(select.selectedOptions).map(opt => opt.value);
+    const checkboxes = document.querySelectorAll('.role-checkbox:checked');
+    const selectedRoles = Array.from(checkboxes).map(cb => cb.value);
     const active = document.getElementById('userActive').checked;
+    
+    if (selectedRoles.length === 0) {
+        alert('請至少選擇一個角色');
+        return;
+    }
     
     try {
         await updateDoc(doc(platformDb, 'users', editingUserId), {

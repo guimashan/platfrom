@@ -61,19 +61,42 @@
 
             <form id="editUserForm">
                 <div class="form-group">
-                    <label for="userRole">角色 * (可多選)</label>
-                    <select id="userRole" required multiple style="height: 160px;">
-                        <option value="user">一般用戶</option>
-                        <option value="poweruser_checkin">簽到幹部</option>
-                        <option value="poweruser_service">神務幹部</option>
-                        <option value="poweruser_schedule">排班幹部</option>
-                        <option value="admin_checkin">簽到管理員</option>
-                        <option value="admin_service">神務管理員</option>
-                        <option value="admin_schedule">排班管理員</option>
-                        <option value="superadmin">超級管理員</option>
-                    </select>
+                    <label>角色 * (可多選)</label>
+                    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 1rem; background: #f8f9fa;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="user" style="width: auto; margin: 0;">
+                            <span>一般用戶</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_checkin" style="width: auto; margin: 0;">
+                            <span>簽到幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_service" style="width: auto; margin: 0;">
+                            <span>神務幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_schedule" style="width: auto; margin: 0;">
+                            <span>排班幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_checkin" style="width: auto; margin: 0;">
+                            <span>簽到管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_service" style="width: auto; margin: 0;">
+                            <span>神務管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_schedule" style="width: auto; margin: 0;">
+                            <span>排班管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="superadmin" style="width: auto; margin: 0;">
+                            <span>超級管理員</span>
+                        </label>
+                    </div>
                     <small>
-                        按住 Ctrl (Windows) 或 Cmd (Mac) 可多選<br>
                         <strong>一般用戶：</strong>只能簽到和查看自己的記錄<br>
                         <strong>幹部：</strong>可查看對應模組所有記錄、篩選匯出、免GPS驗證<br>
                         <strong>管理員：</strong>可管理對應模組的所有功能<br>
@@ -82,9 +105,9 @@
                 </div>
 
                 <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="userActive" checked>
-                        啟用此帳號
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="userActive" checked style="width: auto; margin: 0;">
+                        <span>啟用此帳號</span>
                     </label>
                     <small>停用後，用戶將無法使用系統</small>
                 </div>
