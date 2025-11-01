@@ -450,9 +450,12 @@ exports.verifyCheckinV2 = onRequest(
         );
 
         const tolerance = patrolData.radius || 50;
+        
+        // 檢查是否略過距離驗證（全局測試模式或巡邏點測試模式）
+        const skipCheck = testMode || patrolData.skipDistanceCheck;
 
-        // 測試模式下總是允許簽到
-        if (testMode || distance <= tolerance) {
+        // 測試模式下或距離允許範圍內允許簽到
+        if (skipCheck || distance <= tolerance) {
           const checkinData = {
             userId: userId,
             patrolId: patrolId,
@@ -460,7 +463,8 @@ exports.verifyCheckinV2 = onRequest(
             distance: distance,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
             mode: 'gps',
-            testMode: testMode,
+            testMode: testMode || patrolData.skipDistanceCheck,
+            patrolTestMode: patrolData.skipDistanceCheck || false,
           };
 
           await admin.firestore().collection('checkins').add(checkinData);
@@ -470,6 +474,7 @@ exports.verifyCheckinV2 = onRequest(
             patrolId,
             distance,
             testMode,
+            patrolTestMode: patrolData.skipDistanceCheck,
           });
 
           res.status(200).json({
@@ -477,7 +482,7 @@ exports.verifyCheckinV2 = onRequest(
             mode: 'gps',
             distanceMeters: distance,
             patrolId: patrolId,
-            testMode: testMode,
+            testMode: testMode || patrolData.skipDistanceCheck,
           });
         } else {
           logger.warn('GPS 簽到失敗 - 超出範圍', {
@@ -636,9 +641,26 @@ exports.getCheckinHistory = onRequest(
               patrolName = patrolDoc.data().name;
             }
           }
+          
+          // 獲取用戶名稱
+          let userName = '未知用戶';
+          if (data.userId) {
+            try {
+              const userDoc = await platformDb.collection('users')
+                  .doc(data.userId)
+                  .get();
+              if (userDoc.exists) {
+                userName = userDoc.data().displayName || '未知用戶';
+              }
+            } catch (error) {
+              logger.error('獲取用戶資料失敗', {userId: data.userId, error});
+            }
+          }
 
           checkins.push({
             id: doc.id,
+            userId: data.userId,
+            userName: userName,
             patrolId: data.patrolId,
             patrolName: patrolName,
             timestamp: data.timestamp,

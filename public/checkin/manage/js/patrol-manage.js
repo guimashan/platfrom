@@ -144,6 +144,7 @@ function renderPatrols() {
                     <th>名稱</th>
                     <th>座標</th>
                     <th>容許距離</th>
+                    <th>測試模式</th>
                     <th>操作</th>
                 </tr>
             </thead>
@@ -151,11 +152,16 @@ function renderPatrols() {
     `;
     
     patrols.forEach(patrol => {
+        const testModeBadge = patrol.skipDistanceCheck ? 
+            '<span class="badge warning">已開啟</span>' : 
+            '<span class="badge success">已關閉</span>';
+        
         html += `
             <tr>
                 <td><strong>${patrol.name}</strong></td>
                 <td>${patrol.lat?.toFixed(6)}, ${patrol.lng?.toFixed(6)}</td>
                 <td>${patrol.radius || 30} 公尺</td>
+                <td>${testModeBadge}</td>
                 <td>
                     <button class="btn btn-sm btn-secondary" onclick="window.editPatrol('${patrol.id}')">編輯</button>
                     <button class="btn btn-sm btn-primary" onclick="window.showQRCode('${patrol.id}')">QR Code</button>
@@ -185,9 +191,11 @@ function openPatrolModal(patrolId = null) {
         document.getElementById('patrolLat').value = patrol.lat || '';
         document.getElementById('patrolLng').value = patrol.lng || '';
         document.getElementById('patrolRadius').value = patrol.radius || 30;
+        document.getElementById('skipDistanceCheck').checked = patrol.skipDistanceCheck || false;
     } else {
         modalTitle.textContent = '新增巡邏點';
         form.reset();
+        document.getElementById('skipDistanceCheck').checked = false;
     }
     
     modal.classList.remove('hidden');
@@ -205,6 +213,7 @@ async function savePatrol(event) {
     const lat = parseFloat(document.getElementById('patrolLat').value);
     const lng = parseFloat(document.getElementById('patrolLng').value);
     const radius = parseInt(document.getElementById('patrolRadius').value);
+    const skipDistanceCheck = document.getElementById('skipDistanceCheck').checked;
     
     if (!name || isNaN(lat) || isNaN(lng) || isNaN(radius)) {
         alert('請填寫所有必填欄位');
@@ -217,6 +226,7 @@ async function savePatrol(event) {
             lat,
             lng,
             radius,
+            skipDistanceCheck,
             active: true
         };
         
@@ -273,14 +283,17 @@ function showQRCode(patrolId) {
     
     const qrData = `PATROL_${patrolId}`;
     
-    QRCode.toCanvas(qrData, {
+    // 創建 canvas 元素
+    const canvas = document.createElement('canvas');
+    
+    QRCode.toCanvas(canvas, qrData, {
         width: 300,
         margin: 2,
         color: {
             dark: '#000000',
             light: '#FFFFFF'
         }
-    }, (error, canvas) => {
+    }, (error) => {
         if (error) {
             console.error('QR Code 生成失敗:', error);
             container.innerHTML = '<p class="error">生成失敗</p>';

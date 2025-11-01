@@ -295,7 +295,8 @@ function renderRecords() {
 
     pageRecords.forEach(record => {
         const timestamp = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date();
-        const userName = usersMap[record.userId]?.displayName || '未知用戶';
+        // 優先使用 API 返回的 userName，否則從 usersMap 查找
+        const userName = record.userName || usersMap[record.userId]?.displayName || '未知用戶';
         const patrolName = record.patrolName || patrolsList[record.patrolId]?.name || record.patrolId;
         const distance = record.distance !== undefined ? `${record.distance.toFixed(1)} m` : 'N/A';
         const method = (record.mode === 'qr') ? 'QR Code' : 'GPS 定位';
@@ -331,7 +332,8 @@ async function exportToExcel() {
     // 使用 SheetJS 匯出 Excel
     const data = filteredRecords.map(record => {
         const timestamp = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date();
-        const userName = usersMap[record.userId]?.displayName || '未知用戶';
+        // 優先使用 API 返回的 userName
+        const userName = record.userName || usersMap[record.userId]?.displayName || '未知用戶';
         const patrolName = record.patrolName || patrolsList[record.patrolId]?.name || record.patrolId;
         const distance = record.distance !== undefined ? record.distance.toFixed(1) : 'N/A';
         const method = (record.mode === 'qr') ? 'QR Code' : 'GPS 定位';
