@@ -126,14 +126,23 @@
 
         async function init() {
             try {
+                console.log('=== LIFF App 開始初始化 ===');
+                console.log('LIFF ID:', LIFF_ID);
+                console.log('當前 URL:', window.location.href);
+                console.log('LIFF SDK 已載入:', typeof liff !== 'undefined');
+                
                 const liffData = await initLiff(LIFF_ID);
                 
+                console.log('LIFF 初始化結果:', liffData);
+                
                 if (!liffData) {
+                    console.log('LIFF 初始化返回 null，可能正在重定向到登入頁面');
                     return;
                 }
 
                 onAuthStateChanged(platformAuth, async (user) => {
                     if (user) {
+                        console.log('Firebase 用戶已登入:', user.uid);
                         currentUser = user;
                         const profile = getLiffProfile();
                         
@@ -149,8 +158,31 @@
                 });
 
             } catch (error) {
-                console.error('初始化失敗:', error);
-                alert('系統初始化失敗，請稍後再試');
+                console.error('=== 初始化失敗詳細錯誤 ===');
+                console.error('錯誤類型:', error.name);
+                console.error('錯誤訊息:', error.message);
+                console.error('錯誤堆疊:', error.stack);
+                
+                // 顯示詳細錯誤信息（僅開發環境）
+                const isDev = window.location.hostname.includes('localhost') || 
+                             window.location.hostname.includes('replit');
+                
+                if (isDev) {
+                    alert(`系統初始化失敗\n\n錯誤類型: ${error.name}\n錯誤訊息: ${error.message}\n\n請查看開發者工具的 Console`);
+                } else {
+                    alert('系統初始化失敗，請稍後再試');
+                }
+                
+                // 顯示錯誤頁面
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div style="color: #ef4444; text-align: center; padding: 2rem;">
+                        <h3>❌ 初始化失敗</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #8A2BE2; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            重新載入
+                        </button>
+                    </div>
+                `;
             }
         }
 
