@@ -144,13 +144,29 @@ body {
     background: var(--bg-card);
 }
 
-.btn-danger, .btn-logout {
-    background: #8B4513;
+.btn-danger {
+    background: #dc3545;
     color: white;
 }
 
-.btn-danger:hover, .btn-logout:hover {
-    background: #6B3410;
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-logout {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+.btn-logout:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: white;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
 }
 
 /* 模組網格 */
