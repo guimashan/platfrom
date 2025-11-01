@@ -42,6 +42,7 @@ export async function checkAuth(options = {}) {
                         // 💾 記住用戶原本想去的頁面（包括首頁）
                         const returnUrl = window.location.pathname + window.location.search;
                         sessionStorage.setItem('line_login_return_url', returnUrl);
+                        console.log('🔵 [auth-guard] 儲存返回URL:', returnUrl);
                         window.location.href = '/';
                     }
                     if (onFail) onFail({ error: 'NOT_AUTHENTICATED' });

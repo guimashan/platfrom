@@ -108,9 +108,13 @@
 
                 // 導向用戶原本想去的頁面，如果沒有則導向首頁
                 const returnUrl = sessionStorage.getItem('line_login_return_url');
+                console.log('🟢 [callback] 讀取返回URL:', returnUrl);
+                console.log('🟢 [callback] sessionStorage 內容:', Object.keys(sessionStorage).map(k => `${k}=${sessionStorage.getItem(k)}`));
                 sessionStorage.removeItem('line_login_return_url'); // 清除已使用的返回URL
                 
-                window.location.href = returnUrl || '/';
+                const finalUrl = returnUrl || '/';
+                console.log('🟢 [callback] 最終跳轉到:', finalUrl);
+                window.location.href = finalUrl;
 
             } catch (error) {
                 console.error('處理回調失敗:', error);
