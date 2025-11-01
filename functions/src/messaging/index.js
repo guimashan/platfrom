@@ -173,11 +173,15 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
     }
 
     // ✅ 生產環境已啟用簽名驗證
-    const bodyString = JSON.stringify(req.body);
+    // 使用原始請求體進行簽名驗證
+    const bodyString = req.rawBody ? req.rawBody.toString('utf8') : JSON.stringify(req.body);
     try {
       const isValid = line.validateSignature(bodyString, channelSecret, signature);
       if (!isValid) {
-        logger.error('❌ 簽名驗證失敗');
+        logger.error('❌ 簽名驗證失敗', {
+          bodyLength: bodyString.length,
+          signature: signature.substring(0, 20) + '...'
+        });
         res.status(401).send('Unauthorized: Invalid signature');
         return;
       }
