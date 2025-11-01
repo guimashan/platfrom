@@ -165,7 +165,7 @@ npm run emulators
 ## 部署資訊
 
 ### Staging (測試環境)
-- 網址: guimashan.vercel.app
+- 網址: https://guimashan.vercel.app
 - 用途: 整合測試
 
 ### Production (正式環境)
@@ -175,7 +175,10 @@ npm run emulators
 
 ## LINE 登入資訊
 - Channel ID: 2008269293
-- Callback URL: https://go.guimashan.org.tw/__/auth/handler
+- Callback URLs: 
+  - 正式: https://go.guimashan.org.tw/callback.html
+  - 備用: https://guimashan.vercel.app/callback.html
+  - 測試: http://localhost:5000/callback.html
 
 ## 最近變更
 

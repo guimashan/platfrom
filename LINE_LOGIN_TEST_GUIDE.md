@@ -20,8 +20,9 @@
 
 #### Callback URL（LINE Login 標籤）
 ```
-✅ https://guimashan.vercel.app/callback.html
-✅ http://localhost:5000/callback.html
+✅ https://go.guimashan.org.tw/callback.html (正式網址)
+✅ https://guimashan.vercel.app/callback.html (備用)
+✅ http://localhost:5000/callback.html (本地測試)
 ```
 
 #### Channel 資訊（Basic settings）
@@ -36,7 +37,8 @@
 
 #### 授權域名（Authentication → Settings → Authorized domains）
 ```
-✅ guimashan.vercel.app
+✅ go.guimashan.org.tw (正式網址)
+✅ guimashan.vercel.app (備用)
 ✅ localhost (預設)
 ```
 
@@ -70,7 +72,7 @@
 
 #### 步驟
 1. 清除瀏覽器快取和 Cookie
-2. 訪問：https://guimashan.vercel.app
+2. 訪問：https://go.guimashan.org.tw 或 https://guimashan.vercel.app
 3. 打開瀏覽器開發者工具（F12）→ Console 標籤
 4. 點擊「LINE 登入」按鈕
 
