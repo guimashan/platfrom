@@ -619,13 +619,32 @@ exports.getCheckinHistory = onRequest(
 
         const userId = decodedToken.uid;
         const limit = parseInt(req.query.limit) || 50;
+        
+        // 檢查用戶是否有管理權限
+        const userDoc = await platformDb.collection('users').doc(userId).get();
+        const userData = userDoc.exists ? userDoc.data() : null;
+        const roles = userData?.roles || [];
+        const isAdmin = roles.some(role => 
+          role === 'poweruser_checkin' || role === 'admin_checkin' || role === 'superadmin'
+        );
 
-        const checkinsSnapshot = await admin.firestore()
-            .collection('checkins')
-            .where('userId', '==', userId)
-            .orderBy('timestamp', 'desc')
-            .limit(limit)
-            .get();
+        let checkinsSnapshot;
+        if (isAdmin) {
+          // 管理員：返回所有用戶的記錄
+          checkinsSnapshot = await admin.firestore()
+              .collection('checkins')
+              .orderBy('timestamp', 'desc')
+              .limit(limit)
+              .get();
+        } else {
+          // 一般用戶：只返回自己的記錄
+          checkinsSnapshot = await admin.firestore()
+              .collection('checkins')
+              .where('userId', '==', userId)
+              .orderBy('timestamp', 'desc')
+              .limit(limit)
+              .get();
+        }
 
         const checkins = [];
         for (const doc of checkinsSnapshot.docs) {
