@@ -4,7 +4,7 @@
 
 import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { getDoc, doc, collection, getDocs, query, orderBy, limit as firestoreLimit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
 
@@ -56,50 +56,89 @@ onAuthStateChanged(platformAuth, async (user) => {
 
 async function init() {
     try {
-        const result = await callAPI(API_ENDPOINTS.getDashboardStats, {
-            method: 'GET'
-        });
+        // 顯示載入狀態
+        document.getElementById('todayCount').textContent = '載入中...';
+        document.getElementById('weekCount').textContent = '載入中...';
+        document.getElementById('activeUsers').textContent = '載入中...';
+        document.getElementById('totalCount').textContent = '載入中...';
         
-        const stats = result.stats || {};
+        // 載入所有數據
+        await Promise.all([
+            loadPatrols(),
+            loadUsers(),
+            loadAllRecords()
+        ]);
         
-        document.getElementById('totalPatrols').textContent = stats.totalPatrols || 0;
-        document.getElementById('todayCheckins').textContent = stats.todayCheckins || 0;
+        // 計算統計數據
+        calculateStats();
         
-        const recentList = document.getElementById('recentList');
-        if (stats.recentCheckins && stats.recentCheckins.length > 0) {
-            let html = '<ul>';
-            stats.recentCheckins.forEach(checkin => {
-                const timestamp = checkin.timestamp?.toDate ? checkin.timestamp.toDate() : new Date(checkin.timestamp?._seconds * 1000 || Date.now());
-                const mode = checkin.mode === 'qr' ? 'QR' : 'GPS';
-                html += `<li>${formatDateTime(timestamp)} - ${checkin.patrolName} (${mode})</li>`;
-            });
-            html += '</ul>';
-            recentList.innerHTML = html;
-        } else {
-            recentList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
-        }
+        // 初始化篩選
+        filteredRecords = [...allRecords];
+        renderRecords();
+        
     } catch (error) {
         console.error('初始化失敗:', error);
         alert('載入資料失敗，請重新整理頁面');
     }
 }
 
-function formatDateTime(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-}
-
 async function loadPatrols() {
+    try {
+        const result = await callAPI(API_ENDPOINTS.getPatrols, {
+            method: 'GET'
+        });
+        
+        const patrols = result.patrols || [];
+        patrolsList = {};
+        
+        const patrolFilter = document.getElementById('patrolFilter');
+        // 保留第一個 "全部" 選項
+        patrolFilter.innerHTML = '<option value="">全部</option>';
+        
+        patrols.forEach(patrol => {
+            patrolsList[patrol.id] = patrol;
+            
+            const option = document.createElement('option');
+            option.value = patrol.id;
+            option.textContent = patrol.name;
+            patrolFilter.appendChild(option);
+        });
+        
+        console.log(`已載入 ${patrols.length} 個巡邏點`);
+    } catch (error) {
+        console.error('載入巡邏點失敗:', error);
+    }
 }
 
 async function loadUsers() {
+    try {
+        const usersSnapshot = await getDocs(collection(platformDb, 'users'));
+        usersMap = {};
+        
+        usersSnapshot.forEach(doc => {
+            usersMap[doc.id] = doc.data();
+        });
+        
+        console.log(`已載入 ${usersSnapshot.size} 個用戶`);
+    } catch (error) {
+        console.error('載入用戶失敗:', error);
+    }
 }
 
 async function loadAllRecords() {
+    try {
+        const result = await callAPI(API_ENDPOINTS.getCheckinHistory, {
+            method: 'GET',
+            params: { limit: 1000 } // 載入最近 1000 筆
+        });
+        
+        allRecords = result.checkins || [];
+        
+        console.log(`已載入 ${allRecords.length} 筆簽到記錄`);
+    } catch (error) {
+        console.error('載入簽到記錄失敗:', error);
+        allRecords = [];
+    }
 }
 
 function calculateStats() {
@@ -109,12 +148,12 @@ function calculateStats() {
     weekStart.setDate(weekStart.getDate() - 7);
 
     const todayRecords = allRecords.filter(r => {
-        const recordDate = r.timestamp?.toDate() || new Date(0);
+        const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= todayStart;
     });
 
     const weekRecords = allRecords.filter(r => {
-        const recordDate = r.timestamp?.toDate() || new Date(0);
+        const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= weekStart;
     });
 
@@ -125,10 +164,11 @@ function calculateStats() {
     document.getElementById('activeUsers').textContent = activeUsersSet.size;
     document.getElementById('totalCount').textContent = allRecords.length;
 
+    // 計算趨勢
     const yesterdayStart = new Date(todayStart);
     yesterdayStart.setDate(yesterdayStart.getDate() - 1);
     const yesterdayRecords = allRecords.filter(r => {
-        const recordDate = r.timestamp?.toDate() || new Date(0);
+        const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= yesterdayStart && recordDate < todayStart;
     });
 
@@ -136,16 +176,19 @@ function calculateStats() {
     const todayTrend = document.getElementById('todayTrend');
     if (todayChange > 0) {
         todayTrend.textContent = `↑ 比昨天多 ${todayChange} 次`;
+        todayTrend.style.color = '#4caf50';
     } else if (todayChange < 0) {
         todayTrend.textContent = `↓ 比昨天少 ${Math.abs(todayChange)} 次`;
+        todayTrend.style.color = '#f44336';
     } else {
         todayTrend.textContent = '與昨天相同';
+        todayTrend.style.color = '#999';
     }
 
     const lastWeekStart = new Date(weekStart);
     lastWeekStart.setDate(lastWeekStart.getDate() - 7);
     const lastWeekRecords = allRecords.filter(r => {
-        const recordDate = r.timestamp?.toDate() || new Date(0);
+        const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= lastWeekStart && recordDate < weekStart;
     });
 
@@ -153,10 +196,13 @@ function calculateStats() {
     const weekTrend = document.getElementById('weekTrend');
     if (weekChange > 0) {
         weekTrend.textContent = `↑ 比上週多 ${weekChange} 次`;
+        weekTrend.style.color = '#4caf50';
     } else if (weekChange < 0) {
         weekTrend.textContent = `↓ 比上週少 ${Math.abs(weekChange)} 次`;
+        weekTrend.style.color = '#f44336';
     } else {
         weekTrend.textContent = '與上週相同';
+        weekTrend.style.color = '#999';
     }
 }
 
@@ -169,29 +215,38 @@ function applyFilters() {
     const userSearch = document.getElementById('userSearch').value.toLowerCase();
 
     filteredRecords = allRecords.filter(record => {
+        // 日期篩選
         if (startDate) {
-            const recordDate = record.timestamp?.toDate() || new Date(0);
+            const recordDate = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date(0);
             const start = new Date(startDate);
             if (recordDate < start) return false;
         }
 
         if (endDate) {
-            const recordDate = record.timestamp?.toDate() || new Date(0);
+            const recordDate = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date(0);
             const end = new Date(endDate);
             end.setHours(23, 59, 59, 999);
             if (recordDate > end) return false;
         }
 
+        // 巡邏點篩選
         if (patrolId && record.patrolId !== patrolId) return false;
 
-        if (method && record.method !== method) return false;
+        // 簽到方式篩選（注意：API 返回的是 mode，不是 method）
+        if (method) {
+            const recordMode = record.mode || 'gps';
+            if (method === 'qrcode' && recordMode !== 'qr') return false;
+            if (method === 'gps' && recordMode !== 'gps') return false;
+        }
 
+        // 測試模式篩選
         if (testMode) {
             const isTestMode = record.testMode === true;
             if (testMode === 'true' && !isTestMode) return false;
             if (testMode === 'false' && isTestMode) return false;
         }
 
+        // 用戶搜尋
         if (userSearch) {
             const userName = usersMap[record.userId]?.displayName || '';
             const userId = record.userId || '';
@@ -239,11 +294,11 @@ function renderRecords() {
     `;
 
     pageRecords.forEach(record => {
-        const timestamp = record.timestamp?.toDate() || new Date();
+        const timestamp = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date();
         const userName = usersMap[record.userId]?.displayName || '未知用戶';
-        const patrolName = patrolsList[record.patrolId]?.name || record.patrolId;
+        const patrolName = record.patrolName || patrolsList[record.patrolId]?.name || record.patrolId;
         const distance = record.distance !== undefined ? `${record.distance.toFixed(1)} m` : 'N/A';
-        const method = record.method === 'gps' ? 'GPS 定位' : 'QR Code';
+        const method = (record.mode === 'qr') ? 'QR Code' : 'GPS 定位';
         const testMode = record.testMode ? '<span class="badge warning">測試</span>' : '<span class="badge success">正式</span>';
 
         html += `
@@ -267,37 +322,50 @@ function renderRecords() {
     pagination.style.display = 'block';
 }
 
-function exportToCSV() {
+async function exportToExcel() {
     if (filteredRecords.length === 0) {
         alert('沒有資料可以匯出');
         return;
     }
 
-    let csv = '\uFEFF時間,用戶名稱,用戶ID,巡邏點,距離(m),簽到方式,測試模式\n';
-
-    filteredRecords.forEach(record => {
-        const timestamp = record.timestamp?.toDate() || new Date();
+    // 使用 SheetJS 匯出 Excel
+    const data = filteredRecords.map(record => {
+        const timestamp = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date();
         const userName = usersMap[record.userId]?.displayName || '未知用戶';
-        const userId = record.userId || '';
-        const patrolName = patrolsList[record.patrolId]?.name || record.patrolId;
+        const patrolName = record.patrolName || patrolsList[record.patrolId]?.name || record.patrolId;
         const distance = record.distance !== undefined ? record.distance.toFixed(1) : 'N/A';
-        const method = record.method === 'gps' ? 'GPS定位' : 'QRCode';
+        const method = (record.mode === 'qr') ? 'QR Code' : 'GPS 定位';
         const testMode = record.testMode ? '是' : '否';
 
-        csv += `"${formatDateTime(timestamp)}","${userName}","${userId}","${patrolName}","${distance}","${method}","${testMode}"\n`;
+        return {
+            '時間': formatDateTime(timestamp),
+            '用戶名稱': userName,
+            '用戶ID': record.userId || '',
+            '巡邏點': patrolName,
+            '距離(m)': distance,
+            '簽到方式': method,
+            '測試模式': testMode
+        };
     });
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
+    // 動態載入 SheetJS
+    if (typeof XLSX === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+        script.onload = () => performExport(data);
+        document.head.appendChild(script);
+    } else {
+        performExport(data);
+    }
+}
+
+function performExport(data) {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, '簽到記錄');
     
-    link.setAttribute('href', url);
-    link.setAttribute('download', `簽到記錄_${formatDateForFile(new Date())}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const filename = `簽到記錄_${formatDateForFile(new Date())}.xlsx`;
+    XLSX.writeFile(workbook, filename);
 }
 
 function formatDateTime(date) {
@@ -334,7 +402,7 @@ function resetFilters() {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    document.getElementById('exportBtn')?.addEventListener('click', exportToCSV);
+    document.getElementById('exportBtn')?.addEventListener('click', exportToExcel);
     document.getElementById('applyFilterBtn')?.addEventListener('click', applyFilters);
     document.getElementById('resetFilterBtn')?.addEventListener('click', resetFilters);
     
