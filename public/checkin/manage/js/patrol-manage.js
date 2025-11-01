@@ -283,34 +283,37 @@ function showQRCode(patrolId) {
     
     const qrData = `PATROL_${patrolId}`;
     
-    // 創建 canvas 元素
-    const canvas = document.createElement('canvas');
-    
-    QRCode.toCanvas(canvas, qrData, {
-        width: 300,
-        margin: 2,
-        color: {
-            dark: '#000000',
-            light: '#FFFFFF'
-        }
-    }, (error) => {
-        if (error) {
-            console.error('QR Code 生成失敗:', error);
-            container.innerHTML = '<p class="error">生成失敗</p>';
-            return;
-        }
+    // 使用 davidshimjs-qrcodejs 生成 QR Code
+    try {
+        new QRCode(container, {
+            text: qrData,
+            width: 300,
+            height: 300,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
         
-        canvas.style.border = '2px solid #ddd';
-        canvas.style.borderRadius = '8px';
-        container.appendChild(canvas);
+        // 設置下載功能
+        setTimeout(() => {
+            const canvas = container.querySelector('canvas');
+            if (canvas) {
+                canvas.style.border = '2px solid #ddd';
+                canvas.style.borderRadius = '8px';
+                
+                document.getElementById('downloadQrBtn').onclick = () => {
+                    const link = document.createElement('a');
+                    link.download = `QRCode_${patrol.name}.png`;
+                    link.href = canvas.toDataURL();
+                    link.click();
+                };
+            }
+        }, 100);
         
-        document.getElementById('downloadQrBtn').onclick = () => {
-            const link = document.createElement('a');
-            link.download = `QRCode_${patrol.name}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        };
-    });
+    } catch (error) {
+        console.error('QR Code 生成失敗:', error);
+        container.innerHTML = '<p class="error">生成失敗</p>';
+    }
     
     modal.classList.remove('hidden');
 }

@@ -106,8 +106,11 @@
 
                 console.log('Firebase 登入成功！');
 
-                // 導向首頁（auth.js 會自動處理角色導向）
-                window.location.href = '/';
+                // 導向用戶原本想去的頁面，如果沒有則導向首頁
+                const returnUrl = sessionStorage.getItem('line_login_return_url');
+                sessionStorage.removeItem('line_login_return_url'); // 清除已使用的返回URL
+                
+                window.location.href = returnUrl || '/';
 
             } catch (error) {
                 console.error('處理回調失敗:', error);

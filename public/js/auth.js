@@ -45,6 +45,12 @@ async function handleLineLogin() {
         // 🔒 產生密碼學安全的隨機 state 用於 CSRF 防護
         const state = crypto.randomUUID();
         sessionStorage.setItem('line_login_state', state);
+        
+        // 💾 記住用戶原本想去的頁面
+        const returnUrl = window.location.pathname + window.location.search;
+        if (returnUrl !== '/' && returnUrl !== '/index.html') {
+            sessionStorage.setItem('line_login_return_url', returnUrl);
+        }
 
         // 構建 LINE 授權 URL
         const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
