@@ -138,6 +138,7 @@ body {
     background: white;
     color: var(--primary-gold-dark);
     border: 2px solid var(--primary-gold);
+    padding: calc(0.875rem - 2px) calc(1.75rem - 2px);
 }
 
 .btn-secondary:hover {
