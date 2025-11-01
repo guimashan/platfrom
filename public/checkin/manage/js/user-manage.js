@@ -141,7 +141,7 @@ function renderUsers() {
                         ${roleBadges}
                     </div>
                 </td>
-                <td>${user.email || 'N/A'}</td>
+                <td style="color: ${user.email ? '#333' : '#999'};">${user.email || '未綁定'}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <button class="btn btn-sm btn-secondary" onclick="window.editUser('${user.id}')">編輯</button>
