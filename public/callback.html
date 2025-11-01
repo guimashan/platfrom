@@ -115,15 +115,11 @@
                 // 清除已使用的返回URL
                 sessionStorage.removeItem('line_login_return_url');
                 
-                const finalUrl = returnUrl && returnUrl !== '/' ? returnUrl : '/';
+                const finalUrl = returnUrl || '/';
                 console.log('🟢 [callback] 最終跳轉到:', finalUrl);
-                console.log('🟢 [callback] 3秒後跳轉...');
                 
-                // 延遲跳轉，確保認證狀態已同步
-                setTimeout(() => {
-                    console.log('🟢 [callback] 現在跳轉！');
-                    window.location.href = finalUrl;
-                }, 3000);
+                // 立即跳轉
+                window.location.href = finalUrl;
 
             } catch (error) {
                 console.error('處理回調失敗:', error);
