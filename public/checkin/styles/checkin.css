@@ -40,24 +40,37 @@
 }
 
 .patrol-select label {
-    font-weight: 500;
+    font-weight: 600;
     white-space: nowrap;
     min-width: fit-content;
+    color: #333;
+    font-size: 1.05rem;
 }
 
 .form-select {
     width: 100%;
     padding: 0.75rem;
-    border: 2px solid var(--bg-gray);
+    border: 2px solid #D1C4E9;
     border-radius: 8px;
     font-size: 1rem;
     font-family: 'Noto Sans TC', sans-serif;
-    transition: border-color 0.3s ease;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .form-select:focus {
     outline: none;
-    border-color: var(--primary-color);
+    border-color: #D4AF37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.form-select:hover {
+    border-color: #B39DDB;
+}
+
+.form-select option {
+    padding: 0.5rem;
 }
 
 .location-status {
@@ -138,7 +151,7 @@
     padding: 0.75rem 1rem;
     border: 2px solid #D1C4E9;
     background: #F3F0FF;
-    color: #333;
+    color: #666;
     border-radius: 8px;
     cursor: pointer;
     font-size: 1rem;
@@ -149,13 +162,15 @@
 .mode-tab:hover {
     border-color: #B39DDB;
     background: #E8E0FF;
+    color: #333;
 }
 
 .mode-tab.active {
-    background: #F3F0FF;
-    color: #333;
-    border-color: #B39DDB;
+    background: #D4AF37;
+    color: white;
+    border-color: #C19B2B;
     font-weight: 600;
+    box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
 }
 
 /* 模式內容區域 */

@@ -51,26 +51,14 @@ async function loadPatrols() {
         
         patrols = result.patrols || [];
         const dropdown = document.getElementById('patrolDropdown');
-        dropdown.innerHTML = '<option value="">請選擇巡邏點</option>';
-        
-        let officePatrolId = null;
+        dropdown.innerHTML = '<option value="">請選擇巡邏點 ▼</option>';
         
         patrols.forEach(patrol => {
             const option = document.createElement('option');
             option.value = patrol.id;
             option.textContent = patrol.name;
             dropdown.appendChild(option);
-            
-            // 找到「辦公室」巡邏點
-            if (patrol.name === '辦公室') {
-                officePatrolId = patrol.id;
-            }
         });
-        
-        // 預設選擇「辦公室」
-        if (officePatrolId) {
-            dropdown.value = officePatrolId;
-        }
         
         console.log(`已載入 ${patrols.length} 個巡邏點`);
     } catch (error) {
