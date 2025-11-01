@@ -108,13 +108,22 @@
 
                 // 導向用戶原本想去的頁面，如果沒有則導向首頁
                 const returnUrl = sessionStorage.getItem('line_login_return_url');
-                console.log('🟢 [callback] 讀取返回URL:', returnUrl);
-                console.log('🟢 [callback] sessionStorage 內容:', Object.keys(sessionStorage).map(k => `${k}=${sessionStorage.getItem(k)}`));
-                sessionStorage.removeItem('line_login_return_url'); // 清除已使用的返回URL
+                console.log('🟢 [callback] 登入成功！讀取返回URL:', returnUrl);
+                console.log('🟢 [callback] sessionStorage 所有內容:', 
+                    Object.keys(sessionStorage).map(k => `${k}=${sessionStorage.getItem(k)}`).join(', '));
                 
-                const finalUrl = returnUrl || '/';
+                // 清除已使用的返回URL
+                sessionStorage.removeItem('line_login_return_url');
+                
+                const finalUrl = returnUrl && returnUrl !== '/' ? returnUrl : '/';
                 console.log('🟢 [callback] 最終跳轉到:', finalUrl);
-                window.location.href = finalUrl;
+                console.log('🟢 [callback] 3秒後跳轉...');
+                
+                // 延遲跳轉，確保認證狀態已同步
+                setTimeout(() => {
+                    console.log('🟢 [callback] 現在跳轉！');
+                    window.location.href = finalUrl;
+                }, 3000);
 
             } catch (error) {
                 console.error('處理回調失敗:', error);
