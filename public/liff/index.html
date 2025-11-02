@@ -207,6 +207,18 @@
 
                 console.log('LIFF 初始化成功');
                 await loadUserProfile();
+
+                // 檢查是否有模組參數，自動導航
+                const urlParams = new URLSearchParams(window.location.search);
+                const module = urlParams.get('module');
+                
+                if (module && MODULE_PATHS[module]) {
+                    console.log('自動導航到模組:', module);
+                    window.location.href = MODULE_PATHS[module];
+                    return;
+                }
+
+                // 沒有參數，顯示選單
                 showModules();
 
             } catch (error) {
