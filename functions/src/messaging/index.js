@@ -84,7 +84,7 @@ function handleTextMessage(text) {
           {
             type: 'uri',
             label: '開始簽到',
-            uri: 'https://go.guimashan.org.tw/liff/checkin.html',
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=checkin`,
           },
         ],
       },
@@ -103,7 +103,7 @@ function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: 'https://go.guimashan.org.tw/checkin/manage/index.html',
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=manage`,
           },
         ],
       },
@@ -122,7 +122,7 @@ function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入服務',
-            uri: `https://liff.line.me/${LIFF_IDS.service}`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?module=service`,
           },
         ],
       },
@@ -141,14 +141,14 @@ function handleTextMessage(text) {
           {
             type: 'uri',
             label: '查看班表',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?module=schedule`,
           },
         ],
       },
     };
   }
 
-  // 預設回覆：顯示功能選單（使用 LIFF 主入口）
+  // 預設回覆：打開 LIFF 主入口，顯示功能選單
   return {
     type: 'template',
     altText: '龜馬山 goLine 平台',
@@ -158,18 +158,8 @@ function handleTextMessage(text) {
       actions: [
         {
           type: 'uri',
-          label: '🙏 奉香簽到',
-          uri: 'https://go.guimashan.org.tw/liff/checkin.html',
-        },
-        {
-          type: 'uri',
-          label: '⚡ 神務服務',
-          uri: 'https://go.guimashan.org.tw/liff/service.html',
-        },
-        {
-          type: 'uri',
-          label: '📅 排班系統',
-          uri: 'https://go.guimashan.org.tw/liff/schedule.html',
+          label: '開啟平台',
+          uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
         },
       ],
     },
