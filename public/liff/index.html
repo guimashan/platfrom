@@ -194,6 +194,22 @@
             schedule: 'schedule.html'
         };
 
+        // 從 URL 中提取模組參數（處理 liff.state）
+        function getModuleFromURL() {
+            const queryString = decodeURIComponent(window.location.search);
+            console.log('原始 query string:', queryString);
+            
+            // 處理 liff.state 格式：?liff.state=?module=checkin
+            const cleaned = queryString.replace('?liff.state=', '');
+            console.log('清理後的 query string:', cleaned);
+            
+            const params = new URLSearchParams(cleaned);
+            const module = params.get('module');
+            console.log('提取的模組:', module);
+            
+            return module;
+        }
+
         async function initializeLIFF() {
             try {
                 console.log('初始化 LIFF...');
@@ -209,8 +225,7 @@
                 await loadUserProfile();
 
                 // 檢查是否有模組參數，自動導航
-                const urlParams = new URLSearchParams(window.location.search);
-                const module = urlParams.get('module');
+                const module = getModuleFromURL();
                 
                 if (module && MODULE_PATHS[module]) {
                     console.log('自動導航到模組:', module);
