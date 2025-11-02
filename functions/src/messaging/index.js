@@ -159,17 +159,17 @@ function handleTextMessage(text) {
         {
           type: 'uri',
           label: '🙏 奉香簽到',
-          uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=%2F%3Fmodule%3Dcheckin`,
+          uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=checkin`,
         },
         {
           type: 'uri',
           label: '⚡ 神務服務',
-          uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=%2F%3Fmodule%3Dservice`,
+          uri: `https://liff.line.me/${LIFF_IDS.service}?module=service`,
         },
         {
           type: 'uri',
           label: '📅 排班系統',
-          uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=%2F%3Fmodule%3Dschedule`,
+          uri: `https://liff.line.me/${LIFF_IDS.schedule}?module=schedule`,
         },
       ],
     },
