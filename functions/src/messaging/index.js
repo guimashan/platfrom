@@ -91,6 +91,25 @@ function handleTextMessage(text) {
     };
   }
 
+  // 簽到管理
+  if (text === '簽到管理' || text === '管理') {
+    return {
+      type: 'template',
+      altText: '開啟簽到管理',
+      template: {
+        type: 'buttons',
+        text: '📊 簽到管理系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入管理',
+            uri: 'https://go.guimashan.org.tw/checkin/manage/index.html',
+          },
+        ],
+      },
+    };
+  }
+
   // 神務服務（精確匹配關鍵詞）
   if (text === '神務服務' || text === '神務' || text === '服務' || text === '法會') {
     return {
@@ -129,8 +148,32 @@ function handleTextMessage(text) {
     };
   }
 
-  // 其他訊息不回覆（避免打擾用戶）
-  return null;
+  // 預設回覆：顯示功能選單
+  return {
+    type: 'template',
+    altText: '龜馬山 goLine 平台',
+    template: {
+      type: 'buttons',
+      text: '請選擇服務',
+      actions: [
+        {
+          type: 'uri',
+          label: '🙏 奉香簽到',
+          uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
+        },
+        {
+          type: 'uri',
+          label: '⚡ 神務服務',
+          uri: `https://liff.line.me/${LIFF_IDS.service}`,
+        },
+        {
+          type: 'uri',
+          label: '📅 排班系統',
+          uri: `https://liff.line.me/${LIFF_IDS.schedule}`,
+        },
+      ],
+    },
+  };
 }
 
 /**
