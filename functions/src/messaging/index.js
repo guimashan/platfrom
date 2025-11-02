@@ -84,7 +84,7 @@ function handleTextMessage(text) {
           {
             type: 'uri',
             label: '開始簽到',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
+            uri: 'https://go.guimashan.org.tw/liff/checkin.html',
           },
         ],
       },
@@ -148,7 +148,7 @@ function handleTextMessage(text) {
     };
   }
 
-  // 預設回覆：顯示功能選單
+  // 預設回覆：顯示功能選單（使用 LIFF 主入口）
   return {
     type: 'template',
     altText: '龜馬山 goLine 平台',
@@ -159,17 +159,17 @@ function handleTextMessage(text) {
         {
           type: 'uri',
           label: '🙏 奉香簽到',
-          uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=checkin`,
+          uri: 'https://go.guimashan.org.tw/liff/checkin.html',
         },
         {
           type: 'uri',
           label: '⚡ 神務服務',
-          uri: `https://liff.line.me/${LIFF_IDS.service}?module=service`,
+          uri: 'https://go.guimashan.org.tw/liff/service.html',
         },
         {
           type: 'uri',
           label: '📅 排班系統',
-          uri: `https://liff.line.me/${LIFF_IDS.schedule}?module=schedule`,
+          uri: 'https://go.guimashan.org.tw/liff/schedule.html',
         },
       ],
     },
