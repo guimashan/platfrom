@@ -9,6 +9,7 @@ import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
+let currentUserRoles = [];
 let allRecords = [];
 let filteredRecords = [];
 let patrolsList = {};
@@ -46,6 +47,7 @@ onAuthStateChanged(platformAuth, async (user) => {
         }
         
         currentUser = user;
+        currentUserRoles = roles;
         await init();
     } catch (error) {
         console.error('權限檢查失敗:', error);
@@ -147,12 +149,20 @@ function calculateStats() {
     const weekStart = new Date(now);
     weekStart.setDate(weekStart.getDate() - 7);
 
-    const todayRecords = allRecords.filter(r => {
+    // 檢查是否為管理員（superadmin 或 admin_checkin 可以看所有統計）
+    const isAdmin = currentUserRoles.some(role => 
+        role === 'superadmin' || role === 'admin_checkin'
+    );
+
+    // 根據角色過濾記錄
+    const visibleRecords = isAdmin ? allRecords : allRecords.filter(r => r.userId === currentUser.uid);
+
+    const todayRecords = visibleRecords.filter(r => {
         const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= todayStart;
     });
 
-    const weekRecords = allRecords.filter(r => {
+    const weekRecords = visibleRecords.filter(r => {
         const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= weekStart;
     });
@@ -162,12 +172,12 @@ function calculateStats() {
     document.getElementById('todayCount').textContent = todayRecords.length;
     document.getElementById('weekCount').textContent = weekRecords.length;
     document.getElementById('activeUsers').textContent = activeUsersSet.size;
-    document.getElementById('totalCount').textContent = allRecords.length;
+    document.getElementById('totalCount').textContent = visibleRecords.length;
 
     // 計算趨勢
     const yesterdayStart = new Date(todayStart);
     yesterdayStart.setDate(yesterdayStart.getDate() - 1);
-    const yesterdayRecords = allRecords.filter(r => {
+    const yesterdayRecords = visibleRecords.filter(r => {
         const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= yesterdayStart && recordDate < todayStart;
     });
@@ -187,7 +197,7 @@ function calculateStats() {
 
     const lastWeekStart = new Date(weekStart);
     lastWeekStart.setDate(lastWeekStart.getDate() - 7);
-    const lastWeekRecords = allRecords.filter(r => {
+    const lastWeekRecords = visibleRecords.filter(r => {
         const recordDate = r.timestamp?._seconds ? new Date(r.timestamp._seconds * 1000) : new Date(0);
         return recordDate >= lastWeekStart && recordDate < weekStart;
     });
@@ -213,7 +223,17 @@ function applyFilters() {
     const method = document.getElementById('methodFilter').value;
     const userSearch = document.getElementById('userSearch').value.toLowerCase();
 
+    // 檢查是否為管理員（superadmin 或 admin_checkin 可以看所有記錄）
+    const isAdmin = currentUserRoles.some(role => 
+        role === 'superadmin' || role === 'admin_checkin'
+    );
+
     filteredRecords = allRecords.filter(record => {
+        // 權限篩選：如果不是管理員，只能看自己的記錄
+        if (!isAdmin && record.userId !== currentUser.uid) {
+            return false;
+        }
+
         // 日期篩選
         if (startDate) {
             const recordDate = record.timestamp?._seconds ? new Date(record.timestamp._seconds * 1000) : new Date(0);
