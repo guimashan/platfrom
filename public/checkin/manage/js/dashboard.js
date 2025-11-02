@@ -74,9 +74,8 @@ async function init() {
         // 計算統計數據
         calculateStats();
         
-        // 初始化篩選
-        filteredRecords = [...allRecords];
-        renderRecords();
+        // 初始化篩選（根據角色自動過濾）
+        applyFilters();
         
     } catch (error) {
         console.error('初始化失敗:', error);
@@ -408,9 +407,8 @@ function resetFilters() {
     document.getElementById('methodFilter').value = '';
     document.getElementById('userSearch').value = '';
     
-    filteredRecords = [...allRecords];
-    currentPage = 1;
-    renderRecords();
+    // 重置後重新應用過濾（會根據角色自動過濾）
+    applyFilters();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
