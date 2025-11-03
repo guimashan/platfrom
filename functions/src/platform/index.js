@@ -265,12 +265,17 @@ exports.generateCustomToken = onRequest(
           logger.info('使用者登入時間已更新', {lineUserId, roles: userRoles, email: userEmail});
         }
         
-        // Step 5: 產生包含 roles 的 Firebase Custom Token
+        // Step 5: 設置 Auth custom claims（確保跨專案能讀取角色）
+        await admin.auth().setCustomUserClaims(lineUserId, {
+          roles: userRoles,
+        });
+        
+        // Step 6: 產生包含 roles 的 Firebase Custom Token
         const customToken = await admin.auth().createCustomToken(lineUserId, {
           roles: userRoles,
         });
         
-        logger.info('Custom Token 已產生', {lineUserId, roles: userRoles});
+        logger.info('Custom Token 已產生，custom claims 已設置', {lineUserId, roles: userRoles});
 
         res.json({
           ok: true,
@@ -369,7 +374,12 @@ exports.updateUserRole = onRequest(
               updatedAt: admin.firestore.FieldValue.serverTimestamp(),
             });
 
-        logger.warn('使用者角色已更新', {
+        // 同時更新 Auth custom claims
+        await admin.auth().setCustomUserClaims(targetUserId, {
+          roles: roles,
+        });
+
+        logger.warn('使用者角色已更新（Firestore + Auth custom claims）', {
           requestorUid,
           targetUserId,
           newRoles: roles,

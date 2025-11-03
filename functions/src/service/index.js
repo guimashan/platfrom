@@ -28,13 +28,10 @@ const platformAuth = getAuth(platformApp);
 
 async function checkServiceRole(uid) {
     try {
-        const userDoc = await platformDb.collection('users').doc(uid).get();
-        if (!userDoc.exists) {
-            throw new HttpsError('not-found', '使用者資料不存在');
-        }
-
-        const userData = userDoc.data();
-        const roles = userData.roles || [];
+        // 從 platform-bc783 Auth 獲取用戶資料
+        const userRecord = await platformAuth.getUser(uid);
+        const customClaims = userRecord.customClaims || {};
+        const roles = customClaims.roles || [];
         
         const hasPermission = roles.some(role => 
             ['poweruser_service', 'admin_service', 'superadmin'].includes(role)
