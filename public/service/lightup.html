@@ -9,20 +9,34 @@
     <link rel="stylesheet" href="styles/lightup.css">
 </head>
 <body>
-    <header class="header">
-        <div class="header-left">
-            <h1>🏯 線上點燈</h1>
-            <p>祈求平安順遂，每盞燈 NT$ 700</p>
-        </div>
-        <div class="header-actions">
-            <button class="btn-logout" onclick="window.location.href='/'">
-                返回首頁
+    <!-- 未登入畫面 (預設顯示) -->
+    <div id="loginPrompt" class="login-prompt">
+        <div class="login-card">
+            <h1 style="color: var(--primary-gold); margin-bottom: 10px;">🏯 線上點燈</h1>
+            <p style="color: #666; margin-bottom: 30px;">祈求平安順遂，每盞燈 NT$ 700</p>
+            <p style="margin-bottom: 20px;">請使用 LINE 帳號登入以開始報名</p>
+            <button id="loginBtn" class="btn-primary" style="padding: 12px 40px; font-size: 16px;">
+                LINE 登入
             </button>
         </div>
-    </header>
+    </div>
 
-    <div class="container">
-        <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <!-- 主要內容 (預設隱藏，登入後才顯示) -->
+    <div id="mainApp" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1>🏯 線上點燈</h1>
+                <p>祈求平安順遂，每盞燈 NT$ 700</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-logout" onclick="window.location.href='/'">
+                    返回首頁
+                </button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
             
             <!-- I. 報名聯絡資訊 -->
             <div class="card">
@@ -125,11 +139,11 @@
                 </div>
             </div>
 
+            </div>
         </div>
-    </div>
 
-    <!-- 浮動總結欄位 -->
-    <div id="floatingFooter">
+        <!-- 浮動總結欄位 -->
+        <div id="floatingFooter">
         <div class="footer-content">
             <div class="footer-summary">
                 <div class="summary-item">
@@ -144,6 +158,7 @@
             <button id="submitBtn" class="btn-submit">確認報名並送出</button>
         </div>
     </div>
+    </div> <!-- 關閉 mainApp -->
 
     <script src="../js/firebase-init.js" type="module"></script>
     <script src="js/lightup.js" type="module"></script>

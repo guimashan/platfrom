@@ -26,6 +26,9 @@ let currentUser = null;
 let userData = null;
 
 // --- DOM 元素 ---
+const loginPromptEl = document.getElementById('loginPrompt');
+const mainAppEl = document.getElementById('mainApp');
+const loginBtnEl = document.getElementById('loginBtn');
 const contactNameEl = document.getElementById('contactName');
 const contactPhoneEl = document.getElementById('contactPhone');
 const contactEmailEl = document.getElementById('contactEmail');
@@ -45,8 +48,10 @@ const submitBtnEl = document.getElementById('submitBtn');
 
 // --- 程式進入點 ---
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. 綁定「會動」的事件監聽
-    setupEventListeners();
+    // 1. 綁定登入按鈕
+    if (loginBtnEl) {
+        loginBtnEl.addEventListener('click', handleLineLogin);
+    }
 
     // 2. 檢查登入狀態 (這是非同步的)
     if (!platformAuth) {
@@ -56,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     platformAuth.onAuthStateChanged(async (user) => {
         if (user) {
+            // 使用者已登入
             currentUser = user;
             const userRef = doc(platformDb, 'users', user.uid);
             const userSnap = await getDoc(userRef);
@@ -66,15 +72,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 contactPhoneEl.value = userData.phone || '';
                 contactEmailEl.value = userData.email || '';
             }
+
+            // 隱藏登入畫面，顯示主要內容
+            loginPromptEl.style.display = 'none';
+            mainAppEl.style.display = 'block';
+            
+            // 在確認登入狀態「之後」，才初始化卡片
+            setupEventListeners();
+            updateMode();
         } else {
-            alert("請先登入！");
-            window.location.href = '/index.html';
+            // 使用者未登入，保持顯示登入畫面
+            loginPromptEl.style.display = 'flex';
+            mainAppEl.style.display = 'none';
         }
-        
-        // --- 修正：在確認登入狀態「之後」，才初始化卡片 ---
-        updateMode();
     });
 });
+
+// --- LINE 登入處理 ---
+function handleLineLogin() {
+    // 使用與 auth.js 相同的邏輯
+    const LINE_CHANNEL_ID = '2008269293';
+    const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
+    
+    try {
+        // 產生隨機 state 用於 CSRF 防護
+        const state = crypto.randomUUID();
+        sessionStorage.setItem('line_login_state', state);
+        
+        // 記住用戶想去的頁面
+        const returnUrl = window.location.pathname + window.location.search;
+        sessionStorage.setItem('line_login_return_url', returnUrl);
+        
+        // 構建 LINE 授權 URL
+        const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
+        lineAuthUrl.searchParams.append('response_type', 'code');
+        lineAuthUrl.searchParams.append('client_id', LINE_CHANNEL_ID);
+        lineAuthUrl.searchParams.append('redirect_uri', LINE_CALLBACK_URL);
+        lineAuthUrl.searchParams.append('state', state);
+        lineAuthUrl.searchParams.append('scope', 'profile openid email');
+        
+        // 導向 LINE 授權頁面
+        window.location.href = lineAuthUrl.toString();
+        
+    } catch (error) {
+        console.error('LINE 登入失敗:', error);
+        alert('登入失敗: ' + error.message);
+    }
+}
 
 // --- 事件監聽 ---
 function setupEventListeners() {

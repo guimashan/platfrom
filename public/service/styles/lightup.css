@@ -1,5 +1,24 @@
 /* 線上點燈頁面樣式 - 使用統一的金黃色主題 */
 
+/* 登入提示畫面 */
+.login-prompt {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f1e8 0%, #e8dcc4 100%);
+}
+
+.login-card {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
 body {
     padding-bottom: 140px;
 }
