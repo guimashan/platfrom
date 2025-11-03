@@ -60,7 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData = userSnap.data();
                 contactNameEl.value = userData.displayName || '';
                 contactPhoneEl.value = userData.phone || '';
-                contactEmailEl.value = userData.email || ''; 
+                contactEmailEl.value = userData.email || '';
+                updateMode();
             }
         } else {
             alert("請先登入！");
