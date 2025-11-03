@@ -36,7 +36,7 @@ async function generateOrderId(serviceType) {
     
     // 服務類型代碼對應表
     const typeCodeMap = {
-        'lamp_lighting': 'DD',    // 線上點燈
+        'lightup': 'DD',          // 線上點燈
         'niandou': 'ND',          // 年斗法會
         'lidou': 'LD',            // 禮斗法會
         'zhongyuan': 'ZY',        // 中元法會
