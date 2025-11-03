@@ -17,6 +17,10 @@ const confirmPayment = httpsCallable(serviceFunctions, 'confirmPayment');
         
         currentUser = user;
         
+        // 認證成功：隱藏登入提示，顯示主要內容
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        
         document.getElementById('logoutBtn').addEventListener('click', logout);
         
         document.getElementById('filterServiceType').addEventListener('change', applyFilters);
