@@ -9,7 +9,20 @@
     <link rel="stylesheet" href="/checkin/styles/checkin.css">
 </head>
 <body>
-    <div class="container">
+    <!-- 登入提示畫面（預設顯示） -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">簽到紀錄</h2>
+            <p style="margin: 0; opacity: 0.9;">請使用 LINE 帳號登入以查看紀錄</p>
+            <div style="margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                <p style="margin: 0; font-size: 14px;">驗證中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容（預設隱藏） -->
+    <div id="mainApp" class="container" style="display: none;">
         <header class="header">
             <h1>簽到紀錄</h1>
             <button id="logoutBtn" class="btn-logout">登出</button>
