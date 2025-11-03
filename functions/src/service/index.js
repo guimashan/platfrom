@@ -28,7 +28,7 @@ const platformAuth = getAuth(platformApp);
 
 /**
  * 生成訂單編號
- * 格式: LU-20251103-0001
+ * 格式: DD-20251103-0001
  */
 async function generateOrderId(serviceType) {
     const today = new Date();
@@ -36,7 +36,7 @@ async function generateOrderId(serviceType) {
     
     // 服務類型代碼對應表
     const typeCodeMap = {
-        'lamp_lighting': 'LU',    // 線上點燈
+        'lamp_lighting': 'DD',    // 線上點燈
         'niandou': 'ND',          // 年斗法會
         'lidou': 'LD',            // 禮斗法會
         'zhongyuan': 'ZY',        // 中元法會
