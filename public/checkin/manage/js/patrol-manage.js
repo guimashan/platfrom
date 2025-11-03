@@ -40,6 +40,11 @@ onAuthStateChanged(platformAuth, async (user) => {
         }
         
         currentUser = user;
+        
+        // 認證成功：隱藏登入提示，顯示主要內容
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        
         await init();
     } catch (error) {
         console.error('權限檢查失敗:', error);
