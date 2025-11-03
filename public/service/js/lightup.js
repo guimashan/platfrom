@@ -1,13 +1,9 @@
 // -----------------------------------------
 // 龜馬山 goLine - 線上點燈 (lightup.js)
-// (修正版：適配 firebase-init.js)
+// (最終修正版：修正載入順序 + 即時同步)
 // -----------------------------------------
 
-// --- 修正：從 firebase-init.js 匯入需要的實例 ---
-// 我們需要：
-// 1. serviceFunctions (用於呼叫後端 API)
-// 2. platformAuth (用於檢查使用者是否登入)
-// 3. platformDb (用於讀取登入者的資料)
+// --- 匯入需要的實例 ---
 import { 
     serviceFunctions,
     platformAuth, 
@@ -29,7 +25,7 @@ const LAMP_PRICE = 700;
 let currentUser = null; 
 let userData = null;
 
-// --- DOM 元素 (與前一版相同) ---
+// --- DOM 元素 ---
 const contactNameEl = document.getElementById('contactName');
 const contactPhoneEl = document.getElementById('contactPhone');
 const contactEmailEl = document.getElementById('contactEmail');
@@ -49,6 +45,10 @@ const submitBtnEl = document.getElementById('submitBtn');
 
 // --- 程式進入點 ---
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. 綁定「會動」的事件監聽
+    setupEventListeners();
+
+    // 2. 檢查登入狀態 (這是非同步的)
     if (!platformAuth) {
         alert("Firebase Auth 載入失敗。");
         return;
@@ -61,134 +61,93 @@ document.addEventListener('DOMContentLoaded', () => {
             const userSnap = await getDoc(userRef);
             if (userSnap.exists()) {
                 userData = userSnap.data();
+                // 自動填入聯絡人資訊
                 contactNameEl.value = userData.displayName || '';
                 contactPhoneEl.value = userData.phone || '';
                 contactEmailEl.value = userData.email || '';
-                updateMode();
             }
         } else {
             alert("請先登入！");
             window.location.href = '/index.html';
         }
+        
+        // --- 修正：在確認登入狀態「之後」，才初始化卡片 ---
+        updateMode();
     });
-
-    setupEventListeners();
-    updateMode();
 });
 
 // --- 事件監聽 ---
 function setupEventListeners() {
     modeSingleEl.addEventListener('change', updateMode);
     modeMultiEl.addEventListener('change', updateMode);
-    addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, false));
+    addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, true));
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('input', calculateTotal);
+
+    // --- 新增：即時同步「報名姓名」 ---
+    contactNameEl.addEventListener('input', syncNameToSingleCard);
     
+    // 信用卡欄位格式化
     cardNumberEl.addEventListener('input', formatCardNumber);
     cardExpiryEl.addEventListener('input', formatCardExpiry);
-    cardCVVEl.addEventListener('input', formatCVV);
+    cardCVVEl.addEventListener('input', formatCardCVV);
 }
 
-// --- 信用卡格式化與驗證 ---
-
-function formatCardNumber(e) {
-    let value = e.target.value.replace(/\s/g, '');
-    value = value.replace(/\D/g, '');
-    value = value.substring(0, 16);
-    
-    const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
-    e.target.value = formatted;
+// --- 新增：即時同步的函數 ---
+/**
+ * 即時同步「報名姓名」到「單人模式」的第一張卡片
+ */
+function syncNameToSingleCard() {
+    // 只有在「單人模式」 下才同步
+    if (modeSingleEl.checked) {
+        const firstCard = applicantCardListEl.querySelector('.applicant-card');
+        if (firstCard) {
+            const newName = contactNameEl.value.trim();
+            const displayName = newName || '報名者本人';
+            
+            // 同步卡片標題
+            firstCard.querySelector('.card-summary-name').textContent = displayName;
+            // 同步卡片內的 input 欄位
+            firstCard.querySelector('.card-input-name').value = newName;
+        }
+    }
 }
 
-function formatCardExpiry(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    
-    if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-    }
-    
-    e.target.value = value;
-}
-
-function formatCVV(e) {
-    let value = e.target.value.replace(/\D/g, '');
-    e.target.value = value.substring(0, 3);
-}
-
-function validateCardInfo() {
-    const cardHolderName = cardHolderNameEl.value.trim();
-    const cardNumber = cardNumberEl.value.replace(/\s/g, '');
-    const cardExpiry = cardExpiryEl.value.trim();
-    const cardCVV = cardCVVEl.value.trim();
-    
-    if (!cardHolderName) {
-        alert('請填寫持卡人姓名');
-        cardHolderNameEl.focus();
-        return false;
-    }
-    
-    if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
-        alert('請填寫正確的 16 碼信用卡卡號');
-        cardNumberEl.focus();
-        return false;
-    }
-    
-    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-        alert('請填寫正確的有效期限格式 (MM/YY)');
-        cardExpiryEl.focus();
-        return false;
-    }
-    
-    const [month, year] = cardExpiry.split('/').map(Number);
-    if (month < 1 || month > 12) {
-        alert('月份必須在 01-12 之間');
-        cardExpiryEl.focus();
-        return false;
-    }
-    
-    const currentYear = new Date().getFullYear() % 100;
-    const currentMonth = new Date().getMonth() + 1;
-    if (year < currentYear || (year === currentYear && month < currentMonth)) {
-        alert('信用卡已過期，請確認有效期限');
-        cardExpiryEl.focus();
-        return false;
-    }
-    
-    if (cardCVV.length !== 3 || !/^\d{3}$/.test(cardCVV)) {
-        alert('請填寫正確的 3 碼安全碼 (CVV)');
-        cardCVVEl.focus();
-        return false;
-    }
-    
-    return true;
-}
-
-// --- 核心功能 (與前一版相同) ---
+// --- 核心功能 (修正) ---
 
 function updateMode() {
     const isMultiMode = modeMultiEl.checked;
     addApplicantBtnEl.style.display = isMultiMode ? 'block' : 'none';
     const cards = applicantCardListEl.querySelectorAll('.applicant-card');
     
+    // 取得預設姓名 (現在 userData 已經被載入了)
+    const defaultName = (userData && userData.displayName) ? userData.displayName : '報名者本人';
+
     if (isMultiMode) {
+        // 多人模式：如果一張卡片都沒有，自動建立第一張
         if (cards.length === 0) {
-            const defaultName = (userData && userData.displayName) ? userData.displayName : '報名者本人';
             createApplicantCard(defaultName, false);
         }
     } else {
+        // 單人模式：刪除多餘卡片
         cards.forEach((card, index) => {
             if (index > 0) card.remove();
         });
         
-        const defaultName = (userData && userData.displayName) ? userData.displayName : '報名者本人';
         if (cards.length === 0) {
             createApplicantCard(defaultName, false);
         } else {
-            cards[0].querySelector('.card-summary-name').textContent = defaultName;
+            // 更新第一張卡片的標題和內容
+            const firstCardName = contactNameEl.value.trim() || defaultName;
+            cards[0].querySelector('.card-summary-name').textContent = firstCardName;
+            cards[0].querySelector('.card-input-name').value = contactNameEl.value.trim();
             const removeBtn = cards[0].querySelector('.remove-btn');
             if (removeBtn) removeBtn.style.display = 'none';
         }
     }
+    
+    // --- 修正：在更新模式後，立即執行一次同步和計算 ---
+    syncNameToSingleCard();
     calculateTotal();
 }
 
@@ -199,16 +158,18 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     card.id = cardId;
     card.setAttribute('data-open', 'true');
 
+    // 預填姓名
     let prefillName = name;
-    if (userData && name === userData.displayName) {
-        prefillName = userData.displayName;
+    // 如果 name 是 "報名者本人"，就從已填入的 contactNameEl 抓取
+    if (name === '報名者本人') {
+        prefillName = contactNameEl.value.trim();
     } else if (name === '家人/親友') {
-        prefillName = '';
+        prefillName = ''; // 新增卡片時，姓名留空
     }
 
     card.innerHTML = `
         <div class="card-summary">
-            <span class="card-summary-name">${name}</span>
+            <span class="card-summary-name">${prefillName || '報名者本人'}</span>
             <span class="card-summary-info">共 0 盞燈</span>
         </div>
         <div class="applicant-details">
@@ -246,20 +207,19 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
 
     applicantCardListEl.appendChild(card);
 
+    // 綁定事件
     if (canRemove) {
         card.querySelector('.remove-btn').addEventListener('click', () => {
             document.getElementById(cardId).remove();
             calculateTotal();
         });
     }
-
     card.querySelector('.card-summary').addEventListener('click', () => {
         const details = card.querySelector('.applicant-details');
         const isOpen = card.getAttribute('data-open') === 'true';
         details.style.display = isOpen ? 'none' : 'block';
         card.setAttribute('data-open', isOpen ? 'false' : 'true');
     });
-
     card.querySelector('.card-input-name').addEventListener('input', (e) => {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
     });
@@ -284,13 +244,120 @@ function calculateTotal() {
     totalAmountEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
 }
 
+// --- 信用卡格式化函數 ---
+function formatCardNumber(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    let formatted = value.match(/.{1,4}/g);
+    e.target.value = formatted ? formatted.join(' ') : value;
+}
+
+function formatCardExpiry(e) {
+    let value = e.target.value.replace(/\//g, '');
+    if (value.length >= 2) {
+        e.target.value = value.slice(0, 2) + '/' + value.slice(2, 4);
+    } else {
+        e.target.value = value;
+    }
+}
+
+function formatCardCVV(e) {
+    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
+}
+
+// --- 表單驗證 ---
+function validateForm() {
+    // 聯絡資訊驗證
+    if (!contactNameEl.value.trim()) {
+        alert('請填寫報名姓名');
+        contactNameEl.focus();
+        return false;
+    }
+    if (!contactPhoneEl.value.trim()) {
+        alert('請填寫聯絡電話');
+        contactPhoneEl.focus();
+        return false;
+    }
+
+    // 點燈人驗證
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+    if (cards.length === 0) {
+        alert('請至少新增一位點燈人');
+        return false;
+    }
+
+    let hasLamps = false;
+    for (const card of cards) {
+        const nameInput = card.querySelector('.card-input-name');
+        if (!nameInput.value.trim()) {
+            alert('請填寫所有點燈人的姓名');
+            nameInput.focus();
+            return false;
+        }
+
+        const counts = card.querySelectorAll('.light-count');
+        for (const input of counts) {
+            if (parseInt(input.value, 10) > 0) {
+                hasLamps = true;
+                break;
+            }
+        }
+    }
+
+    if (!hasLamps) {
+        alert('請至少選擇一盞燈');
+        return false;
+    }
+
+    // 信用卡驗證
+    const cardNumber = cardNumberEl.value.replace(/\s/g, '');
+    const cardExpiry = cardExpiryEl.value;
+    const cardCVV = cardCVVEl.value;
+
+    if (!cardHolderNameEl.value.trim()) {
+        alert('請填寫持卡人姓名');
+        cardHolderNameEl.focus();
+        return false;
+    }
+
+    if (cardNumber.length !== 16) {
+        alert('請輸入有效的 16 碼信用卡號');
+        cardNumberEl.focus();
+        return false;
+    }
+
+    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+        alert('請輸入有效的有效期限（格式：MM/YY）');
+        cardExpiryEl.focus();
+        return false;
+    }
+
+    // 檢查卡片是否過期
+    const [month, year] = cardExpiry.split('/').map(Number);
+    const now = new Date();
+    const expiry = new Date(2000 + year, month - 1);
+    if (expiry < now) {
+        alert('此信用卡已過期');
+        cardExpiryEl.focus();
+        return false;
+    }
+
+    if (cardCVV.length !== 3) {
+        alert('請輸入有效的 3 碼 CVV');
+        cardCVVEl.focus();
+        return false;
+    }
+
+    return true;
+}
+
+// --- 處理表單送出 ---
 async function handleSubmit() {
     if (!currentUser) {
         alert("您似乎尚未登入，請重新整理頁面。");
         return;
     }
-    
-    if (!validateCardInfo()) {
+
+    if (!validateForm()) {
         return;
     }
     
@@ -298,6 +365,7 @@ async function handleSubmit() {
     submitBtnEl.textContent = '處理中...';
 
     try {
+        // 1. 收集聯絡人資訊
         const contactInfo = {
             name: contactNameEl.value.trim(),
             phone: contactPhoneEl.value.trim(),
@@ -306,9 +374,9 @@ async function handleSubmit() {
             receiptOption: document.querySelector('input[name="receiptOption"]:checked').value
         };
 
+        // 2. 收集點燈人名單
         const applicants = [];
         const cards = applicantCardListEl.querySelectorAll('.applicant-card');
-        
         cards.forEach(card => {
             const cardData = {
                 applicantName: card.querySelector('.card-input-name').value.trim(),
@@ -316,25 +384,30 @@ async function handleSubmit() {
                 lights: {}
             };
             card.querySelectorAll('.light-count').forEach(input => {
-                cardData.lights[input.dataset.lightName] = parseInt(input.value, 10) || 0;
+                const count = parseInt(input.value, 10) || 0;
+                if (count > 0) {
+                    cardData.lights[input.dataset.lightName] = count;
+                }
             });
             applicants.push(cardData);
         });
 
+        // 3. 收集信用卡資訊
         const paymentInfo = {
             cardHolderName: cardHolderNameEl.value.trim(),
-            cardNumber: cardNumberEl.value.replace(/\s/g, ''),
+            cardNumber: cardNumberEl.value.trim(),
             cardExpiry: cardExpiryEl.value.trim(),
             cardCVV: cardCVVEl.value.trim(),
         };
 
+        // 4. 收集其他資料
         const otherNote = otherNoteEl.value.trim();
-        const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(',', ''), 10);
+        const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(/,/g, ''), 10);
         
+        // --- 呼叫 Cloud Function ---
         console.log("正在呼叫後端 'submitRegistration'...");
         
         const submitRegistrationApi = httpsCallable(serviceFunctions, 'submitRegistration');
-        
         const result = await submitRegistrationApi({
             serviceType: SERVICE_TYPE,
             contactInfo: contactInfo,
@@ -346,8 +419,10 @@ async function handleSubmit() {
         });
 
         console.log("後端回傳結果:", result.data);
-        
         alert(`報名成功！\n您的訂單編號為: ${result.data.orderId}\n我們將在核對資料後盡快為您處理。`);
+        
+        // 重置表單
+        window.location.reload();
 
     } catch (error) {
         console.error("報名失敗:", error);
