@@ -26,18 +26,19 @@ try {
 const platformDb = getFirestore(platformApp);
 const platformAuth = getAuth(platformApp);
 
-async function checkServiceRole(uid) {
+async function checkServiceRole(decodedToken) {
     try {
-        // 從 platform-bc783 Auth 獲取用戶資料
-        const userRecord = await platformAuth.getUser(uid);
-        const customClaims = userRecord.customClaims || {};
-        const roles = customClaims.roles || [];
+        // 從 ID Token 的 custom claims 中讀取角色
+        const roles = decodedToken.roles || [];
+        
+        console.log('檢查權限 - UID:', decodedToken.uid, '角色:', roles);
         
         const hasPermission = roles.some(role => 
             ['poweruser_service', 'admin_service', 'superadmin'].includes(role)
         );
         
         if (!hasPermission) {
+            console.error('權限不足 - UID:', decodedToken.uid, '現有角色:', roles);
             throw new HttpsError('permission-denied', '權限不足，需要 poweruser_service、admin_service 或 superadmin 角色');
         }
         
@@ -348,7 +349,7 @@ exports.getRegistrationsV2 = onRequest({
         }
 
         const uid = decodedToken.uid;
-        await checkServiceRole(uid);
+        await checkServiceRole(decodedToken);
 
         const registrationsSnap = await db.collection('registrations')
             .orderBy('createdAt', 'desc')
@@ -400,7 +401,7 @@ exports.getRegistrationDetailV2 = onRequest({
         }
 
         const uid = decodedToken.uid;
-        await checkServiceRole(uid);
+        await checkServiceRole(decodedToken);
 
         const { orderId } = req.body.data || {};
         if (!orderId) {
@@ -475,7 +476,7 @@ exports.confirmPaymentV2 = onRequest({
         }
 
         const uid = decodedToken.uid;
-        await checkServiceRole(uid);
+        await checkServiceRole(decodedToken);
 
         const { orderId } = req.body.data || {};
         if (!orderId) {
