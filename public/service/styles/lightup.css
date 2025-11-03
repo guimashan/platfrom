@@ -1,0 +1,146 @@
+/* -------------------------
+ * 專屬於 lightup.html 的樣式
+ * ------------------------- */
+
+/* 表單區塊間距 */
+.form-section {
+    margin-bottom: 30px;
+}
+
+/* 信用卡表單的特殊樣式 */
+.payment-card {
+    background-color: #fff9e6; /* 淡淡的警示黃色 */
+    border: 1px solid var(--primary-gold-dark);
+}
+
+/* 單選按鈕樣式 */
+.radio-group {
+    margin-bottom: 15px;
+}
+.radio-group input {
+    margin-right: 5px;
+}
+.radio-group label {
+    margin-right: 20px;
+}
+
+/* -------------------------
+ * 卡片式管理 (H5 草稿核心)
+ * ------------------------- */
+
+/* 卡片總覽 (收合時) */
+.applicant-card {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    transition: box-shadow 0.3s ease;
+}
+
+.applicant-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* 卡片總覽的標題 */
+.card-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.card-summary-name {
+    font-size: 1.1rem;
+    color: var(--primary-gold-dark);
+}
+
+.card-summary-info {
+    font-size: 0.9rem;
+    color: #333;
+}
+
+/* 卡片詳細資料 (展開時) */
+.applicant-details {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px dashed #eee;
+}
+
+/* 燈別計數器 */
+.light-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.light-item label {
+    font-size: 1rem;
+    flex-basis: 50%;
+}
+/* 數字輸入框 */
+.light-item input[type="number"] {
+    width: 80px;
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* 卡片內的按鈕 */
+.card-actions {
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+.remove-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.remove-btn:hover {
+    background-color: #c0392b;
+}
+
+
+/* -------------------------
+ * 浮動總結 (H5 草稿核心)
+ * ------------------------- */
+#floatingFooter {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    border-top: 2px solid var(--primary-gold);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    padding: 15px 0;
+}
+
+.footer-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-value {
+    font-weight: bold;
+}
+.total-price {
+    font-size: 1.25rem;
+    color: var(--primary-gold);
+}
+
+/* 確保內容不會被 footer 擋住 */
+body {
+    padding-bottom: 120px; 
+}

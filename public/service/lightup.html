@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>線上點燈 - 龜馬山 goLine</title>
+    <link rel="stylesheet" href="../styles/common.css">
+    <link rel="stylesheet" href="styles/lightup.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🏯 線上點燈</h1>
+        <p>請填寫報名資訊，每盞燈 $700 元整。</p>
+
+        <div class="form-section">
+            <h2>I. 報名聯絡資訊</h2>
+            <div class="form-card">
+                <label for="contactName">報名姓名 (主要聯絡人)</label>
+                <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
+                
+                <label for="contactPhone">連絡電話</label>
+                <input type="tel" id="contactPhone" class="input-field" placeholder="請輸入電話">
+                
+                <label for="contactEmail">電子信箱</label>
+                <input type="email" id="contactEmail" class="input-field" placeholder="請輸入 Email">
+                
+                <label for="contactAddress">通訊地址</label>
+                <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
+                
+                <label>感謝狀領取</label>
+                <div class="radio-group">
+                    <input type="radio" id="receiptSend" name="receiptOption" value="send" checked>
+                    <label for="receiptSend">寄發感謝狀</label>
+                    <input type="radio" id="receiptSelf" name="receiptOption" value="self">
+                    <label for="receiptSelf">親自領取</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <h2>II. 點燈名單</h2>
+            
+            <label>點燈對象</label>
+            <div class="radio-group">
+                <input type="radio" id="modeSingle" name="mode" value="single" checked>
+                <label for="modeSingle">單人 (僅報名者本人)</label>
+                <input type="radio" id="modeMulti" name="mode" value="multi">
+                <label for="modeMulti">多人 (包含家人親友)</label>
+            </div>
+
+            <div id="applicantCardList"></div>
+
+            <button id="addApplicantBtn" class="secondary-btn" style="display: none; margin-top: 15px;">
+                ➕ 新增一位點燈人
+            </button>
+        </div>
+
+        <div class="form-section">
+            <h2>III. 信用卡資訊 (手動刷卡用)</h2>
+            <div class="form-card payment-card">
+                <label for="cardHolderName">持卡人姓名</label>
+                <input type="text" id="cardHolderName" class="input-field">
+                
+                <label for="cardNumber">信用卡卡號</label>
+                <input type="text" id="cardNumber" class="input-field" placeholder="xxxx-xxxx-xxxx-xxxx">
+                
+                <label for="cardExpiry">有效年月 (MM/YY)</label>
+                <input type="text" id="cardExpiry" class="input-field" placeholder="MM/YY">
+                
+                <label for="cardCVV">背面末三碼 (CVV)</label>
+                <input type="text" id="cardCVV" class="input-field" placeholder="CVV">
+            </div>
+        </div>
+
+        <div class="form-section">
+            <label for="otherNote">其他備註</label>
+            <textarea id="otherNote" class="input-field" rows="3" placeholder="若有其他需求請填寫於此"></textarea>
+        </div>
+
+    </div>
+
+    <div id="floatingFooter">
+        <div class="footer-content">
+            <div>
+                報名總燈數：<span id="totalLamps" class="total-value">0 盞</span>
+            </div>
+            <div>
+                應繳總金額：<span id="totalAmount" class="total-value total-price">NT$ 0</span>
+            </div>
+            <button id="submitBtn" class="primary-btn">確認報名並送出</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="../js/config.js"></script>
+    <script src="js/lightup.js"></script>
+</body>
+</html>
