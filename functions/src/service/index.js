@@ -28,7 +28,7 @@ const platformAuth = getAuth(platformApp);
 
 /**
  * 生成訂單編號
- * 格式: LIGHT-20251103-0001
+ * 格式: LU-20251103-0001
  */
 async function generateOrderId(serviceType) {
     const today = new Date();
@@ -36,9 +36,15 @@ async function generateOrderId(serviceType) {
     
     // 服務類型代碼對應表
     const typeCodeMap = {
-        'lamp_lighting': 'LIGHT',
-        'blessing': 'BLESS',
-        'zhongyuan': 'YUAN'
+        'lamp_lighting': 'LU',    // 線上點燈
+        'niandou': 'ND',          // 年斗法會
+        'lidou': 'LD',            // 禮斗法會
+        'zhongyuan': 'ZY',        // 中元法會
+        'pushi': 'PS',            // 普施法會
+        'futian': 'FT',           // 福田會
+        'futian_youth': 'FTY',    // 福田少年會
+        'xiangyou': 'XY',         // 添香油
+        'build_temple': 'BG'      // 建宮廟款
     };
     
     const typeCode = typeCodeMap[serviceType] || 'ORDER';
