@@ -3,9 +3,10 @@
  * functions/src/service/index.js
  */
 
-const { onCall, HttpsError } = require("firebase-functions/v2/https");
+const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https");
 const { initializeApp, getApps, getApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 
 if (!getApps().length) {
     initializeApp();
@@ -23,6 +24,7 @@ try {
 }
 
 const platformDb = getFirestore(platformApp);
+const platformAuth = getAuth(platformApp);
 
 async function checkServiceRole(uid) {
     try {
@@ -51,59 +53,88 @@ async function checkServiceRole(uid) {
 }
 
 /**
- * 接收所有神務服務的報名
- * 這是一個 Callable Function，專門給前端頁面呼叫
- * 自動驗證使用者是否登入
+ * 接收所有神務服務的報名 (V2 版本)
+ * 使用 onRequest 並手動驗證 platform-bc783 的 ID Token
  */
-exports.submitRegistration = onCall({ 
-    region: 'asia-east2'
-}, async (request) => {
-
-    if (!request.auth) {
-        console.error("未驗證的呼叫", request);
-        throw new HttpsError('unauthenticated', '使用者未登入，禁止存取。');
-    }
-
-    const data = request.data;
-    const auth = request.auth;
-
-    if (!data.serviceType || !data.contactInfo || !data.paymentInfo || !data.totalAmount) {
-        console.error("傳入資料不完整", data);
-        throw new HttpsError('invalid-argument', '資料不完整，無法處理。');
-    }
-
-    if (auth.uid !== data.userId) {
-        console.error("ID 不符", { auth: auth.uid, data: data.userId });
-        throw new HttpsError('permission-denied', '使用者 ID 不符，權限不足。');
-    }
-
-    const paymentInfo = data.paymentInfo;
-    if (paymentInfo) {
-        const cardNumber = (paymentInfo.cardNumber || '').replace(/\s/g, '');
-        const cardExpiry = paymentInfo.cardExpiry || '';
-        const cardCVV = paymentInfo.cardCVV || '';
-        
-        if (!/^\d{16}$/.test(cardNumber)) {
-            throw new HttpsError('invalid-argument', '信用卡卡號格式錯誤');
-        }
-        
-        if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-            throw new HttpsError('invalid-argument', '有效期限格式錯誤');
-        }
-        
-        const [month, year] = cardExpiry.split('/').map(Number);
-        if (month < 1 || month > 12) {
-            throw new HttpsError('invalid-argument', '月份必須在 01-12 之間');
-        }
-        
-        if (!/^\d{3}$/.test(cardCVV)) {
-            throw new HttpsError('invalid-argument', 'CVV 格式錯誤');
-        }
-    }
-
-    console.log(`收到來自 ${data.userId} 的 ${data.serviceType} 報名...`);
-
+exports.submitRegistrationV2 = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
     try {
+        // 驗證 HTTP 方法
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        // 從 Authorization header 取得 ID Token
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        
+        // 使用 platform-bc783 的 Auth 驗證 token
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+        const data = req.body.data;
+
+        // 驗證資料完整性
+        if (!data.serviceType || !data.contactInfo || !data.paymentInfo || !data.totalAmount) {
+            console.error("傳入資料不完整", data);
+            res.status(400).json({ error: { message: '資料不完整，無法處理。' } });
+            return;
+        }
+
+        // 驗證使用者 ID 一致性
+        if (uid !== data.userId) {
+            console.error("ID 不符", { uid, dataUserId: data.userId });
+            res.status(403).json({ error: { message: '使用者 ID 不符，權限不足。' } });
+            return;
+        }
+
+        // 驗證信用卡資訊
+        const paymentInfo = data.paymentInfo;
+        if (paymentInfo) {
+            const cardNumber = (paymentInfo.cardNumber || '').replace(/\s/g, '');
+            const cardExpiry = paymentInfo.cardExpiry || '';
+            const cardCVV = paymentInfo.cardCVV || '';
+            
+            if (!/^\d{16}$/.test(cardNumber)) {
+                res.status(400).json({ error: { message: '信用卡卡號格式錯誤' } });
+                return;
+            }
+            
+            if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+                res.status(400).json({ error: { message: '有效期限格式錯誤' } });
+                return;
+            }
+            
+            const [month, year] = cardExpiry.split('/').map(Number);
+            if (month < 1 || month > 12) {
+                res.status(400).json({ error: { message: '月份必須在 01-12 之間' } });
+                return;
+            }
+            
+            if (!/^\d{3}$/.test(cardCVV)) {
+                res.status(400).json({ error: { message: 'CVV 格式錯誤' } });
+                return;
+            }
+        }
+
+        console.log(`收到來自 ${data.userId} 的 ${data.serviceType} 報名...`);
+
+        // 建立訂單
         const regRef = db.collection('registrations').doc();
         const secretRef = db.collection('temp_payment_secrets').doc();
 
@@ -135,11 +166,11 @@ exports.submitRegistration = onCall({
 
         console.log(`訂單 ${regRef.id} 與機密文件 ${secretRef.id} 已成功建立。`);
 
-        return { success: true, orderId: regRef.id };
+        res.status(200).json({ result: { success: true, orderId: regRef.id } });
 
     } catch (error) {
-        console.error("寫入資料庫失敗:", error);
-        throw new HttpsError('internal', '伺服器內部錯誤，無法建立訂單。');
+        console.error("處理報名時發生錯誤:", error);
+        res.status(500).json({ error: { message: '伺服器內部錯誤，無法建立訂單。' } });
     }
 });
 

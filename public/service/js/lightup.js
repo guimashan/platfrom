@@ -451,19 +451,38 @@ async function handleSubmit() {
         // --- 呼叫 Cloud Function ---
         console.log("正在呼叫後端 'submitRegistration'...");
         
-        const submitRegistrationApi = httpsCallable(serviceFunctions, 'submitRegistration');
-        const result = await submitRegistrationApi({
-            serviceType: SERVICE_TYPE,
-            contactInfo: contactInfo,
-            applicants: applicants,
-            paymentInfo: paymentInfo,
-            otherNote: otherNote,
-            totalAmount: totalAmount,
-            userId: currentUser.uid
+        // 獲取 Platform Auth 的 ID Token（跨專案認證）
+        const idToken = await platformAuth.currentUser.getIdToken();
+        
+        // 使用 fetch 手動呼叫，傳遞認證 token
+        const functionUrl = 'https://asia-east2-service-b9d4a.cloudfunctions.net/submitRegistrationV2';
+        const response = await fetch(functionUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                data: {
+                    serviceType: SERVICE_TYPE,
+                    contactInfo: contactInfo,
+                    applicants: applicants,
+                    paymentInfo: paymentInfo,
+                    otherNote: otherNote,
+                    totalAmount: totalAmount,
+                    userId: currentUser.uid
+                }
+            })
         });
-
-        console.log("後端回傳結果:", result.data);
-        alert(`報名成功！\n您的訂單編號為: ${result.data.orderId}\n我們將在核對資料後盡快為您處理。`);
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || '提交失敗');
+        }
+        
+        const result = await response.json();
+        console.log("後端回傳結果:", result);
+        alert(`報名成功！\n您的訂單編號為: ${result.result.orderId}\n我們將在核對資料後盡快為您處理。`);
         
         // 重置表單
         window.location.reload();
