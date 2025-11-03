@@ -316,3 +316,205 @@ exports.confirmPayment = onCall({
         throw new HttpsError('internal', '伺服器錯誤');
     }
 });
+
+// ========================================
+// V2 管理後台 API（支援跨專案認證）
+// ========================================
+
+/**
+ * V2 版本：查詢訂單列表
+ */
+exports.getRegistrationsV2 = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+        await checkServiceRole(uid);
+
+        const registrationsSnap = await db.collection('registrations')
+            .orderBy('createdAt', 'desc')
+            .limit(100)
+            .get();
+
+        const registrations = registrationsSnap.docs.map(doc => ({
+            orderId: doc.id,
+            ...doc.data(),
+            paymentSecretId: undefined
+        }));
+
+        console.log(`使用者 ${uid} 查詢了 ${registrations.length} 筆訂單`);
+        res.status(200).json({ result: { success: true, registrations } });
+
+    } catch (error) {
+        console.error('查詢訂單失敗:', error);
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
+});
+
+/**
+ * V2 版本：查看單一訂單詳情
+ */
+exports.getRegistrationDetailV2 = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+        await checkServiceRole(uid);
+
+        const { orderId } = req.body.data || {};
+        if (!orderId) {
+            res.status(400).json({ error: { message: '缺少訂單編號' } });
+            return;
+        }
+
+        const regDoc = await db.collection('registrations').doc(orderId).get();
+        if (!regDoc.exists) {
+            res.status(404).json({ error: { message: '訂單不存在' } });
+            return;
+        }
+
+        const registration = {
+            orderId: regDoc.id,
+            ...regDoc.data()
+        };
+
+        let paymentSecret = null;
+        if (registration.paymentSecretId) {
+            const secretDoc = await db.collection('temp_payment_secrets')
+                .doc(registration.paymentSecretId)
+                .get();
+            
+            if (secretDoc.exists) {
+                paymentSecret = secretDoc.data();
+            }
+        }
+
+        console.log(`使用者 ${uid} 查看訂單 ${orderId}`);
+        res.status(200).json({ 
+            result: { 
+                success: true, 
+                registration, 
+                paymentSecret 
+            } 
+        });
+
+    } catch (error) {
+        console.error('查詢訂單詳情失敗:', error);
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
+});
+
+/**
+ * V2 版本：確認收款
+ */
+exports.confirmPaymentV2 = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+        await checkServiceRole(uid);
+
+        const { orderId } = req.body.data || {};
+        if (!orderId) {
+            res.status(400).json({ error: { message: '缺少訂單編號' } });
+            return;
+        }
+
+        const regDoc = await db.collection('registrations').doc(orderId).get();
+        if (!regDoc.exists) {
+            res.status(404).json({ error: { message: '訂單不存在' } });
+            return;
+        }
+
+        const registration = regDoc.data();
+        const paymentSecretId = registration.paymentSecretId;
+
+        const batch = db.batch();
+        
+        batch.update(db.collection('registrations').doc(orderId), {
+            status: 'paid_offline',
+            paidAt: FieldValue.serverTimestamp(),
+            paidBy: uid,
+            paymentSecretId: FieldValue.delete()
+        });
+
+        if (paymentSecretId) {
+            batch.delete(db.collection('temp_payment_secrets').doc(paymentSecretId));
+        }
+
+        await batch.commit();
+
+        console.log(`訂單 ${orderId} 已由使用者 ${uid} 確認收款，機密資料已刪除`);
+        res.status(200).json({ result: { success: true } });
+
+    } catch (error) {
+        console.error('確認收款失敗:', error);
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
+});

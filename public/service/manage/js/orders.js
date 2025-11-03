@@ -1,13 +1,29 @@
 import { checkAuth, logout } from '/js/auth-guard.js';
-import { serviceFunctions } from '/js/firebase-init.js';
-import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+import { platformAuth } from '/js/firebase-init.js';
 
 let currentUser = null;
 let allOrders = [];
 
-const getRegistrations = httpsCallable(serviceFunctions, 'getRegistrations');
-const getRegistrationDetail = httpsCallable(serviceFunctions, 'getRegistrationDetail');
-const confirmPayment = httpsCallable(serviceFunctions, 'confirmPayment');
+const API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
+
+async function callAPI(endpoint, data = {}) {
+    const idToken = await platformAuth.currentUser.getIdToken();
+    const response = await fetch(`${API_BASE}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ data })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || '請求失敗');
+    }
+    
+    return response.json();
+}
 
 (async function init() {
     try {
@@ -38,8 +54,8 @@ const confirmPayment = httpsCallable(serviceFunctions, 'confirmPayment');
 
 async function loadOrders() {
     try {
-        const result = await getRegistrations();
-        allOrders = result.data.registrations || [];
+        const result = await callAPI('getRegistrationsV2');
+        allOrders = result.result.registrations || [];
         
         console.log('載入訂單:', allOrders.length, '筆');
         applyFilters();
@@ -119,9 +135,9 @@ window.viewOrder = async function(orderId) {
         modalBody.innerHTML = '<div style="text-align:center; padding:40px;">載入中...</div>';
         modal.style.display = 'block';
         
-        const result = await getRegistrationDetail({ orderId });
-        const order = result.data.registration;
-        const paymentSecret = result.data.paymentSecret;
+        const result = await callAPI('getRegistrationDetailV2', { orderId });
+        const order = result.result.registration;
+        const paymentSecret = result.result.paymentSecret;
         
         renderOrderDetail(order, paymentSecret);
         
@@ -265,7 +281,7 @@ window.confirmOrderPayment = async function(orderId) {
     }
     
     try {
-        await confirmPayment({ orderId });
+        await callAPI('confirmPaymentV2', { orderId });
         
         alert('收款確認成功！信用卡資訊已刪除。');
         
