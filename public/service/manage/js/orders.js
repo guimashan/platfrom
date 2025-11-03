@@ -1,0 +1,332 @@
+import { checkAuth, logout } from '/js/auth-guard.js';
+import { serviceFunctions } from '/js/firebase-init.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
+
+let currentUser = null;
+let allOrders = [];
+
+const getRegistrations = httpsCallable(serviceFunctions, 'getRegistrations');
+const getRegistrationDetail = httpsCallable(serviceFunctions, 'getRegistrationDetail');
+const confirmPayment = httpsCallable(serviceFunctions, 'confirmPayment');
+
+(async function init() {
+    try {
+        const { user } = await checkAuth({
+            requiredRoles: ['poweruser_service', 'admin_service', 'superadmin']
+        });
+        
+        currentUser = user;
+        
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+        
+        document.getElementById('filterServiceType').addEventListener('change', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+        document.getElementById('filterSearch').addEventListener('input', applyFilters);
+        
+        await loadOrders();
+        
+    } catch (error) {
+        console.error('初始化失敗:', error);
+        alert('權限不足或載入失敗: ' + error.message);
+        window.location.href = '/';
+    }
+})();
+
+async function loadOrders() {
+    try {
+        const result = await getRegistrations();
+        allOrders = result.data.registrations || [];
+        
+        console.log('載入訂單:', allOrders.length, '筆');
+        applyFilters();
+        
+    } catch (error) {
+        console.error('載入訂單失敗:', error);
+        showEmptyState('載入失敗: ' + error.message);
+    }
+}
+
+function applyFilters() {
+    const serviceType = document.getElementById('filterServiceType').value;
+    const status = document.getElementById('filterStatus').value;
+    const search = document.getElementById('filterSearch').value.toLowerCase();
+    
+    let filtered = allOrders;
+    
+    if (serviceType) {
+        filtered = filtered.filter(o => o.serviceType === serviceType);
+    }
+    
+    if (status) {
+        filtered = filtered.filter(o => o.status === status);
+    }
+    
+    if (search) {
+        filtered = filtered.filter(o => {
+            const searchText = `${o.orderId} ${o.contactInfo?.name || ''} ${o.contactInfo?.phone || ''}`.toLowerCase();
+            return searchText.includes(search);
+        });
+    }
+    
+    renderOrders(filtered);
+}
+
+function renderOrders(orders) {
+    const tbody = document.getElementById('ordersTableBody');
+    
+    if (orders.length === 0) {
+        showEmptyState('目前沒有符合條件的訂單');
+        return;
+    }
+    
+    tbody.innerHTML = orders.map(order => `
+        <tr>
+            <td><code>${order.orderId.substring(0, 8)}...</code></td>
+            <td>${getServiceTypeName(order.serviceType)}</td>
+            <td>${order.contactInfo?.name || '-'}</td>
+            <td>${order.contactInfo?.phone || '-'}</td>
+            <td><strong>NT$ ${order.totalAmount?.toLocaleString() || 0}</strong></td>
+            <td><span class="status-badge status-${getStatusClass(order.status)}">${getStatusName(order.status)}</span></td>
+            <td>${formatDate(order.createdAt)}</td>
+            <td>
+                <button class="btn-view" onclick="viewOrder('${order.orderId}')">查看</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function showEmptyState(message) {
+    const tbody = document.getElementById('ordersTableBody');
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="8" class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div>${message}</div>
+            </td>
+        </tr>
+    `;
+}
+
+window.viewOrder = async function(orderId) {
+    try {
+        const modal = document.getElementById('orderModal');
+        const modalBody = document.getElementById('modalBody');
+        
+        modalBody.innerHTML = '<div style="text-align:center; padding:40px;">載入中...</div>';
+        modal.style.display = 'block';
+        
+        const result = await getRegistrationDetail({ orderId });
+        const order = result.data.registration;
+        const paymentSecret = result.data.paymentSecret;
+        
+        renderOrderDetail(order, paymentSecret);
+        
+    } catch (error) {
+        console.error('載入訂單詳情失敗:', error);
+        alert('載入失敗: ' + error.message);
+        closeOrderModal();
+    }
+};
+
+function renderOrderDetail(order, paymentSecret) {
+    const modalBody = document.getElementById('modalBody');
+    
+    const applicantsList = order.applicants?.map((a, index) => {
+        const lightsHtml = Object.entries(a.lights || {})
+            .filter(([name, count]) => count > 0)
+            .map(([name, count]) => `${name} x ${count}`)
+            .join('、') || '無';
+        
+        return `
+            <div class="detail-row">
+                <div class="detail-label">點燈人 ${index + 1}</div>
+                <div class="detail-value">
+                    <strong>${a.applicantName || '未填寫'}</strong><br>
+                    ${a.bazi ? `生辰: ${a.bazi}` : ''}<br>
+                    點燈: ${lightsHtml}
+                </div>
+            </div>
+        `;
+    }).join('') || '<div class="detail-row"><div class="detail-value">無點燈人資料</div></div>';
+    
+    let paymentInfoHtml = '';
+    if (paymentSecret && order.status === 'pending_manual_payment') {
+        const pi = paymentSecret.paymentInfo || {};
+        paymentInfoHtml = `
+            <div class="detail-section">
+                <div class="payment-warning">
+                    <div class="payment-warning-title">
+                        ⚠️ 機密資訊 - 僅限授權人員查看
+                    </div>
+                    <p style="margin:5px 0; color:#856404;">請於刷卡後立即點擊「確認收款」以刪除此機密資訊</p>
+                </div>
+                <h3>💳 信用卡資訊</h3>
+                <div class="card-info">
+                    <div class="card-info-row">
+                        <div class="detail-label">持卡人姓名</div>
+                        <div class="detail-value">${pi.cardHolderName || '-'}</div>
+                    </div>
+                    <div class="card-info-row">
+                        <div class="detail-label">信用卡卡號</div>
+                        <div class="detail-value"><code>${pi.cardNumber || '-'}</code></div>
+                    </div>
+                    <div class="card-info-row">
+                        <div class="detail-label">有效期限</div>
+                        <div class="detail-value">${pi.cardExpiry || '-'}</div>
+                    </div>
+                    <div class="card-info-row">
+                        <div class="detail-label">安全碼 (CVV)</div>
+                        <div class="detail-value"><code>${pi.cardCVV || '-'}</code></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    modalBody.innerHTML = `
+        <div class="detail-section">
+            <h3>📋 訂單資訊</h3>
+            <div class="detail-row">
+                <div class="detail-label">訂單編號</div>
+                <div class="detail-value"><code>${order.orderId}</code></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">服務類型</div>
+                <div class="detail-value">${getServiceTypeName(order.serviceType)}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">訂單狀態</div>
+                <div class="detail-value"><span class="status-badge status-${getStatusClass(order.status)}">${getStatusName(order.status)}</span></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">應繳金額</div>
+                <div class="detail-value"><strong style="color:var(--primary-gold); font-size:18px;">NT$ ${order.totalAmount?.toLocaleString() || 0}</strong></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">建立時間</div>
+                <div class="detail-value">${formatDate(order.createdAt)}</div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3>📞 聯絡資訊</h3>
+            <div class="detail-row">
+                <div class="detail-label">報名姓名</div>
+                <div class="detail-value">${order.contactInfo?.name || '-'}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">連絡電話</div>
+                <div class="detail-value">${order.contactInfo?.phone || '-'}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">電子信箱</div>
+                <div class="detail-value">${order.contactInfo?.email || '-'}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">通訊地址</div>
+                <div class="detail-value">${order.contactInfo?.address || '-'}</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">感謝狀領取</div>
+                <div class="detail-value">${order.contactInfo?.receiptOption === 'send' ? '寄發感謝狀' : '親自領取'}</div>
+            </div>
+        </div>
+        
+        <div class="detail-section">
+            <h3>🕯️ 點燈名單</h3>
+            ${applicantsList}
+        </div>
+        
+        ${paymentInfoHtml}
+        
+        ${order.otherNote ? `
+        <div class="detail-section">
+            <h3>📝 其他備註</h3>
+            <div class="detail-value">${order.otherNote}</div>
+        </div>
+        ` : ''}
+        
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeOrderModal()">關閉</button>
+            ${order.status === 'pending_manual_payment' ? 
+                `<button class="btn-confirm" onclick="confirmOrderPayment('${order.orderId}')">✓ 確認收款</button>` : 
+                ''}
+        </div>
+    `;
+}
+
+window.confirmOrderPayment = async function(orderId) {
+    if (!confirm('確認已完成刷卡並收款？\n\n點擊「確定」後，訂單狀態將更新為「已付款」，且信用卡機密資訊將永久刪除。')) {
+        return;
+    }
+    
+    try {
+        await confirmPayment({ orderId });
+        
+        alert('收款確認成功！信用卡資訊已刪除。');
+        
+        closeOrderModal();
+        await loadOrders();
+        
+    } catch (error) {
+        console.error('確認收款失敗:', error);
+        alert('操作失敗: ' + error.message);
+    }
+};
+
+window.closeOrderModal = function() {
+    document.getElementById('orderModal').style.display = 'none';
+};
+
+window.onclick = function(event) {
+    const modal = document.getElementById('orderModal');
+    if (event.target === modal) {
+        closeOrderModal();
+    }
+};
+
+function getServiceTypeName(type) {
+    const names = {
+        'lightup': '線上點燈',
+        'niandou': '年斗法會',
+        'zhongyuan': '中元普渡'
+    };
+    return names[type] || type;
+}
+
+function getStatusName(status) {
+    const names = {
+        'pending_manual_payment': '待付款',
+        'paid_offline': '已付款',
+        'cancelled': '已取消'
+    };
+    return names[status] || status;
+}
+
+function getStatusClass(status) {
+    if (status === 'pending_manual_payment') return 'pending';
+    if (status === 'paid_offline') return 'paid';
+    if (status === 'cancelled') return 'cancelled';
+    return 'pending';
+}
+
+function formatDate(timestamp) {
+    if (!timestamp) return '-';
+    
+    let date;
+    if (timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+    } else if (timestamp._seconds) {
+        date = new Date(timestamp._seconds * 1000);
+    } else {
+        date = new Date(timestamp);
+    }
+    
+    return date.toLocaleString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
