@@ -1,55 +1,131 @@
-/* -------------------------
- * 專屬於 lightup.html 的樣式
- * ------------------------- */
+/* 線上點燈頁面樣式 - 使用統一的金黃色主題 */
 
-/* 表單區塊間距 */
-.form-section {
-    margin-bottom: 30px;
+body {
+    padding-bottom: 140px;
 }
 
-/* 信用卡表單的特殊樣式 */
-.payment-card {
-    background-color: #fff9e6; /* 淡淡的警示黃色 */
-    border: 1px solid var(--primary-gold-dark);
+.main-content {
+    padding: 20px;
+}
+
+/* 卡片樣式 */
+.card {
+    background: var(--bg-white);
+    border-radius: var(--radius-md);
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.card-title {
+    color: var(--primary-gold-dark);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary-gold);
+}
+
+/* 表單樣式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    transition: all 0.3s;
+    background: white;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.input-field::placeholder {
+    color: #999;
+}
+
+/* 並排表單 */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 /* 單選按鈕樣式 */
 .radio-group {
-    margin-bottom: 15px;
-}
-.radio-group input {
-    margin-right: 5px;
-}
-.radio-group label {
-    margin-right: 20px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
-/* -------------------------
- * 卡片式管理 (H5 草稿核心)
- * ------------------------- */
-
-/* 卡片總覽 (收合時) */
-.applicant-card {
-    background: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px 20px;
-    margin-bottom: 10px;
+.radio-label {
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    transition: box-shadow 0.3s ease;
+    padding: 10px 15px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s;
+    background: white;
+}
+
+.radio-label:hover {
+    border-color: var(--primary-gold);
+    background: var(--bg-card);
+}
+
+.radio-label input[type="radio"] {
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.radio-label input[type="radio"]:checked + span {
+    color: var(--primary-gold-dark);
+    font-weight: 600;
+}
+
+.radio-label span {
+    font-size: 0.95rem;
+}
+
+/* 點燈人卡片 */
+.applicant-card {
+    background: var(--bg-card);
+    border: 1.5px solid rgba(212, 175, 55, 0.2);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
 .applicant-card:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary-gold);
 }
 
-/* 卡片總覽的標題 */
 .card-summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-weight: bold;
+    font-weight: 600;
 }
 
 .card-summary-name {
@@ -59,14 +135,16 @@
 
 .card-summary-info {
     font-size: 0.9rem;
-    color: #333;
+    color: var(--text-secondary);
+    background: white;
+    padding: 4px 12px;
+    border-radius: 20px;
 }
 
-/* 卡片詳細資料 (展開時) */
 .applicant-details {
     margin-top: 20px;
     padding-top: 20px;
-    border-top: 1px dashed #eee;
+    border-top: 1px dashed rgba(212, 175, 55, 0.3);
 }
 
 /* 燈別計數器 */
@@ -75,72 +153,221 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 15px;
-}
-.light-item label {
-    font-size: 1rem;
-    flex-basis: 50%;
-}
-/* 數字輸入框 */
-.light-item input[type="number"] {
-    width: 80px;
-    padding: 8px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
 }
 
-/* 卡片內的按鈕 */
+.light-item label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.light-item input[type="number"] {
+    width: 100px;
+    padding: 8px 12px;
+    text-align: center;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--primary-gold-dark);
+}
+
+.light-item input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* 卡片操作按鈕 */
 .card-actions {
     margin-top: 20px;
     display: flex;
     justify-content: flex-end;
 }
+
 .remove-btn {
-    background-color: #e74c3c;
+    background: #dc3545;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
+    padding: 10px 20px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
 }
+
 .remove-btn:hover {
-    background-color: #c0392b;
+    background: #c82333;
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    transform: translateY(-1px);
 }
 
+/* 信用卡區塊 */
+.payment-card {
+    background: linear-gradient(135deg, #fff9e6 0%, #fffef9 100%);
+    border: 2px solid var(--primary-gold-dark);
+}
 
-/* -------------------------
- * 浮動總結 (H5 草稿核心)
- * ------------------------- */
+/* 按鈕樣式 */
+.btn-secondary {
+    background: white;
+    color: var(--primary-gold-dark);
+    border: 1.5px solid var(--primary-gold);
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.btn-secondary:hover {
+    background: var(--primary-gold);
+    color: white;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+/* 浮動總結欄位 */
 #floatingFooter {
     position: fixed;
     bottom: 0;
     left: 0;
-    width: 100%;
-    background-color: #ffffff;
-    border-top: 2px solid var(--primary-gold);
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    right: 0;
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
     z-index: 1000;
     padding: 15px 0;
 }
 
 .footer-content {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px;
 }
 
-.total-value {
-    font-weight: bold;
+.footer-summary {
+    display: flex;
+    gap: 30px;
+    color: white;
 }
+
+.summary-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.summary-label {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.summary-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
 .total-price {
-    font-size: 1.25rem;
-    color: var(--primary-gold);
+    color: #FFE66D;
 }
 
-/* 確保內容不會被 footer 擋住 */
-body {
-    padding-bottom: 120px; 
+.btn-submit {
+    background: white;
+    color: var(--primary-gold-dark);
+    border: none;
+    padding: 14px 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: all 0.3s;
+    white-space: nowrap;
+}
+
+.btn-submit:hover {
+    background: #f0f0f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .card {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .radio-label {
+        width: 100%;
+    }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .footer-summary {
+        width: 100%;
+        justify-content: space-around;
+        gap: 15px;
+    }
+
+    .summary-item {
+        align-items: center;
+        text-align: center;
+    }
+
+    .summary-label {
+        font-size: 0.8rem;
+    }
+
+    .summary-value {
+        font-size: 1.2rem;
+    }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+    }
+
+    .light-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .light-item input[type="number"] {
+        width: 100%;
+    }
+
+    body {
+        padding-bottom: 180px;
+    }
 }
