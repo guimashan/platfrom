@@ -26,6 +26,50 @@ try {
 const platformDb = getFirestore(platformApp);
 const platformAuth = getAuth(platformApp);
 
+/**
+ * 生成訂單編號
+ * 格式: LIGHT-20251103-0001
+ */
+async function generateOrderId(serviceType) {
+    const today = new Date();
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+    
+    // 服務類型代碼對應表
+    const typeCodeMap = {
+        'lamp_lighting': 'LIGHT',
+        'blessing': 'BLESS',
+        'zhongyuan': 'YUAN'
+    };
+    
+    const typeCode = typeCodeMap[serviceType] || 'ORDER';
+    const counterKey = `${typeCode}-${dateStr}`;
+    
+    // 使用 Firestore transaction 來確保流水號唯一性
+    const counterRef = db.collection('counters').doc(counterKey);
+    
+    const orderId = await db.runTransaction(async (transaction) => {
+        const counterDoc = await transaction.get(counterRef);
+        
+        let nextNumber = 1;
+        if (counterDoc.exists) {
+            nextNumber = (counterDoc.data().count || 0) + 1;
+            transaction.update(counterRef, { count: nextNumber });
+        } else {
+            transaction.set(counterRef, { 
+                count: nextNumber,
+                date: dateStr,
+                serviceType: typeCode
+            });
+        }
+        
+        // 格式化流水號為 4 位數
+        const seqNumber = String(nextNumber).padStart(4, '0');
+        return `${typeCode}-${dateStr}-${seqNumber}`;
+    });
+    
+    return orderId;
+}
+
 async function checkServiceRole(decodedToken) {
     try {
         // 從 ID Token 的 custom claims 中讀取角色
@@ -132,8 +176,11 @@ exports.submitRegistrationV2 = onRequest({
 
         console.log(`收到來自 ${data.userId} 的 ${data.serviceType} 報名...`);
 
+        // 生成有意義的訂單編號
+        const orderId = await generateOrderId(data.serviceType);
+        
         // 建立訂單
-        const regRef = db.collection('registrations').doc();
+        const regRef = db.collection('registrations').doc(orderId);
         const secretRef = db.collection('temp_payment_secrets').doc();
 
         const registrationDoc = {
@@ -151,7 +198,7 @@ exports.submitRegistrationV2 = onRequest({
         };
 
         const secretDoc = {
-            registrationId: regRef.id,
+            registrationId: orderId,
             createdAt: FieldValue.serverTimestamp(),
             paymentInfo: data.paymentInfo
         };
@@ -162,9 +209,9 @@ exports.submitRegistrationV2 = onRequest({
         
         await batch.commit();
 
-        console.log(`訂單 ${regRef.id} 與機密文件 ${secretRef.id} 已成功建立。`);
+        console.log(`訂單 ${orderId} 與機密文件 ${secretRef.id} 已成功建立。`);
 
-        res.status(200).json({ result: { success: true, orderId: regRef.id } });
+        res.status(200).json({ result: { success: true, orderId: orderId } });
 
     } catch (error) {
         console.error("處理報名時發生錯誤:", error);
