@@ -5,20 +5,23 @@
 
 // --- 修正：從 firebase-init.js 匯入需要的實例 ---
 // 我們需要：
-// 1. serviceDb (用於寫入 "神務服務" 的訂單)
+// 1. serviceFunctions (用於呼叫後端 API)
 // 2. platformAuth (用於檢查使用者是否登入)
 // 3. platformDb (用於讀取登入者的資料)
 import { 
-    serviceDb, 
+    serviceFunctions,
     platformAuth, 
     platformDb 
 } from '../../js/firebase-init.js';
 
 import { 
-    collection,
     doc,
     getDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+import { 
+    httpsCallable
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
 const SERVICE_TYPE = "lightup";
@@ -246,17 +249,23 @@ async function handleSubmit() {
         const otherNote = otherNoteEl.value.trim();
         const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(',', ''), 10);
         
-        console.log("表單打包完成:", {
+        console.log("正在呼叫後端 'submitRegistration'...");
+        
+        const submitRegistrationApi = httpsCallable(serviceFunctions, 'submitRegistration');
+        
+        const result = await submitRegistrationApi({
             serviceType: SERVICE_TYPE,
-            contactInfo,
-            applicants,
-            paymentInfo,
-            otherNote,
-            totalAmount,
+            contactInfo: contactInfo,
+            applicants: applicants,
+            paymentInfo: paymentInfo,
+            otherNote: otherNote,
+            totalAmount: totalAmount,
             userId: currentUser.uid
         });
+
+        console.log("後端回傳結果:", result.data);
         
-        alert("報名成功！(此為測試訊息)\n我們將在下一步建立後端來處理這些資料。");
+        alert(`報名成功！\n您的訂單編號為: ${result.data.orderId}\n我們將在核對資料後盡快為您處理。`);
 
     } catch (error) {
         console.error("報名失敗:", error);
