@@ -206,6 +206,65 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-03 神務服務管理後台實作（訂單管理系統）
+
+**功能概述**:
+- ✅ 建立 service/manage/ 後台架構
+  - /service/manage/index.html - 後台入口（角色檢查、導航選單）
+  - /service/manage/orders.html - 訂單管理頁面
+  - /service/manage/js/orders.js - 訂單管理邏輯
+  - /service/manage/styles/manage.css - 後台樣式
+
+**訂單管理功能**:
+- ✅ 訂單列表顯示
+  - 顯示最近 100 筆訂單
+  - 狀態標籤（pending, paid_offline）
+  - 金額顯示與時間戳記
+- ✅ 訂單詳情查看
+  - Modal 彈窗顯示完整訂單資料
+  - **信用卡資訊顯示**（卡號、持卡人、有效期限、CVV）
+  - 報名人資訊（姓名、電話、地址）
+  - 燈座選擇與備註
+- ✅ 手動確認收款
+  - 一鍵確認付款狀態
+  - 自動刪除機密信用卡資料
+  - 記錄確認人員與時間
+
+**後端 API (已部署到 service-b9d4a)**:
+- ✅ `getRegistrations` - 查詢訂單列表
+- ✅ `getRegistrationDetail` - 查看訂單詳情（含信用卡）
+- ✅ `confirmPayment` - 確認收款並刪除機密資料
+
+**三層安全架構**:
+1. **前端權限檢查** (auth-guard.js)
+   - 檢查使用者是否登入
+   - 驗證是否具有 poweruser_service、admin_service 或 superadmin 角色
+   - 未授權使用者無法存取管理頁面
+   
+2. **後端伺服器端驗證** (checkServiceRole 函數)
+   - 跨專案查詢：從 platform-bc783/users 讀取使用者角色
+   - 使用 Admin SDK 確保資料真實性
+   - 所有管理 API 都必須通過角色檢查才能執行
+   
+3. **Firestore Security Rules 完全鎖定**
+   - 所有集合禁止直接讀寫（allow read, write: if false）
+   - 強制所有操作必須通過 Cloud Functions
+   - 防止使用者繞過 API 直接存取資料
+
+**安全考量與未來改進**:
+- ⚠️ 目前架構：使用跨專案 Firestore 查詢來驗證角色
+  - 優點：集中管理角色（platform-bc783/users）
+  - 依賴：platform 專案的 updateUserRole 必須有正確的權限控制
+- 🎯 建議未來升級為 Custom Claims
+  - 在 Firebase Auth Token 中直接包含角色資訊
+  - 更安全，無需額外查詢
+  - 需要修改 platform 專案的登入流程
+
+**相關檔案**:
+- 前端：public/service/manage/index.html、orders.html、js/orders.js
+- 後端：functions/src/service/index.js (checkServiceRole + 管理 API)
+- 共用：public/js/auth-guard.js
+
 ### 2025-11-03 線上點燈信用卡收集功能實作（過渡方案）
 
 ⚠️ **重要安全警告**: 此方案為過渡期解決方案，複製舊系統流程以便快速上線。
