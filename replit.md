@@ -62,7 +62,10 @@
 │   │   ├── js/            # 簽到 JavaScript
 │   │   └── styles/        # 簽到樣式
 │   ├── service/           # 神務服務模組（第三階段）
-│   │   └── index.html     # 服務前端（樣板）
+│   │   ├── index.html     # 服務前端（樣板）
+│   │   ├── lightup.html   # 線上點燈頁面 ⭐ NEW
+│   │   ├── js/            # 服務模組 JavaScript
+│   │   └── styles/        # 服務模組樣式
 │   ├── schedule/          # 排班系統模組（第四階段）
 │   │   └── index.html     # 排班前端（樣板）
 │   ├── js/                # 共用 JavaScript
@@ -71,6 +74,12 @@
 │   │   └── auth-guard.js      # 共用認證模組 ⭐
 │   └── styles/            # 共用樣式
 │       └── common.css     # 通用樣式
+├── docs/                  # 📚 文件中心 ⭐ 已整理
+│   ├── README.md          # 文件索引總覽
+│   ├── 教學手冊/          # 完整教學（00-13章）
+│   ├── 部署指南/          # Vercel 部署文件
+│   ├── 設定指南/          # LINE/LIFF 設定文件
+│   └── 開發文件/          # 技術開發文件
 ├── functions/             # Cloud Functions
 │   ├── src/
 │   │   ├── platform/      # Platform Functions
@@ -196,6 +205,23 @@ npm run emulators
 - 支援關鍵字觸發 LIFF App
 
 ## 最近變更
+
+### 2025-11-03 文件整理 + 線上點燈 UI 重新設計
+- ✅ 整理根目錄文件結構
+  - 建立 docs/部署指南/ - 收納部署相關文件
+  - 建立 docs/設定指南/ - 收納 LINE/LIFF 設定文件
+  - 建立 docs/開發文件/ - 收納技術開發文件
+  - 建立 docs/README.md - 文件索引總覽
+  - 根目錄保持乾淨：僅保留 README.md、replit.md、LICENSE
+- ✅ 重新設計線上點燈頁面 (public/service/lightup.html)
+  - 採用網站統一金黃色主題
+  - Header 導航欄（與其他頁面一致）
+  - 卡片式設計佈局
+  - 改進的表單樣式（大輸入框、金色焦點效果）
+  - 美化的單選按鈕（卡片樣式）
+  - 浮動總結欄位（金黃色漸層背景）
+  - 完整響應式設計（手機版友善）
+  - 統一的 CSS 變數使用（--primary-gold, --primary-gold-dark）
 
 ### 2025-11-01 LIFF 整合（LINE Front-end Framework）
 - ✅ 建立 LIFF 專用頁面
