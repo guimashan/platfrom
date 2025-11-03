@@ -206,6 +206,42 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-03 線上點燈信用卡收集功能實作（過渡方案）
+
+⚠️ **重要安全警告**: 此方案為過渡期解決方案，複製舊系統流程以便快速上線。
+
+**架構決策**:
+- ✅ 實作雙集合設計（資料分離）
+  - `registrations` 集合：儲存報名訂單資料（安全資料）
+  - `temp_payment_secrets` 集合：儲存信用卡資訊（機密資料）
+  - 兩集合透過 `paymentSecretId` 和 `registrationId` 互相關聯
+- ✅ 前端信用卡欄位與驗證
+  - 持卡人姓名、16 碼卡號、有效期限（MM/YY）、CVV
+  - 自動格式化：卡號每 4 碼加空格、有效期限自動加斜線
+  - 完整驗證：卡號長度、CVV 長度、過期檢查
+- ✅ 後端 API (submitRegistration)
+  - 使用 Callable Function 自動驗證登入
+  - 三層驗證：登入檢查、資料完整性、使用者 ID 一致性
+  - 使用 batch 同時寫入兩集合確保資料一致性
+- ✅ 安全措施
+  - Firestore Security Rules 完全鎖定（所有直接存取禁止）
+  - 只有 Cloud Functions 可存取資料
+  - HTTPS 傳輸（Vercel 自動）
+
+**已知風險**:
+- ⚠️ 儲存完整信用卡資料（包括 CVV）違反 PCI-DSS 規範
+- ⚠️ 使用者已明確確認風險並接受責任
+- ⚠️ 此為複製舊系統流程的過渡方案
+
+**後續計劃**:
+- 🎯 待 LINE Pay 申請通過後，將升級為合規的自動化金流
+- 🎯 屆時將移除信用卡收集功能，改用安全的重定向支付
+
+**相關檔案**:
+- 前端：public/service/lightup.html、public/service/js/lightup.js
+- 後端：functions/src/service/index.js
+- 規則：firestore.rules
+
 ### 2025-11-03 文件整理 + 線上點燈 UI 重新設計
 - ✅ 整理根目錄文件結構
   - 建立 docs/部署指南/ - 收納部署相關文件

@@ -76,13 +76,91 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMode();
 });
 
-// --- 事件監聽 (與前一版相同) ---
+// --- 事件監聽 ---
 function setupEventListeners() {
     modeSingleEl.addEventListener('change', updateMode);
     modeMultiEl.addEventListener('change', updateMode);
     addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, false));
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('input', calculateTotal);
+    
+    cardNumberEl.addEventListener('input', formatCardNumber);
+    cardExpiryEl.addEventListener('input', formatCardExpiry);
+    cardCVVEl.addEventListener('input', formatCVV);
+}
+
+// --- 信用卡格式化與驗證 ---
+
+function formatCardNumber(e) {
+    let value = e.target.value.replace(/\s/g, '');
+    value = value.replace(/\D/g, '');
+    value = value.substring(0, 16);
+    
+    const formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+    e.target.value = formatted;
+}
+
+function formatCardExpiry(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    
+    if (value.length >= 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+    }
+    
+    e.target.value = value;
+}
+
+function formatCVV(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    e.target.value = value.substring(0, 3);
+}
+
+function validateCardInfo() {
+    const cardHolderName = cardHolderNameEl.value.trim();
+    const cardNumber = cardNumberEl.value.replace(/\s/g, '');
+    const cardExpiry = cardExpiryEl.value.trim();
+    const cardCVV = cardCVVEl.value.trim();
+    
+    if (!cardHolderName) {
+        alert('請填寫持卡人姓名');
+        cardHolderNameEl.focus();
+        return false;
+    }
+    
+    if (cardNumber.length !== 16 || !/^\d{16}$/.test(cardNumber)) {
+        alert('請填寫正確的 16 碼信用卡卡號');
+        cardNumberEl.focus();
+        return false;
+    }
+    
+    if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+        alert('請填寫正確的有效期限格式 (MM/YY)');
+        cardExpiryEl.focus();
+        return false;
+    }
+    
+    const [month, year] = cardExpiry.split('/').map(Number);
+    if (month < 1 || month > 12) {
+        alert('月份必須在 01-12 之間');
+        cardExpiryEl.focus();
+        return false;
+    }
+    
+    const currentYear = new Date().getFullYear() % 100;
+    const currentMonth = new Date().getMonth() + 1;
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+        alert('信用卡已過期，請確認有效期限');
+        cardExpiryEl.focus();
+        return false;
+    }
+    
+    if (cardCVV.length !== 3 || !/^\d{3}$/.test(cardCVV)) {
+        alert('請填寫正確的 3 碼安全碼 (CVV)');
+        cardCVVEl.focus();
+        return false;
+    }
+    
+    return true;
 }
 
 // --- 核心功能 (與前一版相同) ---
@@ -212,6 +290,10 @@ async function handleSubmit() {
         return;
     }
     
+    if (!validateCardInfo()) {
+        return;
+    }
+    
     submitBtnEl.disabled = true;
     submitBtnEl.textContent = '處理中...';
 
@@ -241,7 +323,7 @@ async function handleSubmit() {
 
         const paymentInfo = {
             cardHolderName: cardHolderNameEl.value.trim(),
-            cardNumber: cardNumberEl.value.trim(),
+            cardNumber: cardNumberEl.value.replace(/\s/g, ''),
             cardExpiry: cardExpiryEl.value.trim(),
             cardCVV: cardCVVEl.value.trim(),
         };

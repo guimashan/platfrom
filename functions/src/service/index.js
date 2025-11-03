@@ -40,6 +40,30 @@ exports.submitRegistration = onCall({
         throw new HttpsError('permission-denied', '使用者 ID 不符，權限不足。');
     }
 
+    const paymentInfo = data.paymentInfo;
+    if (paymentInfo) {
+        const cardNumber = (paymentInfo.cardNumber || '').replace(/\s/g, '');
+        const cardExpiry = paymentInfo.cardExpiry || '';
+        const cardCVV = paymentInfo.cardCVV || '';
+        
+        if (!/^\d{16}$/.test(cardNumber)) {
+            throw new HttpsError('invalid-argument', '信用卡卡號格式錯誤');
+        }
+        
+        if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+            throw new HttpsError('invalid-argument', '有效期限格式錯誤');
+        }
+        
+        const [month, year] = cardExpiry.split('/').map(Number);
+        if (month < 1 || month > 12) {
+            throw new HttpsError('invalid-argument', '月份必須在 01-12 之間');
+        }
+        
+        if (!/^\d{3}$/.test(cardCVV)) {
+            throw new HttpsError('invalid-argument', 'CVV 格式錯誤');
+        }
+    }
+
     console.log(`收到來自 ${data.userId} 的 ${data.serviceType} 報名...`);
 
     try {
