@@ -30,6 +30,7 @@ exports.lineWebhook = messagingFunctions.lineWebhook;
 
 // 導出 Service Functions (神務服務)
 exports.submitRegistration = serviceFunctions.submitRegistration;
+exports.submitRegistrationV2 = serviceFunctions.submitRegistrationV2;
 exports.getRegistrations = serviceFunctions.getRegistrations;
 exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
 exports.confirmPayment = serviceFunctions.confirmPayment;
