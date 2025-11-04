@@ -75,7 +75,7 @@ function convertToLunar(gregorianDate) {
     }
 }
 
-// 等待 lunar-javascript 庫載入（只在需要時才調用）
+// 等待 lunar-javascript 庫載入（本地版本通常很快就載入完成）
 function waitForLunarLibrary() {
     return new Promise((resolve) => {
         // 如果已經載入，直接返回
@@ -85,7 +85,7 @@ function waitForLunarLibrary() {
         }
         
         let attempts = 0;
-        const maxAttempts = 30; // 3 秒（30 * 100ms）
+        const maxAttempts = 50; // 5 秒（本地檔案應該很快）
         
         const checkInterval = setInterval(() => {
             attempts++;
@@ -97,18 +97,10 @@ function waitForLunarLibrary() {
                 return;
             }
             
-            // 檢查是否載入失敗
-            if (window.lunarLoadError) {
-                clearInterval(checkInterval);
-                console.warn('農曆庫載入失敗，將只顯示國曆');
-                resolve();
-                return;
-            }
-            
-            // 超時
+            // 超時（本地檔案超時表示有嚴重問題）
             if (attempts >= maxAttempts) {
                 clearInterval(checkInterval);
-                console.warn('農曆庫載入逾時，將只顯示國曆');
+                console.error('農曆庫載入失敗，請檢查 /lib/lunar.js 是否存在');
                 resolve();
             }
         }, 100);

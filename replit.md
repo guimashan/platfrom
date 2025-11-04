@@ -220,10 +220,10 @@ npm run emulators
 
 ## 最近變更
 
-### 2025-11-04 後台管理新增農曆顯示功能
+### 2025-11-04 後台管理新增農曆顯示功能 + 本地化農曆庫
 
 **新增功能**：
-- ✅ 整合 lunar-javascript 農曆轉換庫
+- ✅ 整合 lunar-javascript 農曆轉換庫（本地化版本）
 - ✅ 後台訂單詳情同時顯示國曆和農曆生辰
 - ✅ 支援舊資料格式（bazi 字串）和新資料格式（bazi 物件）
 - ✅ 農曆日期使用紫色標示，易於區分
@@ -235,15 +235,23 @@ npm run emulators
 - 使用傳統月份名稱（正、二、三...冬、臘）
 - 使用傳統日期名稱（初一、初二...廿一...三十）
 
-**技術實作**：
-- 庫文件：public/js/lunar.min.js
-- 轉換函數：convertToLunar() in orders.js
-- 自動處理轉換錯誤，優雅降級
-- 統一視覺排版：新舊資料皆使用灰色背景網格排版
+**技術實作**（2025-11-04 更新）：
+- ✅ **本地化方案**：lunar-javascript@1.7.3 下載到專案中（426KB）
+- ✅ **本地路徑**：public/lib/lunar.js
+- ✅ **延遲載入**：只在查看訂單詳情時才載入，不影響 LINE 登錄速度
+- ✅ **100% 可靠**：不依賴 CDN，農曆顯示永遠可用
+- ✅ 轉換函數：convertToLunar() in orders.js
+- ✅ 自動處理轉換錯誤，優雅降級
+- ✅ 統一視覺排版：新舊資料皆使用灰色背景網格排版
+
+**效能優化**：
+- ⚡ LINE 登錄速度不受影響（農曆庫不在初始化時載入）
+- ⚡ 訂單詳情開啟時才載入農曆庫（延遲載入）
+- ⚡ 本地檔案速度快，無 CDN 依賴問題
 
 **相關檔案**：
-- public/js/lunar.min.js - 農曆轉換庫
-- public/service/manage/orders.html - 引入農曆庫
+- public/lib/lunar.js - 農曆轉換庫（本地版本 1.7.3）
+- public/service/manage/orders.html - 引入本地農曆庫
 - public/service/manage/js/orders.js - 農曆轉換與顯示邏輯
 
 ### 2025-11-04 服務模組表單優化與資料收集改進

@@ -9,10 +9,17 @@
     "deploy:checkin": "firebase deploy --project checkin-29f7f --only functions",
     "serve": "cd public && python3 -m http.server 5000"
   },
-  "keywords": ["firebase", "line-login", "temple-management"],
+  "keywords": [
+    "firebase",
+    "line-login",
+    "temple-management"
+  ],
   "author": "guimashan-dev",
   "license": "ISC",
   "devDependencies": {
     "firebase-tools": "^13.0.0"
+  },
+  "dependencies": {
+    "lunar-javascript": "^1.7.3"
   }
 }
