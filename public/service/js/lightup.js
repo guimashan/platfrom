@@ -273,6 +273,10 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <option value="亥時">亥時 (21:00-23:00)</option>
             </select>
             
+            <div style="margin-top: 20px; margin-bottom: 10px;">
+                <label style="font-weight: bold; font-size: 1.05em;">燈種選擇</label>
+            </div>
+            
             <div class="light-item">
                 <label>安太歲</label>
                 <input type="number" class="input-field light-count" data-light-name="安太歲" value="0" min="0">

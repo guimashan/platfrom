@@ -276,6 +276,10 @@ npm run emulators
 - 年斗法會：public/service/niandou.html、public/service/js/niandou.js
 - 線上點燈：public/service/lightup.html、public/service/js/lightup.js
 
+**視覺優化**（2025-11-04）：
+- ✅ 線上點燈：新增「燈種選擇」標題，增加時辰欄位與燈種之間的視覺間距
+- ✅ 改善表單層次結構，讓基本資料與燈種選擇明確區分
+
 ### 2025-11-04 年斗法會服務模組實作
 
 **新增功能**：
