@@ -41,8 +41,8 @@
             <div class="card">
                 <h2 class="card-title">報名聯絡資訊</h2>
                 <div class="form-group">
-                    <label for="contactName">主事姓名</label>
-                    <input type="text" id="contactName" class="input-field" placeholder="請輸入主事者姓名">
+                    <label for="contactName">主事姓名 (主要聯絡人)</label>
+                    <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
                 </div>
                 
                 <div class="form-group">
@@ -75,33 +75,29 @@
                 </div>
             </div>
 
-            <!-- II. 功德項目 -->
+            <!-- II. 報名名單 -->
             <div class="card">
-                <h2 class="card-title">功德項目</h2>
+                <h2 class="card-title">報名名單</h2>
                 
                 <div class="form-group">
-                    <label for="puzhuo">普桌</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="color: #666;">NT$</span>
-                        <input type="number" id="puzhuo" class="input-field" value="0" min="0" step="100" placeholder="請輸入金額">
+                    <label>報名對象</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" id="modeSingle" name="mode" value="single" checked>
+                            <span>單人 (僅報名者本人)</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" id="modeMulti" name="mode" value="multi">
+                            <span>多人 (包含家人親友)</span>
+                        </label>
                     </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="rice">白米</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="color: #666;">NT$</span>
-                        <input type="number" id="rice" class="input-field" value="0" min="0" step="100" placeholder="請輸入金額">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="donation">隨喜功德</label>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <span style="color: #666;">NT$</span>
-                        <input type="number" id="donation" class="input-field" value="0" min="0" step="100" placeholder="請輸入金額">
-                    </div>
-                </div>
+
+                <div id="applicantCardList"></div>
+
+                <button id="addApplicantBtn" class="btn-secondary" style="display: none; margin-top: 15px;">
+                    新增報名者
+                </button>
             </div>
 
             <!-- III. 信用卡資訊 -->

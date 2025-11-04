@@ -31,9 +31,10 @@ const contactNameEl = document.getElementById('contactName');
 const contactPhoneEl = document.getElementById('contactPhone');
 const contactEmailEl = document.getElementById('contactEmail');
 const contactAddressEl = document.getElementById('contactAddress');
-const puzhuoEl = document.getElementById('puzhuo');
-const riceEl = document.getElementById('rice');
-const donationEl = document.getElementById('donation');
+const modeSingleEl = document.getElementById('modeSingle');
+const modeMultiEl = document.getElementById('modeMulti');
+const applicantCardListEl = document.getElementById('applicantCardList');
+const addApplicantBtnEl = document.getElementById('addApplicantBtn');
 const cardHolderNameEl = document.getElementById('cardHolderName');
 const cardNumberEl = document.getElementById('cardNumber');
 const cardExpiryEl = document.getElementById('cardExpiry');
@@ -71,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             mainAppEl.style.display = 'block';
             
             setupEventListeners();
-            calculateTotal();
+            updateMode();
         } else {
             loginPromptEl.style.display = 'flex';
             mainAppEl.style.display = 'none';
@@ -108,12 +109,12 @@ function handleLineLogin() {
 
 // --- 事件監聽 ---
 function setupEventListeners() {
+    modeSingleEl.addEventListener('change', updateMode);
+    modeMultiEl.addEventListener('change', updateMode);
+    addApplicantBtnEl.addEventListener('click', () => createApplicantCard('', true));
     submitBtnEl.addEventListener('click', handleSubmit);
-    
-    // 監聽金額變化，自動計算總額
-    puzhuoEl.addEventListener('input', calculateTotal);
-    riceEl.addEventListener('input', calculateTotal);
-    donationEl.addEventListener('input', calculateTotal);
+    applicantCardListEl.addEventListener('input', calculateTotal);
+    contactNameEl.addEventListener('input', syncNameToFirstCard);
     
     // 自動清除錯誤提示
     contactNameEl.addEventListener('input', () => clearError(contactNameEl));
@@ -126,18 +127,146 @@ function setupEventListeners() {
     cardCVVEl.addEventListener('input', formatCardCVV);
 }
 
+// --- 雙向同步姓名 ---
+function syncNameToFirstCard() {
+    const firstCard = applicantCardListEl.querySelector('.applicant-card');
+    if (firstCard) {
+        const newName = contactNameEl.value.trim();
+        const displayName = newName || '報名者本人';
+        firstCard.querySelector('.card-summary-name').textContent = displayName;
+        firstCard.querySelector('.card-input-name').value = newName;
+    }
+}
+
+function syncFirstCardToName(card) {
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+    const isFirstCard = cards[0] === card;
+    if (isFirstCard) {
+        const cardName = card.querySelector('.card-input-name').value.trim();
+        contactNameEl.value = cardName;
+    }
+}
+
+// --- 核心功能 ---
+function updateMode() {
+    const isMultiMode = modeMultiEl.checked;
+    addApplicantBtnEl.style.display = isMultiMode ? 'block' : 'none';
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+    const defaultName = (userData && userData.displayName) ? userData.displayName : '';
+
+    if (isMultiMode) {
+        if (cards.length === 0) {
+            createApplicantCard(defaultName, false);
+        }
+    } else {
+        cards.forEach((card, index) => {
+            if (index > 0) card.remove();
+        });
+        if (cards.length === 0) {
+            createApplicantCard(defaultName, false);
+        } else {
+            cards[0].querySelector('.card-summary-name').textContent = defaultName || '報名者本人';
+            const removeBtn = cards[0].querySelector('.remove-btn');
+            if (removeBtn) removeBtn.style.display = 'none';
+        }
+    }
+    syncNameToFirstCard();
+    calculateTotal();
+}
+
+function createApplicantCard(name = '', canRemove = true) {
+    const cardId = `card-${Date.now()}`;
+    const card = document.createElement('div');
+    card.className = 'applicant-card';
+    card.id = cardId;
+    card.setAttribute('data-open', 'true');
+
+    let prefillName = name || '';
+    
+    card.innerHTML = `
+        <div class="card-summary">
+            <span class="card-summary-name">${prefillName || '報名者本人'}</span>
+            <span class="card-summary-info">功德金額：NT$ 0</span>
+        </div>
+        
+        <div class="applicant-details">
+            <div class="form-group">
+                <label for="name-${cardId}">報名者姓名</label>
+                <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫報名者姓名">
+            </div>
+            
+            <div class="form-group">
+                <label for="puzhuo-${cardId}">普桌</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #666;">NT$</span>
+                    <input type="number" id="puzhuo-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="rice-${cardId}">白米</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #666;">NT$</span>
+                    <input type="number" id="rice-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="donation-${cardId}">隨喜功德</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: #666;">NT$</span>
+                    <input type="number" id="donation-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額">
+                </div>
+            </div>
+
+            ${canRemove ? `<button class="remove-btn" data-card-id="${cardId}">移除此人</button>` : ''}
+        </div>
+    `;
+
+    applicantCardListEl.appendChild(card);
+
+    // 綁定事件
+    if (canRemove) {
+        card.querySelector('.remove-btn').addEventListener('click', () => {
+            document.getElementById(cardId).remove();
+            calculateTotal();
+        });
+    }
+    
+    card.querySelector('.card-summary').addEventListener('click', () => {
+        const details = card.querySelector('.applicant-details');
+        const isOpen = card.getAttribute('data-open') === 'true';
+        details.style.display = isOpen ? 'none' : 'block';
+        card.setAttribute('data-open', isOpen ? 'false' : 'true');
+    });
+    
+    card.querySelector('.card-input-name').addEventListener('input', (e) => {
+        card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
+        syncFirstCardToName(card);
+    });
+}
+
 // --- 計算總金額 ---
 function calculateTotal() {
-    const puzhuo = parseInt(puzhuoEl.value) || 0;
-    const rice = parseInt(riceEl.value) || 0;
-    const donation = parseInt(donationEl.value) || 0;
-    
-    // 確保金額為正數
-    if (puzhuo < 0) puzhuoEl.value = 0;
-    if (rice < 0) riceEl.value = 0;
-    if (donation < 0) donationEl.value = 0;
-    
-    const totalAmount = puzhuo + rice + donation;
+    let totalAmount = 0;
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+
+    cards.forEach(card => {
+        const amounts = card.querySelectorAll('.donation-amount');
+        let cardTotal = 0;
+        
+        amounts.forEach(input => {
+            const amount = parseInt(input.value) || 0;
+            if (amount < 0) input.value = 0;
+            cardTotal += amount;
+        });
+        
+        // 更新卡片摘要資訊
+        card.querySelector('.card-summary-info').textContent = `功德金額：NT$ ${cardTotal.toLocaleString()}`;
+        
+        totalAmount += cardTotal;
+    });
+
     totalAmountEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
 }
 
@@ -233,13 +362,35 @@ async function handleSubmit() {
             return;
         }
         
-        // 2. 驗證功德金額（至少要有一項）
-        const puzhuo = parseInt(puzhuoEl.value) || 0;
-        const rice = parseInt(riceEl.value) || 0;
-        const donation = parseInt(donationEl.value) || 0;
-        const totalAmount = puzhuo + rice + donation;
-        
-        if (totalAmount === 0) {
+        // 2. 驗證報名者與功德金額
+        const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+        if (cards.length === 0) {
+            alert('請至少新增一位報名者');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        let hasAmount = false;
+        for (const card of cards) {
+            const nameInput = card.querySelector('.card-input-name');
+            if (!nameInput.value.trim()) {
+                showError(nameInput, '請填寫報名者姓名');
+                submitBtnEl.disabled = false;
+                submitBtnEl.textContent = '確認報名並送出';
+                return;
+            }
+
+            const amounts = card.querySelectorAll('.donation-amount');
+            for (const input of amounts) {
+                if (parseInt(input.value) > 0) {
+                    hasAmount = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasAmount) {
             alert('請至少填寫一項功德金額');
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
@@ -303,11 +454,22 @@ async function handleSubmit() {
             receiptOption: receiptOption
         };
 
-        const donationItems = {
-            puzhuo: puzhuo,
-            rice: rice,
-            donation: donation
-        };
+        const applicants = [];
+        cards.forEach(card => {
+            const amounts = card.querySelectorAll('.donation-amount');
+            const puzhuo = parseInt(amounts[0].value) || 0;
+            const rice = parseInt(amounts[1].value) || 0;
+            const donation = parseInt(amounts[2].value) || 0;
+
+            applicants.push({
+                applicantName: card.querySelector('.card-input-name').value.trim(),
+                donationItems: {
+                    puzhuo: puzhuo,
+                    rice: rice,
+                    donation: donation
+                }
+            });
+        });
 
         const paymentInfo = {
             cardHolderName: cardHolderNameEl.value.trim(),
@@ -317,6 +479,7 @@ async function handleSubmit() {
         };
 
         const otherNote = otherNoteEl.value.trim();
+        const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(/,/g, ''), 10);
         
         // 5. 呼叫 Cloud Function
         console.log("正在呼叫後端 'submitRegistration'...");
@@ -334,7 +497,7 @@ async function handleSubmit() {
                 data: {
                     serviceType: SERVICE_TYPE,
                     contactInfo: contactInfo,
-                    donationItems: donationItems,
+                    applicants: applicants,
                     paymentInfo: paymentInfo,
                     otherNote: otherNote,
                     totalAmount: totalAmount,
