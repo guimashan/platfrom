@@ -221,6 +221,64 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-04 統一檔案命名規則：全面改用訂單編號命名
+
+**重大架構調整**：
+為了方便長期維護和管理，將所有神務服務相關檔案改用訂單編號（ND/DD）命名，實現**完全統一**的命名規則。
+
+**檔案重新命名**：
+- ✅ HTML 檔案：
+  - `niandou.html` → `ND.html` （年斗法會）
+  - `lightup.html` → `DD.html` （線上點燈）
+- ✅ JavaScript 檔案：
+  - `niandou.js` → `ND.js`
+  - `lightup.js` → `DD.js`
+- ✅ CSS 檔案：
+  - `lightup.css` → `service.css` （兩個服務共用）
+
+**資料庫欄位統一**：
+- ✅ `serviceType: "niandou"` → `serviceType: "nd"`
+- ✅ `serviceType: "lightup"` → `serviceType: "dd"`
+
+**完整對應關係**：
+```
+年斗法會 (ND):
+  - 前端頁面: /service/ND.html
+  - JavaScript: /service/js/ND.js
+  - 訂單編號: ND-YYYYMMDD-XXXX
+  - 資料庫: serviceType: "nd"
+
+線上點燈 (DD):
+  - 前端頁面: /service/DD.html
+  - JavaScript: /service/js/DD.js
+  - 訂單編號: DD-YYYYMMDD-XXXX
+  - 資料庫: serviceType: "dd"
+
+共用樣式: /service/styles/service.css
+```
+
+**後台管理更新**：
+- ✅ 訂單篩選器新增「年斗法會」選項
+- ✅ 更新 serviceType 判斷邏輯（'nd' / 'dd'）
+- ✅ 服務類型名稱對應表更新
+
+**日期格式優化**：
+- ✅ 國曆格式：`2012年06月11日`（加上年月日單位）
+- ✅ 農曆格式：`壬辰年 闰四月廿二日`（加上日字）
+
+**影響範圍**：
+- 前端：public/service/ND.html、DD.html
+- JavaScript：public/service/js/ND.js、DD.js
+- 樣式：public/service/styles/service.css
+- 後台：public/service/manage/js/orders.js、orders.html
+
+**重要提醒**：
+- ⚠️ 舊訂單（serviceType 為 "niandou" 或 "lightup"）將無法被新系統讀取
+- ✅ 測試訂單已全部清除，從全新開始
+- ✅ counters 集合已重置，訂單編號從 0001 開始
+
+---
+
 ### 2025-11-04 後台管理新增農曆顯示功能 + 本地化農曆庫
 
 **新增功能**：
