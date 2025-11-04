@@ -182,15 +182,26 @@ function autoFillShengxiao(card, dateString) {
         const lunar = solar.getLunar();
         const shengxiao = lunar.getYearShengXiao();
         
+        console.log('🔍 生肖自動填入調試:', {
+            日期: dateString,
+            農曆年: lunar.getYearInGanZhi(),
+            生肖返回值: shengxiao,
+            生肖類型: typeof shengxiao,
+            下拉選單當前值: shengxiaoSelect.value
+        });
+        
         if (shengxiao) {
             shengxiaoSelect.value = shengxiao;
+            console.log('✅ 已設定生肖為:', shengxiao, '下拉選單新值:', shengxiaoSelect.value);
+        } else {
+            console.warn('⚠️ 生肖返回值為空');
         }
         
         if (lunarDisplay) {
             const yearInGanZhi = lunar.getYearInGanZhi();
             const monthInChinese = lunar.getMonthInChinese();
             const dayInChinese = lunar.getDayInChinese();
-            lunarDisplay.textContent = `${yearInGanZhi}年 ${monthInChinese}月${dayInChinese}`;
+            lunarDisplay.textContent = `${yearInGanZhi}年 ${monthInChinese}月 ${dayInChinese}日`;
         }
     } catch (error) {
         console.error('計算生肖時發生錯誤:', error);
@@ -287,24 +298,10 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                     <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">🗓️</button>
                 </div>
             </div>
-            <div id="lunar-display-${cardId}" style="font-size: 0.85em; color: #888; margin-top: 5px; min-height: 18px;"></div>
+            <div id="lunar-display-${cardId}" style="font-size: 1em; color: #666; margin-top: 5px; min-height: 20px; font-weight: 500;"></div>
             
             <label for="shengxiao-${cardId}">生肖</label>
-            <select id="shengxiao-${cardId}" class="input-field">
-                <option value="">請選擇生肖</option>
-                <option value="鼠">鼠</option>
-                <option value="牛">牛</option>
-                <option value="虎">虎</option>
-                <option value="兔">兔</option>
-                <option value="龍">龍</option>
-                <option value="蛇">蛇</option>
-                <option value="馬">馬</option>
-                <option value="羊">羊</option>
-                <option value="猴">猴</option>
-                <option value="雞">雞</option>
-                <option value="狗">狗</option>
-                <option value="豬">豬</option>
-            </select>
+            <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed;">
             
             <label for="time-${cardId}">時辰</label>
             <select id="time-${cardId}" class="input-field">
