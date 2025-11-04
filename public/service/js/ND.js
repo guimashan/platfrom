@@ -146,6 +146,31 @@ function syncFirstCardToName(card) {
     }
 }
 
+// --- 自動填入生肖 ---
+function autoFillShengxiao(card, dateString) {
+    const shengxiaoSelect = card.querySelector('[id^="shengxiao-"]');
+    if (!shengxiaoSelect) return;
+    
+    if (!dateString) {
+        shengxiaoSelect.value = '';
+        return;
+    }
+    
+    try {
+        const [year, month, day] = dateString.split('-').map(Number);
+        const solar = Solar.fromYmd(year, month, day);
+        const lunar = solar.getLunar();
+        const shengxiao = lunar.getYearShengXiao();
+        
+        if (shengxiao) {
+            shengxiaoSelect.value = shengxiao;
+        }
+    } catch (error) {
+        console.error('計算生肖時發生錯誤:', error);
+        shengxiaoSelect.value = '';
+    }
+}
+
 // --- 核心功能 ---
 function updateMode() {
     const isMultiMode = modeMultiEl.checked;
@@ -374,10 +399,12 @@ function createApplicantCard(name = '', canRemove = true) {
             yearInput.value = year;
             monthInput.value = parseInt(month, 10);
             dayInput.value = parseInt(day, 10);
+            autoFillShengxiao(card, e.target.value);
         } else {
             yearInput.value = '';
             monthInput.value = '';
             dayInput.value = '';
+            autoFillShengxiao(card, '');
         }
     });
     
@@ -389,13 +416,18 @@ function createApplicantCard(name = '', canRemove = true) {
         
         if (!year && !month && !day) {
             dateInput.value = '';
+            autoFillShengxiao(card, '');
             return;
         }
         
         if (year.length === 4 && month && day) {
             const paddedMonth = month.padStart(2, '0');
             const paddedDay = day.padStart(2, '0');
-            dateInput.value = `${year}-${paddedMonth}-${paddedDay}`;
+            const dateValue = `${year}-${paddedMonth}-${paddedDay}`;
+            dateInput.value = dateValue;
+            autoFillShengxiao(card, dateValue);
+        } else {
+            autoFillShengxiao(card, '');
         }
     };
     
