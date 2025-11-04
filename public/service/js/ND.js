@@ -271,12 +271,12 @@ function createApplicantCard(name = '', canRemove = true) {
                         <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">🗓️</button>
                     </div>
                 </div>
-                <div id="lunar-display-${cardId}" style="font-size: 1em; color: #666; margin-top: 5px; min-height: 20px; font-weight: 500;"></div>
+                <div id="lunar-display-${cardId}" style="font-size: 1em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;"></div>
             </div>
             
             <div class="form-group">
                 <label for="shengxiao-${cardId}">生肖</label>
-                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed;">
+                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 120px;">
             </div>
             
             <div class="form-group">
