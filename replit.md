@@ -212,6 +212,30 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-04 後台管理新增農曆顯示功能
+
+**新增功能**：
+- ✅ 整合 lunar-javascript 農曆轉換庫
+- ✅ 後台訂單詳情同時顯示國曆和農曆生辰
+- ✅ 支援舊資料格式（bazi 字串）和新資料格式（bazi 物件）
+- ✅ 農曆日期使用紫色標示，易於區分
+
+**農曆格式**：
+- 格式範例：2024年 閏二月初八
+- 包含閏月標示
+- 使用傳統月份名稱（正、二、三...冬、臘）
+- 使用傳統日期名稱（初一、初二...廿一...三十）
+
+**技術實作**：
+- 庫文件：public/js/lunar.min.js
+- 轉換函數：convertToLunar() in orders.js
+- 自動處理轉換錯誤，優雅降級
+
+**相關檔案**：
+- public/js/lunar.min.js - 農曆轉換庫
+- public/service/manage/orders.html - 引入農曆庫
+- public/service/manage/js/orders.js - 農曆轉換與顯示邏輯
+
 ### 2025-11-04 服務模組表單優化與資料收集改進
 
 **表單欄位優化**：
