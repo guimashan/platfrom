@@ -478,3 +478,20 @@ body {
     color: var(--primary-gold-dark);
     font-weight: 500;
 }
+
+/* 繳款方案選項樣式（福田會專用） */
+.payment-option {
+    width: 100%;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-option:hover {
+    background-color: var(--bg-card);
+    transform: translateX(5px);
+}
+
+.payment-option input[type="radio"]:checked + div {
+    font-weight: 700;
+}
