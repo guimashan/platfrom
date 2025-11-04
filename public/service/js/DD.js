@@ -187,12 +187,10 @@ function autoFillShengxiao(card, dateString) {
         }
         
         if (lunarDisplay) {
-            const lunarYear = lunar.getYear();
-            const lunarMonth = lunar.getMonth();
-            const lunarDay = lunar.getDay();
-            const isLeapMonth = lunar.isLeap();
-            const monthStr = isLeapMonth ? `閏${lunarMonth}` : lunarMonth;
-            lunarDisplay.textContent = `農曆：${lunarYear}年${monthStr}月${lunarDay}日`;
+            const yearInGanZhi = lunar.getYearInGanZhi();
+            const monthInChinese = lunar.getMonthInChinese();
+            const dayInChinese = lunar.getDayInChinese();
+            lunarDisplay.textContent = `${yearInGanZhi}年 ${monthInChinese}月${dayInChinese}`;
         }
     } catch (error) {
         console.error('計算生肖時發生錯誤:', error);
