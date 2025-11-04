@@ -309,7 +309,7 @@ function createApplicantCard(name = '', canRemove = true) {
                 </div>
             </div>
 
-            ${canRemove ? `<button class="btn-remove" data-card-id="${cardId}">移除此人</button>` : ''}
+            ${canRemove ? `<button class="remove-btn" data-card-id="${cardId}">移除此人</button>` : ''}
         </div>
     `;
 
@@ -317,7 +317,7 @@ function createApplicantCard(name = '', canRemove = true) {
 
     // 綁定事件
     if (canRemove) {
-        card.querySelector('.btn-remove').addEventListener('click', () => {
+        card.querySelector('.remove-btn').addEventListener('click', () => {
             document.getElementById(cardId).remove();
             calculateTotal();
         });
