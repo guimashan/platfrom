@@ -128,8 +128,8 @@ function setupEventListeners() {
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('input', calculateTotal);
 
-    // --- 新增：即時同步「報名姓名」 ---
-    contactNameEl.addEventListener('input', syncNameToSingleCard);
+    // --- 雙向同步：聯絡人姓名 ↔ 第一個報名者姓名 ---
+    contactNameEl.addEventListener('input', syncNameToFirstCard);
     
     // 信用卡欄位格式化
     cardNumberEl.addEventListener('input', formatCardNumber);
@@ -137,23 +137,25 @@ function setupEventListeners() {
     cardCVVEl.addEventListener('input', formatCardCVV);
 }
 
-// --- 新增：即時同步的函數 ---
-/**
- * 即時同步「報名姓名」到「單人模式」的第一張卡片
- */
-function syncNameToSingleCard() {
-    // 只有在「單人模式」 下才同步
-    if (modeSingleEl.checked) {
-        const firstCard = applicantCardListEl.querySelector('.applicant-card');
-        if (firstCard) {
-            const newName = contactNameEl.value.trim();
-            const displayName = newName || '報名者本人';
-            
-            // 同步卡片標題
-            firstCard.querySelector('.card-summary-name').textContent = displayName;
-            // 同步卡片內的 input 欄位
-            firstCard.querySelector('.card-input-name').value = newName;
-        }
+// --- 雙向同步姓名 ---
+// 從聯絡人姓名 → 第一個報名者姓名
+function syncNameToFirstCard() {
+    const firstCard = applicantCardListEl.querySelector('.applicant-card');
+    if (firstCard) {
+        const newName = contactNameEl.value.trim();
+        const displayName = newName || '報名者本人';
+        firstCard.querySelector('.card-summary-name').textContent = displayName;
+        firstCard.querySelector('.card-input-name').value = newName;
+    }
+}
+
+// 從第一個報名者姓名 → 聯絡人姓名
+function syncFirstCardToName(card) {
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+    const isFirstCard = cards[0] === card;
+    if (isFirstCard) {
+        const cardName = card.querySelector('.card-input-name').value.trim();
+        contactNameEl.value = cardName;
     }
 }
 
@@ -191,7 +193,7 @@ function updateMode() {
     }
     
     // --- 修正：在更新模式後，立即執行一次同步和計算 ---
-    syncNameToSingleCard();
+    syncNameToFirstCard();
     calculateTotal();
 }
 
@@ -329,6 +331,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     });
     card.querySelector('.card-input-name').addEventListener('input', (e) => {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
+        syncFirstCardToName(card);
     });
     
     // 同步生辰輸入：日期選擇器 → 三個手動輸入欄位

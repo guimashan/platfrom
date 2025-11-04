@@ -116,19 +116,28 @@ function setupEventListeners() {
     addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, true));
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('change', calculateTotal);
-    contactNameEl.addEventListener('input', syncNameToSingleCard);
+    contactNameEl.addEventListener('input', syncNameToFirstCard);
 }
 
-// --- 同步姓名 ---
-function syncNameToSingleCard() {
-    if (modeSingleEl.checked) {
-        const firstCard = applicantCardListEl.querySelector('.applicant-card');
-        if (firstCard) {
-            const newName = contactNameEl.value.trim();
-            const displayName = newName || '報名者本人';
-            firstCard.querySelector('.card-summary-name').textContent = displayName;
-            firstCard.querySelector('.card-input-name').value = newName;
-        }
+// --- 雙向同步姓名 ---
+// 從聯絡人姓名 → 第一個報名者姓名
+function syncNameToFirstCard() {
+    const firstCard = applicantCardListEl.querySelector('.applicant-card');
+    if (firstCard) {
+        const newName = contactNameEl.value.trim();
+        const displayName = newName || '報名者本人';
+        firstCard.querySelector('.card-summary-name').textContent = displayName;
+        firstCard.querySelector('.card-input-name').value = newName;
+    }
+}
+
+// 從第一個報名者姓名 → 聯絡人姓名
+function syncFirstCardToName(card) {
+    const cards = applicantCardListEl.querySelectorAll('.applicant-card');
+    const isFirstCard = cards[0] === card;
+    if (isFirstCard) {
+        const cardName = card.querySelector('.card-input-name').value.trim();
+        contactNameEl.value = cardName;
     }
 }
 
@@ -155,7 +164,7 @@ function updateMode() {
             if (removeBtn) removeBtn.style.display = 'none';
         }
     }
-    syncNameToSingleCard();
+    syncNameToFirstCard();
     calculateTotal();
 }
 
@@ -318,6 +327,7 @@ function createApplicantCard(name = '', canRemove = true) {
     
     card.querySelector('.card-input-name').addEventListener('input', (e) => {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
+        syncFirstCardToName(card);
     });
 
     // 監聽事業年斗複選框
