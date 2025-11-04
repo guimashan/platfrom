@@ -151,23 +151,65 @@ window.viewOrder = async function(orderId) {
 function renderOrderDetail(order, paymentSecret) {
     const modalBody = document.getElementById('modalBody');
     
+    // 判斷是點燈服務還是年斗服務
+    const isNiandou = order.serviceType === 'niandou';
+    const sectionTitle = isNiandou ? '🎯 斗主名單' : '🕯️ 點燈名單';
+    const personLabel = isNiandou ? '斗主' : '點燈人';
+    
     const applicantsList = order.applicants?.map((a, index) => {
-        const lightsHtml = Object.entries(a.lights || {})
-            .filter(([name, count]) => count > 0)
-            .map(([name, count]) => `${name} x ${count}`)
-            .join('、') || '無';
+        // 處理 bazi (可能是字串或物件)
+        let baziHtml = '';
+        if (a.bazi) {
+            if (typeof a.bazi === 'object') {
+                // 年斗法會的 bazi 物件
+                const parts = [];
+                if (a.bazi.gender) parts.push(`性別: ${a.bazi.gender}`);
+                if (a.bazi.birthDate) parts.push(`生日: ${a.bazi.birthDate}`);
+                if (a.bazi.shengxiao) parts.push(`生肖: ${a.bazi.shengxiao}`);
+                if (a.bazi.time) parts.push(`時辰: ${a.bazi.time}`);
+                baziHtml = parts.join('、');
+            } else {
+                // 點燈服務的 bazi 字串
+                baziHtml = a.bazi;
+            }
+        }
+        
+        // 處理點燈資訊
+        let serviceHtml = '';
+        if (a.lights) {
+            const lightsHtml = Object.entries(a.lights)
+                .filter(([name, count]) => count > 0)
+                .map(([name, count]) => `${name} x ${count}`)
+                .join('、') || '無';
+            serviceHtml = `點燈: ${lightsHtml}`;
+        }
+        
+        // 處理年斗資訊
+        if (a.douTypes) {
+            const dousHtml = Object.entries(a.douTypes)
+                .filter(([name, selected]) => selected === true)
+                .map(([name]) => name)
+                .join('、') || '無';
+            serviceHtml = `年斗項目: ${dousHtml}`;
+        }
+        
+        // 處理事業年斗資訊
+        let businessHtml = '';
+        if (a.businessInfo && (a.businessInfo.title || a.businessInfo.address)) {
+            businessHtml = `<br><small style="color:#666;">📍 ${a.businessInfo.title || ''} (${a.businessInfo.address || ''})</small>`;
+        }
         
         return `
             <div class="detail-row">
-                <div class="detail-label">點燈人 ${index + 1}</div>
+                <div class="detail-label">${personLabel} ${index + 1}</div>
                 <div class="detail-value">
                     <strong>${a.applicantName || '未填寫'}</strong><br>
-                    ${a.bazi ? `生辰: ${a.bazi}` : ''}<br>
-                    點燈: ${lightsHtml}
+                    ${baziHtml ? `${baziHtml}<br>` : ''}
+                    ${serviceHtml}${businessHtml}
                 </div>
             </div>
         `;
-    }).join('') || '<div class="detail-row"><div class="detail-value">無點燈人資料</div></div>';
+    }).join('') || `<div class="detail-row"><div class="detail-value">無${personLabel}資料</div></div>`;
     
     let paymentInfoHtml = '';
     if (paymentSecret && order.status === 'pending_manual_payment') {
@@ -253,7 +295,7 @@ function renderOrderDetail(order, paymentSecret) {
         </div>
         
         <div class="detail-section">
-            <h3>🕯️ 點燈名單</h3>
+            <h3>${sectionTitle}</h3>
             ${applicantsList}
         </div>
         
