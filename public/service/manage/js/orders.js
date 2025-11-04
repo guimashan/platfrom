@@ -47,17 +47,26 @@ function convertToLunar(gregorianDate) {
         const solar = window.Solar.fromYmd(year, month, day);
         const lunar = solar.getLunar();
         
-        // 格式化農曆日期
+        // 使用內建的 toString 方法獲取完整農曆日期
+        // 格式會是：「二零二四年十月初四」或「二零二零年閏四月初八」
+        const lunarStr = lunar.toString();
+        
+        // 如果需要天干地支紀年，使用 getYearInGanZhi()
+        const yearInGanZhi = lunar.getYearInGanZhi();
+        
+        // 取得月份和日期（用於自定義格式）
+        const lunarYear = lunar.getYear();
         const lunarMonth = lunar.getMonth();
         const lunarDay = lunar.getDay();
-        const isLeapMonth = lunar.isLeap();
         
-        // 取得天干地支紀年
-        const yearInGanZhi = lunar.getYearInGanZhi(); // 例如：甲辰
+        // 檢查是否為閏月（使用 getLeapMonth 方法）
+        const leapMonth = lunar.getLeapMonth(); // 返回閏月數字，0表示沒有閏月
+        const isLeapMonth = (lunarMonth < 0); // 負數表示閏月
+        const actualMonth = Math.abs(lunarMonth);
         
         // 月份名稱
         const monthNames = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
-        const monthName = monthNames[lunarMonth - 1] || lunarMonth;
+        const monthName = monthNames[actualMonth - 1] || actualMonth;
         
         // 日期名稱
         const dayNames = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
@@ -70,7 +79,7 @@ function convertToLunar(gregorianDate) {
         return `${yearInGanZhi}年 ${leapPrefix}${monthName}月${dayName}`;
         
     } catch (error) {
-        console.error('農曆轉換失敗:', error);
+        console.error('農曆轉換失敗:', error, '日期:', gregorianDate);
         return '';
     }
 }
