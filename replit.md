@@ -249,11 +249,68 @@ npm run emulators
 
 **影響範圍**：
 - 前端：public/service/js/DD.js、public/service/js/ND.js
-- 後端：functions/index.js
+- 後端：functions/index.js、functions/src/service/index.js
 
 **部署狀態**：
 - ✅ 前端已推送 GitHub → Vercel 自動部署
 - ⏳ 後端待部署到 service-b9d4a 專案
+
+**系統清理狀態**：
+- ✅ 舊檔案完全清空（無 lightup.html/niandou.html）
+- ✅ 舊命名完全移除（無 'lightup'/'niandou' 資料庫代碼）
+- ✅ 測試檔案已刪除（checkin-old.html, test-token.html, test.html）
+- ✅ Service 模組只有 10 個檔案，結構乾淨
+- ⚠️ 建議部署後手動清空 Firestore 測試訂單（registrations、temp_payment_secrets）
+
+**新表單開發標準流程**：
+
+開發新的神務服務表單（例如：禮斗法會、中元法會）時，遵循以下流程：
+
+1. **複製樣板檔案**
+   ```bash
+   # 以禮斗法會（LD）為例
+   cp public/service/ND.html public/service/LD.html
+   cp public/service/js/ND.js public/service/js/LD.js
+   ```
+
+2. **修改 JS 檔案常數**
+   ```javascript
+   // LD.js
+   const SERVICE_TYPE = "lidou";  // 使用預留的服務代碼
+   const DOU_PRICE = 36000;       // 修改為該服務的價格
+   ```
+
+3. **修改 HTML 檔案**
+   ```html
+   <!-- LD.html -->
+   <script src="js/LD.js"></script>
+   <h1>禮斗法會</h1>
+   <!-- 修改表單欄位... -->
+   ```
+
+4. **完成！** 後端自動支援
+   - ✅ 訂單編號自動生成：`LD-YYYYMMDD-XXXX`
+   - ✅ 資料庫 serviceType：`"lidou"`
+   - ✅ 後台 orders.js 自動支援所有服務類型
+
+**預留的服務代碼**（functions/src/service/index.js）：
+```javascript
+'dd': 'DD',               // 線上點燈 ✅ 已實作
+'nd': 'ND',               // 年斗法會 ✅ 已實作
+'lidou': 'LD',            // 禮斗法會 ⏳ 可開發
+'zhongyuan': 'ZY',        // 中元法會 ⏳ 可開發
+'pushi': 'PS',            // 普施法會 ⏳ 可開發
+'futian': 'FT',           // 福田會 ⏳ 可開發
+'futian_youth': 'FTY',    // 福田少年會 ⏳ 可開發
+'xiangyou': 'XY',         // 添香油 ⏳ 可開發
+'build_temple': 'BG'      // 建宮廟款 ⏳ 可開發
+```
+
+**檔案命名規則**：
+- HTML：`{訂單代碼}.html`（例如：LD.html、ZY.html）
+- JavaScript：`{訂單代碼}.js`（例如：LD.js、ZY.js）
+- 資料庫：serviceType 使用小寫英文（例如："lidou", "zhongyuan"）
+- 訂單編號：使用大寫代碼（例如："LD-20251104-0001"）
 
 ---
 
