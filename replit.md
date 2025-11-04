@@ -221,6 +221,38 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-04 雙向同步功能實作 + Bug 修復
+
+**新增功能**：
+- ✅ 實作聯絡人姓名 ↔ 第一個報名者姓名雙向同步
+  - DD.js（線上點燈）：完整雙向同步
+  - ND.js（年斗法會）：完整雙向同步
+  - 單人/多人模式都支援
+  - 即時更新，無需重新整理
+
+**Bug 修復**：
+- ✅ 修正多人報名時，第二個報名者顯示 "null" 的問題
+  - DD.js：新增報名人時傳入空字串而非 null
+  - ND.js：新增報名人時傳入空字串而非 null
+  - 增加防護：確保 prefillName 永遠不為 null
+
+**程式碼清理**：
+- ✅ functions/index.js：刪除 4 個無用的 V2 exports
+  - `submitRegistrationV2` → 已刪除（保留 `submitRegistration`）
+  - `getRegistrationsV2` → 已刪除（保留 `getRegistrations`）
+  - `getRegistrationDetailV2` → 已刪除（保留 `getRegistrationDetail`）
+  - `confirmPaymentV2` → 已刪除（保留 `confirmPayment`）
+
+**影響範圍**：
+- 前端：public/service/js/DD.js、public/service/js/ND.js
+- 後端：functions/index.js
+
+**部署狀態**：
+- ✅ 前端已推送 GitHub → Vercel 自動部署
+- ⏳ 後端待部署到 service-b9d4a 專案
+
+---
+
 ### 2025-11-04 API 重構：移除 V1/V2 命名混淆
 
 **重構目的**：
