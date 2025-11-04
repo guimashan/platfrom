@@ -26,6 +26,22 @@ async function callAPI(endpoint, data = {}) {
 }
 
 /**
+ * 格式化國曆日期
+ * @param {string} gregorianDate - 國曆日期 (YYYY-MM-DD 格式)
+ * @returns {string} 格式化後的國曆日期 (YYYY年MM月DD日)
+ */
+function formatGregorianDate(gregorianDate) {
+    if (!gregorianDate) return '';
+    
+    try {
+        const [year, month, day] = gregorianDate.split('-');
+        return `${year}年${month}月${day}日`;
+    } catch (error) {
+        return gregorianDate;
+    }
+}
+
+/**
  * 將國曆日期轉換為農曆日期
  * @param {string} gregorianDate - 國曆日期 (YYYY-MM-DD 格式)
  * @returns {string} 農曆日期字串
@@ -56,12 +72,12 @@ function convertToLunar(gregorianDate) {
         
         // 從 toString 結果中提取月日部分
         // toString 格式：「二零二四年十月初四」
-        // 我們要：「甲辰年 十月初四」
+        // 我們要：「甲辰年 十月初四日」
         const parts = fullLunarStr.match(/年(.+)/);
         const monthDayPart = parts ? parts[1] : '';
         
-        // 組合最終格式：天干地支紀年 + 月日
-        return `${yearInGanZhi}年 ${monthDayPart}`;
+        // 組合最終格式：天干地支紀年 + 月日 + 日
+        return `${yearInGanZhi}年 ${monthDayPart}日`;
         
     } catch (error) {
         console.error('農曆轉換失敗:', error, '日期:', gregorianDate);
@@ -254,6 +270,7 @@ function renderOrderDetail(order, paymentSecret) {
         if (a.bazi) {
             if (typeof a.bazi === 'object') {
                 // 物件格式（新資料）- 使用表格式排版
+                const gregorianDate = a.bazi.birthDate ? formatGregorianDate(a.bazi.birthDate) : '';
                 const lunarDate = a.bazi.birthDate ? convertToLunar(a.bazi.birthDate) : '';
                 baziHtml = `
                     <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
@@ -262,7 +279,7 @@ function renderOrderDetail(order, paymentSecret) {
                             ${a.bazi.birthDate ? `
                                 <div style="color: #666;">生辰：</div>
                                 <div>
-                                    <div><strong>國曆：${a.bazi.birthDate}</strong></div>
+                                    <div><strong>國曆：${gregorianDate}</strong></div>
                                     ${lunarDate ? `<div style="color: #8A2BE2; margin-top: 2px;"><strong>農曆：${lunarDate}</strong></div>` : ''}
                                 </div>
                             ` : ''}
@@ -273,13 +290,14 @@ function renderOrderDetail(order, paymentSecret) {
                 `;
             } else {
                 // 字串格式（舊資料）- 使用相同的表格式排版
+                const gregorianDate = formatGregorianDate(a.bazi);
                 const lunarDate = convertToLunar(a.bazi);
                 baziHtml = `
                     <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
                         <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 0.9rem;">
                             <div style="color: #666;">生辰：</div>
                             <div>
-                                <div><strong>國曆：${a.bazi}</strong></div>
+                                <div><strong>國曆：${gregorianDate}</strong></div>
                                 ${lunarDate ? `<div style="color: #8A2BE2; margin-top: 2px;"><strong>農曆：${lunarDate}</strong></div>` : ''}
                             </div>
                         </div>
