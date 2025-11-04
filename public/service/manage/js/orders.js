@@ -75,35 +75,48 @@ function convertToLunar(gregorianDate) {
     }
 }
 
-// 等待 lunar-javascript 庫載入（本地版本通常很快就載入完成）
-function waitForLunarLibrary() {
+// 動態載入 lunar-javascript 庫（只在需要時才載入）
+let lunarLibraryLoading = false;
+let lunarLibraryLoaded = false;
+
+function loadLunarLibrary() {
     return new Promise((resolve) => {
-        // 如果已經載入，直接返回
-        if (typeof window.Solar !== 'undefined') {
+        // 如果已經載入完成，直接返回
+        if (lunarLibraryLoaded && typeof window.Solar !== 'undefined') {
             resolve();
             return;
         }
         
-        let attempts = 0;
-        const maxAttempts = 50; // 5 秒（本地檔案應該很快）
+        // 如果正在載入中，等待載入完成
+        if (lunarLibraryLoading) {
+            const checkInterval = setInterval(() => {
+                if (lunarLibraryLoaded && typeof window.Solar !== 'undefined') {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 100);
+            return;
+        }
         
-        const checkInterval = setInterval(() => {
-            attempts++;
-            
-            // 檢查是否載入成功
-            if (typeof window.Solar !== 'undefined') {
-                clearInterval(checkInterval);
-                resolve();
-                return;
-            }
-            
-            // 超時（本地檔案超時表示有嚴重問題）
-            if (attempts >= maxAttempts) {
-                clearInterval(checkInterval);
-                console.error('農曆庫載入失敗，請檢查 /lib/lunar.js 是否存在');
-                resolve();
-            }
-        }, 100);
+        // 開始載入
+        lunarLibraryLoading = true;
+        console.log('動態載入農曆庫...');
+        
+        const script = document.createElement('script');
+        script.src = '/lib/lunar.js';
+        script.onload = () => {
+            lunarLibraryLoaded = true;
+            lunarLibraryLoading = false;
+            console.log('農曆庫載入成功');
+            resolve();
+        };
+        script.onerror = () => {
+            lunarLibraryLoading = false;
+            console.error('農曆庫載入失敗，請檢查 /lib/lunar.js 是否存在');
+            resolve();
+        };
+        
+        document.head.appendChild(script);
     });
 }
 
@@ -217,8 +230,8 @@ window.viewOrder = async function(orderId) {
         modalBody.innerHTML = '<div style="text-align:center; padding:40px;">載入中...</div>';
         modal.style.display = 'block';
         
-        // 確保農曆庫已載入（只在需要時才等待）
-        await waitForLunarLibrary();
+        // 動態載入農曆庫（第一次查看訂單時才載入）
+        await loadLunarLibrary();
         
         const result = await callAPI('getRegistrationDetailV2', { orderId });
         const order = result.result.registration;
