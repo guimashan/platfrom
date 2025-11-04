@@ -284,7 +284,7 @@ function createApplicantCard(name = '', canRemove = true) {
             
             <div class="form-group">
                 <label for="shengxiao-${cardId}">生肖</label>
-                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後，自動顯示！" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 33%;">
+                <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後，自動顯示！" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 30%;">
             </div>
             
             <div class="form-group">

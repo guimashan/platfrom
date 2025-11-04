@@ -418,6 +418,10 @@ body {
         width: 100%;
     }
 
+    .shengxiao-field {
+        max-width: 50% !important;
+    }
+
     body {
         padding-bottom: 180px;
     }
