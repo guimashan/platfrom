@@ -25,6 +25,48 @@ async function callAPI(endpoint, data = {}) {
     return response.json();
 }
 
+/**
+ * 將國曆日期轉換為農曆日期
+ * @param {string} gregorianDate - 國曆日期 (YYYY-MM-DD 格式)
+ * @returns {string} 農曆日期字串
+ */
+function convertToLunar(gregorianDate) {
+    if (!gregorianDate) return '';
+    
+    try {
+        // 解析國曆日期
+        const [year, month, day] = gregorianDate.split('-').map(Number);
+        
+        // 使用 lunar-javascript 庫進行轉換
+        const solar = Solar.fromYmd(year, month, day);
+        const lunar = solar.getLunar();
+        
+        // 格式化農曆日期
+        const lunarYear = lunar.getYear();
+        const lunarMonth = lunar.getMonth();
+        const lunarDay = lunar.getDay();
+        const isLeapMonth = lunar.isLeap();
+        
+        // 月份名稱
+        const monthNames = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
+        const monthName = monthNames[lunarMonth - 1] || lunarMonth;
+        
+        // 日期名稱
+        const dayNames = ['初一', '初二', '初三', '初四', '初五', '初六', '初七', '初八', '初九', '初十',
+                          '十一', '十二', '十三', '十四', '十五', '十六', '十七', '十八', '十九', '二十',
+                          '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
+        const dayName = dayNames[lunarDay - 1] || lunarDay;
+        
+        // 組合農曆日期字串
+        const leapPrefix = isLeapMonth ? '閏' : '';
+        return `${lunarYear}年 ${leapPrefix}${monthName}月${dayName}`;
+        
+    } catch (error) {
+        console.error('農曆轉換失敗:', error);
+        return '';
+    }
+}
+
 (async function init() {
     try {
         const { user } = await checkAuth({
@@ -162,19 +204,32 @@ function renderOrderDetail(order, paymentSecret) {
         if (a.bazi) {
             if (typeof a.bazi === 'object') {
                 // 年斗法會的 bazi 物件 - 使用表格式排版
+                const lunarDate = a.bazi.birthDate ? convertToLunar(a.bazi.birthDate) : '';
                 baziHtml = `
                     <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
                         <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 0.9rem;">
                             ${a.bazi.gender ? `<div style="color: #666;">性別：</div><div><strong>${a.bazi.gender}</strong></div>` : ''}
-                            ${a.bazi.birthDate ? `<div style="color: #666;">生日：</div><div><strong>${a.bazi.birthDate}</strong></div>` : ''}
+                            ${a.bazi.birthDate ? `
+                                <div style="color: #666;">生辰：</div>
+                                <div>
+                                    <div><strong>國曆：${a.bazi.birthDate}</strong></div>
+                                    ${lunarDate ? `<div style="color: #8A2BE2; margin-top: 2px;"><strong>農曆：${lunarDate}</strong></div>` : ''}
+                                </div>
+                            ` : ''}
                             ${a.bazi.shengxiao ? `<div style="color: #666;">生肖：</div><div><strong>${a.bazi.shengxiao}</strong></div>` : ''}
                             ${a.bazi.time ? `<div style="color: #666;">時辰：</div><div><strong>${a.bazi.time}</strong></div>` : ''}
                         </div>
                     </div>
                 `;
             } else {
-                // 點燈服務的 bazi 字串
-                baziHtml = `<div style="margin: 8px 0;"><span style="color: #666;">生辰：</span><strong>${a.bazi}</strong></div>`;
+                // 點燈服務的 bazi 字串（舊格式，僅國曆）
+                const lunarDate = convertToLunar(a.bazi);
+                baziHtml = `
+                    <div style="margin: 8px 0;">
+                        <div><span style="color: #666;">生辰：</span><strong>國曆 ${a.bazi}</strong></div>
+                        ${lunarDate ? `<div style="margin-top: 4px;"><span style="color: #666;"></span><strong style="color: #8A2BE2;">農曆 ${lunarDate}</strong></div>` : ''}
+                    </div>
+                `;
             }
         }
         
