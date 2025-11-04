@@ -149,12 +149,17 @@ function syncFirstCardToName(card) {
 // --- 自動填入生肖 ---
 function autoFillShengxiao(card, dateString) {
     const shengxiaoSelect = card.querySelector('[id^="shengxiao-"]');
-    const lunarDisplay = card.querySelector('[id^="lunar-display-"]');
+    const lunarYearSpan = card.querySelector('[id^="lunar-year-"]');
+    const lunarMonthSpan = card.querySelector('[id^="lunar-month-"]');
+    const lunarDaySpan = card.querySelector('[id^="lunar-day-"]');
+    
     if (!shengxiaoSelect) return;
     
     if (!dateString) {
         shengxiaoSelect.value = '';
-        if (lunarDisplay) lunarDisplay.textContent = '';
+        if (lunarYearSpan) lunarYearSpan.textContent = '';
+        if (lunarMonthSpan) lunarMonthSpan.textContent = '';
+        if (lunarDaySpan) lunarDaySpan.textContent = '';
         return;
     }
     
@@ -164,31 +169,27 @@ function autoFillShengxiao(card, dateString) {
         const lunar = solar.getLunar();
         const shengxiao = lunar.getYearShengXiao();
         
-        console.log('🔍 生肖自動填入調試:', {
-            日期: dateString,
-            農曆年: lunar.getYearInGanZhi(),
-            生肖返回值: shengxiao,
-            生肖類型: typeof shengxiao,
-            下拉選單當前值: shengxiaoSelect.value
-        });
-        
+        // 填入生肖
         if (shengxiao) {
             shengxiaoSelect.value = shengxiao;
-            console.log('✅ 已設定生肖為:', shengxiao, '下拉選單新值:', shengxiaoSelect.value);
-        } else {
-            console.warn('⚠️ 生肖返回值為空');
         }
         
-        if (lunarDisplay) {
-            const yearInGanZhi = lunar.getYearInGanZhi();
-            const monthInChinese = lunar.getMonthInChinese();
-            const dayInChinese = lunar.getDayInChinese();
-            lunarDisplay.textContent = `${yearInGanZhi}年 ${monthInChinese}月 ${dayInChinese}日`;
+        // 分別填入農曆年月日
+        if (lunarYearSpan) {
+            lunarYearSpan.textContent = lunar.getYearInGanZhi();
+        }
+        if (lunarMonthSpan) {
+            lunarMonthSpan.textContent = lunar.getMonthInChinese();
+        }
+        if (lunarDaySpan) {
+            lunarDaySpan.textContent = lunar.getDayInChinese();
         }
     } catch (error) {
         console.error('計算生肖時發生錯誤:', error);
         shengxiaoSelect.value = '';
-        if (lunarDisplay) lunarDisplay.textContent = '';
+        if (lunarYearSpan) lunarYearSpan.textContent = '';
+        if (lunarMonthSpan) lunarMonthSpan.textContent = '';
+        if (lunarDaySpan) lunarDaySpan.textContent = '';
     }
 }
 
@@ -271,12 +272,19 @@ function createApplicantCard(name = '', canRemove = true) {
                         <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">🗓️</button>
                     </div>
                 </div>
-                <div id="lunar-display-${cardId}" style="font-size: 1em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;"></div>
+                <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 0.95em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
+                    <span id="lunar-year-${cardId}" style="display: inline-block; width: 52px; text-align: center;"></span>
+                    <span style="font-size: 0.85em;">年</span>
+                    <span id="lunar-month-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
+                    <span style="font-size: 0.85em;">月</span>
+                    <span id="lunar-day-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
+                    <span style="font-size: 0.85em;">日</span>
+                </div>
             </div>
             
             <div class="form-group">
                 <label for="shengxiao-${cardId}">生肖</label>
-                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 120px;">
+                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
             </div>
             
             <div class="form-group">
