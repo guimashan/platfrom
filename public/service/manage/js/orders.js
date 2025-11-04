@@ -205,7 +205,7 @@ function renderOrderDetail(order, paymentSecret) {
         let baziHtml = '';
         if (a.bazi) {
             if (typeof a.bazi === 'object') {
-                // 年斗法會的 bazi 物件 - 使用表格式排版
+                // 物件格式（新資料）- 使用表格式排版
                 const lunarDate = a.bazi.birthDate ? convertToLunar(a.bazi.birthDate) : '';
                 baziHtml = `
                     <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
@@ -224,12 +224,17 @@ function renderOrderDetail(order, paymentSecret) {
                     </div>
                 `;
             } else {
-                // 點燈服務的 bazi 字串（舊格式，僅國曆）
+                // 字串格式（舊資料）- 使用相同的表格式排版
                 const lunarDate = convertToLunar(a.bazi);
                 baziHtml = `
-                    <div style="margin: 8px 0;">
-                        <div><span style="color: #666;">生辰：</span><strong>國曆 ${a.bazi}</strong></div>
-                        ${lunarDate ? `<div style="margin-top: 4px;"><span style="color: #666;"></span><strong style="color: #8A2BE2;">農曆 ${lunarDate}</strong></div>` : ''}
+                    <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 0.9rem;">
+                            <div style="color: #666;">生辰：</div>
+                            <div>
+                                <div><strong>國曆：${a.bazi}</strong></div>
+                                ${lunarDate ? `<div style="color: #8A2BE2; margin-top: 2px;"><strong>農曆：${lunarDate}</strong></div>` : ''}
+                            </div>
+                        </div>
                     </div>
                 `;
             }

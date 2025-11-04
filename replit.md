@@ -239,6 +239,7 @@ npm run emulators
 - 庫文件：public/js/lunar.min.js
 - 轉換函數：convertToLunar() in orders.js
 - 自動處理轉換錯誤，優雅降級
+- 統一視覺排版：新舊資料皆使用灰色背景網格排版
 
 **相關檔案**：
 - public/js/lunar.min.js - 農曆轉換庫
