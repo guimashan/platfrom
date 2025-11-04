@@ -149,10 +149,12 @@ function syncFirstCardToName(card) {
 // --- 自動填入生肖 ---
 function autoFillShengxiao(card, dateString) {
     const shengxiaoSelect = card.querySelector('[id^="shengxiao-"]');
+    const lunarDisplay = card.querySelector('[id^="lunar-display-"]');
     if (!shengxiaoSelect) return;
     
     if (!dateString) {
         shengxiaoSelect.value = '';
+        if (lunarDisplay) lunarDisplay.textContent = '';
         return;
     }
     
@@ -165,9 +167,19 @@ function autoFillShengxiao(card, dateString) {
         if (shengxiao) {
             shengxiaoSelect.value = shengxiao;
         }
+        
+        if (lunarDisplay) {
+            const lunarYear = lunar.getYear();
+            const lunarMonth = lunar.getMonth();
+            const lunarDay = lunar.getDay();
+            const isLeapMonth = lunar.isLeap();
+            const monthStr = isLeapMonth ? `閏${lunarMonth}` : lunarMonth;
+            lunarDisplay.textContent = `農曆：${lunarYear}年${monthStr}月${lunarDay}日`;
+        }
     } catch (error) {
         console.error('計算生肖時發生錯誤:', error);
         shengxiaoSelect.value = '';
+        if (lunarDisplay) lunarDisplay.textContent = '';
     }
 }
 
@@ -250,6 +262,7 @@ function createApplicantCard(name = '', canRemove = true) {
                         <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">🗓️</button>
                     </div>
                 </div>
+                <div id="lunar-display-${cardId}" style="font-size: 0.85em; color: #888; margin-top: 5px; min-height: 18px;"></div>
             </div>
             
             <div class="form-group">
