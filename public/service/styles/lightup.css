@@ -143,21 +143,38 @@ body {
 .card-summary {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    font-weight: 600;
+    align-items: flex-start;
+    gap: 15px;
 }
 
 .card-summary-name {
     font-size: 1.1rem;
     color: var(--primary-gold-dark);
+    font-weight: 600;
+    flex-shrink: 0;
 }
 
 .card-summary-info {
-    font-size: 0.9rem;
+    flex: 1;
+    text-align: right;
     color: var(--text-secondary);
-    background: white;
-    padding: 4px 12px;
-    border-radius: 20px;
+    line-height: 1.6;
+}
+
+.card-summary-info small {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin: 2px 0;
+}
+
+.card-summary-info small:first-child {
+    margin-top: 0;
+}
+
+.card-summary-info small:last-child {
+    color: var(--primary-gold-dark);
+    font-weight: 500;
 }
 
 .applicant-details {
