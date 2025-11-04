@@ -260,7 +260,7 @@ function renderOrderDetail(order, paymentSecret) {
     const modalBody = document.getElementById('modalBody');
     
     // 判斷是點燈服務還是年斗服務
-    const isNiandou = order.serviceType === 'niandou';
+    const isNiandou = order.serviceType === 'nd';
     const sectionTitle = isNiandou ? '🎯 報名者名單' : '🕯️ 點燈名單';
     const personLabel = isNiandou ? '報名者' : '點燈人';
     
@@ -502,8 +502,8 @@ window.onclick = function(event) {
 
 function getServiceTypeName(type) {
     const names = {
-        'lightup': '線上點燈',
-        'niandou': '年斗法會',
+        'dd': '線上點燈',
+        'nd': '年斗法會',
         'zhongyuan': '中元普渡'
     };
     return names[type] || type;
