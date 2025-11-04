@@ -171,6 +171,12 @@ npm run emulators
 - 手機優先設計 (Mobile First)
 - 圓角 12px、陰影 2px
 
+### 測試與部署偏好
+- ⚠️ **不在 Replit 開發環境測試**
+- ✅ **所有測試都在正式環境進行**
+- 流程：修改代碼 → 推送 GitHub → Vercel 自動部署 → 正式環境測試
+- 正式域名：https://go.guimashan.org.tw/
+
 ## 部署資訊
 
 ### Staging (測試環境)
