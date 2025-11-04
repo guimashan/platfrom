@@ -233,7 +233,10 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             </div>
             
             <label for="bazi-${cardId}">生辰 (國曆)</label>
-            <input type="date" id="bazi-${cardId}" class="input-field">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <input type="text" id="bazi-text-${cardId}" class="input-field" placeholder="____年__月__日" style="flex: 1;">
+                <input type="date" id="bazi-${cardId}" class="input-field" style="width: 40px; opacity: 0.7; cursor: pointer;" title="點擊選擇日期">
+            </div>
             
             <label for="shengxiao-${cardId}">生肖</label>
             <select id="shengxiao-${cardId}" class="input-field">
@@ -314,6 +317,39 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     });
     card.querySelector('.card-input-name').addEventListener('input', (e) => {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
+    });
+    
+    // 同步生辰輸入：日期選擇器 → 手動輸入
+    const dateInput = card.querySelector(`#bazi-${cardId}`);
+    const textInput = card.querySelector(`#bazi-text-${cardId}`);
+    
+    dateInput.addEventListener('change', (e) => {
+        if (e.target.value) {
+            const [year, month, day] = e.target.value.split('-');
+            textInput.value = `${year}年${month}月${day}日`;
+        } else {
+            textInput.value = '';
+        }
+    });
+    
+    // 同步生辰輸入：手動輸入 → 日期選擇器
+    textInput.addEventListener('blur', (e) => {
+        const value = e.target.value.trim();
+        if (!value) {
+            dateInput.value = '';
+            return;
+        }
+        const match = value.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+        if (match) {
+            const [, year, month, day] = match;
+            const paddedMonth = month.padStart(2, '0');
+            const paddedDay = day.padStart(2, '0');
+            dateInput.value = `${year}-${paddedMonth}-${paddedDay}`;
+        } else {
+            // 格式不正確時清空兩個欄位
+            dateInput.value = '';
+            textInput.value = '';
+        }
     });
 }
 
