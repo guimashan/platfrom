@@ -426,3 +426,55 @@ body {
         padding-bottom: 180px;
     }
 }
+
+/* 類別區塊樣式（中元法會專用） */
+.category-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #E8E4DD;
+}
+
+.category-section:last-child {
+    border-bottom: none;
+}
+
+.category-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #4A3C2F;
+    margin-bottom: 15px;
+    padding-left: 10px;
+    border-left: 4px solid var(--primary-gold);
+}
+
+.btn-add-category {
+    background-color: #F0EDE8;
+    color: #6B5D4F;
+    border: 1px dashed #B8AFA3;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-add-category:hover {
+    background-color: var(--primary-gold);
+    border-color: var(--primary-gold-dark);
+    color: white;
+}
+
+/* 農曆顯示 */
+.lunar-display {
+    display: none;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background-color: #FFF9E6;
+    border-left: 3px solid var(--primary-gold);
+    border-radius: 4px;
+    font-size: 0.9rem;
+    color: var(--primary-gold-dark);
+    font-weight: 500;
+}
