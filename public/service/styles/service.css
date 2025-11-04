@@ -80,6 +80,21 @@ body {
     color: #999;
 }
 
+/* 驗證錯誤樣式 */
+.input-field.error {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1) !important;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
 /* 並排表單 */
 .form-row {
     display: grid;

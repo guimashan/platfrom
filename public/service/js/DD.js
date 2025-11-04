@@ -135,6 +135,11 @@ function setupEventListeners() {
     cardNumberEl.addEventListener('input', formatCardNumber);
     cardExpiryEl.addEventListener('input', formatCardExpiry);
     cardCVVEl.addEventListener('input', formatCardCVV);
+    
+    // 自動清除錯誤提示（報名資料欄位）
+    contactNameEl.addEventListener('input', () => clearError(contactNameEl));
+    contactPhoneEl.addEventListener('input', () => clearError(contactPhoneEl));
+    contactAddressEl.addEventListener('input', () => clearError(contactAddressEl));
 }
 
 // --- 雙向同步姓名 ---
@@ -438,6 +443,35 @@ function calculateTotal() {
     totalAmountEl.textContent = `NT$ ${totalAmount.toLocaleString()}`;
 }
 
+// --- 錯誤處理函數 ---
+function showError(element, message) {
+    element.classList.add('error');
+    
+    let errorDiv = element.parentElement.querySelector('.error-message');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        element.parentElement.appendChild(errorDiv);
+    }
+    errorDiv.textContent = `⚠️ ${message}`;
+    
+    element.focus();
+}
+
+function clearError(element) {
+    element.classList.remove('error');
+    const errorDiv = element.parentElement.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+}
+
+function clearAllErrors() {
+    document.querySelectorAll('.input-field.error').forEach(el => {
+        clearError(el);
+    });
+}
+
 // --- 信用卡格式化函數 ---
 function formatCardNumber(e) {
     let value = e.target.value.replace(/\s/g, '');
@@ -460,23 +494,28 @@ function formatCardCVV(e) {
 
 // --- 表單驗證 ---
 function validateForm() {
+    clearAllErrors();
+    
     // 聯絡資訊驗證
     if (!contactNameEl.value.trim()) {
-        alert('請填寫報名姓名');
-        contactNameEl.focus();
+        showError(contactNameEl, '請填寫報名姓名');
         return false;
     }
-    if (!contactPhoneEl.value.trim()) {
-        alert('請填寫聯絡電話');
-        contactPhoneEl.focus();
+    
+    const phoneValue = contactPhoneEl.value.trim();
+    if (!phoneValue) {
+        showError(contactPhoneEl, '請填寫聯絡電話');
+        return false;
+    }
+    if (!/^09\d{8}$/.test(phoneValue)) {
+        showError(contactPhoneEl, '電話號碼格式不正確（應為 10 碼，例如：0912345678）');
         return false;
     }
     
     // 感謝狀寄發時，地址必填
     const receiptOption = document.querySelector('input[name="receiptOption"]:checked').value;
     if (receiptOption === 'send' && !contactAddressEl.value.trim()) {
-        alert('選擇寄發感謝狀時，通訊地址為必填');
-        contactAddressEl.focus();
+        showError(contactAddressEl, '選擇寄發感謝狀時，通訊地址為必填');
         return false;
     }
 
@@ -491,8 +530,7 @@ function validateForm() {
     for (const card of cards) {
         const nameInput = card.querySelector('.card-input-name');
         if (!nameInput.value.trim()) {
-            alert('請填寫所有報名者的姓名');
-            nameInput.focus();
+            showError(nameInput, '請填寫報名者姓名');
             return false;
         }
 

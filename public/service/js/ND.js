@@ -117,6 +117,11 @@ function setupEventListeners() {
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('change', calculateTotal);
     contactNameEl.addEventListener('input', syncNameToFirstCard);
+    
+    // 自動清除錯誤提示（報名資料欄位）
+    contactNameEl.addEventListener('input', () => clearError(contactNameEl));
+    contactPhoneEl.addEventListener('input', () => clearError(contactPhoneEl));
+    contactAddressEl.addEventListener('input', () => clearError(contactAddressEl));
 }
 
 // --- 雙向同步姓名 ---
@@ -406,6 +411,35 @@ function createApplicantCard(name = '', canRemove = true) {
     });
 }
 
+// --- 錯誤處理函數 ---
+function showError(element, message) {
+    element.classList.add('error');
+    
+    let errorDiv = element.parentElement.querySelector('.error-message');
+    if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        element.parentElement.appendChild(errorDiv);
+    }
+    errorDiv.textContent = `⚠️ ${message}`;
+    
+    element.focus();
+}
+
+function clearError(element) {
+    element.classList.remove('error');
+    const errorDiv = element.parentElement.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+}
+
+function clearAllErrors() {
+    document.querySelectorAll('.input-field.error').forEach(el => {
+        clearError(el);
+    });
+}
+
 /**
  * 計算總斗數與總金額
  */
@@ -451,22 +485,29 @@ async function handleSubmit() {
         return;
     }
     
+    clearAllErrors();
+    
     submitBtnEl.disabled = true;
     submitBtnEl.textContent = '處理中...';
 
     try {
         // 1. 驗證聯絡資訊
         if (!contactNameEl.value.trim()) {
-            alert('請填寫報名姓名');
-            contactNameEl.focus();
+            showError(contactNameEl, '請填寫報名姓名');
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
             return;
         }
         
-        if (!contactPhoneEl.value.trim()) {
-            alert('請填寫連絡電話');
-            contactPhoneEl.focus();
+        const phoneValue = contactPhoneEl.value.trim();
+        if (!phoneValue) {
+            showError(contactPhoneEl, '請填寫聯絡電話');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+        if (!/^09\d{8}$/.test(phoneValue)) {
+            showError(contactPhoneEl, '電話號碼格式不正確（應為 10 碼，例如：0912345678）');
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
             return;
@@ -474,8 +515,7 @@ async function handleSubmit() {
         
         const receiptOption = document.querySelector('input[name="receiptOption"]:checked').value;
         if (receiptOption === 'send' && !contactAddressEl.value.trim()) {
-            alert('選擇寄發感謝狀時，通訊地址為必填');
-            contactAddressEl.focus();
+            showError(contactAddressEl, '選擇寄發感謝狀時，通訊地址為必填');
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
             return;
