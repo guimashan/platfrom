@@ -101,15 +101,15 @@
 
                 console.log('Firebase Custom Token 已取得，準備登入...');
 
-                // 使用 Custom Token 登入 Firebase（加上超時處理）
-                const loginPromise = signInWithCustomToken(platformAuth, data.firebaseCustomToken);
-                const timeoutPromise = new Promise((_, reject) => 
-                    setTimeout(() => reject(new Error('Firebase 登入超時，請重試')), 15000)
-                );
-                
-                await Promise.race([loginPromise, timeoutPromise]);
-
-                console.log('Firebase 登入成功！');
+                // 使用 Custom Token 登入 Firebase
+                // Firebase SDK 本身有內建的超時處理，移除自訂超時以避免過早中斷
+                try {
+                    await signInWithCustomToken(platformAuth, data.firebaseCustomToken);
+                    console.log('Firebase 登入成功！');
+                } catch (authError) {
+                    console.error('Firebase 登入錯誤:', authError);
+                    throw new Error(`Firebase 登入失敗: ${authError.message}`);
+                }
 
                 // 導向用戶原本想去的頁面，如果沒有則導向首頁
                 const returnUrl = sessionStorage.getItem('line_login_return_url');
