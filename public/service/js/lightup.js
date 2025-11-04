@@ -274,13 +274,28 @@ function calculateTotal() {
     const cards = applicantCardListEl.querySelectorAll('.applicant-card');
     cards.forEach(card => {
         let lampsInCard = 0;
+        const lampDetails = [];
         const counts = card.querySelectorAll('.light-count');
         counts.forEach(input => {
             const count = parseInt(input.value, 10) || 0;
             if (count < 0) input.value = 0;
+            if (count > 0) {
+                const label = input.closest('.form-group').querySelector('label').textContent;
+                lampDetails.push(`${label} x ${count}`);
+            }
             lampsInCard += count;
         });
-        card.querySelector('.card-summary-info').textContent = `共 ${lampsInCard} 盞燈`;
+        
+        // 更新卡片摘要資訊
+        const name = card.querySelector('.card-input-name').value.trim() || '未填寫';
+        const bazi = card.querySelector('.card-input-bazi').value || '';
+        const lampInfo = lampDetails.length > 0 ? lampDetails.join('、') : '無';
+        
+        card.querySelector('.card-summary-info').innerHTML = `
+            <small style="display:block; margin:2px 0;">生辰: ${bazi || '未填寫'}</small>
+            <small style="display:block; margin:2px 0;">點燈: ${lampInfo}</small>
+        `;
+        
         totalLamps += lampsInCard;
     });
     const totalAmount = totalLamps * LAMP_PRICE;

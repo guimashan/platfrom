@@ -287,10 +287,25 @@ function calculateTotal() {
 
     cards.forEach(card => {
         let dousInCard = 0;
+        const douDetails = [];
         const checkboxes = card.querySelectorAll('.dou-checkbox:checked');
+        
+        checkboxes.forEach(checkbox => {
+            douDetails.push(checkbox.dataset.douName);
+        });
+        
         dousInCard = checkboxes.length;
         
-        card.querySelector('.card-summary-info').textContent = `共 ${dousInCard} 斗`;
+        // 更新卡片摘要資訊
+        const name = card.querySelector('.card-input-name').value.trim() || '未填寫';
+        const birthDate = card.querySelector('[id^="bazi-"]').value || '';
+        const douInfo = douDetails.length > 0 ? douDetails.join('、') : '無';
+        
+        card.querySelector('.card-summary-info').innerHTML = `
+            <small style="display:block; margin:2px 0;">生辰: ${birthDate || '未填寫'}</small>
+            <small style="display:block; margin:2px 0;">年斗: ${douInfo}</small>
+        `;
+        
         totalDous += dousInCard;
     });
 
