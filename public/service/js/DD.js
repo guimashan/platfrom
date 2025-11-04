@@ -1,5 +1,5 @@
 // -----------------------------------------
-// 龜馬山 goLine - 線上點燈 (lightup.js)
+// 龜馬山 goLine - 線上點燈 (DD.js)
 // (最終修正版：修正載入順序 + 即時同步)
 // -----------------------------------------
 
@@ -20,7 +20,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "lightup";
+const SERVICE_TYPE = "dd";
 const LAMP_PRICE = 700;
 let currentUser = null; 
 let userData = null;

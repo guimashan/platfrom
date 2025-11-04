@@ -1,5 +1,5 @@
 // -----------------------------------------
-// 龜馬山 goLine - 年斗法會 (niandou.js)
+// 龜馬山 goLine - 年斗法會 (ND.js)
 // -----------------------------------------
 
 // --- 匯入需要的實例 ---
@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "niandou";
+const SERVICE_TYPE = "nd";
 const DOU_PRICE = 36000;
 let currentUser = null; 
 let userData = null;
