@@ -206,7 +206,10 @@ function createApplicantCard(name = '', canRemove = true) {
                     <span style="font-size: 0.8em;">月</span>
                     <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
                     <span style="font-size: 0.8em;">日</span>
-                    <input type="date" id="bazi-${cardId}" class="input-field" style="flex: 1; min-width: 120px; cursor: pointer; font-size: 0.9em;" title="或點此使用日期選擇器">
+                    <div style="position: relative; display: inline-block;">
+                        <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
+                        <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">📅</button>
+                    </div>
                 </div>
             </div>
             
@@ -325,9 +328,30 @@ function createApplicantCard(name = '', canRemove = true) {
     
     // 同步生辰輸入：日期選擇器 → 三個手動輸入欄位
     const dateInput = card.querySelector(`#bazi-${cardId}`);
+    const dateButton = card.querySelector(`#bazi-btn-${cardId}`);
     const yearInput = card.querySelector(`#bazi-year-${cardId}`);
     const monthInput = card.querySelector(`#bazi-month-${cardId}`);
     const dayInput = card.querySelector(`#bazi-day-${cardId}`);
+    
+    // 點擊日曆圖示時觸發日期選擇器（兼容 Safari/iOS）
+    dateButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        dateInput.style.pointerEvents = 'auto';
+        
+        if (typeof dateInput.showPicker === 'function') {
+            // Chrome/Edge 支援 showPicker()
+            try {
+                dateInput.showPicker();
+            } catch (err) {
+                dateInput.click();
+            }
+        } else {
+            // Safari/iOS 不支援 showPicker()，使用 click()
+            dateInput.click();
+        }
+        
+        setTimeout(() => { dateInput.style.pointerEvents = 'none'; }, 100);
+    });
     
     dateInput.addEventListener('change', (e) => {
         if (e.target.value) {
