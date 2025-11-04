@@ -309,7 +309,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             </div>
 
             <label for="shengxiao-${cardId}">生肖</label>
-            <input type="text" id="shengxiao-${cardId}" class="input-field" readonly style="background-color: #f5f5f5; cursor: not-allowed; max-width: 33%;">
+            <input type="text" id="shengxiao-${cardId}" class="input-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 33%;">
 
             <label for="time-${cardId}">時辰</label>
             <select id="time-${cardId}" class="input-field">
