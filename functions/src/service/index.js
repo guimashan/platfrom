@@ -106,10 +106,10 @@ async function checkServiceRole(decodedToken) {
 }
 
 /**
- * 接收所有神務服務的報名 (V2 版本)
+ * 接收所有神務服務的報名
  * 使用 onRequest 並手動驗證 platform-bc783 的 ID Token
  */
-exports.submitRegistrationV2 = onRequest({ 
+exports.submitRegistration = onRequest({ 
     region: 'asia-east2',
     cors: true
 }, async (req, res) => {
@@ -234,153 +234,7 @@ exports.submitRegistrationV2 = onRequest({
  * 查詢訂單列表（管理後台用）
  * 需要 poweruser_service, admin_service 或 superadmin 權限
  */
-exports.getRegistrations = onCall({
-    region: 'asia-east2'
-}, async (request) => {
-    if (!request.auth) {
-        throw new HttpsError('unauthenticated', '使用者未登入');
-    }
-
-    await checkServiceRole(request.auth.uid);
-
-    try {
-        const registrationsSnap = await db.collection('registrations')
-            .orderBy('createdAt', 'desc')
-            .limit(100)
-            .get();
-
-        const registrations = registrationsSnap.docs.map(doc => ({
-            orderId: doc.id,
-            ...doc.data(),
-            paymentSecretId: undefined
-        }));
-
-        console.log(`使用者 ${request.auth.uid} 查詢了 ${registrations.length} 筆訂單`);
-        return { success: true, registrations };
-
-    } catch (error) {
-        console.error('查詢訂單失敗:', error);
-        if (error instanceof HttpsError) throw error;
-        throw new HttpsError('internal', '伺服器錯誤');
-    }
-});
-
-/**
- * 查看單一訂單詳情（含信用卡資訊）
- * 需要 poweruser_service, admin_service 或 superadmin 權限
- */
-exports.getRegistrationDetail = onCall({
-    region: 'asia-east2'
-}, async (request) => {
-    if (!request.auth) {
-        throw new HttpsError('unauthenticated', '使用者未登入');
-    }
-
-    await checkServiceRole(request.auth.uid);
-
-    const { orderId } = request.data;
-    if (!orderId) {
-        throw new HttpsError('invalid-argument', '缺少訂單編號');
-    }
-
-    try {
-        const regDoc = await db.collection('registrations').doc(orderId).get();
-        if (!regDoc.exists) {
-            throw new HttpsError('not-found', '訂單不存在');
-        }
-
-        const registration = {
-            orderId: regDoc.id,
-            ...regDoc.data()
-        };
-
-        let paymentSecret = null;
-        if (registration.paymentSecretId) {
-            const secretDoc = await db.collection('temp_payment_secrets')
-                .doc(registration.paymentSecretId)
-                .get();
-            
-            if (secretDoc.exists) {
-                paymentSecret = secretDoc.data();
-            }
-        }
-
-        console.log(`使用者 ${request.auth.uid} 查看訂單 ${orderId}`);
-        
-        return {
-            success: true,
-            registration,
-            paymentSecret
-        };
-
-    } catch (error) {
-        console.error('查詢訂單詳情失敗:', error);
-        if (error instanceof HttpsError) throw error;
-        throw new HttpsError('internal', '伺服器錯誤');
-    }
-});
-
-/**
- * 確認收款並刪除機密資料
- * 需要 poweruser_service, admin_service 或 superadmin 權限
- */
-exports.confirmPayment = onCall({
-    region: 'asia-east2'
-}, async (request) => {
-    if (!request.auth) {
-        throw new HttpsError('unauthenticated', '使用者未登入');
-    }
-
-    await checkServiceRole(request.auth.uid);
-
-    const { orderId } = request.data;
-    if (!orderId) {
-        throw new HttpsError('invalid-argument', '缺少訂單編號');
-    }
-
-    try {
-        const regDoc = await db.collection('registrations').doc(orderId).get();
-        if (!regDoc.exists) {
-            throw new HttpsError('not-found', '訂單不存在');
-        }
-
-        const registration = regDoc.data();
-        const paymentSecretId = registration.paymentSecretId;
-
-        const batch = db.batch();
-        
-        batch.update(db.collection('registrations').doc(orderId), {
-            status: 'paid_offline',
-            paidAt: FieldValue.serverTimestamp(),
-            paidBy: request.auth.uid,
-            paymentSecretId: FieldValue.delete()
-        });
-
-        if (paymentSecretId) {
-            batch.delete(db.collection('temp_payment_secrets').doc(paymentSecretId));
-        }
-
-        await batch.commit();
-
-        console.log(`訂單 ${orderId} 已由使用者 ${request.auth.uid} 確認收款，機密資料已刪除`);
-
-        return { success: true };
-
-    } catch (error) {
-        console.error('確認收款失敗:', error);
-        if (error instanceof HttpsError) throw error;
-        throw new HttpsError('internal', '伺服器錯誤');
-    }
-});
-
-// ========================================
-// V2 管理後台 API（支援跨專案認證）
-// ========================================
-
-/**
- * V2 版本：查詢訂單列表
- */
-exports.getRegistrationsV2 = onRequest({ 
+exports.getRegistrations = onRequest({ 
     region: 'asia-east2',
     cors: true
 }, async (req, res) => {
@@ -430,9 +284,10 @@ exports.getRegistrationsV2 = onRequest({
 });
 
 /**
- * V2 版本：查看單一訂單詳情
+ * 查看單一訂單詳情（含信用卡資訊）
+ * 需要 poweruser_service, admin_service 或 superadmin 權限
  */
-exports.getRegistrationDetailV2 = onRequest({ 
+exports.getRegistrationDetail = onRequest({ 
     region: 'asia-east2',
     cors: true
 }, async (req, res) => {
@@ -505,9 +360,10 @@ exports.getRegistrationDetailV2 = onRequest({
 });
 
 /**
- * V2 版本：確認收款
+ * 確認收款並刪除機密資料
+ * 需要 poweruser_service, admin_service 或 superadmin 權限
  */
-exports.confirmPaymentV2 = onRequest({ 
+exports.confirmPayment = onRequest({ 
     region: 'asia-east2',
     cors: true
 }, async (req, res) => {

@@ -528,13 +528,13 @@ async function handleSubmit() {
         const otherNote = otherNoteEl.value.trim();
         const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(/,/g, ''), 10);
         
-        // 5. 取得 ID Token
-        const idToken = await currentUser.getIdToken();
+        // 5. 取得 ID Token（使用 Platform Auth 進行跨專案認證）
+        const idToken = await platformAuth.currentUser.getIdToken();
         
-        // 6. 呼叫 V2 API
-        console.log("正在呼叫後端 submitRegistrationV2...");
+        // 6. 呼叫後端 API
+        console.log("正在呼叫後端 submitRegistration...");
         
-        const response = await fetch('https://submitregistrationv2-me62t36jia-df.a.run.app', {
+        const response = await fetch('https://asia-east2-service-b9d4a.cloudfunctions.net/submitRegistration', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -221,6 +221,48 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-04 API 重構：移除 V1/V2 命名混淆
+
+**重構目的**：
+統一 API 命名，移除不必要的版本後綴，提升可維護性。
+
+**清理工作**：
+- ✅ 刪除無用的 V1 API（3 個）：
+  - `getRegistrations` (onCall) - 前端從未使用
+  - `getRegistrationDetail` (onCall) - 前端從未使用
+  - `confirmPayment` (onCall) - 前端從未使用
+- ✅ 重命名 V2 API 去掉後綴（4 個）：
+  - `submitRegistrationV2` → `submitRegistration`
+  - `getRegistrationsV2` → `getRegistrations`
+  - `getRegistrationDetailV2` → `getRegistrationDetail`
+  - `confirmPaymentV2` → `confirmPayment`
+
+**最終 API 清單**：
+```
+Service 模組 API（4 個）：
+1. submitRegistration      - 接收神務報名
+2. getRegistrations        - 查詢訂單列表（管理後台）
+3. getRegistrationDetail   - 查詢訂單詳情（含信用卡）
+4. confirmPayment          - 確認收款並刪除機密
+```
+
+**前端更新**：
+- ✅ DD.js：更新 API 呼叫 + 修正認證方式
+- ✅ ND.js：更新 API 呼叫 + 修正認證方式 + 修正 API URL
+- ✅ orders.js：更新所有 API 呼叫
+
+**程式碼改善**：
+- ✅ ND.js 認證方式統一：`platformAuth.currentUser.getIdToken()`
+- ✅ ND.js API URL 修正：使用正確的 Cloud Functions URL
+- ✅ 移除約 150 行冗余代碼
+
+**測試檔案清理**：
+- ✅ 刪除 `public/liff/checkin-old.html`
+- ✅ 刪除 `public/liff/test-token.html`
+- ✅ 刪除 `public/liff/test.html`
+
+---
+
 ### 2025-11-04 統一檔案命名規則：全面改用訂單編號命名
 
 **重大架構調整**：

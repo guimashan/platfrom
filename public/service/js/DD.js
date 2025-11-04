@@ -618,7 +618,7 @@ async function handleSubmit() {
         const idToken = await platformAuth.currentUser.getIdToken();
         
         // 使用 fetch 手動呼叫，傳遞認證 token
-        const functionUrl = 'https://asia-east2-service-b9d4a.cloudfunctions.net/submitRegistrationV2';
+        const functionUrl = 'https://asia-east2-service-b9d4a.cloudfunctions.net/submitRegistration';
         const response = await fetch(functionUrl, {
             method: 'POST',
             headers: {

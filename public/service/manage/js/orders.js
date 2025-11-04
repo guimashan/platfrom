@@ -159,7 +159,7 @@ function loadLunarLibrary() {
 
 async function loadOrders() {
     try {
-        const result = await callAPI('getRegistrationsV2');
+        const result = await callAPI('getRegistrations');
         allOrders = result.result.registrations || [];
         
         console.log('載入訂單:', allOrders.length, '筆');
@@ -243,7 +243,7 @@ window.viewOrder = async function(orderId) {
         // 動態載入農曆庫（第一次查看訂單時才載入）
         await loadLunarLibrary();
         
-        const result = await callAPI('getRegistrationDetailV2', { orderId });
+        const result = await callAPI('getRegistrationDetail', { orderId });
         const order = result.result.registration;
         const paymentSecret = result.result.paymentSecret;
         
@@ -476,7 +476,7 @@ window.confirmOrderPayment = async function(orderId) {
     }
     
     try {
-        await callAPI('confirmPaymentV2', { orderId });
+        await callAPI('confirmPayment', { orderId });
         
         alert('收款確認成功！信用卡資訊已刪除。');
         
