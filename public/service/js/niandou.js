@@ -150,7 +150,7 @@ function updateMode() {
         if (cards.length === 0) {
             createApplicantCard(defaultName, false);
         } else {
-            cards[0].querySelector('.card-summary-name').textContent = defaultName || '斗主本人';
+            cards[0].querySelector('.card-summary-name').textContent = defaultName || '報名者本人';
             const removeBtn = cards[0].querySelector('.remove-btn');
             if (removeBtn) removeBtn.style.display = 'none';
         }
@@ -160,7 +160,7 @@ function updateMode() {
 }
 
 /**
- * 建立斗主卡片
+ * 建立報名人卡片
  */
 function createApplicantCard(name = '', canRemove = true) {
     const cardId = `card-${Date.now()}`;
@@ -173,19 +173,28 @@ function createApplicantCard(name = '', canRemove = true) {
     
     card.innerHTML = `
         <div class="card-summary">
-            <span class="card-summary-name">${prefillName || '斗主本人'}</span>
+            <span class="card-summary-name">${prefillName || '報名者本人'}</span>
             <span class="card-summary-info">共 0 斗</span>
         </div>
         
         <div class="applicant-details">
             <div class="form-group">
-                <label for="name-${cardId}">斗主姓名</label>
-                <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫斗主姓名">
+                <label for="name-${cardId}">報名者姓名</label>
+                <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫報名者姓名">
             </div>
             
             <div class="form-group">
-                <label for="gender-${cardId}">性別</label>
-                <input type="text" id="gender-${cardId}" class="input-field" placeholder="男 / 女">
+                <label>性別</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="gender-${cardId}" value="男" checked>
+                        <span>男</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="gender-${cardId}" value="女">
+                        <span>女</span>
+                    </label>
+                </div>
             </div>
             
             <div class="form-group">
@@ -195,12 +204,41 @@ function createApplicantCard(name = '', canRemove = true) {
             
             <div class="form-group">
                 <label for="shengxiao-${cardId}">生肖</label>
-                <input type="text" id="shengxiao-${cardId}" class="input-field" placeholder="請填寫生肖">
+                <select id="shengxiao-${cardId}" class="input-field">
+                    <option value="">請選擇生肖</option>
+                    <option value="鼠">鼠</option>
+                    <option value="牛">牛</option>
+                    <option value="虎">虎</option>
+                    <option value="兔">兔</option>
+                    <option value="龍">龍</option>
+                    <option value="蛇">蛇</option>
+                    <option value="馬">馬</option>
+                    <option value="羊">羊</option>
+                    <option value="猴">猴</option>
+                    <option value="雞">雞</option>
+                    <option value="狗">狗</option>
+                    <option value="豬">豬</option>
+                </select>
             </div>
             
             <div class="form-group">
                 <label for="time-${cardId}">時辰</label>
-                <input type="text" id="time-${cardId}" class="input-field" placeholder="吉時、子時、丑時...">
+                <select id="time-${cardId}" class="input-field">
+                    <option value="">請選擇時辰</option>
+                    <option value="吉時">吉時</option>
+                    <option value="子時">子時 (23:00-01:00)</option>
+                    <option value="丑時">丑時 (01:00-03:00)</option>
+                    <option value="寅時">寅時 (03:00-05:00)</option>
+                    <option value="卯時">卯時 (05:00-07:00)</option>
+                    <option value="辰時">辰時 (07:00-09:00)</option>
+                    <option value="巳時">巳時 (09:00-11:00)</option>
+                    <option value="午時">午時 (11:00-13:00)</option>
+                    <option value="未時">未時 (13:00-15:00)</option>
+                    <option value="申時">申時 (15:00-17:00)</option>
+                    <option value="酉時">酉時 (17:00-19:00)</option>
+                    <option value="戌時">戌時 (19:00-21:00)</option>
+                    <option value="亥時">亥時 (21:00-23:00)</option>
+                </select>
             </div>
 
             <div class="form-group" style="margin-top: 20px;">
@@ -327,24 +365,53 @@ async function handleSubmit() {
     submitBtnEl.textContent = '處理中...';
 
     try {
-        // 1. 收集聯絡人資訊
+        // 1. 驗證聯絡資訊
+        if (!contactNameEl.value.trim()) {
+            alert('請填寫報名姓名');
+            contactNameEl.focus();
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+        
+        if (!contactPhoneEl.value.trim()) {
+            alert('請填寫連絡電話');
+            contactPhoneEl.focus();
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+        
+        const receiptOption = document.querySelector('input[name="receiptOption"]:checked').value;
+        if (receiptOption === 'send' && !contactAddressEl.value.trim()) {
+            alert('選擇寄發感謝狀時，通訊地址為必填');
+            contactAddressEl.focus();
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+        
+        // 2. 收集聯絡人資訊
         const contactInfo = {
             name: contactNameEl.value.trim(),
             phone: contactPhoneEl.value.trim(),
             email: contactEmailEl.value.trim(),
             address: contactAddressEl.value.trim(),
-            receiptOption: document.querySelector('input[name="receiptOption"]:checked').value
+            receiptOption: receiptOption
         };
 
-        // 2. 收集斗主名單
+        // 3. 收集斗主名單
         const applicants = [];
         const cards = applicantCardListEl.querySelectorAll('.applicant-card');
         
         cards.forEach(card => {
+            // 獲取性別（單選按鈕）
+            const genderRadio = card.querySelector('input[name^="gender-"]:checked');
+            
             const cardData = {
                 applicantName: card.querySelector('.card-input-name').value.trim(),
                 bazi: {
-                    gender: card.querySelector('[id^="gender-"]').value,
+                    gender: genderRadio ? genderRadio.value : '',
                     birthDate: card.querySelector('[id^="bazi-"]').value,
                     shengxiao: card.querySelector('[id^="shengxiao-"]').value,
                     time: card.querySelector('[id^="time-"]').value,
