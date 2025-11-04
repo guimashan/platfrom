@@ -412,7 +412,7 @@ function calculateTotal() {
             const count = parseInt(input.value, 10) || 0;
             if (count < 0) input.value = 0;
             if (count > 0) {
-                const label = input.closest('.form-group').querySelector('label').textContent;
+                const label = input.getAttribute('data-light-name') || '燈種';
                 lampDetails.push(`${label} x ${count}`);
             }
             lampsInCard += count;
