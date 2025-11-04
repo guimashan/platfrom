@@ -197,8 +197,8 @@ function renderOrderDetail(order, paymentSecret) {
     
     // 判斷是點燈服務還是年斗服務
     const isNiandou = order.serviceType === 'niandou';
-    const sectionTitle = isNiandou ? '🎯 斗主名單' : '🕯️ 點燈名單';
-    const personLabel = isNiandou ? '斗主' : '點燈人';
+    const sectionTitle = isNiandou ? '🎯 報名者名單' : '🕯️ 點燈名單';
+    const personLabel = isNiandou ? '報名者' : '點燈人';
     
     const applicantsList = order.applicants?.map((a, index) => {
         // 處理 bazi (可能是字串或物件)
