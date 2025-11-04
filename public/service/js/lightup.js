@@ -233,14 +233,14 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             </div>
             
             <label>生辰 (國曆)</label>
-            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 70px; text-align: center;">
-                <span style="font-size: 0.9em;">年</span>
-                <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 50px; text-align: center;">
-                <span style="font-size: 0.9em;">月</span>
-                <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 50px; text-align: center;">
-                <span style="font-size: 0.9em;">日</span>
-                <input type="date" id="bazi-${cardId}" class="input-field" style="cursor: pointer;" title="或點此使用日期選擇器">
+            <div style="display: flex; gap: 3px; align-items: center;">
+                <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
+                <span style="font-size: 0.8em;">年</span>
+                <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
+                <span style="font-size: 0.8em;">月</span>
+                <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
+                <span style="font-size: 0.8em;">日</span>
+                <input type="date" id="bazi-${cardId}" class="input-field" style="flex: 1; min-width: 120px; cursor: pointer; font-size: 0.9em;" title="或點此使用日期選擇器">
             </div>
             
             <label for="shengxiao-${cardId}">生肖</label>
