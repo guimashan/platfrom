@@ -284,7 +284,7 @@ function createApplicantCard(name = '', canRemove = true) {
             
             <div class="form-group">
                 <label for="shengxiao-${cardId}">生肖</label>
-                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly style="background-color: #f5f5f5; cursor: not-allowed;">
+                <input type="text" id="shengxiao-${cardId}" class="input-field" readonly style="background-color: #f5f5f5; cursor: not-allowed; max-width: 33%;">
             </div>
             
             <div class="form-group">
