@@ -232,10 +232,15 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 </label>
             </div>
             
-            <label for="bazi-${cardId}">生辰 (國曆)</label>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <input type="text" id="bazi-text-${cardId}" class="input-field" placeholder="____年__月__日" style="flex: 1;">
-                <input type="date" id="bazi-${cardId}" class="input-field" style="width: 40px; opacity: 0.7; cursor: pointer;" title="點擊選擇日期">
+            <label>生辰 (國曆)</label>
+            <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 70px; text-align: center;">
+                <span style="font-size: 0.9em;">年</span>
+                <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 50px; text-align: center;">
+                <span style="font-size: 0.9em;">月</span>
+                <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 50px; text-align: center;">
+                <span style="font-size: 0.9em;">日</span>
+                <input type="date" id="bazi-${cardId}" class="input-field" style="cursor: pointer;" title="或點此使用日期選擇器">
             </div>
             
             <label for="shengxiao-${cardId}">生肖</label>
@@ -323,37 +328,52 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
     });
     
-    // 同步生辰輸入：日期選擇器 → 手動輸入
+    // 同步生辰輸入：日期選擇器 → 三個手動輸入欄位
     const dateInput = card.querySelector(`#bazi-${cardId}`);
-    const textInput = card.querySelector(`#bazi-text-${cardId}`);
+    const yearInput = card.querySelector(`#bazi-year-${cardId}`);
+    const monthInput = card.querySelector(`#bazi-month-${cardId}`);
+    const dayInput = card.querySelector(`#bazi-day-${cardId}`);
     
     dateInput.addEventListener('change', (e) => {
         if (e.target.value) {
             const [year, month, day] = e.target.value.split('-');
-            textInput.value = `${year}年${month}月${day}日`;
+            yearInput.value = year;
+            monthInput.value = parseInt(month, 10);
+            dayInput.value = parseInt(day, 10);
         } else {
-            textInput.value = '';
+            yearInput.value = '';
+            monthInput.value = '';
+            dayInput.value = '';
         }
     });
     
     // 同步生辰輸入：手動輸入 → 日期選擇器
-    textInput.addEventListener('blur', (e) => {
-        const value = e.target.value.trim();
-        if (!value) {
+    const syncManualToDate = () => {
+        const year = yearInput.value.trim();
+        const month = monthInput.value.trim();
+        const day = dayInput.value.trim();
+        
+        if (!year && !month && !day) {
             dateInput.value = '';
             return;
         }
-        const match = value.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-        if (match) {
-            const [, year, month, day] = match;
+        
+        if (year.length === 4 && month && day) {
             const paddedMonth = month.padStart(2, '0');
             const paddedDay = day.padStart(2, '0');
             dateInput.value = `${year}-${paddedMonth}-${paddedDay}`;
-        } else {
-            // 格式不正確時清空兩個欄位
-            dateInput.value = '';
-            textInput.value = '';
         }
+    };
+    
+    yearInput.addEventListener('blur', syncManualToDate);
+    monthInput.addEventListener('blur', syncManualToDate);
+    dayInput.addEventListener('blur', syncManualToDate);
+    
+    // 限制只能輸入數字
+    [yearInput, monthInput, dayInput].forEach(input => {
+        input.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
     });
 }
 
