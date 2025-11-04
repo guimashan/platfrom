@@ -161,16 +161,20 @@ function renderOrderDetail(order, paymentSecret) {
         let baziHtml = '';
         if (a.bazi) {
             if (typeof a.bazi === 'object') {
-                // 年斗法會的 bazi 物件
-                const parts = [];
-                if (a.bazi.gender) parts.push(`性別: ${a.bazi.gender}`);
-                if (a.bazi.birthDate) parts.push(`生日: ${a.bazi.birthDate}`);
-                if (a.bazi.shengxiao) parts.push(`生肖: ${a.bazi.shengxiao}`);
-                if (a.bazi.time) parts.push(`時辰: ${a.bazi.time}`);
-                baziHtml = parts.join('、');
+                // 年斗法會的 bazi 物件 - 使用表格式排版
+                baziHtml = `
+                    <div style="background: #f9f9f9; padding: 10px; border-radius: 6px; margin: 8px 0;">
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 0.9rem;">
+                            ${a.bazi.gender ? `<div style="color: #666;">性別：</div><div><strong>${a.bazi.gender}</strong></div>` : ''}
+                            ${a.bazi.birthDate ? `<div style="color: #666;">生日：</div><div><strong>${a.bazi.birthDate}</strong></div>` : ''}
+                            ${a.bazi.shengxiao ? `<div style="color: #666;">生肖：</div><div><strong>${a.bazi.shengxiao}</strong></div>` : ''}
+                            ${a.bazi.time ? `<div style="color: #666;">時辰：</div><div><strong>${a.bazi.time}</strong></div>` : ''}
+                        </div>
+                    </div>
+                `;
             } else {
                 // 點燈服務的 bazi 字串
-                baziHtml = a.bazi;
+                baziHtml = `<div style="margin: 8px 0;"><span style="color: #666;">生辰：</span><strong>${a.bazi}</strong></div>`;
             }
         }
         
@@ -179,33 +183,54 @@ function renderOrderDetail(order, paymentSecret) {
         if (a.lights) {
             const lightsHtml = Object.entries(a.lights)
                 .filter(([name, count]) => count > 0)
-                .map(([name, count]) => `${name} x ${count}`)
-                .join('、') || '無';
-            serviceHtml = `點燈: ${lightsHtml}`;
+                .map(([name, count]) => `<div style="padding: 4px 0;">• ${name} <strong>x ${count}</strong></div>`)
+                .join('') || '<div>無</div>';
+            serviceHtml = `
+                <div style="margin-top: 8px;">
+                    <div style="color: #666; margin-bottom: 4px;">點燈項目：</div>
+                    <div style="padding-left: 10px;">${lightsHtml}</div>
+                </div>
+            `;
         }
         
         // 處理年斗資訊
         if (a.douTypes) {
             const dousHtml = Object.entries(a.douTypes)
                 .filter(([name, selected]) => selected === true)
-                .map(([name]) => name)
-                .join('、') || '無';
-            serviceHtml = `年斗項目: ${dousHtml}`;
+                .map(([name]) => `<div style="padding: 4px 0;">• ${name}</div>`)
+                .join('') || '<div>無</div>';
+            serviceHtml = `
+                <div style="margin-top: 8px;">
+                    <div style="color: #666; margin-bottom: 4px;">年斗項目：</div>
+                    <div style="padding-left: 10px;">${dousHtml}</div>
+                </div>
+            `;
         }
         
         // 處理事業年斗資訊
         let businessHtml = '';
         if (a.businessInfo && (a.businessInfo.title || a.businessInfo.address)) {
-            businessHtml = `<br><small style="color:#666;">📍 ${a.businessInfo.title || ''} (${a.businessInfo.address || ''})</small>`;
+            businessHtml = `
+                <div style="background: #fff3cd; padding: 8px; border-radius: 4px; margin-top: 8px; border-left: 3px solid #ffc107;">
+                    <div style="font-size: 0.85rem; color: #856404;">
+                        <div><strong>📍 事業年斗資訊</strong></div>
+                        ${a.businessInfo.title ? `<div style="margin-top: 4px;">抬頭：${a.businessInfo.title}</div>` : ''}
+                        ${a.businessInfo.address ? `<div>地址：${a.businessInfo.address}</div>` : ''}
+                    </div>
+                </div>
+            `;
         }
         
         return `
             <div class="detail-row">
                 <div class="detail-label">${personLabel} ${index + 1}</div>
                 <div class="detail-value">
-                    <strong>${a.applicantName || '未填寫'}</strong><br>
-                    ${baziHtml ? `${baziHtml}<br>` : ''}
-                    ${serviceHtml}${businessHtml}
+                    <div style="font-size: 1.1rem; color: var(--primary-gold-dark); margin-bottom: 8px;">
+                        <strong>${a.applicantName || '未填寫'}</strong>
+                    </div>
+                    ${baziHtml}
+                    ${serviceHtml}
+                    ${businessHtml}
                 </div>
             </div>
         `;
