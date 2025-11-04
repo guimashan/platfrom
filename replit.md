@@ -63,7 +63,8 @@
 │   │   └── styles/        # 簽到樣式
 │   ├── service/           # 神務服務模組（第三階段）
 │   │   ├── index.html     # 服務前端（樣板）
-│   │   ├── lightup.html   # 線上點燈頁面 ⭐ NEW
+│   │   ├── DD.html        # 線上點燈頁面（訂單編號 DD）⭐
+│   │   ├── ND.html        # 年斗法會頁面（訂單編號 ND）⭐
 │   │   ├── js/            # 服務模組 JavaScript
 │   │   └── styles/        # 服務模組樣式
 │   ├── schedule/          # 排班系統模組（第四階段）
@@ -288,8 +289,8 @@ npm run emulators
 - ✅ 欄位間距與排版優化
 
 **影響範圍**：
-- 年斗法會：public/service/niandou.html、public/service/js/niandou.js
-- 線上點燈：public/service/lightup.html、public/service/js/lightup.js
+- 年斗法會：public/service/ND.html、public/service/js/niandou.js
+- 線上點燈：public/service/DD.html、public/service/js/lightup.js
 
 **視覺優化**（2025-11-04）：
 - ✅ 線上點燈：新增「燈種選擇」標題，增加時辰欄位與燈種之間的視覺間距
@@ -351,11 +352,11 @@ npm run emulators
 
 **正式環境網址**：
 ```
-https://go.guimashan.org.tw/service/niandou.html
+https://go.guimashan.org.tw/service/ND.html
 ```
 
 **相關檔案**：
-- 前端：public/service/niandou.html、public/service/js/niandou.js
+- 前端：public/service/ND.html、public/service/js/niandou.js
 - 後端：functions/src/service/index.js（共用 submitRegistrationV2）
 - 管理：public/service/manage/js/orders.js（新增年斗資料處理）
 
@@ -389,7 +390,7 @@ https://go.guimashan.org.tw/service/niandou.html
 - 🔒 防止未授權訪問
 
 **相關檔案**：
-- 前端：public/service/lightup.html、js/lightup.js
+- 前端：public/service/DD.html、js/lightup.js
 - 樣式：public/service/styles/lightup.css
 
 ### 2025-11-03 線上點燈「即時同步」功能修復
@@ -511,7 +512,7 @@ https://go.guimashan.org.tw/service/niandou.html
 - 🎯 屆時將移除信用卡收集功能，改用安全的重定向支付
 
 **相關檔案**:
-- 前端：public/service/lightup.html、public/service/js/lightup.js
+- 前端：public/service/DD.html、public/service/js/lightup.js
 - 後端：functions/src/service/index.js
 - 規則：firestore.rules
 
