@@ -206,6 +206,58 @@ npm run emulators
 
 ## 最近變更
 
+### 2025-11-04 年斗法會服務模組實作
+
+**新增功能**：
+- ✅ 建立年斗法會報名頁面
+  - `/service/niandou.html` - 年斗法會報名前端
+  - `/service/js/niandou.js` - 年斗法會功能邏輯
+  - 完全一致的 UI 設計（與點燈服務相同風格）
+  - LINE 登入保護（未登入無法看到表單）
+
+**斗主資料欄位**：
+- 斗主姓名、性別、生辰（國曆）、生肖、時辰
+- 單人/多人模式切換
+- 自動同步報名姓名到斗主姓名（單人模式）
+
+**年斗項目選擇**（可複選）：
+- 闔家年斗
+- 元辰年斗
+- 紫微年斗
+- 事業年斗（額外欄位：抬頭名稱、所在地址）
+
+**定價與計算**：
+- 每斗 NT$ 36,000
+- 即時計算總斗數與總金額
+- 自動格式化金額顯示
+
+**訂單編號格式**：
+- 格式：`ND-YYYYMMDD-XXXX`
+- 範例：`ND-20251104-0001`
+- 每日重置流水號
+
+**後端整合**：
+- 使用 V2 API：`submitRegistrationV2`
+- 雙集合架構：`registrations` + `temp_payment_secrets`
+- 自動驗證登入身份與資料完整性
+
+**管理後台優化**：
+- ✅ 修正年斗資料顯示（不再顯示 "[object Object]"）
+- ✅ 正確解析 bazi 物件（性別、生日、生肖、時辰）
+- ✅ 顯示年斗項目清單（闔家、元辰、紫微、事業）
+- ✅ 顯示事業年斗額外資訊（抬頭、地址）
+- ✅ 動態標題：點燈服務顯示「🕯️ 點燈名單」、年斗服務顯示「🎯 斗主名單」
+
+**正式環境網址**：
+```
+https://go.guimashan.org.tw/service/niandou.html
+```
+
+**相關檔案**：
+- 前端：public/service/niandou.html、public/service/js/niandou.js
+- 後端：functions/src/service/index.js（共用 submitRegistrationV2）
+- 管理：public/service/manage/js/orders.js（新增年斗資料處理）
+
 ### 2025-11-03 線上點燈「登入保護」功能修復
 
 **問題**：
