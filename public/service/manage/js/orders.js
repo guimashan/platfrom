@@ -42,10 +42,12 @@ function convertToLunar(gregorianDate) {
         const lunar = solar.getLunar();
         
         // 格式化農曆日期
-        const lunarYear = lunar.getYear();
         const lunarMonth = lunar.getMonth();
         const lunarDay = lunar.getDay();
         const isLeapMonth = lunar.isLeap();
+        
+        // 取得天干地支紀年
+        const yearInGanZhi = lunar.getYearInGanZhi(); // 例如：甲辰
         
         // 月份名稱
         const monthNames = ['正', '二', '三', '四', '五', '六', '七', '八', '九', '十', '冬', '臘'];
@@ -57,9 +59,9 @@ function convertToLunar(gregorianDate) {
                           '廿一', '廿二', '廿三', '廿四', '廿五', '廿六', '廿七', '廿八', '廿九', '三十'];
         const dayName = dayNames[lunarDay - 1] || lunarDay;
         
-        // 組合農曆日期字串
+        // 組合農曆日期字串（使用天干地支紀年）
         const leapPrefix = isLeapMonth ? '閏' : '';
-        return `${lunarYear}年 ${leapPrefix}${monthName}月${dayName}`;
+        return `${yearInGanZhi}年 ${leapPrefix}${monthName}月${dayName}`;
         
     } catch (error) {
         console.error('農曆轉換失敗:', error);
