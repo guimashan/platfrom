@@ -75,35 +75,48 @@ function convertToLunar(gregorianDate) {
     }
 }
 
-// 等待 lunar-javascript 庫載入
+// 等待 lunar-javascript 庫載入（只在需要時才調用）
 function waitForLunarLibrary() {
     return new Promise((resolve) => {
+        // 如果已經載入，直接返回
         if (typeof window.Solar !== 'undefined') {
             resolve();
             return;
         }
         
+        let attempts = 0;
+        const maxAttempts = 30; // 3 秒（30 * 100ms）
+        
         const checkInterval = setInterval(() => {
+            attempts++;
+            
+            // 檢查是否載入成功
             if (typeof window.Solar !== 'undefined') {
                 clearInterval(checkInterval);
                 resolve();
+                return;
+            }
+            
+            // 檢查是否載入失敗
+            if (window.lunarLoadError) {
+                clearInterval(checkInterval);
+                console.warn('農曆庫載入失敗，將只顯示國曆');
+                resolve();
+                return;
+            }
+            
+            // 超時
+            if (attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                console.warn('農曆庫載入逾時，將只顯示國曆');
+                resolve();
             }
         }, 100);
-        
-        // 最多等待 5 秒
-        setTimeout(() => {
-            clearInterval(checkInterval);
-            console.warn('lunar-javascript 庫載入逾時');
-            resolve();
-        }, 5000);
     });
 }
 
 (async function init() {
     try {
-        // 等待 lunar-javascript 庫載入完成
-        await waitForLunarLibrary();
-        
         const { user } = await checkAuth({
             requiredRoles: ['poweruser_service', 'admin_service', 'superadmin']
         });
@@ -211,6 +224,9 @@ window.viewOrder = async function(orderId) {
         
         modalBody.innerHTML = '<div style="text-align:center; padding:40px;">載入中...</div>';
         modal.style.display = 'block';
+        
+        // 確保農曆庫已載入（只在需要時才等待）
+        await waitForLunarLibrary();
         
         const result = await callAPI('getRegistrationDetailV2', { orderId });
         const order = result.result.registration;
