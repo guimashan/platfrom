@@ -451,7 +451,7 @@ function showError(element, message) {
         errorDiv.className = 'error-message';
         element.parentElement.appendChild(errorDiv);
     }
-    errorDiv.textContent = `⚠️ ${message}`;
+    errorDiv.textContent = `${message}`;
     
     element.focus();
 }
