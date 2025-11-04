@@ -217,8 +217,8 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             <span class="card-summary-info">共 0 盞燈</span>
         </div>
         <div class="applicant-details">
-            <label for="name-${cardId}">點燈人姓名</label>
-            <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫點燈人姓名">
+            <label for="name-${cardId}">報名者姓名</label>
+            <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫報名者姓名">
             
             <label>性別</label>
             <div class="radio-group">
@@ -393,10 +393,10 @@ function validateForm() {
         return false;
     }
 
-    // 點燈人驗證
+    // 報名者驗證
     const cards = applicantCardListEl.querySelectorAll('.applicant-card');
     if (cards.length === 0) {
-        alert('請至少新增一位點燈人');
+        alert('請至少新增一位報名者');
         return false;
     }
 
@@ -404,7 +404,7 @@ function validateForm() {
     for (const card of cards) {
         const nameInput = card.querySelector('.card-input-name');
         if (!nameInput.value.trim()) {
-            alert('請填寫所有點燈人的姓名');
+            alert('請填寫所有報名者的姓名');
             nameInput.focus();
             return false;
         }
@@ -489,7 +489,7 @@ async function handleSubmit() {
             receiptOption: document.querySelector('input[name="receiptOption"]:checked').value
         };
 
-        // 2. 收集點燈人名單
+        // 2. 收集報名者名單
         const applicants = [];
         const cards = applicantCardListEl.querySelectorAll('.applicant-card');
         cards.forEach(card => {

@@ -125,7 +125,7 @@ function syncNameToSingleCard() {
         const firstCard = applicantCardListEl.querySelector('.applicant-card');
         if (firstCard) {
             const newName = contactNameEl.value.trim();
-            const displayName = newName || '斗主本人';
+            const displayName = newName || '報名者本人';
             firstCard.querySelector('.card-summary-name').textContent = displayName;
             firstCard.querySelector('.card-input-name').value = newName;
         }
