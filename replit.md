@@ -242,6 +242,10 @@ npm run emulators
   - `getRegistrationsV2` → 已刪除（保留 `getRegistrations`）
   - `getRegistrationDetailV2` → 已刪除（保留 `getRegistrationDetail`）
   - `confirmPaymentV2` → 已刪除（保留 `confirmPayment`）
+- ✅ functions/src/service/index.js：移除舊命名向下兼容
+  - 刪除 `'lightup': 'DD'`（已無用）
+  - 刪除 `'niandou': 'ND'`（已無用）
+  - 只保留新命名：`'dd': 'DD'` 和 `'nd': 'ND'`
 
 **影響範圍**：
 - 前端：public/service/js/DD.js、public/service/js/ND.js
