@@ -34,11 +34,17 @@ function convertToLunar(gregorianDate) {
     if (!gregorianDate) return '';
     
     try {
+        // 檢查 lunar-javascript 庫是否已載入
+        if (typeof window.Solar === 'undefined') {
+            console.error('lunar-javascript 庫尚未載入');
+            return '';
+        }
+        
         // 解析國曆日期
         const [year, month, day] = gregorianDate.split('-').map(Number);
         
         // 使用 lunar-javascript 庫進行轉換
-        const solar = Solar.fromYmd(year, month, day);
+        const solar = window.Solar.fromYmd(year, month, day);
         const lunar = solar.getLunar();
         
         // 格式化農曆日期
@@ -69,8 +75,35 @@ function convertToLunar(gregorianDate) {
     }
 }
 
+// 等待 lunar-javascript 庫載入
+function waitForLunarLibrary() {
+    return new Promise((resolve) => {
+        if (typeof window.Solar !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        const checkInterval = setInterval(() => {
+            if (typeof window.Solar !== 'undefined') {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 100);
+        
+        // 最多等待 5 秒
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            console.warn('lunar-javascript 庫載入逾時');
+            resolve();
+        }, 5000);
+    });
+}
+
 (async function init() {
     try {
+        // 等待 lunar-javascript 庫載入完成
+        await waitForLunarLibrary();
+        
         const { user } = await checkAuth({
             requiredRoles: ['poweruser_service', 'admin_service', 'superadmin']
         });
