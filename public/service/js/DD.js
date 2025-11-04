@@ -124,7 +124,7 @@ function handleLineLogin() {
 function setupEventListeners() {
     modeSingleEl.addEventListener('change', updateMode);
     modeMultiEl.addEventListener('change', updateMode);
-    addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, true));
+    addApplicantBtnEl.addEventListener('click', () => createApplicantCard('', true));
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('input', calculateTotal);
 
@@ -204,12 +204,12 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     card.id = cardId;
     card.setAttribute('data-open', 'true');
 
-    // 預填姓名
-    let prefillName = name;
+    // 預填姓名（確保不會是 null）
+    let prefillName = name || '';
     // 如果 name 是 "報名者本人"，就從已填入的 contactNameEl 抓取
     if (name === '報名者本人') {
         prefillName = contactNameEl.value.trim();
-    } else if (name === '家人/親友') {
+    } else if (name === '家人/親友' || name === '') {
         prefillName = ''; // 新增卡片時，姓名留空
     }
 

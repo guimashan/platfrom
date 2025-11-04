@@ -113,7 +113,7 @@ function handleLineLogin() {
 function setupEventListeners() {
     modeSingleEl.addEventListener('change', updateMode);
     modeMultiEl.addEventListener('change', updateMode);
-    addApplicantBtnEl.addEventListener('click', () => createApplicantCard(null, true));
+    addApplicantBtnEl.addEventListener('click', () => createApplicantCard('', true));
     submitBtnEl.addEventListener('click', handleSubmit);
     applicantCardListEl.addEventListener('change', calculateTotal);
     contactNameEl.addEventListener('input', syncNameToFirstCard);
