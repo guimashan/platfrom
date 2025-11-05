@@ -7,6 +7,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
     <link rel="stylesheet" href="styles/service.css">
+    <style>
+        /* FTC 企業團體 - 藍色主題覆蓋 */
+        #floatingFooter {
+            background: linear-gradient(135deg, #42A5F5 0%, #1976D2 100%);
+        }
+        .summary-value {
+            color: white !important;
+        }
+        .summary-label {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+    </style>
 </head>
 <body>
     <!-- 未登入畫面 (預設顯示) -->
@@ -121,7 +133,7 @@
                         <label class="radio-label payment-option">
                             <input type="radio" name="paymentPlan" value="quarterly" checked>
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--primary-gold-dark);">季繳</div>
+                                <div style="font-weight: 600; color: #1976D2;">季繳</div>
                                 <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
                                     共 12 期，每期 NT$ 2,500
                                 </div>
@@ -131,7 +143,7 @@
                         <label class="radio-label payment-option">
                             <input type="radio" name="paymentPlan" value="halfYearly">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--primary-gold-dark);">半年繳</div>
+                                <div style="font-weight: 600; color: #1976D2;">半年繳</div>
                                 <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
                                     共 6 期，每期 NT$ 5,000
                                 </div>
@@ -141,7 +153,7 @@
                         <label class="radio-label payment-option">
                             <input type="radio" name="paymentPlan" value="yearly">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--primary-gold-dark);">年繳</div>
+                                <div style="font-weight: 600; color: #1976D2;">年繳</div>
                                 <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
                                     共 3 期，每期 NT$ 10,000
                                 </div>
@@ -151,7 +163,7 @@
                         <label class="radio-label payment-option">
                             <input type="radio" name="paymentPlan" value="fullPayment">
                             <div style="flex: 1;">
-                                <div style="font-weight: 600; color: var(--primary-gold-dark);">全繳</div>
+                                <div style="font-weight: 600; color: #1976D2;">全繳</div>
                                 <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
                                     一次繳清，NT$ 30,000
                                 </div>
@@ -160,10 +172,10 @@
                     </div>
                 </div>
 
-                <div style="background: #FFF9E6; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary-gold);">
+                <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #42A5F5;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <span style="color: #666;">首期扣款金額：</span>
-                        <span id="firstPayment" style="font-size: 1.3rem; font-weight: 700; color: var(--primary-gold-dark);">NT$ 2,500</span>
+                        <span id="firstPayment" style="font-size: 1.3rem; font-weight: 700; color: #1976D2;">NT$ 2,500</span>
                     </div>
                     <div style="font-size: 0.85rem; color: #888; margin-top: 8px;">
                         ※ 後續將按期自動扣款，直到三年期滿
