@@ -7,8 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
     <link rel="stylesheet" href="styles/service.css">
-    <script type="module" src="js/FTC.js"></script>
-    <script src="/lib/lunar.js"></script>
 </head>
 <body>
     <!-- 未登入畫面 (預設顯示) -->
@@ -54,8 +52,8 @@
             <div class="card">
                 <h2 class="card-title">報名聯絡資訊</h2>
                 <div class="form-group">
-                    <label for="contactName">企業團體名稱</label>
-                    <input type="text" id="contactName" class="input-field" placeholder="請輸入企業團體名稱">
+                    <label for="contactName">企業/團體 名稱</label>
+                    <input type="text" id="contactName" class="input-field" placeholder="請輸入企業/團體名稱">
                 </div>
 
                 <div class="form-group">
@@ -69,49 +67,6 @@
                             <input type="radio" name="gender" value="女">
                             <span>女</span>
                         </label>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="idNumber">身分證字號</label>
-                    <input type="text" id="idNumber" class="input-field" placeholder="請輸入身分證字號" maxlength="10">
-                </div>
-
-                <div class="form-group">
-                    <label style="display: block; margin-bottom: 8px;">出生日期 (國曆)</label>
-                    <div style="margin-bottom: 4px;">
-                        <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
-                            <span style="color: #666;">民國</span>
-                            <input type="text" id="bazi-year" class="input-field" placeholder="年" maxlength="3" style="width: 60px; text-align: center;">
-                            <span>年</span>
-                            <input type="text" id="bazi-month" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
-                            <span>月</span>
-                            <input type="text" id="bazi-day" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
-                            <span>日</span>
-                            <button type="button" id="bazi-btn" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
-                            <input type="date" id="bazi" style="position: absolute; opacity: 0; pointer-events: none;">
-                        </div>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                        <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
-                        <span style="visibility: hidden;">民國</span>
-                        <span id="western-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">年</span>
-                        <span id="western-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">月</span>
-                        <span id="western-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">日</span>
-                    </div>
-                    <div id="lunar-display" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
-                        <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
-                        <span style="visibility: hidden;">民國</span>
-                        <span id="lunar-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">年</span>
-                        <span id="lunar-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">月</span>
-                        <span id="lunar-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                        <span style="color: #666;">日</span>
                     </div>
                 </div>
                 
@@ -275,8 +230,7 @@
         </div>
     </div> <!-- 關閉 mainApp -->
 
-    <script src="../lib/lunar.js" defer></script>
     <script src="../js/firebase-init.js" type="module"></script>
-    <script src="js/FT.js" type="module"></script>
+    <script type="module" src="js/FTC.js"></script>
 </body>
 </html>
