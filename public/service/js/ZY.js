@@ -203,7 +203,7 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
@@ -375,7 +375,7 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
