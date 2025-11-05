@@ -8,84 +8,180 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF;
+        }
+
+        .service-header {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-header h1 {
+            color: white;
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .service-container {
+            max-width: 640px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .service-box {
+            background: white;
+            border: 3px solid #333;
+            border-radius: 24px;
+            padding: 3rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .service-btn {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 50px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans TC', sans-serif;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-btn:hover {
+            background: var(--bg-card);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-btn:active {
+            transform: translateY(0);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #E8E4DD;
+            padding: 0.5rem 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .bottom-nav-items {
+            display: flex;
+            justify-content: space-around;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .bottom-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            padding: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .bottom-nav-item.active {
+            color: var(--primary-gold-dark);
+        }
+
+        .bottom-nav-item .icon {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 768px) {
+            .service-container {
+                margin: 1.5rem auto;
+                padding: 0 1rem;
+            }
+
+            .service-box {
+                padding: 2rem 1.5rem;
+            }
+
+            .service-btn {
+                font-size: 1rem;
+                padding: 0.875rem 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header-left">
-                <h1>🙏 神務服務</h1>
-                <p id="welcomeMessage" class="subtitle"></p>
+    <!-- 頂部導航 -->
+    <div class="service-header">
+        <h1>🙏 神務服務</h1>
+        <div class="header-buttons">
+            <button onclick="window.location.href='/'" class="btn-logout">首頁</button>
+            <button id="logoutBtn" class="btn-logout">登出</button>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div class="service-container">
+        <div class="service-box">
+            <div class="service-menu">
+                <button class="service-btn" onclick="window.location.href='/service/DD.html'">線上點燈</button>
+                <button class="service-btn" onclick="window.location.href='/service/ND.html'">年斗法會</button>
+                <button class="service-btn" onclick="window.location.href='/service/LD.html'">禮斗法會</button>
+                <button class="service-btn" onclick="window.location.href='/service/ZY.html'">中元法會</button>
+                <button class="service-btn" onclick="window.location.href='/service/PS.html'">普施法會</button>
+                <button class="service-btn" onclick="window.location.href='/service/QJ.html'">秋祭法會</button>
             </div>
-            <div class="header-actions">
-                <button onclick="window.location.href='/'" class="btn-secondary" style="margin-right: 0.5rem;">首頁</button>
-                <button id="logoutBtn" class="btn-logout">登出</button>
-            </div>
-        </header>
+        </div>
+    </div>
 
-        <main class="main-content">
-            <div id="loadingIndicator" class="loading">
-                <div class="spinner"></div>
-                <p>載入中...</p>
-            </div>
-
-            <div id="serviceGrid" class="module-grid" style="display: none;">
-                <div class="module-card" data-service="ceremony">
-                    <div class="module-icon">🕯️</div>
-                    <div class="module-title">法會報名</div>
-                    <div class="module-desc">線上報名參加各類法會活動</div>
-                </div>
-
-                <div class="module-card" data-service="order">
-                    <div class="module-icon">📝</div>
-                    <div class="module-title">服務單管理</div>
-                    <div class="module-desc">提交與追蹤服務申請單</div>
-                </div>
-
-                <div class="module-card" data-service="merit">
-                    <div class="module-icon">💰</div>
-                    <div class="module-title">功德登記</div>
-                    <div class="module-desc">登記善款與功德項目</div>
-                </div>
-
-                <div class="module-card" data-service="blessing">
-                    <div class="module-icon">🏮</div>
-                    <div class="module-title">祈福點燈</div>
-                    <div class="module-desc">線上點燈祈福服務</div>
-                </div>
-
-                <div class="module-card" data-service="query">
-                    <div class="module-icon">🔍</div>
-                    <div class="module-title">法會查詢</div>
-                    <div class="module-desc">查詢法會時間與詳細資訊</div>
-                </div>
-
-                <div class="module-card" data-service="history">
-                    <div class="module-icon">📋</div>
-                    <div class="module-title">服務記錄</div>
-                    <div class="module-desc">查看個人服務歷史記錄</div>
-                </div>
-            </div>
-        </main>
-
-        <div class="bottom-nav">
-            <div class="bottom-nav-items">
-                <a href="/" class="bottom-nav-item">
-                    <span class="icon">🏠</span>
-                    <span>首頁</span>
-                </a>
-                <a href="/checkin/index.html" class="bottom-nav-item">
-                    <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
-                    <span>簽到</span>
-                </a>
-                <a href="/service/index.html" class="bottom-nav-item active">
-                    <span class="icon">🙏</span>
-                    <span>神務</span>
-                </a>
-                <a href="/schedule/index.html" class="bottom-nav-item">
-                    <span class="icon">📅</span>
-                    <span>排班</span>
-                </a>
-            </div>
+    <!-- 底部導航欄 -->
+    <div class="bottom-nav">
+        <div class="bottom-nav-items">
+            <a href="/" class="bottom-nav-item">
+                <span class="icon">🏠</span>
+                <span>首頁</span>
+            </a>
+            <a href="/checkin/index.html" class="bottom-nav-item">
+                <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                <span>簽到</span>
+            </a>
+            <a href="/service/index.html" class="bottom-nav-item active">
+                <span class="icon">🙏</span>
+                <span>神務</span>
+            </a>
+            <a href="/schedule/index.html" class="bottom-nav-item">
+                <span class="icon">📅</span>
+                <span>排班</span>
+            </a>
         </div>
     </div>
 
@@ -94,47 +190,17 @@
 
         (async function init() {
             try {
-                const { userData } = await checkAuth({
-                    requiredRoles: ['poweruser_service', 'admin_service', 'superadmin'],
-                    onSuccess: ({ userData }) => {
-                        const welcomeMessage = document.getElementById('welcomeMessage');
-                        if (welcomeMessage && userData.displayName) {
-                            welcomeMessage.textContent = `歡迎，${userData.displayName}`;
-                        }
-                        
-                        document.getElementById('loadingIndicator').style.display = 'none';
-                        document.getElementById('serviceGrid').style.display = 'grid';
-                    }
+                await checkAuth({
+                    requiredRoles: ['poweruser_service', 'admin_service', 'superadmin']
                 });
 
+                // 登出按鈕
                 document.getElementById('logoutBtn').addEventListener('click', logout);
 
-                document.querySelectorAll('.module-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        const service = this.dataset.service;
-                        handleServiceClick(service);
-                    });
-                });
-
             } catch (error) {
-                console.error('初始化失敗:', error);
-                document.getElementById('loadingIndicator').innerHTML = 
-                    '<p style="color: var(--text-secondary);">載入失敗，請重新整理頁面</p>';
+                console.error('驗證失敗:', error);
             }
         })();
-
-        function handleServiceClick(service) {
-            const serviceNames = {
-                ceremony: '法會報名',
-                order: '服務單管理',
-                merit: '功德登記',
-                blessing: '祈福點燈',
-                query: '法會查詢',
-                history: '服務記錄'
-            };
-
-            alert(`${serviceNames[service]}功能開發中\n\n此模組將於第三階段開發完成`);
-        }
     </script>
 </body>
 </html>
