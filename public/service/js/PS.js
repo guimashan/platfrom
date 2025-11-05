@@ -199,7 +199,7 @@ function createApplicantCard(name = '', canRemove = true) {
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="puzhuo-${cardId}" style="min-width: 100px; margin-bottom: 0;">普桌</label>
                     <span style="color: #666; white-space: nowrap;">數量</span>
-                    <input type="number" id="puzhuo-${cardId}" class="input-field donation-amount" min="0" step="1" placeholder="0" style="flex: 1;">
+                    <input type="number" id="puzhuo-${cardId}" class="input-field donation-amount" min="0" step="1" placeholder="0" style="flex: 1; text-align: center;">
                 </div>
             </div>
             
@@ -207,7 +207,7 @@ function createApplicantCard(name = '', canRemove = true) {
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="rice-${cardId}" style="min-width: 100px; margin-bottom: 0;">白米</label>
                     <span style="color: #666; white-space: nowrap;">NT$</span>
-                    <input type="number" id="rice-${cardId}" class="input-field donation-amount" min="0" step="100" placeholder="0" style="flex: 1;">
+                    <input type="number" id="rice-${cardId}" class="input-field donation-amount" min="0" step="100" placeholder="0" style="flex: 1; text-align: center;">
                 </div>
             </div>
             
@@ -215,7 +215,7 @@ function createApplicantCard(name = '', canRemove = true) {
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="donation-${cardId}" style="min-width: 100px; margin-bottom: 0;">隨喜功德</label>
                     <span style="color: #666; white-space: nowrap;">NT$</span>
-                    <input type="number" id="donation-${cardId}" class="input-field donation-amount" min="0" step="100" placeholder="0" style="flex: 1;">
+                    <input type="number" id="donation-${cardId}" class="input-field donation-amount" min="0" step="100" placeholder="0" style="flex: 1; text-align: center;">
                 </div>
             </div>
 
