@@ -197,11 +197,11 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px;">
+                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px;">
+                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px;">
+                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
                                 <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
@@ -369,11 +369,11 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px;">
+                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px;">
+                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px;">
+                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
                                 <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
