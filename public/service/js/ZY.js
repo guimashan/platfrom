@@ -194,31 +194,39 @@ function createCategoryCard(category) {
                     <div class="form-group">
                         <label>生辰 (國曆)</label>
                         <div style="margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap;">國曆:</span>
-                                <input type="date" class="input-field" data-field="birthDate" style="flex: 1;">
+                                <input type="number" class="input-field solar-year" data-target="birthDate" placeholder="年" min="1900" max="2100" style="width: 70px;">
+                                <span>年</span>
+                                <input type="number" class="input-field solar-month" data-target="birthDate" placeholder="月" min="1" max="12" style="width: 50px;">
+                                <span>月</span>
+                                <input type="number" class="input-field solar-day" data-target="birthDate" placeholder="日" min="1" max="31" style="width: 50px;">
+                                <span>日</span>
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;">
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap;">農曆:</span>
-                            <input type="number" class="input-field" data-field="birthLunarYear" placeholder="年" min="1" style="width: 70px;">
-                            <input type="number" class="input-field" data-field="birthLunarMonth" placeholder="月" min="1" max="12" style="width: 60px;">
-                            <input type="number" class="input-field" data-field="birthLunarDay" placeholder="日" min="1" max="31" style="width: 60px;">
+                            <div class="lunar-display" data-field="birthLunar" style="color: #666;"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>忌日 (國曆)</label>
                         <div style="margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap;">國曆:</span>
-                                <input type="date" class="input-field" data-field="deathDate" style="flex: 1;">
+                                <input type="number" class="input-field solar-year" data-target="deathDate" placeholder="年" min="1900" max="2100" style="width: 70px;">
+                                <span>年</span>
+                                <input type="number" class="input-field solar-month" data-target="deathDate" placeholder="月" min="1" max="12" style="width: 50px;">
+                                <span>月</span>
+                                <input type="number" class="input-field solar-day" data-target="deathDate" placeholder="日" min="1" max="31" style="width: 50px;">
+                                <span>日</span>
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;">
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap;">農曆:</span>
-                            <input type="number" class="input-field" data-field="deathLunarYear" placeholder="年" min="1" style="width: 70px;">
-                            <input type="number" class="input-field" data-field="deathLunarMonth" placeholder="月" min="1" max="12" style="width: 60px;">
-                            <input type="number" class="input-field" data-field="deathLunarDay" placeholder="日" min="1" max="31" style="width: 60px;">
+                            <div class="lunar-display" data-field="deathLunar" style="color: #666;"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -324,31 +332,39 @@ function createCategoryCard(category) {
                     <div class="form-group">
                         <label>生辰 (國曆)</label>
                         <div style="margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap;">國曆:</span>
-                                <input type="date" class="input-field" data-field="birthDate" style="flex: 1;">
+                                <input type="number" class="input-field solar-year" data-target="birthDate" placeholder="年" min="1900" max="2100" style="width: 70px;">
+                                <span>年</span>
+                                <input type="number" class="input-field solar-month" data-target="birthDate" placeholder="月" min="1" max="12" style="width: 50px;">
+                                <span>月</span>
+                                <input type="number" class="input-field solar-day" data-target="birthDate" placeholder="日" min="1" max="31" style="width: 50px;">
+                                <span>日</span>
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;">
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap;">農曆:</span>
-                            <input type="number" class="input-field" data-field="birthLunarYear" placeholder="年" min="1" style="width: 70px;">
-                            <input type="number" class="input-field" data-field="birthLunarMonth" placeholder="月" min="1" max="12" style="width: 60px;">
-                            <input type="number" class="input-field" data-field="birthLunarDay" placeholder="日" min="1" max="31" style="width: 60px;">
+                            <div class="lunar-display" data-field="birthLunar" style="color: #666;"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>忌日 (國曆)</label>
                         <div style="margin-bottom: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap;">國曆:</span>
-                                <input type="date" class="input-field" data-field="deathDate" style="flex: 1;">
+                                <input type="number" class="input-field solar-year" data-target="deathDate" placeholder="年" min="1900" max="2100" style="width: 70px;">
+                                <span>年</span>
+                                <input type="number" class="input-field solar-month" data-target="deathDate" placeholder="月" min="1" max="12" style="width: 50px;">
+                                <span>月</span>
+                                <input type="number" class="input-field solar-day" data-target="deathDate" placeholder="日" min="1" max="31" style="width: 50px;">
+                                <span>日</span>
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;">
                             </div>
                         </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap;">農曆:</span>
-                            <input type="number" class="input-field" data-field="deathLunarYear" placeholder="年" min="1" style="width: 70px;">
-                            <input type="number" class="input-field" data-field="deathLunarMonth" placeholder="月" min="1" max="12" style="width: 60px;">
-                            <input type="number" class="input-field" data-field="deathLunarDay" placeholder="日" min="1" max="31" style="width: 60px;">
+                            <div class="lunar-display" data-field="deathLunar" style="color: #666;"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -402,6 +418,19 @@ function createCategoryCard(category) {
         });
     }
 
+    // 農曆轉換（僅 zuxian 和 qita 需要）
+    if (category === 'zuxian' || category === 'qita') {
+        // 監聽年月日輸入框的變化
+        card.querySelectorAll('.solar-year, .solar-month, .solar-day').forEach(input => {
+            input.addEventListener('input', () => handleSolarInputChange(card, input.getAttribute('data-target')));
+        });
+
+        // 監聽日期選擇器的變化
+        card.querySelectorAll('.date-picker-trigger').forEach(picker => {
+            picker.addEventListener('change', (e) => handleDatePickerChange(card, e.target));
+        });
+    }
+
     calculateTotal();
 }
 
@@ -416,6 +445,87 @@ function getCategoryDisplayName(category) {
         'qita': '其他'
     };
     return names[category] || category;
+}
+
+// --- 處理日期選擇器變化 ---
+function handleDatePickerChange(card, picker) {
+    const target = picker.getAttribute('data-target');
+    const dateValue = picker.value;
+    
+    if (!dateValue) return;
+    
+    const dateObj = new Date(dateValue);
+    const year = dateObj.getFullYear();
+    const month = dateObj.getMonth() + 1;
+    const day = dateObj.getDate();
+    
+    // 填入年月日輸入框
+    const yearInput = card.querySelector(`.solar-year[data-target="${target}"]`);
+    const monthInput = card.querySelector(`.solar-month[data-target="${target}"]`);
+    const dayInput = card.querySelector(`.solar-day[data-target="${target}"]`);
+    
+    if (yearInput) yearInput.value = year;
+    if (monthInput) monthInput.value = month;
+    if (dayInput) dayInput.value = day;
+    
+    // 轉換農曆
+    convertToLunar(card, target, year, month, day);
+}
+
+// --- 處理年月日輸入框變化 ---
+function handleSolarInputChange(card, target) {
+    const yearInput = card.querySelector(`.solar-year[data-target="${target}"]`);
+    const monthInput = card.querySelector(`.solar-month[data-target="${target}"]`);
+    const dayInput = card.querySelector(`.solar-day[data-target="${target}"]`);
+    
+    if (!yearInput || !monthInput || !dayInput) return;
+    
+    const year = parseInt(yearInput.value);
+    const month = parseInt(monthInput.value);
+    const day = parseInt(dayInput.value);
+    
+    // 檢查是否都有值
+    if (!year || !month || !day) {
+        const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
+        const displayEl = card.querySelector(`[data-field="${lunarField}"]`);
+        if (displayEl) displayEl.textContent = '';
+        return;
+    }
+    
+    // 轉換農曆
+    convertToLunar(card, target, year, month, day);
+}
+
+// --- 農曆轉換 ---
+function convertToLunar(card, target, year, month, day) {
+    try {
+        const dateObj = new Date(year, month - 1, day);
+        
+        // 檢查日期是否有效
+        if (dateObj.getFullYear() !== year || dateObj.getMonth() !== month - 1 || dateObj.getDate() !== day) {
+            const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
+            const displayEl = card.querySelector(`[data-field="${lunarField}"]`);
+            if (displayEl) displayEl.textContent = '日期無效';
+            return;
+        }
+        
+        const lunarObj = window.Lunar.fromDate(dateObj);
+        const lunarYear = year - 1911; // 轉民國年
+        const lunarMonth = lunarObj.getMonth();
+        const lunarDay = lunarObj.getDay();
+        
+        const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
+        const displayEl = card.querySelector(`[data-field="${lunarField}"]`);
+        
+        if (displayEl) {
+            displayEl.textContent = `民國 ${lunarYear} 年 農曆 ${lunarMonth} 月 ${lunarDay} 日`;
+        }
+    } catch (error) {
+        console.error('農曆轉換失敗:', error);
+        const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
+        const displayEl = card.querySelector(`[data-field="${lunarField}"]`);
+        if (displayEl) displayEl.textContent = '轉換失敗';
+    }
 }
 
 // --- 計算總金額 ---
