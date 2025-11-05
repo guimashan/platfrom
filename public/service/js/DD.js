@@ -342,7 +342,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 1.15rem; font-weight: 500;">安太歲</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1rem;">數量：</span>
-                    <input type="number" class="input-field light-count" data-light-name="安太歲" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center; background-color: #f5f1e8;">
+                    <input type="number" class="input-field light-count" data-light-name="安太歲" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center;">
                 </div>
             </div>
             
@@ -350,7 +350,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 1.15rem; font-weight: 500;">元辰燈</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1rem;">數量：</span>
-                    <input type="number" class="input-field light-count" data-light-name="元辰燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center; background-color: #f5f1e8;">
+                    <input type="number" class="input-field light-count" data-light-name="元辰燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center;">
                 </div>
             </div>
             
@@ -358,7 +358,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 1.15rem; font-weight: 500;">文昌燈</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1rem;">數量：</span>
-                    <input type="number" class="input-field light-count" data-light-name="文昌燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center; background-color: #f5f1e8;">
+                    <input type="number" class="input-field light-count" data-light-name="文昌燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center;">
                 </div>
             </div>
             
@@ -366,7 +366,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 1.15rem; font-weight: 500;">財利燈</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1rem;">數量：</span>
-                    <input type="number" class="input-field light-count" data-light-name="財利燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center; background-color: #f5f1e8;">
+                    <input type="number" class="input-field light-count" data-light-name="財利燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center;">
                 </div>
             </div>
             
@@ -374,7 +374,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 1.15rem; font-weight: 500;">光明燈</span>
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <span style="font-size: 1rem;">數量：</span>
-                    <input type="number" class="input-field light-count" data-light-name="光明燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center; background-color: #f5f1e8;">
+                    <input type="number" class="input-field light-count" data-light-name="光明燈" value="0" min="0" style="width: 180px; height: 56px; font-size: 1.1rem; text-align: center;">
                 </div>
             </div>
             
