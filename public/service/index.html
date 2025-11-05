@@ -8,273 +8,82 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <style>
-        .service-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1.5rem;
-            min-height: 100vh;
-            background-color: var(--bg-cream);
-        }
-
-        .page-header {
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            color: white;
-            padding: 1.5rem;
-            border-radius: var(--radius-lg);
-            margin-bottom: 2rem;
-            box-shadow: var(--shadow-md);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .header-left h1 {
-            margin: 0;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .header-left p {
-            margin: 0.25rem 0 0 0;
-            opacity: 0.95;
-            font-size: 0.9rem;
-        }
-
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .header-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1.5px solid rgba(255, 255, 255, 0.6);
-            padding: 0.625rem 1.25rem;
-            font-size: 0.9rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            font-family: 'Noto Sans TC', sans-serif;
-        }
-
-        .header-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: white;
-            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
-            transform: translateY(-1px);
-        }
-
-        .section-title {
-            text-align: center;
-            margin: 2rem 0 1.5rem;
-        }
-
-        .section-title h2 {
-            color: var(--primary-gold-dark);
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .section-title p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .service-card {
-            background: linear-gradient(135deg, var(--bg-card) 0%, #FFFBF5 100%);
-            border: 2px solid rgba(212, 175, 55, 0.2);
-            border-radius: var(--radius-md);
-            padding: 2rem 1.5rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(184, 148, 31, 0.15) 100%);
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 0;
-        }
-
-        .service-card:hover::before {
-            left: 0;
-        }
-
-        .service-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--primary-gold);
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.25), 
-                        0 0 20px rgba(212, 175, 55, 0.15);
-        }
-
-        .service-icon {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            position: relative;
-            z-index: 1;
-            filter: drop-shadow(0 2px 4px rgba(212, 175, 55, 0.3));
-            transition: transform 0.3s ease;
-        }
-
-        .service-card:hover .service-icon {
-            transform: scale(1.1);
-        }
-
-        .service-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .service-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            position: relative;
-            z-index: 1;
-        }
-
-        .service-badge {
-            display: inline-block;
-            padding: 0.375rem 0.875rem;
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            color: white;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-top: 1rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (max-width: 768px) {
-            .service-container {
-                padding: 1rem;
-            }
-
-            .page-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
-
-            .header-actions {
-                width: 100%;
-            }
-
-            .header-btn {
-                flex: 1;
-            }
-
-            .service-grid {
-                grid-template-columns: 1fr;
-                gap: 1rem;
-            }
-
-            .section-title h2 {
-                font-size: 1.5rem;
-            }
-
-            .service-card {
-                padding: 1.5rem 1rem;
-            }
-
-            .service-icon {
-                font-size: 3rem;
-            }
-        }
-    </style>
 </head>
 <body>
-    <div class="service-container">
-        <div class="page-header">
+    <div class="container">
+        <header class="header">
             <div class="header-left">
                 <h1>🙏 神務服務</h1>
-                <p id="welcomeMessage"></p>
+                <p id="welcomeMessage" class="subtitle"></p>
             </div>
             <div class="header-actions">
-                <button class="header-btn" onclick="window.location.href='/'">首頁</button>
-                <button id="logoutBtn" class="header-btn">登出</button>
+                <button onclick="window.location.href='/'" class="btn-secondary" style="margin-right: 0.5rem;">首頁</button>
+                <button id="logoutBtn" class="btn-logout">登出</button>
             </div>
-        </div>
+        </header>
 
-        <div id="loadingIndicator" class="loading">
-            <div class="spinner"></div>
-            <p>載入中...</p>
-        </div>
-
-        <div id="serviceContent" style="display: none;">
-            <div class="section-title">
-                <h2>神務服務項目</h2>
-                <p>為信眾提供便利的線上神務服務</p>
+        <main class="main-content">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>載入中...</p>
             </div>
 
-            <div class="service-grid">
-                <a href="/service/DD.html" class="service-card" data-service="DD">
-                    <div class="service-icon">🕯️</div>
-                    <div class="service-title">線上點燈</div>
-                    <div class="service-desc">線上祈福點燈服務</div>
-                    <div class="service-badge">開發中</div>
-                </a>
+            <div id="serviceGrid" class="module-grid" style="display: none;">
+                <div class="module-card" data-service="ceremony">
+                    <div class="module-icon">🕯️</div>
+                    <div class="module-title">法會報名</div>
+                    <div class="module-desc">線上報名參加各類法會活動</div>
+                </div>
 
-                <a href="/service/ND.html" class="service-card" data-service="ND">
-                    <div class="service-icon">⭐</div>
-                    <div class="service-title">年斗法會</div>
-                    <div class="service-desc">新春安太歲祈福法會</div>
-                    <div class="service-badge">開發中</div>
-                </a>
+                <div class="module-card" data-service="order">
+                    <div class="module-icon">📝</div>
+                    <div class="module-title">服務單管理</div>
+                    <div class="module-desc">提交與追蹤服務申請單</div>
+                </div>
 
-                <a href="/service/LD.html" class="service-card" data-service="LD">
-                    <div class="service-icon">🌟</div>
-                    <div class="service-title">禮斗法會</div>
-                    <div class="service-desc">禮拜斗首消災祈福</div>
-                    <div class="service-badge">開發中</div>
-                </a>
+                <div class="module-card" data-service="merit">
+                    <div class="module-icon">💰</div>
+                    <div class="module-title">功德登記</div>
+                    <div class="module-desc">登記善款與功德項目</div>
+                </div>
 
-                <a href="/service/ZY.html" class="service-card" data-service="ZY">
-                    <div class="service-icon">🌕</div>
-                    <div class="service-title">中元法會</div>
-                    <div class="service-desc">中元普渡超度法會</div>
-                    <div class="service-badge">開發中</div>
-                </a>
+                <div class="module-card" data-service="blessing">
+                    <div class="module-icon">🏮</div>
+                    <div class="module-title">祈福點燈</div>
+                    <div class="module-desc">線上點燈祈福服務</div>
+                </div>
 
-                <a href="/service/PS.html" class="service-card" data-service="PS">
-                    <div class="service-icon">🙏</div>
-                    <div class="service-title">普施法會</div>
-                    <div class="service-desc">普施孤魂超度法會</div>
-                    <div class="service-badge">開發中</div>
-                </a>
+                <div class="module-card" data-service="query">
+                    <div class="module-icon">🔍</div>
+                    <div class="module-title">法會查詢</div>
+                    <div class="module-desc">查詢法會時間與詳細資訊</div>
+                </div>
 
-                <a href="/service/QJ.html" class="service-card" data-service="QJ">
-                    <div class="service-icon">🍂</div>
-                    <div class="service-title">秋祭法會</div>
-                    <div class="service-desc">秋季祭祖追思法會</div>
-                    <div class="service-badge">開發中</div>
+                <div class="module-card" data-service="history">
+                    <div class="module-icon">📋</div>
+                    <div class="module-title">服務記錄</div>
+                    <div class="module-desc">查看個人服務歷史記錄</div>
+                </div>
+            </div>
+        </main>
+
+        <div class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="/" class="bottom-nav-item">
+                    <span class="icon">🏠</span>
+                    <span>首頁</span>
+                </a>
+                <a href="/checkin/index.html" class="bottom-nav-item">
+                    <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                    <span>簽到</span>
+                </a>
+                <a href="/service/index.html" class="bottom-nav-item active">
+                    <span class="icon">🙏</span>
+                    <span>神務</span>
+                </a>
+                <a href="/schedule/index.html" class="bottom-nav-item">
+                    <span class="icon">📅</span>
+                    <span>排班</span>
                 </a>
             </div>
         </div>
@@ -294,11 +103,18 @@
                         }
                         
                         document.getElementById('loadingIndicator').style.display = 'none';
-                        document.getElementById('serviceContent').style.display = 'block';
+                        document.getElementById('serviceGrid').style.display = 'grid';
                     }
                 });
 
                 document.getElementById('logoutBtn').addEventListener('click', logout);
+
+                document.querySelectorAll('.module-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        const service = this.dataset.service;
+                        handleServiceClick(service);
+                    });
+                });
 
             } catch (error) {
                 console.error('初始化失敗:', error);
@@ -306,6 +122,19 @@
                     '<p style="color: var(--text-secondary);">載入失敗，請重新整理頁面</p>';
             }
         })();
+
+        function handleServiceClick(service) {
+            const serviceNames = {
+                ceremony: '法會報名',
+                order: '服務單管理',
+                merit: '功德登記',
+                blessing: '祈福點燈',
+                query: '法會查詢',
+                history: '服務記錄'
+            };
+
+            alert(`${serviceNames[service]}功能開發中\n\n此模組將於第三階段開發完成`);
+        }
     </script>
 </body>
 </html>
