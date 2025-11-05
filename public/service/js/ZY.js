@@ -209,21 +209,21 @@ function createCategoryCard(category) {
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
@@ -381,21 +381,21 @@ function createCategoryCard(category) {
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
@@ -603,15 +603,15 @@ function convertToLunar(card, target, year, month, day) {
         if (westernMonth) westernMonth.textContent = month;
         if (westernDay) westernDay.textContent = day;
         
-        // 轉換並顯示農曆
+        // 轉換並顯示農曆（使用中文）
         const lunarObj = window.Lunar.fromDate(dateObj);
         const lunarYear = card.querySelector(`.lunar-year[data-target="${target}"]`);
         const lunarMonth = card.querySelector(`.lunar-month[data-target="${target}"]`);
         const lunarDay = card.querySelector(`.lunar-day[data-target="${target}"]`);
         
-        if (lunarYear) lunarYear.textContent = lunarObj.getYear();
-        if (lunarMonth) lunarMonth.textContent = lunarObj.getMonth();
-        if (lunarDay) lunarDay.textContent = lunarObj.getDay();
+        if (lunarYear) lunarYear.textContent = lunarObj.getYearInGanZhi();  // 干支年，如"壬寅"
+        if (lunarMonth) lunarMonth.textContent = lunarObj.getMonthInChinese();  // 中文月份，如"二"
+        if (lunarDay) lunarDay.textContent = lunarObj.getDayInChinese();  // 中文日期，如"十八"
         
     } catch (error) {
         console.error('農曆轉換失敗:', error);
