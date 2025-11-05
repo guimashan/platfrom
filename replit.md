@@ -378,20 +378,21 @@ npm run emulators
 |------|---------|--------------|--------------|------|
 | DD | 線上點燈 | `"dd"` | DD-YYYYMMDD-XXXX | ✅ |
 | ND | 年斗法會 | `"nd"` | ND-YYYYMMDD-XXXX | ✅ |
-| LD | 禮斗法會 | `"lidou"` | LD-YYYYMMDD-XXXX | ✅ |
-| QJ | 秋祭法會 | `"qiuji"` | QJ-YYYYMMDD-XXXX | ✅ |
-| PS | 普施法會 | `"pushi"` | PS-YYYYMMDD-XXXX | ✅ |
-| BG | 建宮廟款 | `"build"` | BG-YYYYMMDD-XXXX | ✅ |
-| XY | 添香油 | `"xiangyou"` | XY-YYYYMMDD-XXXX | ✅ |
-| ZY | 中元法會 | `"zhongyuan"` | ZY-YYYYMMDD-XXXX | ✅ |
-| FTP | 福田會 個人 | `"futian"` | FT-YYYYMMDD-XXXX | ✅ |
-| FTY | 福田少年會 個人 | `"futian_youth"` | FTY-YYYYMMDD-XXXX | ✅ |
-| FTC | 福田會 企業團體 | `"futian_corporate"` | FTC-YYYYMMDD-XXXX | ✅ |
+| LD | 禮斗法會 | `"ld"` | LD-YYYYMMDD-XXXX | ✅ |
+| QJ | 秋祭法會 | `"qj"` | QJ-YYYYMMDD-XXXX | ✅ |
+| PS | 普施法會 | `"ps"` | PS-YYYYMMDD-XXXX | ✅ |
+| BG | 建宮廟款 | `"bg"` | BG-YYYYMMDD-XXXX | ✅ |
+| XY | 添香油 | `"xy"` | XY-YYYYMMDD-XXXX | ✅ |
+| ZY | 中元法會 | `"zy"` | ZY-YYYYMMDD-XXXX | ✅ |
+| FTP | 福田會 個人 | `"ftp"` | FTP-YYYYMMDD-XXXX | ✅ |
+| FTY | 福田少年會 個人 | `"fty"` | FTY-YYYYMMDD-XXXX | ✅ |
+| FTC | 福田會 企業團體 | `"ftc"` | FTC-YYYYMMDD-XXXX | ✅ |
 
 **命名規範說明**：
-- 🔹 **SERVICE_TYPE**（內部識別碼）：使用**小寫**（如 `"dd"`, `"futian"`）
-- 🔹 **訂單編號前綴**（用戶可見）：使用**大寫**（如 `DD-`, `FT-`）
+- 🔹 **SERVICE_TYPE**（內部識別碼）：統一使用**2-3個字母的簡短小寫**（如 `"dd"`, `"ftp"`）
+- 🔹 **訂單編號前綴**（用戶可見）：使用**大寫**（如 `DD-`, `FTP-`）
 - 🔹 後端 Cloud Functions 透過 typeCodeMap 自動轉換：小寫 key → 大寫前綴
+- 🔹 **統一規範**：避免使用中文拼音全拼（如 `lidou`、`xiangyou`），改用簡短代碼（如 `ld`、`xy`）
 
 **技術亮點**：
 - ✅ **建立三種可複用模板**：標準多人報名、類別卡片、分期付款
@@ -412,9 +413,9 @@ npm run emulators
 
 **後端支援**：
 - ✅ **訂單代碼映射**（Cloud Functions typeCodeMap）：
-  - `'dd': 'DD'`, `'nd': 'ND'`, `'lidou': 'LD'`, `'qiuji': 'QJ'`
-  - `'pushi': 'PS'`, `'build': 'BG'`, `'xiangyou': 'XY'`, `'zhongyuan': 'ZY'`
-  - `'futian': 'FT'`, `'futian_youth': 'FTY'`, `'futian_corporate': 'FTC'`
+  - `'dd': 'DD'`, `'nd': 'ND'`, `'ld': 'LD'`, `'qj': 'QJ'`
+  - `'ps': 'PS'`, `'bg': 'BG'`, `'xy': 'XY'`, `'zy': 'ZY'`
+  - `'ftp': 'FTP'`, `'fty': 'FTY'`, `'ftc': 'FTC'`
 - ✅ submitRegistration 函數自動支援所有服務類型
 - ✅ 雙集合架構：registrations + temp_payment_secrets
 - ✅ 訂單編號自動生成（帶流水號）
