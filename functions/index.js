@@ -6,7 +6,6 @@
 const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
-const serviceFunctions = require('./src/service');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -27,9 +26,3 @@ exports.getDashboardStats = checkinFunctions.getDashboardStats;
 
 // 導出 LINE Messaging API Functions
 exports.lineWebhook = messagingFunctions.lineWebhook;
-
-// 導出 Service Functions (神務服務)
-exports.submitRegistration = serviceFunctions.submitRegistration;
-exports.getRegistrations = serviceFunctions.getRegistrations;
-exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
-exports.confirmPayment = serviceFunctions.confirmPayment;

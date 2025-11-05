@@ -19,11 +19,6 @@ let currentMode = 'gps';
             requiredRoles: ['user', 'poweruser_checkin', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
             onSuccess: ({ user, userData }) => {
                 currentUser = user;
-                
-                // 認證成功：隱藏登入提示，顯示主要內容
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
                 const userName = document.getElementById('userName');
                 if (userName) {
                     userName.textContent = `歡迎，${userData.displayName || '使用者'}`;

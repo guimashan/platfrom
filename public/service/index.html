@@ -6,109 +6,30 @@
     <title>神務服務 - 龜馬山 goLine</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <style>
-        .service-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .service-card {
-            background: white;
-            border-radius: 16px;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-            cursor: pointer;
-            border: 2px solid transparent;
-        }
-
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2);
-            border-color: var(--primary-gold);
-        }
-
-        .service-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
-        }
-
-        .service-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-        }
-
-        .service-desc {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        @media (max-width: 768px) {
-            .service-grid {
-                grid-template-columns: 1fr;
-                padding: 15px;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
         <header class="header">
             <div class="header-left">
-                <h1>🙏 神務服務</h1>
-                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
+                <h1>📋 神務服務</h1>
+                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: #666;"></p>
             </div>
-            <div class="header-actions" style="display: flex; gap: 10px;">
-                <button class="btn-secondary" onclick="window.location.href='/'">首頁</button>
+            <div class="header-actions">
                 <button id="logoutBtn" class="btn-logout">登出</button>
             </div>
         </header>
 
         <main class="main-content">
-            <div class="service-grid">
-                <div class="service-card" onclick="window.location.href='DD.html'">
-                    <div class="service-icon">🕯️</div>
-                    <div class="service-title">線上點燈</div>
-                    <div class="service-desc">為自己與家人祈福點燈</div>
-                </div>
-
-                <div class="service-card" onclick="window.location.href='ND.html'">
-                    <div class="service-icon">⭐</div>
-                    <div class="service-title">年斗法會</div>
-                    <div class="service-desc">新春安太歲祈福法會</div>
-                </div>
-
-                <div class="service-card" onclick="window.location.href='LD.html'">
-                    <div class="service-icon">🌟</div>
-                    <div class="service-title">禮斗法會</div>
-                    <div class="service-desc">元辰光彩禮斗祈福</div>
-                </div>
-
-                <div class="service-card" onclick="window.location.href='ZY.html'">
-                    <div class="service-icon">🌕</div>
-                    <div class="service-title">中元法會</div>
-                    <div class="service-desc">超拔祖先冤親債主</div>
-                </div>
-
-                <div class="service-card" onclick="window.location.href='PS.html'">
-                    <div class="service-icon">🙏</div>
-                    <div class="service-title">普施法會</div>
-                    <div class="service-desc">普施功德迴向</div>
-                </div>
-
-                <div class="service-card" onclick="window.location.href='QJ.html'">
-                    <div class="service-icon">🍂</div>
-                    <div class="service-title">秋祭法會</div>
-                    <div class="service-desc">秋季祭祖法會</div>
-                </div>
+            <div class="welcome-card" style="text-align: center; padding: 60px 20px;">
+                <h2 style="font-size: 48px; margin-bottom: 20px;">🚧</h2>
+                <h3 style="color: #666; margin-bottom: 30px;">神務服務系統開發中</h3>
+                <p style="color: #999; line-height: 1.8;">
+                    此模組將提供法會報名、服務單管理等功能<br>
+                    預計於第三階段開發完成
+                </p>
+                <button class="btn btn-primary" onclick="window.location.href='/'" style="margin-top: 30px;">
+                    返回首頁
+                </button>
             </div>
         </main>
     </div>
@@ -118,7 +39,7 @@
 
         (async function init() {
             try {
-                await checkAuth({
+                const { userData } = await checkAuth({
                     requiredRoles: ['poweruser_service', 'admin_service', 'superadmin'],
                     onSuccess: ({ userData }) => {
                         const userName = document.getElementById('userName');

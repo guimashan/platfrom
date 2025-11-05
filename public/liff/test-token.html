@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFF Token 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .log {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+        .error { background: #ffebee; color: #c62828; }
+        .success { background: #e8f5e9; color: #2e7d32; }
+        button {
+            background: #8A2BE2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 LIFF Token 交换测试</h1>
+    <div id="status"></div>
+    
+    <button onclick="testTokenExchange()">测试 Token 交换</button>
+    <button onclick="location.reload()">重新加载</button>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script>
+        const LIFF_ID = '2008269293-Nl2pZBpV';
+        const TOKEN_URL = 'https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomTokenFromLiff';
+        
+        function log(message, type = 'log') {
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            document.getElementById('status').appendChild(div);
+            console.log(message);
+        }
+        
+        async function testTokenExchange() {
+            document.getElementById('status').innerHTML = '';
+            
+            try {
+                log('步骤 1: 初始化 LIFF...');
+                await liff.init({ liffId: LIFF_ID });
+                log('✅ LIFF 初始化成功', 'success');
+                
+                log('步骤 2: 检查登录状态...');
+                if (!liff.isLoggedIn()) {
+                    log('⚠️ 用户未登录，准备登录...', 'error');
+                    liff.login();
+                    return;
+                }
+                log('✅ 用户已登录', 'success');
+                
+                log('步骤 3: 获取用户资料...');
+                const profile = await liff.getProfile();
+                log(`✅ 用户: ${profile.displayName} (${profile.userId})`, 'success');
+                
+                log('步骤 4: 获取 LIFF ID Token...');
+                const idToken = liff.getIDToken();
+                if (!idToken) {
+                    throw new Error('无法获取 LIFF ID Token');
+                }
+                log(`✅ ID Token (前20字符): ${idToken.substring(0, 20)}...`, 'success');
+                
+                log('步骤 5: 调用 Cloud Function 交换 Firebase Token...');
+                log(`📡 请求 URL: ${TOKEN_URL}`);
+                log(`📦 请求数据: lineUserId=${profile.userId}`);
+                
+                const response = await fetch(TOKEN_URL, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        liffIdToken: idToken,
+                        lineUserId: profile.userId,
+                        displayName: profile.displayName,
+                        pictureUrl: profile.pictureUrl
+                    })
+                });
+                
+                log(`📬 响应状态: ${response.status} ${response.statusText}`);
+                
+                const data = await response.json();
+                log(`📥 响应数据: ${JSON.stringify(data).substring(0, 100)}...`);
+                
+                if (!response.ok || !data.ok) {
+                    throw new Error(data.message || `HTTP ${response.status}`);
+                }
+                
+                log('✅ Firebase Custom Token 获取成功！', 'success');
+                log(`🎟️ Token (前30字符): ${data.customToken.substring(0, 30)}...`, 'success');
+                
+                log('✨ 所有步骤完成！LIFF Token 交换正常工作。', 'success');
+                
+            } catch (error) {
+                log(`❌ 错误: ${error.message}`, 'error');
+                log(`📋 详细信息: ${JSON.stringify(error, null, 2)}`, 'error');
+                if (error.stack) {
+                    log(`📚 Stack: ${error.stack}`, 'error');
+                }
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.addEventListener('load', () => {
+            log('🚀 测试页面已加载');
+            log('点击"测试 Token 交换"按钮开始测试');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>奉香簽到 - 龜馬山 LIFF</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/styles/checkin.css">
+    <style>
+        .liff-header {
+            background: linear-gradient(135deg, #8A2BE2 0%, #9370DB 100%);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .liff-header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+        .user-badge img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="liff-header">
+            <h1>🙏 奉香簽到</h1>
+            <div class="user-badge">
+                <img id="userAvatar" src="/images/default-avatar.svg" alt="用戶頭像">
+                <span id="userName">載入中...</span>
+            </div>
+            <button class="close-btn" onclick="closeWindow()">關閉</button>
+        </header>
+
+        <main class="main-content">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>正在初始化...</p>
+            </div>
+
+            <div id="checkinCard" class="checkin-card" style="display: none;">
+                <h2>奉香簽到</h2>
+                
+                <div class="mode-tabs">
+                    <button id="gpsModeBtn" class="mode-tab active">📍 GPS 簽到</button>
+                    <button id="qrModeBtn" class="mode-tab">📷 QR Code 簽到</button>
+                </div>
+
+                <div id="gpsMode" class="mode-content">
+                    <div id="patrolSelect" class="patrol-select">
+                        <label for="patrolDropdown">選擇巡邏點:</label>
+                        <select id="patrolDropdown" class="form-select">
+                            <option value="">載入中...</option>
+                        </select>
+                    </div>
+
+                    <div id="locationStatus" class="location-status">
+                        <p>準備開始簽到</p>
+                    </div>
+
+                    <button id="checkinBtn" class="btn btn-primary btn-large">
+                        開始 GPS 簽到
+                    </button>
+                </div>
+
+                <div id="qrMode" class="mode-content hidden">
+                    <div id="qrReader" style="width: 100%; max-width: 500px; margin: 20px auto;"></div>
+                    
+                    <div id="qrStatus" class="location-status">
+                        <p>點擊下方按鈕開始掃描</p>
+                    </div>
+
+                    <button id="startQrBtn" class="btn btn-primary btn-large">
+                        📷 開始掃描 QR Code
+                    </button>
+                    <button id="stopQrBtn" class="btn btn-secondary btn-large hidden">
+                        ⏹️ 停止掃描
+                    </button>
+                </div>
+
+                <div id="result" class="result-area hidden"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    
+    <script type="module">
+        import { initLiff, getLiffProfile, closeLiffWindow, sendMessageToChat } from '/js/liff-init.js';
+        import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
+        const LIFF_ID = '2008269293-Nl2pZBpV';
+        
+        let currentUser = null;
+        let selectedPatrol = null;
+        let html5QrCode = null;
+
+        window.closeWindow = closeLiffWindow;
+
+        async function init() {
+            try {
+                console.log('=== LIFF App 開始初始化 ===');
+                console.log('LIFF ID:', LIFF_ID);
+                console.log('當前 URL:', window.location.href);
+                console.log('LIFF SDK 已載入:', typeof liff !== 'undefined');
+                
+                const liffData = await initLiff(LIFF_ID);
+                
+                console.log('LIFF 初始化結果:', liffData);
+                
+                if (!liffData) {
+                    console.log('LIFF 初始化返回 null，可能正在重定向到登入頁面');
+                    return;
+                }
+
+                onAuthStateChanged(platformAuth, async (user) => {
+                    if (user) {
+                        console.log('Firebase 用戶已登入:', user.uid);
+                        currentUser = user;
+                        const profile = getLiffProfile();
+                        
+                        document.getElementById('userName').textContent = profile.displayName;
+                        document.getElementById('userAvatar').src = profile.pictureUrl || '/images/default-avatar.svg';
+                        
+                        document.getElementById('loadingIndicator').style.display = 'none';
+                        document.getElementById('checkinCard').style.display = 'block';
+                        
+                        await loadPatrols();
+                        setupEventListeners();
+                    }
+                });
+
+            } catch (error) {
+                console.error('=== 初始化失敗詳細錯誤 ===');
+                console.error('錯誤類型:', error.name);
+                console.error('錯誤訊息:', error.message);
+                console.error('錯誤堆疊:', error.stack);
+                
+                // 顯示詳細錯誤信息（僅開發環境）
+                const isDev = window.location.hostname.includes('localhost') || 
+                             window.location.hostname.includes('replit');
+                
+                if (isDev) {
+                    alert(`系統初始化失敗\n\n錯誤類型: ${error.name}\n錯誤訊息: ${error.message}\n\n請查看開發者工具的 Console`);
+                } else {
+                    alert('系統初始化失敗，請稍後再試');
+                }
+                
+                // 顯示錯誤頁面
+                document.getElementById('loadingIndicator').innerHTML = `
+                    <div style="color: #ef4444; text-align: center; padding: 2rem;">
+                        <h3>❌ 初始化失敗</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #8A2BE2; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            重新載入
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadPatrols() {
+            try {
+                const idToken = await currentUser.getIdToken();
+                const response = await fetch(API_ENDPOINTS.getPatrols, {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('載入巡邏點失敗');
+
+                const data = await response.json();
+                const patrols = data.patrols || [];
+                
+                const dropdown = document.getElementById('patrolDropdown');
+                dropdown.innerHTML = '<option value="">請選擇巡邏點</option>';
+                
+                patrols.sort((a, b) => {
+                    if (a.name === '辦公室') return -1;
+                    if (b.name === '辦公室') return 1;
+                    return a.name.localeCompare(b.name, 'zh-TW');
+                });
+
+                patrols.forEach(patrol => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify(patrol);
+                    option.textContent = patrol.name;
+                    dropdown.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error('載入巡邏點失敗:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            document.getElementById('patrolDropdown').addEventListener('change', (e) => {
+                if (e.target.value) {
+                    selectedPatrol = JSON.parse(e.target.value);
+                }
+            });
+
+            document.getElementById('checkinBtn').addEventListener('click', handleGpsCheckin);
+            
+            document.getElementById('gpsModeBtn').addEventListener('click', () => switchMode('gps'));
+            document.getElementById('qrModeBtn').addEventListener('click', () => switchMode('qr'));
+        }
+
+        function switchMode(mode) {
+            const gpsModeBtn = document.getElementById('gpsModeBtn');
+            const qrModeBtn = document.getElementById('qrModeBtn');
+            const gpsMode = document.getElementById('gpsMode');
+            const qrMode = document.getElementById('qrMode');
+
+            if (mode === 'gps') {
+                gpsModeBtn.classList.add('active');
+                qrModeBtn.classList.remove('active');
+                gpsMode.classList.remove('hidden');
+                qrMode.classList.add('hidden');
+            } else {
+                qrModeBtn.classList.add('active');
+                gpsModeBtn.classList.remove('active');
+                qrMode.classList.remove('hidden');
+                gpsMode.classList.add('hidden');
+            }
+        }
+
+        async function handleGpsCheckin() {
+            if (!selectedPatrol) {
+                alert('請先選擇巡邏點');
+                return;
+            }
+
+            const btn = document.getElementById('checkinBtn');
+            const status = document.getElementById('locationStatus');
+            
+            btn.disabled = true;
+            status.innerHTML = '<p>🔍 正在取得位置...</p>';
+
+            try {
+                const position = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        enableHighAccuracy: true,
+                        timeout: 10000
+                    });
+                });
+
+                const { latitude, longitude } = position.coords;
+                
+                const idToken = await currentUser.getIdToken();
+                const response = await fetch(API_ENDPOINTS.verifyCheckinV2, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({
+                        patrolId: selectedPatrol.id,
+                        latitude,
+                        longitude
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.ok) {
+                    status.innerHTML = `<p style="color: #10b981;">✅ 簽到成功！${selectedPatrol.name}</p>`;
+                    
+                    await sendMessageToChat([{
+                        type: 'text',
+                        text: `✅ 簽到成功！\n地點：${selectedPatrol.name}\n時間：${new Date().toLocaleString('zh-TW')}`
+                    }]);
+                    
+                    setTimeout(() => {
+                        closeLiffWindow();
+                    }, 2000);
+                } else {
+                    status.innerHTML = `<p style="color: #ef4444;">❌ ${result.message}</p>`;
+                }
+
+            } catch (error) {
+                console.error('簽到失敗:', error);
+                status.innerHTML = `<p style="color: #ef4444;">❌ 簽到失敗：${error.message}</p>`;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
