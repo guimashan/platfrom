@@ -20,7 +20,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "qiuji";
+const SERVICE_TYPE = "qj";
 const POSITION_PRICE = 300;
 let currentUser = null; 
 let userData = null;

@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "futian";
+const SERVICE_TYPE = "ftp";
 const TOTAL_AMOUNT = 30000;
 const PAYMENT_PLANS = {
     quarterly: { periods: 12, amount: 2500, name: '季繳' },

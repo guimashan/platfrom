@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "pushi";
+const SERVICE_TYPE = "ps";
 let currentUser = null; 
 let userData = null;
 

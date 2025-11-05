@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "lidou";
+const SERVICE_TYPE = "ld";
 const DOU_PRICE = 1500;
 let currentUser = null; 
 let userData = null;

@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "zhongyuan";
+const SERVICE_TYPE = "zy";
 const PRICE_PER_PERSON = 1500;
 let currentUser = null; 
 let userData = null;

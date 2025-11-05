@@ -372,19 +372,26 @@ npm run emulators
    - 感謝狀抬頭選擇
    - 個人報名（無多人模式）
 
-**完整服務列表（10 個）**：
-```
-DD  - 線上點燈        $700/盞              ✅ 完成
-ND  - 年斗法會        $36,000/斗           ✅ 完成
-LD  - 禮斗法會        $1,500/斗            ✅ 完成
-QJ  - 秋祭法會        $300/人              ✅ 完成
-PS  - 普施法會        隨喜功德             ✅ 完成
-BG  - 建宮廟款        隨喜捐款             ✅ 完成
-XY  - 添香油          $100/份 + 隨喜       ✅ 完成
-ZY  - 中元法會        $1,500/位超拔        ✅ 完成
-FTP - 福田會          三年期 $30,000       ✅ 完成
-FTY - 福田少年會      五年期 $30,000       ✅ 完成
-```
+**完整服務列表（11 個神務服務）**：
+
+| 代碼 | 服務名稱 | SERVICE_TYPE | 訂單編號格式 | 狀態 |
+|------|---------|--------------|--------------|------|
+| DD | 線上點燈 | `"dd"` | DD-YYYYMMDD-XXXX | ✅ |
+| ND | 年斗法會 | `"nd"` | ND-YYYYMMDD-XXXX | ✅ |
+| LD | 禮斗法會 | `"lidou"` | LD-YYYYMMDD-XXXX | ✅ |
+| QJ | 秋祭法會 | `"qiuji"` | QJ-YYYYMMDD-XXXX | ✅ |
+| PS | 普施法會 | `"pushi"` | PS-YYYYMMDD-XXXX | ✅ |
+| BG | 建宮廟款 | `"build"` | BG-YYYYMMDD-XXXX | ✅ |
+| XY | 添香油 | `"xiangyou"` | XY-YYYYMMDD-XXXX | ✅ |
+| ZY | 中元法會 | `"zhongyuan"` | ZY-YYYYMMDD-XXXX | ✅ |
+| FTP | 福田會 個人 | `"futian"` | FT-YYYYMMDD-XXXX | ✅ |
+| FTY | 福田少年會 個人 | `"futian_youth"` | FTY-YYYYMMDD-XXXX | ✅ |
+| FTC | 福田會 企業團體 | `"futian_corporate"` | FTC-YYYYMMDD-XXXX | ✅ |
+
+**命名規範說明**：
+- 🔹 **SERVICE_TYPE**（內部識別碼）：使用**小寫**（如 `"dd"`, `"futian"`）
+- 🔹 **訂單編號前綴**（用戶可見）：使用**大寫**（如 `DD-`, `FT-`）
+- 🔹 後端 Cloud Functions 透過 typeCodeMap 自動轉換：小寫 key → 大寫前綴
 
 **技術亮點**：
 - ✅ **建立三種可複用模板**：標準多人報名、類別卡片、分期付款
@@ -404,10 +411,13 @@ FTY - 福田少年會      五年期 $30,000       ✅ 完成
 - 樣式：service.css（新增類別區塊樣式、繳款方案樣式）
 
 **後端支援**：
-- ✅ 訂單代碼已預留：'xiangyou': 'XY', 'zhongyuan': 'ZY', 'futian': 'FT', 'futian_youth': 'FTY'
+- ✅ **訂單代碼映射**（Cloud Functions typeCodeMap）：
+  - `'dd': 'DD'`, `'nd': 'ND'`, `'lidou': 'LD'`, `'qiuji': 'QJ'`
+  - `'pushi': 'PS'`, `'build': 'BG'`, `'xiangyou': 'XY'`, `'zhongyuan': 'ZY'`
+  - `'futian': 'FT'`, `'futian_youth': 'FTY'`, `'futian_corporate': 'FTC'`
 - ✅ submitRegistration 函數自動支援所有服務類型
 - ✅ 雙集合架構：registrations + temp_payment_secrets
-- ✅ 訂單編號自動生成：XY-YYYYMMDD-XXXX, ZY-YYYYMMDD-XXXX, FT-YYYYMMDD-XXXX, FTY-YYYYMMDD-XXXX
+- ✅ 訂單編號自動生成（帶流水號）
 
 **正式環境網址**：
 ```

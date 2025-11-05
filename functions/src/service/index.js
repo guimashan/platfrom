@@ -36,16 +36,17 @@ async function generateOrderId(serviceType) {
     
     // 服務類型代碼對應表
     const typeCodeMap = {
-        'dd': 'DD',               // 線上點燈
-        'nd': 'ND',               // 年斗法會
-        // 未來擴充服務
-        'lidou': 'LD',            // 禮斗法會
-        'zhongyuan': 'ZY',        // 中元法會
-        'pushi': 'PS',            // 普施法會
-        'futian': 'FT',           // 福田會
-        'futian_youth': 'FTY',    // 福田少年會
-        'xiangyou': 'XY',         // 添香油
-        'build_temple': 'BG'      // 建宮廟款
+        'dd': 'DD',                    // 線上點燈
+        'nd': 'ND',                    // 年斗法會
+        'lidou': 'LD',                 // 禮斗法會
+        'qiuji': 'QJ',                 // 秋祭法會
+        'pushi': 'PS',                 // 普施法會
+        'build': 'BG',                 // 建宮廟款
+        'xiangyou': 'XY',              // 添香油
+        'zhongyuan': 'ZY',             // 中元法會
+        'futian': 'FT',                // 福田會 個人入會
+        'futian_youth': 'FTY',         // 福田少年會 個人入會
+        'futian_corporate': 'FTC'      // 福田會 企業團體入會
     };
     
     const typeCode = typeCodeMap[serviceType] || 'ORDER';

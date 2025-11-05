@@ -19,7 +19,7 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
 // --- 全域變數 ---
-const SERVICE_TYPE = "futian_youth";
+const SERVICE_TYPE = "fty";
 const TOTAL_AMOUNT = 30000;
 const AGE_LIMIT = 30;
 const PAYMENT_PLANS = {
