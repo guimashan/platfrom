@@ -7,170 +7,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
     <style>
+        .service-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            max-width: 600px;
+            margin: 20px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
         .service-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            max-width: 500px;
-            margin: 0 auto;
+            gap: 15px;
         }
 
         .service-btn {
             display: block;
-            padding: 1rem 1.5rem;
+            width: 100%;
+            padding: 18px 30px;
             background: white;
-            border: 2px solid var(--primary-gold);
-            border-radius: var(--radius-sm);
-            font-size: 1.1rem;
+            border: 2px solid #333;
+            border-radius: 50px;
+            font-size: 20px;
             font-weight: 500;
-            color: var(--primary-gold-dark);
+            color: #333;
             text-align: center;
             text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
         }
 
         .service-btn:hover {
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            background: var(--primary-gold);
             color: white;
-            border-color: var(--primary-gold-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .service-btn:active {
-            transform: translateY(0);
-        }
-
-        .service-container {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 2rem 1.5rem;
-            box-shadow: var(--shadow-md);
-            margin: 2rem auto;
-            max-width: 600px;
-        }
-
-        .service-header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--primary-gold);
-        }
-
-        .service-header h2 {
-            color: var(--primary-gold-dark);
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .service-header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+            border-color: var(--primary-gold);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- 未登入畫面 -->
-        <div id="loginPrompt" class="main-content">
-            <div class="welcome-card">
-                <h2>歡迎</h2>
-                <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
-                <button id="loginBtn" class="btn btn-primary">
-                    LINE 登入
-                </button>
+        <header class="header">
+            <div class="header-left">
+                <h1>🙏 神務服務</h1>
+                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
             </div>
-        </div>
+            <div class="header-actions" style="display: flex; gap: 10px;">
+                <button class="btn-secondary" onclick="window.location.href='/'">🏠 首頁</button>
+                <button id="logoutBtn" class="btn-logout">登出</button>
+            </div>
+        </header>
 
-        <!-- 主要內容 -->
-        <div id="mainApp" style="display: none;">
-            <header class="header">
-                <div class="header-left">
-                    <h1>神務服務</h1>
-                    <p>線上報名系統</p>
-                </div>
-                <div class="header-actions">
-                    <button class="btn-logout" onclick="window.location.href='/'">
-                        返回首頁
-                    </button>
-                </div>
-            </header>
-
-            <div class="main-content">
-                <div class="service-container">
-                    <div class="service-header">
-                        <h2>🙏 請選擇服務項目</h2>
-                        <p>點選以下服務進行線上報名</p>
-                    </div>
-                    
-                    <div class="service-list">
-                        <a href="DD.html" class="service-btn">線上點燈</a>
-                        <a href="ND.html" class="service-btn">年斗法會</a>
-                        <a href="LD.html" class="service-btn">禮斗法會</a>
-                        <a href="ZY.html" class="service-btn">中元法會</a>
-                        <a href="PS.html" class="service-btn">普施法會</a>
-                        <a href="QJ.html" class="service-btn">秋祭法會</a>
-                    </div>
+        <main class="main-content">
+            <div class="service-container">
+                <div class="service-list">
+                    <a href="DD.html" class="service-btn">線上點燈</a>
+                    <a href="ND.html" class="service-btn">年斗法會</a>
+                    <a href="LD.html" class="service-btn">禮斗法會</a>
+                    <a href="ZY.html" class="service-btn">中元法會</a>
+                    <a href="PS.html" class="service-btn">普施法會</a>
+                    <a href="QJ.html" class="service-btn">秋祭法會</a>
                 </div>
             </div>
-        </div>
+        </main>
     </div>
 
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script type="module" src="../js/firebase-init.js"></script>
     <script type="module">
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { checkAuth, logout } from '/js/auth-guard.js';
 
-        const LIFF_ID = '2006582260-YBnDz9Xk';
-        const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
-
-        const loginPromptEl = document.getElementById('loginPrompt');
-        const mainAppEl = document.getElementById('mainApp');
-        const loginBtnEl = document.getElementById('loginBtn');
-
-        async function initLiff() {
+        (async function init() {
             try {
-                await liff.init({ liffId: LIFF_ID });
-                
-                if (!liff.isLoggedIn()) {
-                    const returnUrl = window.location.pathname + window.location.search;
-                    const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
-                    lineAuthUrl.searchParams.set('response_type', 'code');
-                    lineAuthUrl.searchParams.set('client_id', '2006582260');
-                    lineAuthUrl.searchParams.set('redirect_uri', LINE_CALLBACK_URL);
-                    lineAuthUrl.searchParams.set('state', returnUrl);
-                    lineAuthUrl.searchParams.set('scope', 'profile openid email');
-                    
-                    loginBtnEl.addEventListener('click', () => {
-                        window.location.href = lineAuthUrl.toString();
-                    });
-                    
-                    loginPromptEl.style.display = 'block';
-                    mainAppEl.style.display = 'none';
-                    return;
-                }
-
-                const platformAuth = getAuth(window.platformApp);
-                onAuthStateChanged(platformAuth, (user) => {
-                    if (user) {
-                        loginPromptEl.style.display = 'none';
-                        mainAppEl.style.display = 'block';
-                    } else {
-                        loginPromptEl.style.display = 'block';
-                        mainAppEl.style.display = 'none';
+                const { userData } = await checkAuth({
+                    requiredRoles: ['poweruser_service', 'admin_service', 'superadmin'],
+                    onSuccess: ({ userData }) => {
+                        const userName = document.getElementById('userName');
+                        if (userName) {
+                            userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
+                        }
                     }
                 });
 
-            } catch (error) {
-                console.error('LIFF 初始化失敗:', error);
-                loginPromptEl.style.display = 'block';
-                mainAppEl.style.display = 'none';
-            }
-        }
+                document.getElementById('logoutBtn').addEventListener('click', logout);
 
-        initLiff();
+            } catch (error) {
+                console.error('初始化失敗:', error);
+            }
+        })();
     </script>
 </body>
 </html>
