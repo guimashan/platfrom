@@ -676,8 +676,8 @@ async function handleSubmit() {
             }
             
             // 驗證日期格式
-            if (year.length !== 4 || isNaN(year)) {
-                showError(yearInput, `${cardName} 的生辰年份格式不正確（需4位數字）`);
+            if (year.length !== 3 || isNaN(year)) {
+                showError(yearInput, `${cardName} 的生辰年份格式不正確（需3位數字，民國年）`);
                 card.querySelector('.applicant-details').style.display = 'block';
                 card.setAttribute('data-open', 'true');
                 submitBtnEl.disabled = false;
