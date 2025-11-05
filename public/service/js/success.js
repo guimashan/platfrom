@@ -1,7 +1,7 @@
 import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { platformDb } from '../js/firebase-init.js';
+import { serviceDb } from '../js/firebase-init.js';
 
-const db = platformDb;
+const db = serviceDb;
 
 const SERVICE_NAMES = {
     dd: '線上點燈',
