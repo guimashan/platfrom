@@ -170,6 +170,9 @@ function autoFillShengxiao(card, dateString) {
     const lunarYearSpan = card.querySelector('[id^="lunar-year-"]');
     const lunarMonthSpan = card.querySelector('[id^="lunar-month-"]');
     const lunarDaySpan = card.querySelector('[id^="lunar-day-"]');
+    const westernYearSpan = card.querySelector('[id^="western-year-"]');
+    const westernMonthSpan = card.querySelector('[id^="western-month-"]');
+    const westernDaySpan = card.querySelector('[id^="western-day-"]');
     
     if (!shengxiaoSelect) return;
     
@@ -178,6 +181,9 @@ function autoFillShengxiao(card, dateString) {
         if (lunarYearSpan) lunarYearSpan.textContent = '';
         if (lunarMonthSpan) lunarMonthSpan.textContent = '';
         if (lunarDaySpan) lunarDaySpan.textContent = '';
+        if (westernYearSpan) westernYearSpan.textContent = '';
+        if (westernMonthSpan) westernMonthSpan.textContent = '';
+        if (westernDaySpan) westernDaySpan.textContent = '';
         return;
     }
     
@@ -192,7 +198,7 @@ function autoFillShengxiao(card, dateString) {
             shengxiaoSelect.value = shengxiao;
         }
         
-        // 分別填入農曆年月日
+        // 填入農曆年月日
         if (lunarYearSpan) {
             lunarYearSpan.textContent = lunar.getYearInGanZhi();
         }
@@ -201,6 +207,17 @@ function autoFillShengxiao(card, dateString) {
         }
         if (lunarDaySpan) {
             lunarDaySpan.textContent = lunar.getDayInChinese();
+        }
+        
+        // 填入西曆年月日
+        if (westernYearSpan) {
+            westernYearSpan.textContent = year;
+        }
+        if (westernMonthSpan) {
+            westernMonthSpan.textContent = month;
+        }
+        if (westernDaySpan) {
+            westernDaySpan.textContent = day;
         }
     } catch (error) {
         console.error('計算生肖時發生錯誤:', error);
@@ -287,25 +304,39 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             </div>
             
             <label style="display: block; margin-bottom: 8px;">生辰 (國曆)</label>
-            <div style="display: flex; gap: 3px; align-items: center;">
-                <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; height: 55px; text-align: center; font-size: 1rem; padding: 12px 4px;">
-                <span style="font-size: 1rem;">年</span>
-                <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 55px; text-align: center; font-size: 1rem; padding: 12px 4px;">
-                <span style="font-size: 1rem;">月</span>
-                <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 55px; text-align: center; font-size: 1rem; padding: 12px 4px;">
-                <span style="font-size: 1rem;">日</span>
-                <div style="position: relative; display: inline-block;">
-                    <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
-                    <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 14px 12px; cursor: pointer; font-size: 1.1em; height: 55px;" title="點擊選擇日期">🗓️</button>
+            <div style="margin-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
+                    <span style="color: #666;">民國</span>
+                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                    <span>年</span>
+                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
+                    <span>月</span>
+                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
+                    <span>日</span>
+                    <button type="button" id="bazi-btn-${cardId}" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                    <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; pointer-events: none;">
                 </div>
             </div>
-            <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 1rem; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
-                <span id="lunar-year-${cardId}" style="display: inline-block; width: 52px; text-align: center;"></span>
-                <span style="font-size: 1rem;">年</span>
-                <span id="lunar-month-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
-                <span style="font-size: 1rem;">月</span>
-                <span id="lunar-day-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
-                <span style="font-size: 1rem;">日</span>
+            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
+                <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                <span style="visibility: hidden;">民國</span>
+                <span id="western-year-${cardId}" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">年</span>
+                <span id="western-month-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">月</span>
+                <span id="western-day-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">日</span>
+            </div>
+            <div id="lunar-display-${cardId}" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
+                <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                <span style="visibility: hidden;">民國</span>
+                <span id="lunar-year-${cardId}" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">年</span>
+                <span id="lunar-month-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">月</span>
+                <span id="lunar-day-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                <span style="color: #666;">日</span>
             </div>
 
             <div class="shengxiao-time-grid">
@@ -389,8 +420,9 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     
     dateInput.addEventListener('change', (e) => {
         if (e.target.value) {
-            const [year, month, day] = e.target.value.split('-');
-            yearInput.value = year;
+            const [westernYear, month, day] = e.target.value.split('-');
+            const rocYear = parseInt(westernYear) - 1911;
+            yearInput.value = rocYear;
             monthInput.value = parseInt(month, 10);
             dayInput.value = parseInt(day, 10);
             autoFillShengxiao(card, e.target.value);
@@ -404,20 +436,21 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     
     // 同步生辰輸入：手動輸入 → 日期選擇器
     const syncManualToDate = () => {
-        const year = yearInput.value.trim();
+        const rocYear = yearInput.value.trim();
         const month = monthInput.value.trim();
         const day = dayInput.value.trim();
         
-        if (!year && !month && !day) {
+        if (!rocYear && !month && !day) {
             dateInput.value = '';
             autoFillShengxiao(card, '');
             return;
         }
         
-        if (year.length === 4 && month && day) {
+        if (rocYear.length >= 2 && rocYear.length <= 3 && month && day) {
+            const westernYear = parseInt(rocYear) + 1911;
             const paddedMonth = month.padStart(2, '0');
             const paddedDay = day.padStart(2, '0');
-            const dateValue = `${year}-${paddedMonth}-${paddedDay}`;
+            const dateValue = `${westernYear}-${paddedMonth}-${paddedDay}`;
             dateInput.value = dateValue;
             autoFillShengxiao(card, dateValue);
         } else {
