@@ -172,6 +172,23 @@ npm run emulators
 - 手機優先設計 (Mobile First)
 - 圓角 12px、陰影 2px
 
+### 響應式設計規範（全站適用）
+- ⚠️ **必須針對所有四個階段實施全局響應式設計**
+- ✅ **手機版斷點**: `@media (max-width: 480px)`
+- ✅ **平板版斷點**: `@media (max-width: 768px)`
+- **手機版優化原則（480px以下）**:
+  - 日期輸入框縮小：年 70px→50px，月/日 50px→40px
+  - 間距縮小：5px → 3px
+  - 字體稍微縮小：1rem → 0.95rem
+  - 按鈕和卡片內距減少
+  - 保持觸控區域最小 36px（符合人體工學）
+- **CSS文件狀態**:
+  - ✅ `public/styles/common.css` - 全站通用樣式（已完成 768px + 480px）
+  - ✅ `public/service/styles/service.css` - 服務模組（已完成 768px + 480px）
+  - ⚠️ `public/checkin/styles/checkin.css` - 打卡模組（僅 768px，需添加 480px）
+  - ⚠️ `public/checkin/manage/styles/manage.css` - 打卡管理（僅 768px，需添加 480px）
+  - ⚠️ `public/service/manage/styles/manage.css` - 服務管理（僅 768px，需添加 480px）
+
 ### 資料顯示規範
 - **生辰顯示**：所有包含生辰（國曆）的報名資料，後台管理介面必須同時顯示：
   - 國曆生辰（YYYY-MM-DD 格式）
@@ -220,6 +237,47 @@ npm run emulators
 - 支援關鍵字觸發 LIFF App
 
 ## 最近變更
+
+### 2025-11-05 完成全站手機版響應式設計優化
+
+**重大優化**：
+- ✅ **統一五個表單的日期格式為三層顯示**（ZY、DD、ND、LD、QJ）
+  - 生辰/忌日字段統一格式：國曆（民國年輸入）→ 西曆（自動顯示）→ 農曆（干支年、中文月日）
+  - 年份輸入框：70px，支持民國年輸入（3位數）
+  - 月/日輸入框：50px
+  - 日曆按鈕：🗓️ 統一樣式，40px
+  - 完美對齊，所有文字置中
+
+**全站響應式設計**：
+- ✅ **service.css 添加完整手機版優化**（@media max-width: 480px）
+  - 整體佈局：縮小內距、間距、字體
+  - 日期輸入框：年 70px→50px，月/日 50px→40px，間距 5px→3px
+  - 日曆按鈕：40px→36px
+  - 西曆/農曆顯示：同步縮小，字體 1rem→0.85rem
+  - 卡片、按鈕、表單元素全面優化
+  - 適用於所有 10 個服務表單
+
+**手機版優化原則**：
+- 📱 保持觸控區域最小 36px（符合人體工學）
+- 📱 總寬度約 291px，完美適配 iPhone SE (320px)
+- 📱 無橫向滾動
+- 📱 所有功能正常工作
+- 📱 三層日期顯示完整保留
+
+**待完成工作**：
+- ⚠️ checkin.css 需添加手機版優化
+- ⚠️ checkin/manage/styles/manage.css 需添加手機版優化
+- ⚠️ service/manage/styles/manage.css 需添加手機版優化
+
+**影響範圍**：
+- CSS：public/service/styles/service.css（新增 192 行手機版樣式）
+- JavaScript：DD.js、ND.js、LD.js、QJ.js、ZY.js（日期處理邏輯更新）
+- 設計規範：replit.md（新增響應式設計規範章節）
+
+**部署狀態**：
+- ⏳ 待推送 GitHub → Vercel 自動部署
+
+---
 
 ### 2025-11-04 完成 Phase 3 全部 10 個服務表單
 
