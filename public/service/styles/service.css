@@ -495,3 +495,19 @@ body {
 .payment-option input[type="radio"]:checked + div {
     font-weight: 700;
 }
+
+/* 生肖時辰並排網格 */
+.shengxiao-time-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    align-items: start;
+}
+
+/* 響應式設計：小屏幕垂直堆疊 */
+@media (max-width: 480px) {
+    .shengxiao-time-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+}

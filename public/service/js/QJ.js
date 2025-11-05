@@ -308,14 +308,14 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 0.85em;">日</span>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
+            <div class="shengxiao-time-grid">
                 <div>
                     <label for="shengxiao-${cardId}" style="display: block; margin-bottom: 8px;">生肖</label>
-                    <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 44px; font-size: 1rem;">
+                    <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 50px; font-size: 1rem;">
                 </div>
                 <div>
                     <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
-                    <select id="time-${cardId}" class="input-field" style="width: 100%; height: 44px; font-size: 1rem;">
+                    <select id="time-${cardId}" class="input-field" style="width: 100%; height: 50px; font-size: 1rem;">
                         <option value="">請選擇時辰</option>
                         <option value="吉時">吉時</option>
                         <option value="子時">子時 (23:00-01:00)</option>
