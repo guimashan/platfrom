@@ -25,7 +25,8 @@ const AGE_LIMIT = 30;
 const PAYMENT_PLANS = {
     quarterly: { periods: 20, amount: 1500, name: '季繳' },
     halfYearly: { periods: 10, amount: 3000, name: '半年繳' },
-    yearly: { periods: 5, amount: 6000, name: '年繳' }
+    yearly: { periods: 5, amount: 6000, name: '年繳' },
+    fullPayment: { periods: 1, amount: 30000, name: '全繳' }
 };
 
 let currentUser = null; 

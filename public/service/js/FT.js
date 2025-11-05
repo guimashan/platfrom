@@ -24,7 +24,8 @@ const TOTAL_AMOUNT = 30000;
 const PAYMENT_PLANS = {
     quarterly: { periods: 12, amount: 2500, name: '季繳' },
     halfYearly: { periods: 6, amount: 5000, name: '半年繳' },
-    yearly: { periods: 3, amount: 10000, name: '年繳' }
+    yearly: { periods: 3, amount: 10000, name: '年繳' },
+    fullPayment: { periods: 1, amount: 30000, name: '全繳' }
 };
 
 let currentUser = null; 
