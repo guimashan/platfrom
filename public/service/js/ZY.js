@@ -234,33 +234,34 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 100px;">
+                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
+                                <button type="button" class="date-picker-btn" data-target="deathDate" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="position: absolute; opacity: 0; pointer-events: none;">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
@@ -407,33 +408,34 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 100px;">
+                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
+                                <button type="button" class="date-picker-btn" data-target="deathDate" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="position: absolute; opacity: 0; pointer-events: none;">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
