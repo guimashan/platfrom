@@ -259,17 +259,17 @@ function createApplicantCard(name = '', canRemove = true) {
             </div>
             
             <div class="form-group">
-                <label>生辰 (國曆)</label>
+                <label style="display: block; margin-bottom: 8px;">生辰 (國曆)</label>
                 <div style="display: flex; gap: 3px; align-items: center;">
-                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
-                    <span style="font-size: 0.8em;">年</span>
-                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
-                    <span style="font-size: 0.8em;">月</span>
-                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; text-align: center; font-size: 0.95em; padding: 6px 4px;">
-                    <span style="font-size: 0.8em;">日</span>
+                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <span style="font-size: 1rem;">年</span>
+                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <span style="font-size: 1rem;">月</span>
+                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <span style="font-size: 1rem;">日</span>
                     <div style="position: relative; display: inline-block;">
                         <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
-                        <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 8px 12px; cursor: pointer; font-size: 1.1em;" title="點擊選擇日期">🗓️</button>
+                        <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 14px 12px; cursor: pointer; font-size: 1.1em; height: 50px;" title="點擊選擇日期">🗓️</button>
                     </div>
                 </div>
                 <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 0.95em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
