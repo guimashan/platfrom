@@ -334,29 +334,67 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 </div>
             </div>
             
-            <div style="margin-top: 20px; margin-bottom: 10px;">
+            <div style="margin-top: 20px; margin-bottom: 15px;">
                 <label style="font-weight: bold; font-size: 1.05em;">燈種選擇</label>
             </div>
             
-            <div class="light-item">
-                <label>安太歲</label>
-                <input type="number" class="input-field light-count" data-light-name="安太歲" value="0" min="0">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #e0e0e0;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 500;">
+                    <input type="checkbox" class="light-checkbox" data-light-name="安太歲" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>安太歲</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1rem; min-width: 60px;">數量：</span>
+                    <input type="number" class="input-field light-count" data-light-name="安太歲" value="0" min="0" style="width: 120px; height: 50px; font-size: 1rem; text-align: center;">
+                </div>
             </div>
-            <div class="light-item">
-                <label>元辰燈</label>
-                <input type="number" class="input-field light-count" data-light-name="元辰燈" value="0" min="0">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #e0e0e0;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 500;">
+                    <input type="checkbox" class="light-checkbox" data-light-name="元辰燈" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>元辰燈</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1rem; min-width: 60px;">數量：</span>
+                    <input type="number" class="input-field light-count" data-light-name="元辰燈" value="0" min="0" style="width: 120px; height: 50px; font-size: 1rem; text-align: center;">
+                </div>
             </div>
-            <div class="light-item">
-                <label>文昌燈</label>
-                <input type="number" class="input-field light-count" data-light-name="文昌燈" value="0" min="0">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #e0e0e0;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 500;">
+                    <input type="checkbox" class="light-checkbox" data-light-name="文昌燈" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>文昌燈</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1rem; min-width: 60px;">數量：</span>
+                    <input type="number" class="input-field light-count" data-light-name="文昌燈" value="0" min="0" style="width: 120px; height: 50px; font-size: 1rem; text-align: center;">
+                </div>
             </div>
-            <div class="light-item">
-                <label>財利燈</label>
-                <input type="number" class="input-field light-count" data-light-name="財利燈" value="0" min="0">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #e0e0e0;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 500;">
+                    <input type="checkbox" class="light-checkbox" data-light-name="財利燈" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>財利燈</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1rem; min-width: 60px;">數量：</span>
+                    <input type="number" class="input-field light-count" data-light-name="財利燈" value="0" min="0" style="width: 120px; height: 50px; font-size: 1rem; text-align: center;">
+                </div>
             </div>
-            <div class="light-item">
-                <label>光明燈</label>
-                <input type="number" class="input-field light-count" data-light-name="光明燈" value="0" min="0">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 0;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer; font-size: 1.1rem; font-weight: 500;">
+                    <input type="checkbox" class="light-checkbox" data-light-name="光明燈" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>光明燈</span>
+                </label>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 1rem; min-width: 60px;">數量：</span>
+                    <input type="number" class="input-field light-count" data-light-name="光明燈" value="0" min="0" style="width: 120px; height: 50px; font-size: 1rem; text-align: center;">
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 12px; background-color: #f9f9f9; border-radius: 8px; font-size: 0.95rem; color: #666;">
+                每盞燈 500 元整，每份名單都可以複選燈別與數量
             </div>
             
             <div class="card-actions">
@@ -458,6 +496,38 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     [yearInput, monthInput, dayInput].forEach(input => {
         input.addEventListener('input', (e) => {
             e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    });
+    
+    // 燈種選擇：復選框與數量輸入框聯動
+    const lightCheckboxes = card.querySelectorAll('.light-checkbox');
+    const lightCounts = card.querySelectorAll('.light-count');
+    
+    // 復選框點擊事件：勾選時設定數量為1（如果當前為0）
+    lightCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const lightName = this.getAttribute('data-light-name');
+            const countInput = card.querySelector(`.light-count[data-light-name="${lightName}"]`);
+            
+            if (this.checked && parseInt(countInput.value) === 0) {
+                countInput.value = 1;
+                calculateTotal();
+            } else if (!this.checked) {
+                countInput.value = 0;
+                calculateTotal();
+            }
+        });
+    });
+    
+    // 數量輸入框變更事件：同步更新復選框狀態
+    lightCounts.forEach(countInput => {
+        countInput.addEventListener('input', function() {
+            const lightName = this.getAttribute('data-light-name');
+            const checkbox = card.querySelector(`.light-checkbox[data-light-name="${lightName}"]`);
+            const count = parseInt(this.value) || 0;
+            
+            checkbox.checked = count > 0;
+            calculateTotal();
         });
     });
 }
