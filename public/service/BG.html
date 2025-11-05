@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>建宮廟款 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="styles/service.css">
+</head>
+<body>
+    <!-- 未登入畫面 (預設顯示) -->
+    <div id="loginPrompt" class="login-prompt">
+        <div class="welcome-card">
+            <h2>歡迎</h2>
+            <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
+            <button id="loginBtn" class="btn btn-primary">
+                LINE 登入
+            </button>
+        </div>
+    </div>
+
+    <!-- 主要內容 (預設隱藏，登入後才顯示) -->
+    <div id="mainApp" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1>建宮廟款</h1>
+                <p>護持宮廟建設，功德無量</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-logout" onclick="window.location.href='/'">
+                    返回首頁
+                </button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            
+            <!-- 建宮說明 -->
+            <div class="card" style="background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); border: none;">
+                <p style="color: #333; line-height: 1.8; margin: 0;">
+                    本宮目前正在辦理第二期、第三期工程，未來規劃有露天廣場、中小型教室、禪修室、演講廳、圖書館、藏經閣、展覽廳等。以上規劃可供中小型玄帝信仰佈道、正信講座、藝文展演等活動，並可深耕祖庭武當山文化與在地文化結合，宣揚玄帝正信文化及正統道教精神。
+                </p>
+            </div>
+            
+            <!-- I. 報名聯絡資訊 -->
+            <div class="card">
+                <h2 class="card-title">報名聯絡資訊</h2>
+                <div class="form-group">
+                    <label for="contactName">報名姓名 (主要聯絡人)</label>
+                    <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">連絡電話</label>
+                    <input type="tel" id="contactPhone" class="input-field" placeholder="請輸入電話">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">電子信箱</label>
+                    <input type="email" id="contactEmail" class="input-field" placeholder="請輸入 Email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactAddress">通訊地址</label>
+                    <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
+                </div>
+                
+                <div class="form-group">
+                    <label>感謝狀領取</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" id="receiptSend" name="receiptOption" value="send" checked>
+                            <span>寄發感謝狀</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" id="receiptSelf" name="receiptOption" value="self">
+                            <span>親自領取</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- II. 報名名單 -->
+            <div class="card">
+                <h2 class="card-title">報名名單</h2>
+                
+                <div class="form-group">
+                    <label>報名對象</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" id="modeSingle" name="mode" value="single" checked>
+                            <span>個人報名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" id="modeMulti" name="mode" value="multi">
+                            <span>多人報名</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="applicantCardList"></div>
+
+                <button id="addApplicantBtn" class="btn-secondary" style="display: none; margin-top: 15px;">
+                    新增捐款者
+                </button>
+            </div>
+
+            <!-- III. 信用卡資訊 -->
+            <div class="card payment-card">
+                <h2 class="card-title">信用卡資訊 (手動刷卡用)</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    請填寫信用卡資訊，廟方將與您聯絡確認後手動刷卡
+                </p>
+                
+                <div class="form-group">
+                    <label for="cardHolderName">持卡人姓名</label>
+                    <input type="text" id="cardHolderName" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardNumber">信用卡卡號</label>
+                    <input type="text" id="cardNumber" class="input-field" placeholder="xxxx-xxxx-xxxx-xxxx">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardExpiry">有效年月 (MM/YY)</label>
+                        <input type="text" id="cardExpiry" class="input-field" placeholder="MM/YY">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cardCVV">背面末三碼 (CVV)</label>
+                        <input type="text" id="cardCVV" class="input-field" placeholder="CVV">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他備註 -->
+            <div class="card">
+                <h2 class="card-title">其他備註</h2>
+                <div class="form-group">
+                    <textarea id="otherNote" class="input-field" rows="4" placeholder="若有其他需求請填寫於此"></textarea>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <!-- 浮動總結欄位 -->
+        <div id="floatingFooter">
+        <div class="footer-content">
+            <div class="footer-summary">
+                <div class="summary-item">
+                    <span class="summary-label">應繳總金額：</span>
+                    <span id="totalAmount" class="summary-value total-price">NT$ 0</span>
+                </div>
+            </div>
+            <button id="submitBtn" class="btn-submit">確認捐款並送出</button>
+        </div>
+    </div>
+    </div> <!-- 關閉 mainApp -->
+
+    <script src="../js/firebase-init.js" type="module"></script>
+    <script src="js/BG.js" type="module"></script>
+</body>
+</html>

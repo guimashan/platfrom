@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單送出成功 - 龜馬山代天府</title>
+    <link rel="stylesheet" href="styles/service.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .success-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px 15px 0 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 10px;
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .liff-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .liff-close-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .success-card {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 15px 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .order-info {
+            margin-bottom: 25px;
+        }
+
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .order-row:last-child {
+            border-bottom: none;
+        }
+
+        .order-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .order-value {
+            color: #333;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .order-id {
+            color: #d4af37;
+            font-size: 18px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .applicant-list {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #d4af37;
+        }
+
+        .applicant-list-title {
+            color: #d4af37;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .applicant-item {
+            padding: 8px 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .applicant-item::before {
+            content: "•";
+            color: #d4af37;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .total-amount {
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-print {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #1976D2;
+        }
+
+        .btn-share {
+            background: #FF9800;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #F57C00;
+        }
+
+        .btn-calendar {
+            background: #9C27B0;
+            color: white;
+        }
+
+        .btn-calendar:hover {
+            background: #7B1FA2;
+        }
+
+        .btn-close {
+            background: #666;
+            color: white;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-close:hover {
+            background: #555;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        .error {
+            text-align: center;
+            padding: 50px;
+            color: #f44336;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .action-buttons {
+                display: none;
+            }
+            .liff-close-btn {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-header">
+            <button class="liff-close-btn" id="liffCloseBtn">✕</button>
+            <div class="success-icon">✓</div>
+            <h1 class="success-title">訂單送出成功！</h1>
+        </div>
+
+        <div class="success-card">
+            <div id="loadingArea" class="loading">
+                <p>正在載入訂單資訊...</p>
+            </div>
+
+            <div id="errorArea" class="error" style="display: none;">
+                <p>無法載入訂單資訊，請聯繫廟方確認。</p>
+            </div>
+
+            <div id="orderArea" style="display: none;">
+                <div class="order-info">
+                    <div class="order-row">
+                        <span class="order-label">訂單編號</span>
+                        <span class="order-value order-id" id="orderId"></span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">服務項目</span>
+                        <span class="order-value" id="serviceName"></span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">送出時間</span>
+                        <span class="order-value" id="orderTime"></span>
+                    </div>
+                </div>
+
+                <div id="applicantListArea"></div>
+
+                <div class="total-amount">
+                    總金額：NT$ <span id="totalAmount"></span>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn btn-print" id="printBtn">
+                        📄 列印訂單
+                    </button>
+                    <button class="action-btn btn-share" id="shareBtn">
+                        🔗 分享連結
+                    </button>
+                    <button class="action-btn btn-calendar" id="calendarBtn" style="display: none;">
+                        📅 加入行事曆
+                    </button>
+                </div>
+
+                <button class="action-btn btn-close" id="closeBtn" style="display: none;">
+                    關閉視窗
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="../js/firebase-init.js"></script>
+    <script type="module" src="js/success.js"></script>
+</body>
+</html>
