@@ -299,13 +299,13 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                     <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 14px 12px; cursor: pointer; font-size: 1.1em; height: 55px;" title="點擊選擇日期">🗓️</button>
                 </div>
             </div>
-            <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 0.95em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
+            <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 1rem; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
                 <span id="lunar-year-${cardId}" style="display: inline-block; width: 52px; text-align: center;"></span>
-                <span style="font-size: 0.85em;">年</span>
+                <span style="font-size: 1rem;">年</span>
                 <span id="lunar-month-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
-                <span style="font-size: 0.85em;">月</span>
+                <span style="font-size: 1rem;">月</span>
                 <span id="lunar-day-${cardId}" style="display: inline-block; width: 34px; text-align: center;"></span>
-                <span style="font-size: 0.85em;">日</span>
+                <span style="font-size: 1rem;">日</span>
             </div>
 
             <div class="shengxiao-time-grid">
