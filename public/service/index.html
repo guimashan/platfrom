@@ -101,6 +101,9 @@
             position: relative;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+            text-decoration: none;
+            color: inherit;
+            display: block;
         }
 
         .service-card::before {
@@ -232,47 +235,47 @@
             </div>
 
             <div class="service-grid">
-                <div class="service-card" data-service="ceremony">
+                <a href="/service/DD.html" class="service-card" data-service="DD">
                     <div class="service-icon">🕯️</div>
-                    <div class="service-title">法會報名</div>
-                    <div class="service-desc">線上報名參加各類法會活動</div>
+                    <div class="service-title">線上點燈</div>
+                    <div class="service-desc">線上祈福點燈服務</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
 
-                <div class="service-card" data-service="merit">
+                <a href="/service/ND.html" class="service-card" data-service="ND">
                     <div class="service-icon">⭐</div>
-                    <div class="service-title">功德登記</div>
-                    <div class="service-desc">登記善款與功德項目</div>
+                    <div class="service-title">年斗法會</div>
+                    <div class="service-desc">新春安太歲祈福法會</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
 
-                <div class="service-card" data-service="blessing">
+                <a href="/service/LD.html" class="service-card" data-service="LD">
                     <div class="service-icon">🌟</div>
-                    <div class="service-title">祈福點燈</div>
-                    <div class="service-desc">線上點燈祈福服務</div>
+                    <div class="service-title">禮斗法會</div>
+                    <div class="service-desc">禮拜斗首消災祈福</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
 
-                <div class="service-card" data-service="moon">
+                <a href="/service/ZY.html" class="service-card" data-service="ZY">
                     <div class="service-icon">🌕</div>
-                    <div class="service-title">月老牽線</div>
-                    <div class="service-desc">求姻緣與感情祈福</div>
+                    <div class="service-title">中元法會</div>
+                    <div class="service-desc">中元普渡超度法會</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
 
-                <div class="service-card" data-service="prayer">
+                <a href="/service/PS.html" class="service-card" data-service="PS">
                     <div class="service-icon">🙏</div>
-                    <div class="service-title">祈願服務</div>
-                    <div class="service-desc">線上提交祈願與祝福</div>
+                    <div class="service-title">普施法會</div>
+                    <div class="service-desc">普施孤魂超度法會</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
 
-                <div class="service-card" data-service="memorial">
+                <a href="/service/QJ.html" class="service-card" data-service="QJ">
                     <div class="service-icon">🍂</div>
-                    <div class="service-title">追思超度</div>
-                    <div class="service-desc">超度法會與牌位登記</div>
+                    <div class="service-title">秋祭法會</div>
+                    <div class="service-desc">秋季祭祖追思法會</div>
                     <div class="service-badge">開發中</div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
@@ -297,32 +300,12 @@
 
                 document.getElementById('logoutBtn').addEventListener('click', logout);
 
-                document.querySelectorAll('.service-card').forEach(card => {
-                    card.addEventListener('click', function() {
-                        const service = this.dataset.service;
-                        handleServiceClick(service);
-                    });
-                });
-
             } catch (error) {
                 console.error('初始化失敗:', error);
                 document.getElementById('loadingIndicator').innerHTML = 
                     '<p style="color: var(--text-secondary);">載入失敗，請重新整理頁面</p>';
             }
         })();
-
-        function handleServiceClick(service) {
-            const serviceNames = {
-                ceremony: '法會報名',
-                merit: '功德登記',
-                blessing: '祈福點燈',
-                moon: '月老牽線',
-                prayer: '祈願服務',
-                memorial: '追思超度'
-            };
-
-            alert(`${serviceNames[service]}功能開發中\n\n此模組將於第三階段開發完成，敬請期待！`);
-        }
     </script>
 </body>
 </html>
