@@ -203,7 +203,10 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; cursor: pointer;" title="📅">
+                                <span style="position: relative; display: inline-block;">
+                                    <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; height: 44px; opacity: 0; position: absolute; cursor: pointer; left: 0; top: 0;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; pointer-events: none;">🗓️</span>
+                                </span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
@@ -375,7 +378,10 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; cursor: pointer;" title="📅">
+                                <span style="position: relative; display: inline-block;">
+                                    <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; height: 44px; opacity: 0; position: absolute; cursor: pointer; left: 0; top: 0;">
+                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; pointer-events: none;">🗓️</span>
+                                </span>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
