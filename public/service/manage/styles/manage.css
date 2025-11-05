@@ -1,0 +1,584 @@
+/* 奉香簽到管理系統共用樣式 */
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* 管理容器 */
+.manage-container {
+    min-height: 100vh;
+    background: #f5f5f5;
+}
+
+/* 頁面頭部 */
+.page-header {
+    background: linear-gradient(135deg, #D4AF37, #B8941F);
+    color: white;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: white;
+}
+
+.header-left p {
+    margin: 5px 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* 頭部按鈕統一樣式 */
+.header-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: 500;
+}
+
+.header-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: white;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.header {
+    background: linear-gradient(135deg, #D4AF37, #B8941F);
+    color: white;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.15);
+}
+
+.header-content {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+/* 子導航欄 */
+.sub-nav {
+    background: white;
+    border-bottom: 2px solid #D4AF37;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+}
+
+.nav-content {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+}
+
+.nav-link {
+    color: #2C2416;
+    text-decoration: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s;
+    font-weight: 500;
+    background: transparent;
+    border: 2px solid transparent;
+}
+
+.nav-link:hover {
+    background: #FFF9F0;
+    border-color: #E8C547;
+}
+
+.nav-link.active {
+    background: #FFF9F0;
+    border-color: #D4AF37;
+    color: #D4AF37;
+}
+
+/* 管理卡片 */
+.manage-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+/* 統計卡片網格 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: #FFF9F0;
+    color: #2C2416;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);
+    border: 2px solid #D4AF37;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+    transform: translateY(-2px);
+}
+
+.stat-card.green {
+    background: #FFF9F0;
+    border-color: #D4AF37;
+}
+
+.stat-card.orange {
+    background: #FFF9F0;
+    border-color: #D4AF37;
+}
+
+.stat-card.blue {
+    background: #FFF9F0;
+    border-color: #D4AF37;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6B5D4F;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #D4AF37;
+}
+
+.stat-trend {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    color: #6B5D4F;
+}
+
+/* 篩選區域 */
+.filter-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.filter-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #555;
+}
+
+.filter-group input,
+.filter-group select {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.filter-actions .btn {
+    margin-top: 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.filter-actions .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #D4AF37;
+}
+
+/* 表格樣式 */
+.data-table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.data-table table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.data-table th {
+    background: #f8f9fa;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.data-table tr:hover {
+    background: #f8f9fa;
+}
+
+/* 徽章 */
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.badge.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.badge.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.badge.danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.badge.info {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* Modal 樣式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #999;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* 表單樣式 */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.3rem;
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.form-actions .btn {
+    margin-top: 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.form-actions .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: 2px solid #D4AF37;
+}
+
+/* 用戶信息卡片 */
+.user-info {
+    background: white;
+    padding: 1.5rem 2rem;
+    margin: 2rem 2rem 1rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid #D4AF37;
+    object-fit: cover;
+}
+
+.user-details h3 {
+    margin: 0 0 0.25rem 0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.user-roles {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* 管理內容區域 */
+.manage-content {
+    padding: 0 2rem 2rem 2rem;
+}
+
+/* 功能卡片網格 */
+.function-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.function-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+}
+
+.function-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+    border-color: #D4AF37;
+}
+
+.function-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.function-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.function-desc {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    flex-grow: 1;
+}
+
+.function-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    background: #8A2BE2;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    align-self: center;
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+/* 載入狀態 */
+.loading {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #666;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #D4AF37;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.error {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 6px;
+    margin: 1rem 0;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+    
+    .header-nav {
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .data-table {
+        font-size: 0.9rem;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 0.5rem;
+    }
+}
