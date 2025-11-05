@@ -575,10 +575,73 @@ function validateForm() {
     }
 
     let hasLamps = false;
+    let cardIndex = 0;
     for (const card of cards) {
+        cardIndex++;
+        const cardName = card.querySelector('.card-summary-name').textContent || `第 ${cardIndex} 位報名者`;
+        
+        // 檢查姓名
         const nameInput = card.querySelector('.card-input-name');
         if (!nameInput.value.trim()) {
-            showError(nameInput, '請填寫報名者姓名');
+            showError(nameInput, `請填寫 ${cardName} 的姓名`);
+            // 展開卡片以顯示錯誤
+            card.querySelector('.applicant-details').style.display = 'block';
+            card.setAttribute('data-open', 'true');
+            return false;
+        }
+
+        // 檢查生辰（國曆）- 年、月、日都要填寫
+        const cardId = card.id;
+        const yearInput = card.querySelector(`#bazi-year-${cardId}`);
+        const monthInput = card.querySelector(`#bazi-month-${cardId}`);
+        const dayInput = card.querySelector(`#bazi-day-${cardId}`);
+        
+        const year = yearInput.value.trim();
+        const month = monthInput.value.trim();
+        const day = dayInput.value.trim();
+        
+        if (!year || !month || !day) {
+            // 找到第一個空白的欄位並顯示錯誤
+            let errorInput;
+            let errorField;
+            if (!year) {
+                errorInput = yearInput;
+                errorField = '年';
+            } else if (!month) {
+                errorInput = monthInput;
+                errorField = '月';
+            } else {
+                errorInput = dayInput;
+                errorField = '日';
+            }
+            showError(errorInput, `請填寫 ${cardName} 的生辰（${errorField}）`);
+            // 展開卡片以顯示錯誤
+            card.querySelector('.applicant-details').style.display = 'block';
+            card.setAttribute('data-open', 'true');
+            return false;
+        }
+        
+        // 驗證日期格式
+        if (year.length !== 4 || isNaN(year)) {
+            showError(yearInput, `${cardName} 的生辰年份格式不正確（需4位數字）`);
+            card.querySelector('.applicant-details').style.display = 'block';
+            card.setAttribute('data-open', 'true');
+            return false;
+        }
+        
+        const monthNum = parseInt(month, 10);
+        if (monthNum < 1 || monthNum > 12) {
+            showError(monthInput, `${cardName} 的生辰月份必須在 1-12 之間`);
+            card.querySelector('.applicant-details').style.display = 'block';
+            card.setAttribute('data-open', 'true');
+            return false;
+        }
+        
+        const dayNum = parseInt(day, 10);
+        if (dayNum < 1 || dayNum > 31) {
+            showError(dayInput, `${cardName} 的生辰日期必須在 1-31 之間`);
+            card.querySelector('.applicant-details').style.display = 'block';
+            card.setAttribute('data-open', 'true');
             return false;
         }
 
