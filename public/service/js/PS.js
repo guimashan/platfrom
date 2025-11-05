@@ -196,25 +196,26 @@ function createApplicantCard(name = '', canRemove = true) {
             </div>
             
             <div class="form-group">
+                <label for="puzhuo-${cardId}">普桌</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <label for="puzhuo-${cardId}" style="min-width: 100px;">普桌 數量</label>
-                    <input type="number" id="puzhuo-${cardId}" class="input-field donation-amount" value="0" min="0" step="1" placeholder="請輸入數量" style="flex: 1;">
+                    <span style="color: #666;">數量</span>
+                    <input type="number" id="puzhuo-${cardId}" class="input-field donation-amount" value="0" min="0" step="1" placeholder="請輸入數量">
                 </div>
             </div>
             
             <div class="form-group">
+                <label for="rice-${cardId}">白米</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <label for="rice-${cardId}" style="min-width: 100px;">白米</label>
                     <span style="color: #666;">NT$</span>
-                    <input type="number" id="rice-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額" style="flex: 1;">
+                    <input type="number" id="rice-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額">
                 </div>
             </div>
             
             <div class="form-group">
+                <label for="donation-${cardId}">隨喜功德</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <label for="donation-${cardId}" style="min-width: 100px;">隨喜功德</label>
                     <span style="color: #666;">NT$</span>
-                    <input type="number" id="donation-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額" style="flex: 1;">
+                    <input type="number" id="donation-${cardId}" class="input-field donation-amount" value="0" min="0" step="100" placeholder="請輸入金額">
                 </div>
             </div>
 
