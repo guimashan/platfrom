@@ -261,15 +261,15 @@ function createApplicantCard(name = '', canRemove = true) {
             <div class="form-group">
                 <label style="display: block; margin-bottom: 8px;">生辰 (國曆)</label>
                 <div style="display: flex; gap: 3px; align-items: center;">
-                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="____" maxlength="4" style="width: 52px; height: 53px; text-align: center; font-size: 1rem; padding: 12px 4px;">
                     <span style="font-size: 1rem;">年</span>
-                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 53px; text-align: center; font-size: 1rem; padding: 12px 4px;">
                     <span style="font-size: 1rem;">月</span>
-                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 50px; text-align: center; font-size: 1rem; padding: 12px 4px;">
+                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="__" maxlength="2" style="width: 34px; height: 53px; text-align: center; font-size: 1rem; padding: 12px 4px;">
                     <span style="font-size: 1rem;">日</span>
                     <div style="position: relative; display: inline-block;">
                         <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none;">
-                        <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 14px 12px; cursor: pointer; font-size: 1.1em; height: 50px;" title="點擊選擇日期">🗓️</button>
+                        <button type="button" id="bazi-btn-${cardId}" style="background: var(--primary-gold); color: white; border: none; border-radius: 4px; padding: 14px 12px; cursor: pointer; font-size: 1.1em; height: 53px;" title="點擊選擇日期">🗓️</button>
                     </div>
                 </div>
                 <div id="lunar-display-${cardId}" style="display: flex; gap: 3px; align-items: center; font-size: 0.95em; color: #666; margin-top: 5px; margin-bottom: 15px; min-height: 20px; font-weight: 500;">
@@ -286,11 +286,11 @@ function createApplicantCard(name = '', canRemove = true) {
                 <div class="shengxiao-time-grid">
                     <div>
                         <label for="shengxiao-${cardId}" style="display: block; margin-bottom: 8px;">生肖</label>
-                        <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 50px; font-size: 1rem;">
+                        <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 53px; font-size: 1rem;">
                     </div>
                     <div>
                         <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
-                        <select id="time-${cardId}" class="input-field" style="width: 100%; height: 50px; font-size: 1rem;">
+                        <select id="time-${cardId}" class="input-field" style="width: 100%; height: 53px; font-size: 1rem;">
                             <option value="">請選擇時辰</option>
                             <option value="吉時">吉時</option>
                             <option value="子時">子時 (23:00-01:00)</option>
