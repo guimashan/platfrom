@@ -21,7 +21,7 @@ import {
 
 // --- 全域變數 ---
 const SERVICE_TYPE = "dd";
-const LAMP_PRICE = 700;
+const LAMP_PRICE = 500;
 let currentUser = null; 
 let userData = null;
 
@@ -379,7 +379,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             </div>
             
             <div style="margin-top: 15px; padding: 12px; background-color: #f9f9f9; border-radius: 8px; font-size: 0.95rem; color: #666;">
-                每盞燈 700 元整，每份名單都可以複選燈別與數量
+                每盞燈 500 元整，每份名單都可以複選燈別與數量
             </div>
             
             <div class="card-actions">
