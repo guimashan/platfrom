@@ -198,7 +198,7 @@ function createApplicantCard(name = '', canRemove = true) {
             <div class="form-group">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="qingshiban-${cardId}" style="min-width: 180px; margin-bottom: 0;">青石板（$2,000 / 塊）</label>
-                    <input type="number" id="qingshiban-${cardId}" class="input-field donation-item" data-price="2000" min="0" placeholder="0" style="flex: 1;">
+                    <input type="number" id="qingshiban-${cardId}" class="input-field donation-item" data-price="2000" min="0" placeholder="0" style="flex: 1; text-align: center;">
                     <span style="color: #666; white-space: nowrap;">塊</span>
                 </div>
             </div>
@@ -206,7 +206,7 @@ function createApplicantCard(name = '', canRemove = true) {
             <div class="form-group">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="gangjin-${cardId}" style="min-width: 180px; margin-bottom: 0;">鋼筋（$3,000 / 公斤）</label>
-                    <input type="number" id="gangjin-${cardId}" class="input-field donation-item" data-price="3000" min="0" placeholder="0" style="flex: 1;">
+                    <input type="number" id="gangjin-${cardId}" class="input-field donation-item" data-price="3000" min="0" placeholder="0" style="flex: 1; text-align: center;">
                     <span style="color: #666; white-space: nowrap;">公斤</span>
                 </div>
             </div>
@@ -214,7 +214,7 @@ function createApplicantCard(name = '', canRemove = true) {
             <div class="form-group">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="shuini-${cardId}" style="min-width: 180px; margin-bottom: 0;">水泥（$300 / 包）</label>
-                    <input type="number" id="shuini-${cardId}" class="input-field donation-item" data-price="300" min="0" placeholder="0" style="flex: 1;">
+                    <input type="number" id="shuini-${cardId}" class="input-field donation-item" data-price="300" min="0" placeholder="0" style="flex: 1; text-align: center;">
                     <span style="color: #666; white-space: nowrap;">包</span>
                 </div>
             </div>
@@ -222,7 +222,7 @@ function createApplicantCard(name = '', canRemove = true) {
             <div class="form-group">
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="liuliwa-${cardId}" style="min-width: 180px; margin-bottom: 0;">琉璃瓦（$300 / 塊）</label>
-                    <input type="number" id="liuliwa-${cardId}" class="input-field donation-item" data-price="300" min="0" placeholder="0" style="flex: 1;">
+                    <input type="number" id="liuliwa-${cardId}" class="input-field donation-item" data-price="300" min="0" placeholder="0" style="flex: 1; text-align: center;">
                     <span style="color: #666; white-space: nowrap;">塊</span>
                 </div>
             </div>
@@ -231,7 +231,7 @@ function createApplicantCard(name = '', canRemove = true) {
                 <div style="display: flex; align-items: center; gap: 15px;">
                     <label for="other-${cardId}" style="min-width: 180px; margin-bottom: 0;">其他</label>
                     <span style="color: #666; white-space: nowrap;">NT$</span>
-                    <input type="number" id="other-${cardId}" class="input-field donation-item" data-price="1" min="0" step="100" placeholder="0" style="flex: 1;">
+                    <input type="number" id="other-${cardId}" class="input-field donation-item" data-price="1" min="0" step="100" placeholder="0" style="flex: 1; text-align: center;">
                 </div>
             </div>
 
