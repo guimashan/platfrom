@@ -203,10 +203,8 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <span style="position: relative; display: inline-block;">
-                                    <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; height: 44px; opacity: 0; position: absolute; cursor: pointer; left: 0; top: 0;">
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; pointer-events: none;">🗓️</span>
-                                </span>
+                                <button type="button" class="date-picker-btn" data-target="birthDate" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="position: absolute; opacity: 0; pointer-events: none;">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
@@ -378,10 +376,8 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>日</span>
-                                <span style="position: relative; display: inline-block;">
-                                    <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; height: 44px; opacity: 0; position: absolute; cursor: pointer; left: 0; top: 0;">
-                                    <span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 44px; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; pointer-events: none;">🗓️</span>
-                                </span>
+                                <button type="button" class="date-picker-btn" data-target="birthDate" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="position: absolute; opacity: 0; pointer-events: none;">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
@@ -502,6 +498,22 @@ function createCategoryCard(category) {
         // 監聽日期選擇器的變化
         card.querySelectorAll('.date-picker-trigger').forEach(picker => {
             picker.addEventListener('change', (e) => handleDatePickerChange(card, e.target));
+        });
+
+        // 監聽日期選擇器按鈕點擊
+        card.querySelectorAll('.date-picker-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-target');
+                const picker = card.querySelector(`.date-picker-trigger[data-target="${target}"]`);
+                if (picker) {
+                    // 嘗試使用 showPicker()，若不支援則使用 click()
+                    if (picker.showPicker) {
+                        picker.showPicker();
+                    } else {
+                        picker.click();
+                    }
+                }
+            });
         });
     }
 
