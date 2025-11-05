@@ -43,7 +43,7 @@
                 <div style="line-height: 1.8; color: #4A3C2F;">
                     <p>感恩您發心護持龜馬山紫皇天乙真慶宮建宮大業</p>
                     <p style="margin-top: 10px;"><strong>護持方案</strong>：三年期捐助 NT$ 30,000</p>
-                    <p style="margin-top: 5px;"><strong>繳款方式</strong>：可選擇季繳、半年繳或年繳</p>
+                    <p style="margin-top: 5px;"><strong>繳款方式</strong>：可選擇季繳、半年繳、年繳或全繳</p>
                     <p style="margin-top: 5px;"><strong>功德回向</strong>：每期自動扣款，功德持續累積</p>
                 </div>
             </div>
@@ -52,8 +52,8 @@
             <div class="card">
                 <h2 class="card-title">報名聯絡資訊</h2>
                 <div class="form-group">
-                    <label for="contactName">報名姓名 (主要聯絡人)</label>
-                    <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
+                    <label for="contactName">會員 姓名/企業團體</label>
+                    <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名或企業團體名稱">
                 </div>
                 
                 <div class="form-group">
@@ -69,6 +69,29 @@
                 <div class="form-group">
                     <label for="contactAddress">通訊地址</label>
                     <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
+                </div>
+
+                <div class="form-group">
+                    <label>感謝狀抬頭</label>
+                    <div class="radio-group" style="flex-direction: column; gap: 10px;">
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="donor" checked>
+                            <span>同功德主名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="cardholder">
+                            <span>同持卡人姓名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="custom">
+                            <span>其他</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="customNameField" class="form-group" style="display: none;">
+                    <label for="customName">自訂感謝狀抬頭</label>
+                    <input type="text" id="customName" class="input-field" placeholder="請輸入感謝狀抬頭名稱">
                 </div>
             </div>
 
@@ -96,8 +119,45 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="birthDate">出生日期</label>
-                    <input type="date" id="birthDate" class="input-field">
+                    <label for="idNumber">身分證字號</label>
+                    <input type="text" id="idNumber" class="input-field" placeholder="請輸入身分證字號" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px;">出生日期 (國曆)</label>
+                    <div style="margin-bottom: 4px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
+                            <span style="color: #666;">民國</span>
+                            <input type="text" id="bazi-year" class="input-field" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                            <span>年</span>
+                            <input type="text" id="bazi-month" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>月</span>
+                            <input type="text" id="bazi-day" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>日</span>
+                            <button type="button" id="bazi-btn" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                            <input type="date" id="bazi" style="position: absolute; opacity: 0; pointer-events: none;">
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="western-year" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="western-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">月</span>
+                        <span id="western-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
+                    <div id="lunar-display" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="lunar-year" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="lunar-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span id="lunar-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
                 </div>
             </div>
 
@@ -163,34 +223,7 @@
                 </div>
             </div>
 
-            <!-- IV. 感謝狀抬頭 -->
-            <div class="card">
-                <h2 class="card-title">感謝狀抬頭</h2>
-                
-                <div class="form-group">
-                    <div class="radio-group" style="flex-direction: column; gap: 10px;">
-                        <label class="radio-label">
-                            <input type="radio" name="certificateName" value="donor" checked>
-                            <span>同功德主名</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="certificateName" value="cardholder">
-                            <span>同信用卡持卡人</span>
-                        </label>
-                        <label class="radio-label">
-                            <input type="radio" name="certificateName" value="custom">
-                            <span>其他（自訂抬頭）</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div id="customNameField" class="form-group" style="display: none; margin-top: 15px;">
-                    <label for="customName">自訂感謝狀抬頭</label>
-                    <input type="text" id="customName" class="input-field" placeholder="請輸入感謝狀抬頭名稱">
-                </div>
-            </div>
-
-            <!-- V. 信用卡資訊 -->
+            <!-- IV. 信用卡資訊 -->
             <div class="card payment-card">
                 <h2 class="card-title">信用卡資訊 (手動刷卡用)</h2>
                 <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
@@ -249,6 +282,7 @@
         </div>
     </div> <!-- 關閉 mainApp -->
 
+    <script src="../lib/lunar.js" defer></script>
     <script src="../js/firebase-init.js" type="module"></script>
     <script src="js/FT.js" type="module"></script>
 </body>

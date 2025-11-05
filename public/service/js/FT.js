@@ -40,7 +40,18 @@ const contactPhoneEl = document.getElementById('contactPhone');
 const contactEmailEl = document.getElementById('contactEmail');
 const contactAddressEl = document.getElementById('contactAddress');
 const donorNameEl = document.getElementById('donorName');
-const birthDateEl = document.getElementById('birthDate');
+const idNumberEl = document.getElementById('idNumber');
+const baziYearEl = document.getElementById('bazi-year');
+const baziMonthEl = document.getElementById('bazi-month');
+const baziDayEl = document.getElementById('bazi-day');
+const baziBtnEl = document.getElementById('bazi-btn');
+const baziDateEl = document.getElementById('bazi');
+const westernYearEl = document.getElementById('western-year');
+const westernMonthEl = document.getElementById('western-month');
+const westernDayEl = document.getElementById('western-day');
+const lunarYearEl = document.getElementById('lunar-year');
+const lunarMonthEl = document.getElementById('lunar-month');
+const lunarDayEl = document.getElementById('lunar-day');
 const firstPaymentEl = document.getElementById('firstPayment');
 const footerFirstPaymentEl = document.getElementById('footerFirstPayment');
 const customNameFieldEl = document.getElementById('customNameField');
@@ -136,6 +147,9 @@ function setupEventListeners() {
         contactNameEl.value = donorNameEl.value;
     });
 
+    // 日期處理
+    setupDateHandlers();
+
     submitBtnEl.addEventListener('click', handleSubmit);
     
     // 自動清除錯誤提示
@@ -143,7 +157,10 @@ function setupEventListeners() {
     contactPhoneEl.addEventListener('input', () => clearError(contactPhoneEl));
     contactAddressEl.addEventListener('input', () => clearError(contactAddressEl));
     donorNameEl.addEventListener('input', () => clearError(donorNameEl));
-    birthDateEl.addEventListener('input', () => clearError(birthDateEl));
+    idNumberEl.addEventListener('input', () => clearError(idNumberEl));
+    baziYearEl.addEventListener('input', () => clearError(baziYearEl));
+    baziMonthEl.addEventListener('input', () => clearError(baziMonthEl));
+    baziDayEl.addEventListener('input', () => clearError(baziDayEl));
     
     // 信用卡格式化
     cardNumberEl.addEventListener('input', formatCardNumber);
@@ -167,6 +184,82 @@ function handleCertificateNameChange() {
     if (selectedOption !== 'custom') {
         customNameEl.value = '';
     }
+}
+
+// --- 日期處理函數 ---
+function setupDateHandlers() {
+    // 民國年轉西元年
+    function rocToWestern(rocYear) {
+        return parseInt(rocYear) + 1911;
+    }
+
+    // 西元年轉民國年
+    function westernToRoc(westernYear) {
+        return westernYear - 1911;
+    }
+
+    // 更新西曆和農曆顯示
+    function updateDateDisplay() {
+        const rocYear = baziYearEl.value.trim();
+        const month = baziMonthEl.value.trim();
+        const day = baziDayEl.value.trim();
+
+        if (rocYear && month && day) {
+            const westernYear = rocToWestern(rocYear);
+            
+            // 顯示西曆
+            westernYearEl.textContent = westernYear;
+            westernMonthEl.textContent = month.padStart(2, '0');
+            westernDayEl.textContent = day.padStart(2, '0');
+
+            // 計算農曆
+            try {
+                if (typeof Lunar !== 'undefined') {
+                    const lunar = Lunar.fromYmd(westernYear, parseInt(month), parseInt(day));
+                    lunarYearEl.textContent = lunar.getYearInGanZhi();
+                    lunarMonthEl.textContent = lunar.getMonthInChinese();
+                    lunarDayEl.textContent = lunar.getDayInChinese();
+                }
+            } catch (error) {
+                console.error('農曆轉換錯誤:', error);
+                lunarYearEl.textContent = '';
+                lunarMonthEl.textContent = '';
+                lunarDayEl.textContent = '';
+            }
+        } else {
+            westernYearEl.textContent = '';
+            westernMonthEl.textContent = '';
+            westernDayEl.textContent = '';
+            lunarYearEl.textContent = '';
+            lunarMonthEl.textContent = '';
+            lunarDayEl.textContent = '';
+        }
+    }
+
+    // 監聽民國年、月、日輸入
+    baziYearEl.addEventListener('input', updateDateDisplay);
+    baziMonthEl.addEventListener('input', updateDateDisplay);
+    baziDayEl.addEventListener('input', updateDateDisplay);
+
+    // 日曆按鈕點擊
+    baziBtnEl.addEventListener('click', () => {
+        baziDateEl.click();
+    });
+
+    // 日曆選擇器變更
+    baziDateEl.addEventListener('change', (e) => {
+        const dateValue = e.target.value;
+        if (dateValue) {
+            const [westernYear, month, day] = dateValue.split('-');
+            const rocYear = westernToRoc(parseInt(westernYear));
+            
+            baziYearEl.value = rocYear;
+            baziMonthEl.value = parseInt(month);
+            baziDayEl.value = parseInt(day);
+            
+            updateDateDisplay();
+        }
+    });
 }
 
 // --- 錯誤處理函數 ---
@@ -268,8 +361,68 @@ async function handleSubmit() {
             return;
         }
 
-        if (!birthDateEl.value) {
-            showError(birthDateEl, '請填寫出生日期');
+        if (!idNumberEl.value.trim()) {
+            showError(idNumberEl, '請填寫身分證字號');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        // 驗證身分證字號格式
+        const idNumber = idNumberEl.value.trim().toUpperCase();
+        if (!/^[A-Z][12]\d{8}$/.test(idNumber)) {
+            showError(idNumberEl, '身分證字號格式不正確');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        // 驗證出生日期（ROC年格式）
+        const rocYear = baziYearEl.value.trim();
+        const month = baziMonthEl.value.trim();
+        const day = baziDayEl.value.trim();
+
+        if (!rocYear || !month || !day) {
+            let errorInput, errorField;
+            if (!rocYear) {
+                errorInput = baziYearEl;
+                errorField = '年';
+            } else if (!month) {
+                errorInput = baziMonthEl;
+                errorField = '月';
+            } else {
+                errorInput = baziDayEl;
+                errorField = '日';
+            }
+            showError(errorInput, `請填寫出生日期（${errorField}）`);
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        // 驗證日期有效性
+        const westernYear = parseInt(rocYear) + 1911;
+        const monthNum = parseInt(month);
+        const dayNum = parseInt(day);
+
+        if (monthNum < 1 || monthNum > 12) {
+            showError(baziMonthEl, '月份必須在 1-12 之間');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        if (dayNum < 1 || dayNum > 31) {
+            showError(baziDayEl, '日期必須在 1-31 之間');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
+        // 檢查日期是否存在
+        const testDate = new Date(westernYear, monthNum - 1, dayNum);
+        if (testDate.getMonth() + 1 !== monthNum || testDate.getDate() !== dayNum) {
+            showError(baziDayEl, '此日期不存在');
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
             return;
@@ -326,9 +479,9 @@ async function handleSubmit() {
             return;
         }
 
-        const [month, year] = cardExpiry.split('/').map(Number);
+        const [cardMonth, cardYear] = cardExpiry.split('/').map(Number);
         const now = new Date();
-        const expiry = new Date(2000 + year, month - 1);
+        const expiry = new Date(2000 + cardYear, cardMonth - 1);
         if (expiry < now) {
             alert('此信用卡已過期');
             cardExpiryEl.focus();
@@ -353,10 +506,35 @@ async function handleSubmit() {
             address: contactAddressEl.value.trim()
         };
 
+        // 組合出生日期（西元年格式，使用前面已聲明的 westernYear）
+        const birthDate = `${westernYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+
+        // 收集農曆資訊
+        let lunarInfo = null;
+        try {
+            if (typeof Lunar !== 'undefined') {
+                const lunar = Lunar.fromYmd(westernYear, parseInt(month), parseInt(day));
+                lunarInfo = {
+                    year: lunar.getYearInGanZhi(),
+                    month: lunar.getMonthInChinese(),
+                    day: lunar.getDayInChinese()
+                };
+            }
+        } catch (error) {
+            console.error('農曆轉換錯誤:', error);
+        }
+
         const donorInfo = {
             name: donorNameEl.value.trim(),
             gender: document.querySelector('input[name="gender"]:checked').value,
-            birthDate: birthDateEl.value
+            idNumber: idNumberEl.value.trim().toUpperCase(),
+            birthDate: birthDate,
+            birthDateRoc: {
+                year: rocYear,
+                month: month,
+                day: day
+            },
+            lunarBirthDate: lunarInfo
         };
 
         const paymentPlanInfo = {
@@ -370,7 +548,10 @@ async function handleSubmit() {
         const applicants = [{
             applicantName: donorInfo.name,
             gender: donorInfo.gender,
+            idNumber: donorInfo.idNumber,
             birthDate: donorInfo.birthDate,
+            birthDateRoc: donorInfo.birthDateRoc,
+            lunarBirthDate: donorInfo.lunarBirthDate,
             paymentPlan: paymentPlanInfo,
             certificateName: certificateName,
             certificateOption: certificateOption
