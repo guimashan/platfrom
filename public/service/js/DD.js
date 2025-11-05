@@ -308,26 +308,31 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <span style="font-size: 0.85em;">日</span>
             </div>
 
-            <label for="shengxiao-${cardId}">生肖</label>
-            <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後，自動顯示！" style="background-color: #f5f5f5; cursor: not-allowed; max-width: 30%;">
-
-            <label for="time-${cardId}">時辰</label>
-            <select id="time-${cardId}" class="input-field">
-                <option value="">請選擇時辰</option>
-                <option value="吉時">吉時</option>
-                <option value="子時">子時 (23:00-01:00)</option>
-                <option value="丑時">丑時 (01:00-03:00)</option>
-                <option value="寅時">寅時 (03:00-05:00)</option>
-                <option value="卯時">卯時 (05:00-07:00)</option>
-                <option value="辰時">辰時 (07:00-09:00)</option>
-                <option value="巳時">巳時 (09:00-11:00)</option>
-                <option value="午時">午時 (11:00-13:00)</option>
-                <option value="未時">未時 (13:00-15:00)</option>
-                <option value="申時">申時 (15:00-17:00)</option>
-                <option value="酉時">酉時 (17:00-19:00)</option>
-                <option value="戌時">戌時 (19:00-21:00)</option>
-                <option value="亥時">亥時 (21:00-23:00)</option>
-            </select>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; align-items: start;">
+                <div>
+                    <label for="shengxiao-${cardId}" style="display: block; margin-bottom: 8px;">生肖</label>
+                    <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 44px; font-size: 1rem;">
+                </div>
+                <div>
+                    <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
+                    <select id="time-${cardId}" class="input-field" style="width: 100%; height: 44px; font-size: 1rem;">
+                        <option value="">請選擇時辰</option>
+                        <option value="吉時">吉時</option>
+                        <option value="子時">子時 (23:00-01:00)</option>
+                        <option value="丑時">丑時 (01:00-03:00)</option>
+                        <option value="寅時">寅時 (03:00-05:00)</option>
+                        <option value="卯時">卯時 (05:00-07:00)</option>
+                        <option value="辰時">辰時 (07:00-09:00)</option>
+                        <option value="巳時">巳時 (09:00-11:00)</option>
+                        <option value="午時">午時 (11:00-13:00)</option>
+                        <option value="未時">未時 (13:00-15:00)</option>
+                        <option value="申時">申時 (15:00-17:00)</option>
+                        <option value="酉時">酉時 (17:00-19:00)</option>
+                        <option value="戌時">戌時 (19:00-21:00)</option>
+                        <option value="亥時">亥時 (21:00-23:00)</option>
+                    </select>
+                </div>
+            </div>
             
             <div style="margin-top: 20px; margin-bottom: 10px;">
                 <label style="font-weight: bold; font-size: 1.05em;">燈種選擇</label>
