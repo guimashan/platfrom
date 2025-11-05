@@ -188,6 +188,12 @@ function autoFillShengxiao(card, dateString) {
     }
     
     try {
+        // 检查Solar对象是否可用
+        if (typeof Solar === 'undefined') {
+            console.error('❌ lunar.js未加载，Solar对象不可用');
+            return;
+        }
+        
         const [year, month, day] = dateString.split('-').map(Number);
         const solar = Solar.fromYmd(year, month, day);
         const lunar = solar.getLunar();
