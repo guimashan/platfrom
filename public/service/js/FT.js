@@ -39,7 +39,6 @@ const contactNameEl = document.getElementById('contactName');
 const contactPhoneEl = document.getElementById('contactPhone');
 const contactEmailEl = document.getElementById('contactEmail');
 const contactAddressEl = document.getElementById('contactAddress');
-const donorNameEl = document.getElementById('donorName');
 const idNumberEl = document.getElementById('idNumber');
 const baziYearEl = document.getElementById('bazi-year');
 const baziMonthEl = document.getElementById('bazi-month');
@@ -84,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (userSnap.exists()) {
                 userData = userSnap.data();
                 contactNameEl.value = userData.displayName || '';
-                donorNameEl.value = userData.displayName || '';
                 contactPhoneEl.value = userData.phone || '';
                 contactEmailEl.value = userData.email || '';
             }
@@ -139,13 +137,6 @@ function setupEventListeners() {
         radio.addEventListener('change', handleCertificateNameChange);
     });
 
-    // 姓名雙向同步
-    contactNameEl.addEventListener('input', () => {
-        donorNameEl.value = contactNameEl.value;
-    });
-    donorNameEl.addEventListener('input', () => {
-        contactNameEl.value = donorNameEl.value;
-    });
 
     // 日期處理
     setupDateHandlers();
@@ -156,7 +147,6 @@ function setupEventListeners() {
     contactNameEl.addEventListener('input', () => clearError(contactNameEl));
     contactPhoneEl.addEventListener('input', () => clearError(contactPhoneEl));
     contactAddressEl.addEventListener('input', () => clearError(contactAddressEl));
-    donorNameEl.addEventListener('input', () => clearError(donorNameEl));
     idNumberEl.addEventListener('input', () => clearError(idNumberEl));
     baziYearEl.addEventListener('input', () => clearError(baziYearEl));
     baziMonthEl.addEventListener('input', () => clearError(baziMonthEl));
@@ -353,14 +343,7 @@ async function handleSubmit() {
             return;
         }
 
-        // 2. 驗證功德主資料
-        if (!donorNameEl.value.trim()) {
-            showError(donorNameEl, '請填寫功德主姓名');
-            submitBtnEl.disabled = false;
-            submitBtnEl.textContent = '確認報名並送出';
-            return;
-        }
-
+        // 2. 驗證性別、身分證字號、出生日期
         if (!idNumberEl.value.trim()) {
             showError(idNumberEl, '請填寫身分證字號');
             submitBtnEl.disabled = false;
@@ -437,7 +420,7 @@ async function handleSubmit() {
         let certificateName = '';
         
         if (certificateOption === 'donor') {
-            certificateName = donorNameEl.value.trim();
+            certificateName = contactNameEl.value.trim();
         } else if (certificateOption === 'cardholder') {
             certificateName = cardHolderNameEl.value.trim();
         } else if (certificateOption === 'custom') {
@@ -525,7 +508,7 @@ async function handleSubmit() {
         }
 
         const donorInfo = {
-            name: donorNameEl.value.trim(),
+            name: contactNameEl.value.trim(),
             gender: document.querySelector('input[name="gender"]:checked').value,
             idNumber: idNumberEl.value.trim().toUpperCase(),
             birthDate: birthDate,
