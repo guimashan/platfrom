@@ -197,11 +197,11 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 100px;">
+                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px;">
                                 <span>日</span>
                                 <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
@@ -209,21 +209,21 @@ function createCategoryCard(category) {
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
@@ -369,11 +369,11 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 100px;">
+                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px;">
                                 <span>年</span>
-                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px;">
                                 <span>月</span>
-                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 80px;">
+                                <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 50px;">
                                 <span>日</span>
                                 <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
@@ -381,21 +381,21 @@ function createCategoryCard(category) {
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
                             <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
                             <span style="visibility: hidden;">民國</span>
-                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666; text-align: center;"></span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">年</span>
-                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">月</span>
-                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666; text-align: center;"></span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
                             <span style="color: #666;">日</span>
                         </div>
                     </div>
