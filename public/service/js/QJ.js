@@ -765,10 +765,9 @@ async function handleSubmit() {
         
         const result = await response.json();
         console.log("後端回傳結果:", result);
-        alert(`報名成功！\n您的訂單編號為: ${result.result.orderId}\n我們將在核對資料後盡快為您處理。`);
         
-        // 重置表單
-        window.location.reload();
+        // 跳轉到訂單確認頁面
+        window.location.href = `success.html?orderId=${result.result.orderId}&service=${SERVICE_TYPE}`;
 
     } catch (error) {
         console.error("報名失敗:", error);
