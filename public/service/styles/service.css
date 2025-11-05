@@ -510,6 +510,81 @@ body {
         grid-template-columns: 1fr;
         gap: 12px;
     }
+    
+    /* 日期格式在手机上优化 - 针对生辰/忌日的國曆/西曆/農曆三层显示 */
+    /* 缩小输入框宽度 */
+    input[id^="bazi-year-"],
+    input[id^="death-year-"],
+    input[id^="birth-year-ancestor-"],
+    input[id^="death-year-ancestor-"],
+    input[id^="birth-year-other-"],
+    input[id^="death-year-other-"] {
+        width: 50px !important;
+        padding: 8px 2px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    input[id^="bazi-month-"],
+    input[id^="bazi-day-"],
+    input[id^="death-month-"],
+    input[id^="death-day-"],
+    input[id^="birth-month-ancestor-"],
+    input[id^="birth-day-ancestor-"],
+    input[id^="death-month-ancestor-"],
+    input[id^="death-day-ancestor-"],
+    input[id^="birth-month-other-"],
+    input[id^="birth-day-other-"],
+    input[id^="death-month-other-"],
+    input[id^="death-day-other-"] {
+        width: 40px !important;
+        padding: 8px 2px !important;
+        font-size: 0.95rem !important;
+    }
+    
+    /* 缩小日历按钮 */
+    button[id^="bazi-btn-"],
+    button[id^="death-btn-"],
+    button[id^="birth-btn-ancestor-"],
+    button[id^="death-btn-ancestor-"],
+    button[id^="birth-btn-other-"],
+    button[id^="death-btn-other-"] {
+        width: 36px !important;
+        padding: 8px 0 !important;
+        font-size: 18px !important;
+    }
+    
+    /* 缩小西曆/農曆显示宽度 */
+    span[id^="western-year-"],
+    span[id^="lunar-year-"],
+    span[id^="western-year-ancestor-"],
+    span[id^="lunar-year-ancestor-"],
+    span[id^="western-year-other-"],
+    span[id^="lunar-year-other-"] {
+        width: 50px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    span[id^="western-month-"],
+    span[id^="western-day-"],
+    span[id^="lunar-month-"],
+    span[id^="lunar-day-"],
+    span[id^="western-month-ancestor-"],
+    span[id^="western-day-ancestor-"],
+    span[id^="lunar-month-ancestor-"],
+    span[id^="lunar-day-ancestor-"],
+    span[id^="western-month-other-"],
+    span[id^="western-day-other-"],
+    span[id^="lunar-month-other-"],
+    span[id^="lunar-day-other-"] {
+        width: 40px !important;
+        font-size: 0.9rem !important;
+    }
+    
+    /* 缩小标签和文字 */
+    .applicant-details label,
+    .form-group label {
+        font-size: 0.9rem !important;
+    }
 }
 
 /* 數量輸入框：上下箭头始終顯示 */
