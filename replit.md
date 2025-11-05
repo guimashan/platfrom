@@ -312,8 +312,8 @@ npm run emulators
   - 部分類別支援農曆轉換
 - 適用情境：需要多種「類別」而非多個「人」的服務
 
-📋 **模板 C：分期付款模板**（FT.html / FT.js 為範本）
-- 適用表單：FT, FTY（福田會系列）
+📋 **模板 C：分期付款模板**（FTP.html / FTP.js 為範本）
+- 適用表單：FTP, FTY（福田會系列）
 - 架構特色：
   - 個人報名（無多人模式）
   - 繳款方式選擇（季繳/半年繳/年繳）
@@ -357,7 +357,7 @@ npm run emulators
    - 部分類別支援農曆轉換（祖先、其他）
    - 6 種超拔類別獨立卡片設計
 
-7. **FT - 福田會**（使用模板 C - 分期付款）
+7. **FTP - 福田會**（使用模板 C - 分期付款）
    - 護持方案：三年期總額 NT$ 30,000
    - 繳款方式：季繳（12期×$2,500）/ 半年繳（6期×$5,000）/ 年繳（3期×$10,000）
    - 感謝狀抬頭選擇：同功德主名/同持卡人/自訂
@@ -382,7 +382,7 @@ PS  - 普施法會        隨喜功德             ✅ 完成
 BG  - 建宮廟款        隨喜捐款             ✅ 完成
 XY  - 添香油          $100/份 + 隨喜       ✅ 完成
 ZY  - 中元法會        $1,500/位超拔        ✅ 完成
-FT  - 福田會          三年期 $30,000       ✅ 完成
+FTP - 福田會          三年期 $30,000       ✅ 完成
 FTY - 福田少年會      五年期 $30,000       ✅ 完成
 ```
 
@@ -396,11 +396,11 @@ FTY - 福田少年會      五年期 $30,000       ✅ 完成
 **模板複用策略**：
 - 📋 新增簡單服務（如：祈福法會）→ 複製模板 A（ND.js），修改價格和項目
 - 📋 新增類別型服務（如：祭祀法會）→ 複製模板 B（ZY.js），修改類別和欄位
-- 📋 新增分期服務（如：長期護持）→ 複製模板 C（FT.js），修改期數和金額
+- 📋 新增分期服務（如：長期護持）→ 複製模板 C（FTP.js），修改期數和金額
 
 **檔案更新**：
-- 前端 HTML：XY.html, ZY.html, FT.html, FTY.html
-- JavaScript：XY.js, ZY.js, FT.js, FTY.js
+- 前端 HTML：XY.html, ZY.html, FTP.html, FTY.html
+- JavaScript：XY.js, ZY.js, FTP.js, FTY.js
 - 樣式：service.css（新增類別區塊樣式、繳款方案樣式）
 
 **後端支援**：
@@ -413,7 +413,7 @@ FTY - 福田少年會      五年期 $30,000       ✅ 完成
 ```
 https://go.guimashan.org.tw/service/XY.html
 https://go.guimashan.org.tw/service/ZY.html
-https://go.guimashan.org.tw/service/FT.html
+https://go.guimashan.org.tw/service/FTP.html
 https://go.guimashan.org.tw/service/FTY.html
 ```
 
