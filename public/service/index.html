@@ -6,74 +6,106 @@
     <title>神務服務 - 龜馬山 goLine</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <link rel="stylesheet" href="styles/service.css">
     <style>
-        .service-grid {
-            display: grid;
-            gap: 15px;
-            max-width: 600px;
+        .service-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
             margin: 0 auto;
         }
 
         .service-btn {
             display: block;
-            padding: 18px 30px;
+            padding: 1rem 1.5rem;
             background: white;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            border-radius: 50px;
-            font-size: 20px;
+            border: 2px solid var(--primary-gold);
+            border-radius: var(--radius-sm);
+            font-size: 1.1rem;
             font-weight: 500;
-            color: var(--text-primary);
+            color: var(--primary-gold-dark);
             text-align: center;
             text-decoration: none;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .service-btn:hover {
-            background: linear-gradient(135deg, var(--primary-gold) 0%, #f4d03f 100%);
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
             color: white;
-            border-color: var(--primary-gold);
+            border-color: var(--primary-gold-dark);
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            box-shadow: var(--shadow-md);
         }
 
         .service-btn:active {
             transform: translateY(0);
         }
+
+        .service-container {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 2rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            margin: 2rem auto;
+            max-width: 600px;
+        }
+
+        .service-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-gold);
+        }
+
+        .service-header h2 {
+            color: var(--primary-gold-dark);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .service-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
-    <!-- 未登入畫面 (預設顯示) -->
-    <div id="loginPrompt" class="login-prompt">
-        <div class="welcome-card">
-            <h2>歡迎</h2>
-            <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
-            <button id="loginBtn" class="btn btn-primary">
-                LINE 登入
-            </button>
-        </div>
-    </div>
-
-    <!-- 主要內容 (預設隱藏，登入後才顯示) -->
-    <div id="mainApp" style="display: none;">
-        <header class="header">
-            <div class="header-left">
-                <h1>神務服務</h1>
-                <p>線上報名系統</p>
-            </div>
-            <div class="header-actions">
-                <button class="btn-logout" onclick="window.location.href='/'">
-                    返回首頁
+    <div class="container">
+        <!-- 未登入畫面 -->
+        <div id="loginPrompt" class="main-content">
+            <div class="welcome-card">
+                <h2>歡迎</h2>
+                <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
+                <button id="loginBtn" class="btn btn-primary">
+                    LINE 登入
                 </button>
             </div>
-        </header>
+        </div>
 
-        <div class="container">
-            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-                <div class="card">
-                    <div class="service-grid">
+        <!-- 主要內容 -->
+        <div id="mainApp" style="display: none;">
+            <header class="header">
+                <div class="header-left">
+                    <h1>神務服務</h1>
+                    <p>線上報名系統</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-logout" onclick="window.location.href='/'">
+                        返回首頁
+                    </button>
+                </div>
+            </header>
+
+            <div class="main-content">
+                <div class="service-container">
+                    <div class="service-header">
+                        <h2>🙏 請選擇服務項目</h2>
+                        <p>點選以下服務進行線上報名</p>
+                    </div>
+                    
+                    <div class="service-list">
                         <a href="DD.html" class="service-btn">線上點燈</a>
                         <a href="ND.html" class="service-btn">年斗法會</a>
                         <a href="LD.html" class="service-btn">禮斗法會</a>
@@ -90,9 +122,6 @@
     <script src="../js/firebase-init.js"></script>
     <script type="module">
         import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-        const auth = getAuth(window.firebaseApp);
-        const platformAuth = getAuth(window.platformApp);
 
         const LIFF_ID = '2006582260-YBnDz9Xk';
         const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
@@ -118,24 +147,25 @@
                         window.location.href = lineAuthUrl.toString();
                     });
                     
-                    loginPromptEl.style.display = 'flex';
+                    loginPromptEl.style.display = 'block';
                     mainAppEl.style.display = 'none';
                     return;
                 }
 
+                const platformAuth = getAuth(window.platformApp);
                 onAuthStateChanged(platformAuth, (user) => {
                     if (user) {
                         loginPromptEl.style.display = 'none';
                         mainAppEl.style.display = 'block';
                     } else {
-                        loginPromptEl.style.display = 'flex';
+                        loginPromptEl.style.display = 'block';
                         mainAppEl.style.display = 'none';
                     }
                 });
 
             } catch (error) {
                 console.error('LIFF 初始化失敗:', error);
-                loginPromptEl.style.display = 'flex';
+                loginPromptEl.style.display = 'block';
                 mainAppEl.style.display = 'none';
             }
         }
