@@ -53,33 +53,8 @@
             <div class="card">
                 <h2 class="card-title">報名聯絡資訊</h2>
                 <div class="form-group">
-                    <label for="contactName">報名姓名 (主要聯絡人)</label>
+                    <label for="contactName">會員 姓名</label>
                     <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactPhone">連絡電話</label>
-                    <input type="tel" id="contactPhone" class="input-field" placeholder="請輸入電話">
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactEmail">電子信箱</label>
-                    <input type="email" id="contactEmail" class="input-field" placeholder="請輸入 Email">
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactAddress">通訊地址</label>
-                    <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
-                </div>
-            </div>
-
-            <!-- II. 功德主資料 -->
-            <div class="card">
-                <h2 class="card-title">功德主資料</h2>
-                
-                <div class="form-group">
-                    <label for="donorName">功德主姓名</label>
-                    <input type="text" id="donorName" class="input-field" placeholder="請輸入功德主姓名">
                 </div>
 
                 <div class="form-group">
@@ -97,15 +72,88 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="birthDate">出生日期（需年滿 30 歲以下）</label>
-                    <input type="date" id="birthDate" class="input-field">
-                    <div id="ageWarning" style="display: none; color: #dc3545; font-size: 0.9rem; margin-top: 5px;">
-                        福田少年會限 30 歲以下青年加入
+                    <label for="idNumber">身分證字號</label>
+                    <input type="text" id="idNumber" class="input-field" placeholder="請輸入身分證字號" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px;">出生日期 (國曆)</label>
+                    <div style="margin-bottom: 4px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
+                            <span style="color: #666;">民國</span>
+                            <input type="text" id="bazi-year" class="input-field" placeholder="年" maxlength="3" style="width: 60px; text-align: center;">
+                            <span>年</span>
+                            <input type="text" id="bazi-month" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>月</span>
+                            <input type="text" id="bazi-day" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>日</span>
+                            <button type="button" id="bazi-btn" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                            <input type="date" id="bazi" style="position: absolute; opacity: 0; pointer-events: none;">
+                        </div>
                     </div>
+                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="western-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="western-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">月</span>
+                        <span id="western-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
+                    <div id="lunar-display" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="lunar-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="lunar-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">月</span>
+                        <span id="lunar-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">連絡電話</label>
+                    <input type="tel" id="contactPhone" class="input-field" placeholder="請輸入電話">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">電子信箱</label>
+                    <input type="email" id="contactEmail" class="input-field" placeholder="請輸入 Email">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactAddress">通訊地址</label>
+                    <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
+                </div>
+
+                <div class="form-group">
+                    <label>感謝狀抬頭</label>
+                    <div class="radio-group" style="flex-direction: column; gap: 10px;">
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="donor" checked>
+                            <span>同會員姓名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="cardholder">
+                            <span>同持卡人姓名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="custom">
+                            <span>其他</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="customNameField" class="form-group" style="display: none;">
+                    <label for="customName">自訂感謝狀抬頭</label>
+                    <input type="text" id="customName" class="input-field" placeholder="請輸入感謝狀抬頭名稱">
                 </div>
             </div>
 
-            <!-- III. 繳款方式 -->
+            <!-- II. 繳款方式 -->
             <div class="card">
                 <h2 class="card-title">繳款方式選擇</h2>
                 <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
