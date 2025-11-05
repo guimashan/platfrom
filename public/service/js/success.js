@@ -59,6 +59,8 @@ function getUrlParams() {
 async function loadOrderData() {
     const { orderId, service } = getUrlParams();
     
+    console.log('開始載入訂單:', { orderId, service });
+    
     if (!orderId || !service) {
         showError('缺少訂單資訊');
         return;
@@ -67,6 +69,7 @@ async function loadOrderData() {
     serviceType = service;
     
     try {
+        console.log('查詢資料庫:', 'registrations', { orderId, serviceType: service });
         const q = query(
             collection(db, 'registrations'),
             where('orderId', '==', orderId),
@@ -74,17 +77,19 @@ async function loadOrderData() {
         );
         
         const querySnapshot = await getDocs(q);
+        console.log('查詢結果:', querySnapshot.size, '筆資料');
         
         if (querySnapshot.empty) {
-            showError('找不到訂單資料');
+            showError('找不到訂單資料（訂單編號：' + orderId + '）');
             return;
         }
         
         orderData = querySnapshot.docs[0].data();
+        console.log('訂單資料載入成功:', orderData);
         displayOrderInfo();
     } catch (error) {
         console.error('載入訂單失敗:', error);
-        showError('載入訂單失敗，請稍後再試');
+        showError('載入訂單失敗：' + error.message);
     }
 }
 
