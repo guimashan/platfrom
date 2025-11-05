@@ -195,7 +195,7 @@ function createCategoryCard(category) {
                         <label>生辰 (國曆)</label>
                         <div style="margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="color: #666; white-space: nowrap; min-width: 45px;">國曆:</span>
+                                <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
                                 <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 100px;">
                                 <span>年</span>
@@ -203,37 +203,35 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 80px;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;">
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">西曆:</span>
-                            <div class="western-display" data-field="birthWestern" style="color: #666;">
-                                <span class="western-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="western-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="western-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">農曆:</span>
-                            <div class="lunar-display" data-field="birthLunar" style="color: #666;">
-                                <span class="lunar-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="lunar-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="lunar-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>忌日 (國曆)</label>
                         <div style="margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="color: #666; white-space: nowrap; min-width: 45px;">國曆:</span>
+                                <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
                                 <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 100px;">
                                 <span>年</span>
@@ -241,30 +239,28 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 80px;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;">
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">西曆:</span>
-                            <div class="western-display" data-field="deathWestern" style="color: #666;">
-                                <span class="western-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="western-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="western-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">農曆:</span>
-                            <div class="lunar-display" data-field="deathLunar" style="color: #666;">
-                                <span class="lunar-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="lunar-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="lunar-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -371,7 +367,7 @@ function createCategoryCard(category) {
                         <label>生辰 (國曆)</label>
                         <div style="margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="color: #666; white-space: nowrap; min-width: 45px;">國曆:</span>
+                                <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
                                 <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 100px;">
                                 <span>年</span>
@@ -379,37 +375,35 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="birthDate" placeholder="日" maxlength="2" style="width: 80px;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;">
+                                <input type="date" class="input-field date-picker-trigger" data-target="birthDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">西曆:</span>
-                            <div class="western-display" data-field="birthWestern" style="color: #666;">
-                                <span class="western-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="western-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="western-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="western-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="western-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="western-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">農曆:</span>
-                            <div class="lunar-display" data-field="birthLunar" style="color: #666;">
-                                <span class="lunar-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="lunar-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="lunar-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="lunar-year" data-target="birthDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="lunar-month" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="lunar-day" data-target="birthDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                     </div>
                     <div class="form-group">
                         <label>忌日 (國曆)</label>
                         <div style="margin-bottom: 4px;">
                             <div style="display: flex; align-items: center; gap: 5px;">
-                                <span style="color: #666; white-space: nowrap; min-width: 45px;">國曆:</span>
+                                <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
                                 <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 100px;">
                                 <span>年</span>
@@ -417,30 +411,28 @@ function createCategoryCard(category) {
                                 <span>月</span>
                                 <input type="text" class="input-field solar-day" data-target="deathDate" placeholder="日" maxlength="2" style="width: 80px;">
                                 <span>日</span>
-                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;">
+                                <input type="date" class="input-field date-picker-trigger" data-target="deathDate" style="width: 40px; padding: 5px; cursor: pointer;" title="📅">
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">西曆:</span>
-                            <div class="western-display" data-field="deathWestern" style="color: #666;">
-                                <span class="western-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="western-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="western-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="western-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="western-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="western-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                         <div style="display: flex; align-items: center; gap: 5px;">
-                            <span style="color: #666; white-space: nowrap; min-width: 45px;">農曆:</span>
-                            <div class="lunar-display" data-field="deathLunar" style="color: #666;">
-                                <span class="lunar-year" style="display: inline-block; width: 100px;"></span>
-                                <span>年</span>
-                                <span class="lunar-month" style="display: inline-block; width: 80px;"></span>
-                                <span>月</span>
-                                <span class="lunar-day" style="display: inline-block; width: 80px;"></span>
-                                <span>日</span>
-                            </div>
+                            <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                            <span style="visibility: hidden;">民國</span>
+                            <span class="lunar-year" data-target="deathDate" style="display: inline-block; width: 100px; color: #666;"></span>
+                            <span style="color: #666;">年</span>
+                            <span class="lunar-month" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">月</span>
+                            <span class="lunar-day" data-target="deathDate" style="display: inline-block; width: 80px; color: #666;"></span>
+                            <span style="color: #666;">日</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -585,66 +577,58 @@ function convertToLunar(card, target, year, month, day) {
         
         // 檢查日期是否有效
         if (dateObj.getFullYear() !== year || dateObj.getMonth() !== month - 1 || dateObj.getDate() !== day) {
-            const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
-            const westernField = target === 'birthDate' ? 'birthWestern' : 'deathWestern';
+            // 清空顯示
+            const westernYear = card.querySelector(`.western-year[data-target="${target}"]`);
+            const westernMonth = card.querySelector(`.western-month[data-target="${target}"]`);
+            const westernDay = card.querySelector(`.western-day[data-target="${target}"]`);
+            const lunarYear = card.querySelector(`.lunar-year[data-target="${target}"]`);
+            const lunarMonth = card.querySelector(`.lunar-month[data-target="${target}"]`);
+            const lunarDay = card.querySelector(`.lunar-day[data-target="${target}"]`);
             
-            const lunarDisplayEl = card.querySelector(`[data-field="${lunarField}"]`);
-            const westernDisplayEl = card.querySelector(`[data-field="${westernField}"]`);
-            
-            if (lunarDisplayEl) {
-                lunarDisplayEl.querySelector('.lunar-year').textContent = '';
-                lunarDisplayEl.querySelector('.lunar-month').textContent = '';
-                lunarDisplayEl.querySelector('.lunar-day').textContent = '';
-            }
-            if (westernDisplayEl) {
-                westernDisplayEl.querySelector('.western-year').textContent = '';
-                westernDisplayEl.querySelector('.western-month').textContent = '';
-                westernDisplayEl.querySelector('.western-day').textContent = '';
-            }
+            if (westernYear) westernYear.textContent = '';
+            if (westernMonth) westernMonth.textContent = '';
+            if (westernDay) westernDay.textContent = '';
+            if (lunarYear) lunarYear.textContent = '';
+            if (lunarMonth) lunarMonth.textContent = '';
+            if (lunarDay) lunarDay.textContent = '';
             return;
         }
         
         // 顯示西曆
-        const westernField = target === 'birthDate' ? 'birthWestern' : 'deathWestern';
-        const westernDisplayEl = card.querySelector(`[data-field="${westernField}"]`);
-        if (westernDisplayEl) {
-            westernDisplayEl.querySelector('.western-year').textContent = year;
-            westernDisplayEl.querySelector('.western-month').textContent = month;
-            westernDisplayEl.querySelector('.western-day').textContent = day;
-        }
+        const westernYear = card.querySelector(`.western-year[data-target="${target}"]`);
+        const westernMonth = card.querySelector(`.western-month[data-target="${target}"]`);
+        const westernDay = card.querySelector(`.western-day[data-target="${target}"]`);
+        
+        if (westernYear) westernYear.textContent = year;
+        if (westernMonth) westernMonth.textContent = month;
+        if (westernDay) westernDay.textContent = day;
         
         // 轉換並顯示農曆
         const lunarObj = window.Lunar.fromDate(dateObj);
-        const lunarYear = lunarObj.getYear();
-        const lunarMonth = lunarObj.getMonth();
-        const lunarDay = lunarObj.getDay();
+        const lunarYear = card.querySelector(`.lunar-year[data-target="${target}"]`);
+        const lunarMonth = card.querySelector(`.lunar-month[data-target="${target}"]`);
+        const lunarDay = card.querySelector(`.lunar-day[data-target="${target}"]`);
         
-        const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
-        const lunarDisplayEl = card.querySelector(`[data-field="${lunarField}"]`);
+        if (lunarYear) lunarYear.textContent = lunarObj.getYear();
+        if (lunarMonth) lunarMonth.textContent = lunarObj.getMonth();
+        if (lunarDay) lunarDay.textContent = lunarObj.getDay();
         
-        if (lunarDisplayEl) {
-            lunarDisplayEl.querySelector('.lunar-year').textContent = lunarYear;
-            lunarDisplayEl.querySelector('.lunar-month').textContent = lunarMonth;
-            lunarDisplayEl.querySelector('.lunar-day').textContent = lunarDay;
-        }
     } catch (error) {
         console.error('農曆轉換失敗:', error);
-        const lunarField = target === 'birthDate' ? 'birthLunar' : 'deathLunar';
-        const westernField = target === 'birthDate' ? 'birthWestern' : 'deathWestern';
+        // 清空顯示
+        const westernYear = card.querySelector(`.western-year[data-target="${target}"]`);
+        const westernMonth = card.querySelector(`.western-month[data-target="${target}"]`);
+        const westernDay = card.querySelector(`.western-day[data-target="${target}"]`);
+        const lunarYear = card.querySelector(`.lunar-year[data-target="${target}"]`);
+        const lunarMonth = card.querySelector(`.lunar-month[data-target="${target}"]`);
+        const lunarDay = card.querySelector(`.lunar-day[data-target="${target}"]`);
         
-        const lunarDisplayEl = card.querySelector(`[data-field="${lunarField}"]`);
-        const westernDisplayEl = card.querySelector(`[data-field="${westernField}"]`);
-        
-        if (lunarDisplayEl) {
-            lunarDisplayEl.querySelector('.lunar-year').textContent = '';
-            lunarDisplayEl.querySelector('.lunar-month').textContent = '';
-            lunarDisplayEl.querySelector('.lunar-day').textContent = '';
-        }
-        if (westernDisplayEl) {
-            westernDisplayEl.querySelector('.western-year').textContent = '';
-            westernDisplayEl.querySelector('.western-month').textContent = '';
-            westernDisplayEl.querySelector('.western-day').textContent = '';
-        }
+        if (westernYear) westernYear.textContent = '';
+        if (westernMonth) westernMonth.textContent = '';
+        if (westernDay) westernDay.textContent = '';
+        if (lunarYear) lunarYear.textContent = '';
+        if (lunarMonth) lunarMonth.textContent = '';
+        if (lunarDay) lunarDay.textContent = '';
     }
 }
 
