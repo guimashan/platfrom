@@ -29,8 +29,7 @@ async function initLiff() {
         
         if (isLiffEnv) {
             document.getElementById('liffCloseBtn').style.display = 'flex';
-        } else {
-            document.getElementById('closeBtn').style.display = 'block';
+            document.getElementById('closeBtn').style.display = 'none';
         }
         
         if (!liff.isLoggedIn()) {
@@ -41,6 +40,7 @@ async function initLiff() {
         loadOrderData();
     } catch (error) {
         console.error('LIFF 初始化失敗:', error);
+        // 不是 LIFF 環境，關閉按鈕保持顯示（已在 HTML 中預設顯示）
         loadOrderData();
     }
 }
@@ -100,6 +100,35 @@ function displayOrderInfo() {
     document.getElementById('serviceName').textContent = SERVICE_NAMES[serviceType] || serviceType.toUpperCase();
     document.getElementById('orderTime').textContent = formatTimestamp(orderData.timestamp);
     document.getElementById('totalAmount').textContent = orderData.totalAmount.toLocaleString();
+    
+    // 顯示訂單狀態
+    const statusText = {
+        'pending_manual_payment': '待人工確認付款',
+        'paid_offline': '已收款（臨櫃/匯款）',
+        'completed': '已完成',
+        'cancelled': '已取消'
+    };
+    document.getElementById('orderStatus').textContent = statusText[orderData.status] || '處理中';
+    
+    // 顯示聯絡人資訊
+    document.getElementById('contactName').textContent = orderData.contactName || '---';
+    document.getElementById('contactPhone').textContent = orderData.contactPhone || '---';
+    
+    if (orderData.contactEmail) {
+        document.getElementById('contactEmail').textContent = orderData.contactEmail;
+        document.getElementById('contactEmailRow').style.display = 'flex';
+    }
+    
+    if (orderData.contactAddress) {
+        document.getElementById('contactAddress').textContent = orderData.contactAddress;
+        document.getElementById('contactAddressRow').style.display = 'flex';
+    }
+    
+    // 顯示備註
+    if (orderData.otherNote) {
+        document.getElementById('otherNote').textContent = orderData.otherNote;
+        document.getElementById('otherNoteArea').style.display = 'block';
+    }
     
     displayApplicants();
     

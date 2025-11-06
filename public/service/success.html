@@ -255,9 +255,39 @@
                         <span class="order-label">送出時間</span>
                         <span class="order-value" id="orderTime"></span>
                     </div>
+                    <div class="order-row">
+                        <span class="order-label">訂單狀態</span>
+                        <span class="order-value" id="orderStatus"></span>
+                    </div>
+                </div>
+
+                <div class="order-info" id="contactInfoArea">
+                    <div class="order-row">
+                        <span class="order-label">聯絡人</span>
+                        <span class="order-value" id="contactName"></span>
+                    </div>
+                    <div class="order-row">
+                        <span class="order-label">聯絡電話</span>
+                        <span class="order-value" id="contactPhone"></span>
+                    </div>
+                    <div class="order-row" id="contactEmailRow" style="display: none;">
+                        <span class="order-label">Email</span>
+                        <span class="order-value" id="contactEmail"></span>
+                    </div>
+                    <div class="order-row" id="contactAddressRow" style="display: none;">
+                        <span class="order-label">地址</span>
+                        <span class="order-value" id="contactAddress"></span>
+                    </div>
                 </div>
 
                 <div id="applicantListArea"></div>
+
+                <div class="order-info" id="otherNoteArea" style="display: none;">
+                    <div class="order-row">
+                        <span class="order-label">備註</span>
+                        <span class="order-value" id="otherNote"></span>
+                    </div>
+                </div>
 
                 <div class="total-amount">
                     總金額：NT$ <span id="totalAmount"></span>
@@ -275,7 +305,7 @@
                     </button>
                 </div>
 
-                <button class="action-btn btn-close" id="closeBtn" style="display: none;">
+                <button class="action-btn btn-close" id="closeBtn">
                     關閉視窗
                 </button>
             </div>
