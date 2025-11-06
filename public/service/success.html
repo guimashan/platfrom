@@ -114,17 +114,26 @@
         }
 
         .applicant-item {
-            padding: 8px 0;
+            padding: 10px 0;
             color: #333;
-            display: flex;
-            align-items: center;
+            border-bottom: 1px dashed #e0e0e0;
         }
 
-        .applicant-item::before {
-            content: "•";
-            color: #d4af37;
+        .applicant-item:last-child {
+            border-bottom: none;
+        }
+
+        .applicant-name {
             font-weight: bold;
-            margin-right: 10px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-detail {
+            color: #666;
+            font-size: 14px;
+            padding-left: 15px;
+            margin-top: 3px;
         }
 
         .total-amount {
