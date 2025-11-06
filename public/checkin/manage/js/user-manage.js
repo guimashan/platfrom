@@ -2,18 +2,17 @@
  * 用戶管理
  */
 
-import { platformAuth, platformDb, checkinDb } from '/js/firebase-init.js';
+import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { 
     collection, 
     doc,
     getDocs,
     getDoc,
-    updateDoc,
-    query,
-    where
+    updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
+import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allUsers = [];
@@ -272,18 +271,15 @@ async function viewUserStats(userId) {
     modal.classList.remove('hidden');
     
     try {
-        const checkinsRef = collection(checkinDb, 'checkins');
-        const q = query(checkinsRef, where('userId', '==', userId));
-        const snapshot = await getDocs(q);
-        
-        const records = [];
-        snapshot.forEach(doc => {
-            records.push(doc.data());
+        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + `?userId=${userId}&limit=100`, {
+            method: 'GET'
         });
         
+        const records = result.checkins || [];
+        
         records.sort((a, b) => {
-            const aTime = a.timestamp?.toDate() || new Date(0);
-            const bTime = b.timestamp?.toDate() || new Date(0);
+            const aTime = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp?._seconds * 1000 || 0);
+            const bTime = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp?._seconds * 1000 || 0);
             return bTime - aTime;
         });
         
@@ -293,12 +289,12 @@ async function viewUserStats(userId) {
         thisWeek.setDate(thisWeek.getDate() - 7);
         
         const monthRecords = records.filter(r => {
-            const recordDate = r.timestamp?.toDate() || new Date(0);
+            const recordDate = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp?._seconds * 1000 || 0);
             return recordDate >= thisMonth;
         });
         
         const weekRecords = records.filter(r => {
-            const recordDate = r.timestamp?.toDate() || new Date(0);
+            const recordDate = r.timestamp?.toDate ? r.timestamp.toDate() : new Date(r.timestamp?._seconds * 1000 || 0);
             return recordDate >= thisWeek;
         });
         
@@ -332,13 +328,14 @@ async function viewUserStats(userId) {
             html += '<div class="data-table"><table style="width: 100%;"><thead><tr><th>時間</th><th>巡邏點</th><th>距離</th></tr></thead><tbody>';
             
             records.slice(0, 10).forEach(record => {
-                const timestamp = record.timestamp?.toDate() || new Date();
+                const timestamp = record.timestamp?.toDate ? record.timestamp.toDate() : new Date(record.timestamp?._seconds * 1000 || Date.now());
                 const distance = record.distance !== undefined ? `${record.distance.toFixed(1)} m` : 'N/A';
+                const patrolName = record.patrolName || record.patrolId;
                 
                 html += `
                     <tr>
                         <td data-label="時間">${formatDateTime(timestamp)}</td>
-                        <td data-label="巡邏點">${record.patrolId}</td>
+                        <td data-label="巡邏點">${patrolName}</td>
                         <td data-label="距離">${distance}</td>
                     </tr>
                 `;

@@ -619,18 +619,19 @@ exports.getCheckinHistory = onRequest(
         const decodedToken = await verifyPlatformToken(req, res);
         if (!decodedToken) return;
 
-        const userId = decodedToken.uid;
+        const currentUserId = decodedToken.uid;
         const limit = parseInt(req.query.limit) || 50;
+        const requestedUserId = req.query.userId;
         
-        // 從 platform 數據庫獲取用戶角色
+        // 從 platform 數據庫獲取當前用戶角色
         let userRoles = [];
         try {
-          const userDoc = await platformDb.collection('users').doc(userId).get();
+          const userDoc = await platformDb.collection('users').doc(currentUserId).get();
           if (userDoc.exists) {
             userRoles = userDoc.data().roles || [];
           }
         } catch (error) {
-          logger.warn('獲取用戶角色失敗', {userId, error: error.message});
+          logger.warn('獲取用戶角色失敗', {userId: currentUserId, error: error.message});
         }
         
         // 檢查是否為管理員
@@ -638,12 +639,25 @@ exports.getCheckinHistory = onRequest(
           role === 'superadmin' || role === 'admin_checkin'
         );
         
+        // 確定要查詢的用戶 ID
+        let targetUserId = currentUserId;
+        if (requestedUserId) {
+          if (!isAdmin) {
+            res.status(403).json({
+              ok: false,
+              message: '您沒有權限查看其他用戶的記錄',
+            });
+            return;
+          }
+          targetUserId = requestedUserId;
+        }
+        
         // 根據角色查詢簽到記錄
         let checkinsQuery = admin.firestore().collection('checkins');
         
-        if (!isAdmin) {
-          // 普通用戶只能看到自己的記錄
-          checkinsQuery = checkinsQuery.where('userId', '==', userId);
+        if (!isAdmin || targetUserId) {
+          // 普通用戶只能看到自己的記錄，或管理員查看指定用戶的記錄
+          checkinsQuery = checkinsQuery.where('userId', '==', targetUserId);
         }
         
         const checkinsSnapshot = await checkinsQuery
@@ -683,7 +697,9 @@ exports.getCheckinHistory = onRequest(
         }));
 
         logger.info('簽到紀錄已取得', {
-          userId,
+          currentUserId,
+          targetUserId,
+          isAdmin,
           count: checkins.length,
         });
 
