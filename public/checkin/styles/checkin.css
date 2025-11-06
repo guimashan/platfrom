@@ -132,17 +132,26 @@
 
 .history-link {
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+    border-top: 1px solid #E0E0E0;
 }
 
 .history-link a {
     color: var(--primary-color);
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    background: rgba(212, 175, 55, 0.1);
+    transition: all 0.3s ease;
 }
 
 .history-link a:hover {
-    text-decoration: underline;
+    background: rgba(212, 175, 55, 0.2);
+    text-decoration: none;
 }
 
 /* 簽到紀錄頁面樣式 */
