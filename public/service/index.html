@@ -3,110 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神務服務 - 龜馬山 goLine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles/common.css">
+    <title>神務服務 - 龜馬山代天府</title>
     <style>
-        .service-container {
-            background: linear-gradient(135deg, #ffffff 0%, #fffef9 100%);
-            border-radius: 24px;
-            padding: 50px 35px;
-            max-width: 600px;
-            margin: 30px auto;
-            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
-            border: 1px solid rgba(212, 175, 55, 0.1);
-        }
-
-        .service-header {
-            text-align: center;
-            margin-bottom: 35px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--primary-gold);
-        }
-
-        .service-header h2 {
-            color: var(--primary-gold-dark);
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .service-header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
         }
 
         .service-list {
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 15px;
+        }
+
+        .service-category {
+            margin-bottom: 10px;
+        }
+
+        .category-title {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+            padding-left: 10px;
+            font-weight: 500;
         }
 
         .service-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            display: block;
             width: 100%;
             padding: 18px 30px;
             background: white;
-            border: 2px solid rgba(212, 175, 55, 0.3);
+            border: 2px solid #e0e0e0;
             border-radius: 50px;
-            font-size: 1.1rem;
+            font-size: 20px;
             font-weight: 500;
-            color: var(--text-primary);
+            color: #333;
             text-align: center;
             text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            transition: left 0.4s ease;
-            z-index: 0;
-        }
-
-        .service-btn span {
-            position: relative;
-            z-index: 1;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         .service-btn:hover {
-            border-color: var(--primary-gold);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
-        }
-
-        .service-btn:hover::before {
-            left: 0;
-        }
-
-        .service-btn:hover span {
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
             color: white;
+            border-color: #d4af37;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
         .service-btn:active {
-            transform: translateY(-1px);
+            transform: translateY(0);
         }
 
-        @media (max-width: 600px) {
-            .service-container {
-                padding: 35px 25px;
-                margin: 20px 15px;
-            }
+        .futian-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
 
+        .futian-btn {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .futian-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+        }
+
+        .btn-ftp {
+            border-color: #FFD700;
+        }
+
+        .btn-ftp:hover {
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border-color: #FFD700;
+        }
+
+        .btn-fty {
+            border-color: #4CAF50;
+        }
+
+        .btn-fty:hover {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border-color: #4CAF50;
+        }
+
+        .btn-ftc {
+            border-color: #2196F3;
+        }
+
+        .btn-ftc:hover {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            border-color: #2196F3;
+        }
+
+        @media (max-width: 480px) {
             .service-btn {
-                font-size: 1rem;
+                font-size: 18px;
                 padding: 16px 25px;
             }
         }
@@ -114,69 +146,66 @@
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <div class="header-left">
-                <h1>🙏 神務服務</h1>
-                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;"></p>
-            </div>
-            <div class="header-actions" style="display: flex; gap: 10px;">
-                <button class="btn-secondary" onclick="window.location.href='/'">🏠 首頁</button>
-                <button id="logoutBtn" class="btn-logout">登出</button>
-            </div>
-        </header>
+        <div class="header">
+            <h1>🙏 龜馬山代天府</h1>
+            <p>神務服務線上報名</p>
+        </div>
 
-        <main class="main-content">
-            <div class="service-container">
-                <div class="service-header">
-                    <h2>🙏 神務服務項目</h2>
-                    <p>請選擇您需要的服務項目</p>
-                </div>
-                
-                <div class="service-list">
-                    <a href="DD.html" class="service-btn">
-                        <span>🕯️ 線上點燈</span>
+        <div class="service-list">
+            <!-- 基本服務 -->
+            <a href="DD.html" class="service-btn">線上點燈</a>
+            <a href="ND.html" class="service-btn">年斗法會</a>
+            <a href="LD.html" class="service-btn">禮斗法會</a>
+            <a href="ZY.html" class="service-btn">中元法會</a>
+            <a href="PS.html" class="service-btn">普施法會</a>
+            <a href="QJ.html" class="service-btn">秋祭法會</a>
+            
+            <!-- 捐款服務 -->
+            <div class="service-category" style="margin-top: 20px;">
+                <div class="category-title">💰 捐款支持</div>
+                <a href="BG.html" class="service-btn">建宮廟款</a>
+                <a href="XY.html" class="service-btn">添香油</a>
+            </div>
+
+            <!-- 福田會系列 -->
+            <div class="service-category" style="margin-top: 20px;">
+                <div class="category-title">🌾 福田會入會</div>
+                <div class="futian-group">
+                    <a href="FTP.html" class="service-btn futian-btn btn-ftp">
+                        <span class="futian-icon">🟡</span>
+                        福田會 個人入會
                     </a>
-                    <a href="ND.html" class="service-btn">
-                        <span>⭐ 年斗法會</span>
+                    <a href="FTY.html" class="service-btn futian-btn btn-fty">
+                        <span class="futian-icon">🟢</span>
+                        福田少年會 個人入會
                     </a>
-                    <a href="LD.html" class="service-btn">
-                        <span>🌟 禮斗法會</span>
-                    </a>
-                    <a href="ZY.html" class="service-btn">
-                        <span>🌕 中元法會</span>
-                    </a>
-                    <a href="PS.html" class="service-btn">
-                        <span>🙏 普施法會</span>
-                    </a>
-                    <a href="QJ.html" class="service-btn">
-                        <span>🍂 秋祭法會</span>
+                    <a href="FTC.html" class="service-btn futian-btn btn-ftc">
+                        <span class="futian-icon">🔵</span>
+                        福田會 企業團體入會
                     </a>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="../js/firebase-init.js"></script>
     <script type="module">
-        import { checkAuth, logout } from '/js/auth-guard.js';
+        const LIFF_ID = '2006582260-YBnDz9Xk';
 
-        (async function init() {
+        async function initLiff() {
             try {
-                const { userData } = await checkAuth({
-                    requiredRoles: ['poweruser_service', 'admin_service', 'superadmin'],
-                    onSuccess: ({ userData }) => {
-                        const userName = document.getElementById('userName');
-                        if (userName) {
-                            userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
-                        }
-                    }
-                });
-
-                document.getElementById('logoutBtn').addEventListener('click', logout);
-
+                await liff.init({ liffId: LIFF_ID });
+                
+                if (!liff.isLoggedIn()) {
+                    liff.login();
+                }
             } catch (error) {
-                console.error('初始化失敗:', error);
+                console.error('LIFF 初始化失敗:', error);
             }
-        })();
+        }
+
+        initLiff();
     </script>
 </body>
 </html>
