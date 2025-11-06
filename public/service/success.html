@@ -19,7 +19,7 @@
         }
 
         .success-header {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            background: linear-gradient(135deg, rgba(76, 175, 80, 1) 0%, rgba(69, 160, 73, 1) 100%);
             color: white;
             padding: 30px 20px;
             border-radius: 15px 15px 0 0;
@@ -114,8 +114,26 @@
         }
 
         .applicant-item {
-            padding: 8px 0;
+            padding: 10px 0;
             color: #333;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+
+        .applicant-item:last-child {
+            border-bottom: none;
+        }
+
+        .applicant-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-detail {
+            color: #666;
+            font-size: 14px;
+            padding-left: 15px;
+            margin-top: 3px;
         }
 
         .total-amount {
