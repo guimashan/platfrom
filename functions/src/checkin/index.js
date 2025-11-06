@@ -625,13 +625,23 @@ exports.getCheckinHistory = onRequest(
         
         // 從 platform 數據庫獲取當前用戶角色
         let userRoles = [];
+        let userExists = false;
         try {
           const userDoc = await platformDb.collection('users').doc(currentUserId).get();
+          userExists = userDoc.exists;
           if (userDoc.exists) {
-            userRoles = userDoc.data().roles || [];
+            const userData = userDoc.data();
+            userRoles = userData.roles || [];
+            logger.info('用戶角色查詢成功', {
+              userId: currentUserId,
+              roles: userRoles,
+              userData: userData
+            });
+          } else {
+            logger.warn('用戶文檔不存在', {userId: currentUserId});
           }
         } catch (error) {
-          logger.warn('獲取用戶角色失敗', {userId: currentUserId, error: error.message});
+          logger.error('獲取用戶角色失敗', {userId: currentUserId, error: error.message, stack: error.stack});
         }
         
         // 檢查是否為管理員
@@ -639,10 +649,24 @@ exports.getCheckinHistory = onRequest(
           role === 'superadmin' || role === 'admin_checkin'
         );
         
+        logger.info('權限檢查', {
+          currentUserId,
+          requestedUserId,
+          userExists,
+          userRoles,
+          isAdmin
+        });
+        
         // 確定要查詢的用戶 ID
         let targetUserId = currentUserId;
         if (requestedUserId) {
           if (!isAdmin) {
+            logger.warn('權限不足', {
+              currentUserId,
+              requestedUserId,
+              userRoles,
+              isAdmin
+            });
             res.status(403).json({
               ok: false,
               message: '您沒有權限查看其他用戶的記錄',
