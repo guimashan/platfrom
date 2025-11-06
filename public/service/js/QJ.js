@@ -308,7 +308,7 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                 <div style="display: flex; align-items: center; gap: 5px;">
                     <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                     <span style="color: #666;">民國</span>
-                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="年" style="width: 70px; text-align: center;">
                     <span>年</span>
                     <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                     <span>月</span>
@@ -462,11 +462,15 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     monthInput.addEventListener('blur', syncManualToDate);
     dayInput.addEventListener('blur', syncManualToDate);
     
-    // 限制只能輸入數字
-    [yearInput, monthInput, dayInput].forEach(input => {
-        input.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
+    // 限制只能輸入數字，並限制長度
+    yearInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
+    });
+    monthInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    });
+    dayInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 }
 
@@ -608,9 +612,10 @@ function validateForm() {
             return false;
         }
         
-        // 驗證日期格式
-        if (year.length !== 4 || isNaN(year)) {
-            showError(yearInput, `${cardName} 的生辰年份格式不正確（需4位數字）`);
+        // 驗證日期格式（民國年：接受 2-3 位數字）
+        const yearNum = parseInt(year, 10);
+        if (isNaN(yearNum) || year.length < 2 || year.length > 3 || yearNum < 10 || yearNum > 200) {
+            showError(yearInput, `${cardName} 的生辰年份格式不正確（民國年，2-3位數字，例如：70、113）`);
             card.querySelector('.applicant-details').style.display = 'block';
             card.setAttribute('data-open', 'true');
             return false;
