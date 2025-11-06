@@ -395,6 +395,7 @@ exports.getPublicOrderDetail = onRequest({
         }
 
         // 只返回基本資訊，不包含敏感資料
+        const timestamp = data.createdAt || data.timestamp;
         const publicData = {
             orderId: regDoc.id,
             serviceType: data.serviceType,
@@ -404,7 +405,10 @@ exports.getPublicOrderDetail = onRequest({
             contactAddress: data.contactAddress,
             applicants: data.applicants,
             totalAmount: data.totalAmount,
-            timestamp: data.timestamp,
+            timestamp: timestamp ? {
+                _seconds: timestamp._seconds || Math.floor(timestamp.toMillis() / 1000),
+                _nanoseconds: timestamp._nanoseconds || 0
+            } : null,
             status: data.status || 'pending',
             otherNote: data.otherNote
         };

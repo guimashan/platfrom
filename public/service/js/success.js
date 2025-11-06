@@ -117,7 +117,7 @@ function displayApplicants() {
         <div class="applicant-list">
             <div class="applicant-list-title">報名人數：${orderData.applicants.length} 位</div>
             ${orderData.applicants.map(app => {
-                let detail = app.name;
+                let detail = app.applicantName || app.name || '（未填寫姓名）';
                 if (app.category) {
                     detail += ` (${app.category})`;
                 } else if (app.amount) {
@@ -133,7 +133,20 @@ function displayApplicants() {
 
 function formatTimestamp(timestamp) {
     if (!timestamp) return '---';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    
+    let date;
+    if (timestamp._seconds) {
+        date = new Date(timestamp._seconds * 1000);
+    } else if (timestamp.toDate && typeof timestamp.toDate === 'function') {
+        date = timestamp.toDate();
+    } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+        date = new Date(timestamp);
+    } else {
+        return '---';
+    }
+    
+    if (isNaN(date.getTime())) return '---';
+    
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
