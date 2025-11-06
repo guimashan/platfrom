@@ -262,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('printBtn').addEventListener('click', handlePrint);
     document.getElementById('shareBtn').addEventListener('click', handleShare);
     document.getElementById('calendarBtn').addEventListener('click', handleCalendar);
-    document.getElementById('closeBtn').addEventListener('click', handleClose);
     document.getElementById('liffCloseBtn').addEventListener('click', handleClose);
     
     initLiff();
