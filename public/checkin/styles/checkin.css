@@ -62,6 +62,30 @@
     transform: translateY(-1px);
 }
 
+/* 卡片外部的查看記錄連結 */
+.history-link-outside {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    margin-top: 1rem;
+}
+
+.history-link-outside a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    background: rgba(212, 175, 55, 0.15);
+    transition: all 0.3s ease;
+}
+
+.history-link-outside a:hover {
+    background: rgba(212, 175, 55, 0.25);
+    transform: translateY(-1px);
+}
+
 .patrol-select {
     margin-bottom: 1.5rem;
     display: flex;
