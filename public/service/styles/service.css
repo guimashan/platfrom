@@ -713,3 +713,332 @@ input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: inner-spin-button;
     display: inline-block;
 }
+
+
+/* ========================================
+   進階響應式設計 - 服務表單優化
+   ======================================== */
+
+/* 平板橫向 (1023px 以下) */
+@media (max-width: 1023px) {
+    .card {
+        padding: 20px;
+        margin-bottom: 18px;
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+    }
+    
+    .input-field {
+        padding: 11px 14px;
+        font-size: 0.98rem;
+    }
+    
+    .btn-submit {
+        padding: 14px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* 平板直向 (767px 以下) */
+@media (max-width: 767px) {
+    body {
+        padding-bottom: 120px;
+    }
+    
+    .main-content {
+        padding: 18px;
+    }
+    
+    .card {
+        padding: 18px;
+        margin-bottom: 16px;
+        border-radius: 14px;
+    }
+    
+    .card-title {
+        font-size: 1.15rem;
+        margin-bottom: 18px;
+        padding-bottom: 9px;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+    
+    .form-group label {
+        font-size: 0.92rem;
+        margin-bottom: 7px;
+    }
+    
+    .input-field {
+        padding: 11px 13px;
+        font-size: 0.96rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+    
+    .radio-group {
+        gap: 10px;
+    }
+    
+    .radio-label {
+        padding: 9px 13px;
+        font-size: 0.88rem;
+    }
+    
+    .btn-submit {
+        padding: 13px 18px;
+        font-size: 0.98rem;
+    }
+    
+    .applicant-card {
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+    
+    .footer-summary {
+        font-size: 0.95rem;
+    }
+}
+
+/* 手機橫向 (479px 以下) */
+@media (max-width: 479px) {
+    body {
+        padding-bottom: 110px;
+    }
+    
+    .main-content {
+        padding: 14px;
+    }
+    
+    .login-card {
+        padding: 32px 28px;
+    }
+    
+    .card {
+        padding: 16px;
+        margin-bottom: 14px;
+        border-radius: 12px;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
+    }
+    
+    .form-group label {
+        font-size: 0.9rem;
+        margin-bottom: 6px;
+    }
+    
+    .input-field {
+        padding: 10px 12px;
+        font-size: 0.94rem;
+        border-radius: 7px;
+    }
+    
+    .radio-group {
+        gap: 8px;
+        flex-direction: column;
+    }
+    
+    .radio-label {
+        padding: 8px 12px;
+        font-size: 0.86rem;
+        width: 100%;
+    }
+    
+    .btn-submit {
+        padding: 12px 16px;
+        font-size: 0.96rem;
+    }
+    
+    .applicant-card {
+        padding: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .card-summary {
+        padding: 10px;
+        font-size: 0.92rem;
+    }
+    
+    .light-item,
+    .item-row {
+        padding: 10px;
+        gap: 8px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .light-name,
+    .item-name {
+        font-size: 0.88rem;
+    }
+    
+    input[type="number"].light-count,
+    input.count-input {
+        width: 100%;
+        max-width: 100px;
+    }
+    
+    .footer {
+        padding: 12px;
+    }
+    
+    .footer-summary {
+        font-size: 0.92rem;
+        gap: 8px;
+    }
+    
+    .summary-value {
+        font-size: 1.05rem;
+    }
+}
+
+/* 小手機 (359px 以下) */
+@media (max-width: 359px) {
+    body {
+        padding-bottom: 100px;
+    }
+    
+    .main-content {
+        padding: 12px;
+    }
+    
+    .login-card {
+        padding: 28px 20px;
+        width: 95%;
+    }
+    
+    .card {
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 10px;
+    }
+    
+    .card-title {
+        font-size: 1.05rem;
+        margin-bottom: 14px;
+        padding-bottom: 7px;
+    }
+    
+    .form-group {
+        margin-bottom: 14px;
+    }
+    
+    .form-group label {
+        font-size: 0.88rem;
+        margin-bottom: 5px;
+    }
+    
+    .input-field {
+        padding: 9px 11px;
+        font-size: 0.92rem;
+        border-radius: 6px;
+    }
+    
+    .radio-group {
+        gap: 7px;
+    }
+    
+    .radio-label {
+        padding: 7px 10px;
+        font-size: 0.84rem;
+    }
+    
+    .btn-submit {
+        padding: 11px 14px;
+        font-size: 0.94rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 9px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .applicant-card {
+        padding: 11px;
+        margin-bottom: 11px;
+    }
+    
+    .card-summary {
+        padding: 9px;
+        font-size: 0.9rem;
+    }
+    
+    .applicant-details {
+        padding: 11px;
+    }
+    
+    .light-item,
+    .item-row {
+        padding: 9px;
+        gap: 7px;
+    }
+    
+    .light-name,
+    .item-name {
+        font-size: 0.86rem;
+    }
+    
+    input[type="number"].light-count,
+    input.count-input {
+        width: 100%;
+        max-width: 90px;
+        padding: 7px;
+        font-size: 0.92rem;
+    }
+    
+    .footer {
+        padding: 11px;
+    }
+    
+    .footer-summary {
+        font-size: 0.9rem;
+        gap: 7px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .summary-value {
+        font-size: 1rem;
+    }
+    
+    .category-section {
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+    }
+    
+    .category-title {
+        font-size: 0.96rem;
+        margin-bottom: 10px;
+    }
+    
+    .person-item {
+        padding: 11px;
+        margin-bottom: 9px;
+    }
+    
+    .remove-btn {
+        padding: 5px 8px;
+        font-size: 0.82rem;
+    }
+    
+    .add-btn {
+        padding: 7px 10px;
+        font-size: 0.88rem;
+    }
+}
+

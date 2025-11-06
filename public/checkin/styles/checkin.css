@@ -378,3 +378,158 @@
         gap: 0.5rem;
     }
 }
+
+
+/* ========================================
+   進階響應式設計 - 簽到頁面優化
+   ======================================== */
+
+/* 平板橫向 (1023px 以下) */
+@media (max-width: 1023px) {
+    .checkin-card {
+        max-width: 500px;
+        padding: 1.875rem;
+        margin: 1.875rem auto;
+    }
+}
+
+/* 平板直向 (767px 以下) */
+@media (max-width: 767px) {
+    .checkin-card {
+        max-width: 100%;
+        padding: 1.75rem;
+        margin: 1.5rem auto;
+    }
+    
+    .checkin-card h2 {
+        font-size: 1.3rem;
+    }
+    
+    .history-link-top a,
+    .history-link-outside a {
+        font-size: 0.92rem;
+        padding: 0.5rem 0.95rem;
+    }
+    
+    .qr-scanner {
+        height: 280px;
+    }
+    
+    .manual-input {
+        padding: 1rem;
+    }
+    
+    .checkin-success h3 {
+        font-size: 1.25rem;
+    }
+}
+
+/* 手機橫向 (479px 以下) */
+@media (max-width: 479px) {
+    .checkin-card {
+        padding: 1.5rem 1.25rem;
+        margin: 1.25rem 0.875rem;
+        border-radius: 10px;
+    }
+    
+    .checkin-card h2 {
+        font-size: 1.2rem;
+        margin-bottom: 0.875rem;
+    }
+    
+    .history-link-top {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.875rem;
+    }
+    
+    .history-link-top a,
+    .history-link-outside a {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.875rem;
+    }
+    
+    .qr-scanner {
+        height: 260px;
+    }
+    
+    .manual-input {
+        padding: 0.875rem;
+    }
+    
+    .manual-input input {
+        padding: 10px 12px;
+        font-size: 0.94rem;
+    }
+    
+    .manual-input button {
+        padding: 11px 16px;
+        font-size: 0.96rem;
+    }
+    
+    .checkin-success {
+        padding: 1.25rem;
+    }
+    
+    .checkin-success h3 {
+        font-size: 1.15rem;
+    }
+    
+    .checkin-success .icon {
+        font-size: 3rem;
+    }
+}
+
+/* 小手機 (359px 以下) */
+@media (max-width: 359px) {
+    .checkin-card {
+        padding: 1.25rem 1rem;
+        margin: 1rem 0.625rem;
+        border-radius: 8px;
+    }
+    
+    .checkin-card h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .history-link-top a,
+    .history-link-outside a {
+        font-size: 0.88rem;
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .qr-scanner {
+        height: 240px;
+    }
+    
+    .manual-input {
+        padding: 0.75rem;
+    }
+    
+    .manual-input input {
+        padding: 9px 11px;
+        font-size: 0.92rem;
+    }
+    
+    .manual-input button {
+        padding: 10px 14px;
+        font-size: 0.94rem;
+    }
+    
+    .checkin-success {
+        padding: 1rem;
+    }
+    
+    .checkin-success h3 {
+        font-size: 1.05rem;
+    }
+    
+    .checkin-success .icon {
+        font-size: 2.75rem;
+    }
+    
+    .checkin-success p {
+        font-size: 0.9rem;
+    }
+}
+

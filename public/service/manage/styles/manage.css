@@ -582,3 +582,180 @@
         padding: 0.5rem;
     }
 }
+
+
+/* ========================================
+   進階響應式設計 - 後台管理優化
+   ======================================== */
+
+/* 平板橫向 (1023px 以下) */
+@media (max-width: 1023px) {
+    .manage-container {
+        padding: 1.25rem;
+    }
+    
+    .page-header {
+        padding: 1.25rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 11px;
+        font-size: 0.9rem;
+    }
+}
+
+/* 平板直向 (767px 以下) */
+@media (max-width: 767px) {
+    .manage-container {
+        padding: 1rem;
+    }
+    
+    .page-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.3rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 0.875rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .filters-row {
+        flex-direction: column;
+        gap: 0.875rem;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+    
+    .orders-table {
+        font-size: 0.88rem;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 10px 8px;
+    }
+    
+    .order-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn-small {
+        width: 100%;
+    }
+}
+
+/* 手機橫向 (479px 以下) */
+@media (max-width: 479px) {
+    .manage-container {
+        padding: 0.875rem;
+    }
+    
+    .page-header {
+        padding: 0.875rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.2rem;
+    }
+    
+    .stat-card {
+        padding: 0.875rem;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+    }
+    
+    .search-box input {
+        padding: 9px 11px;
+        font-size: 0.92rem;
+    }
+    
+    .orders-table {
+        font-size: 0.86rem;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 9px 6px;
+    }
+    
+    .order-id {
+        font-size: 0.82rem;
+    }
+    
+    .status-badge {
+        padding: 4px 7px;
+        font-size: 0.75rem;
+    }
+}
+
+/* 小手機 (359px 以下) */
+@media (max-width: 359px) {
+    .manage-container {
+        padding: 0.75rem;
+    }
+    
+    .page-header {
+        padding: 0.75rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .page-header p {
+        font-size: 0.8rem;
+    }
+    
+    .stat-card {
+        padding: 0.75rem;
+    }
+    
+    .stat-value {
+        font-size: 1.35rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .orders-table {
+        font-size: 0.84rem;
+    }
+    
+    .orders-table th,
+    .orders-table td {
+        padding: 8px 5px;
+    }
+    
+    .btn-small {
+        padding: 6px 9px;
+        font-size: 0.82rem;
+    }
+}
+

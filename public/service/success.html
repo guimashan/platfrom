@@ -209,6 +209,291 @@
             color: #f44336;
         }
 
+        /* ========================================
+           進階響應式設計 - 訂單成功頁面優化
+           ======================================== */
+        
+        /* 平板橫向 (1023px 以下) */
+        @media (max-width: 1023px) {
+            .success-container {
+                max-width: 700px;
+            }
+            
+            .success-card {
+                padding: 28px;
+            }
+        }
+        
+        /* 平板直向 (767px 以下) */
+        @media (max-width: 767px) {
+            body {
+                padding: 15px;
+            }
+            
+            .success-container {
+                padding-top: 15px;
+            }
+            
+            .success-header {
+                padding: 25px 18px;
+                border-radius: 12px 12px 0 0;
+            }
+            
+            .success-icon {
+                font-size: 52px;
+            }
+            
+            .success-title {
+                font-size: 22px;
+            }
+            
+            .success-card {
+                padding: 25px;
+                border-radius: 0 0 12px 12px;
+            }
+            
+            .order-row {
+                padding: 10px 0;
+            }
+            
+            .order-label,
+            .order-value {
+                font-size: 0.95rem;
+            }
+            
+            .order-id {
+                font-size: 17px;
+            }
+            
+            .applicant-list {
+                padding: 13px;
+            }
+            
+            .total-amount {
+                font-size: 19px;
+                padding: 14px;
+            }
+            
+            .action-buttons {
+                gap: 8px;
+            }
+            
+            .action-btn {
+                padding: 11px 18px;
+                font-size: 15px;
+            }
+        }
+        
+        /* 手機橫向 (479px 以下) */
+        @media (max-width: 479px) {
+            body {
+                padding: 12px;
+            }
+            
+            .success-container {
+                padding-top: 12px;
+            }
+            
+            .success-header {
+                padding: 22px 15px;
+                border-radius: 10px 10px 0 0;
+            }
+            
+            .success-icon {
+                font-size: 48px;
+                margin-bottom: 8px;
+            }
+            
+            .success-title {
+                font-size: 20px;
+            }
+            
+            .liff-close-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+                top: 12px;
+                right: 12px;
+            }
+            
+            .success-card {
+                padding: 20px;
+                border-radius: 0 0 10px 10px;
+            }
+            
+            .order-info {
+                margin-bottom: 20px;
+            }
+            
+            .order-row {
+                padding: 9px 0;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+            
+            .order-label {
+                font-size: 0.9rem;
+            }
+            
+            .order-value {
+                font-size: 0.95rem;
+                text-align: left;
+            }
+            
+            .order-id {
+                font-size: 16px;
+            }
+            
+            .applicant-list {
+                padding: 12px;
+                margin-top: 12px;
+            }
+            
+            .applicant-list-title {
+                font-size: 0.95rem;
+                margin-bottom: 8px;
+            }
+            
+            .applicant-item {
+                padding: 8px 0;
+            }
+            
+            .applicant-name {
+                font-size: 0.95rem;
+            }
+            
+            .item-detail {
+                font-size: 13px;
+                padding-left: 12px;
+            }
+            
+            .total-amount {
+                font-size: 18px;
+                padding: 13px;
+                margin: 18px 0;
+            }
+            
+            .action-buttons {
+                gap: 7px;
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+                padding: 11px 16px;
+                font-size: 15px;
+                min-width: auto;
+            }
+        }
+        
+        /* 小手機 (359px 以下) */
+        @media (max-width: 359px) {
+            body {
+                padding: 10px;
+            }
+            
+            .success-container {
+                padding-top: 10px;
+            }
+            
+            .success-header {
+                padding: 20px 12px;
+                border-radius: 8px 8px 0 0;
+            }
+            
+            .success-icon {
+                font-size: 44px;
+                margin-bottom: 6px;
+            }
+            
+            .success-title {
+                font-size: 18px;
+            }
+            
+            .liff-close-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 18px;
+                top: 10px;
+                right: 10px;
+            }
+            
+            .success-card {
+                padding: 16px;
+                border-radius: 0 0 8px 8px;
+            }
+            
+            .order-info {
+                margin-bottom: 18px;
+            }
+            
+            .order-row {
+                padding: 8px 0;
+            }
+            
+            .order-label {
+                font-size: 0.88rem;
+            }
+            
+            .order-value {
+                font-size: 0.92rem;
+            }
+            
+            .order-id {
+                font-size: 15px;
+            }
+            
+            .applicant-list {
+                padding: 10px;
+                margin-top: 10px;
+                border-radius: 6px;
+            }
+            
+            .applicant-list-title {
+                font-size: 0.9rem;
+                margin-bottom: 7px;
+            }
+            
+            .applicant-item {
+                padding: 7px 0;
+            }
+            
+            .applicant-name {
+                font-size: 0.9rem;
+                margin-bottom: 4px;
+            }
+            
+            .item-detail {
+                font-size: 12px;
+                padding-left: 10px;
+            }
+            
+            .total-amount {
+                font-size: 17px;
+                padding: 12px;
+                margin: 16px 0;
+                border-radius: 6px;
+            }
+            
+            .action-buttons {
+                gap: 6px;
+                margin-top: 12px;
+            }
+            
+            .action-btn {
+                padding: 10px 14px;
+                font-size: 14px;
+                border-radius: 6px;
+            }
+            
+            .loading,
+            .error {
+                padding: 40px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
         @media print {
             body {
                 background: white;
