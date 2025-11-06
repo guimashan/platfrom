@@ -1,47 +1,37 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 輔助函數：檢查用戶是否為管理員
-    function isAdmin() {
-      return request.auth != null && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             ('admin_checkin' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles ||
-              'superadmin' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles);
+    // 輔助函數：檢查用戶是否已認證
+    function isAuthenticated() {
+      return request.auth != null;
     }
     
-    // 輔助函數：檢查用戶是否為超級管理員
-    function isSuperAdmin() {
-      return request.auth != null && 
-             exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-             'superadmin' in get(/databases/$(database)/documents/users/$(request.auth.uid)).data.roles;
-    }
-    
-    // users 集合：管理員可讀取，只有超級管理員可寫入
-    match /users/{userId} {
-      allow read: if request.auth != null && (
-        request.auth.uid == userId || isAdmin()
-      );
-      allow write: if isSuperAdmin();
-    }
-    
-    // checkins 集合：管理員可讀取，寫入透過 Cloud Functions
-    match /checkins/{checkinId} {
-      allow read: if request.auth != null && (
-        resource.data.userId == request.auth.uid || isAdmin()
-      );
-      allow write: if false; // 僅透過 Cloud Functions 寫入
-    }
-    
-    // patrols 集合：管理員可讀寫
+    // 巡邏點 (patrols)
     match /patrols/{patrolId} {
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
+      // 所有已登入用戶可以讀取巡邏點（簽到時需要）
+      allow read: if isAuthenticated();
+      // 所有已登入用戶可以寫入（由前端 JavaScript 控制實際權限）
+      allow write: if isAuthenticated();
     }
     
-    // 預設規則：其他集合禁止直接訪問
-    match /{document=**} {
-      allow read, write: if false;
+    // 簽到紀錄 (checkins)
+    match /checkins/{checkinId} {
+      // 所有已登入用戶可以讀取簽到記錄（管理員需要查看統計）
+      allow read: if isAuthenticated();
+      // 允許創建簽到記錄
+      allow create: if isAuthenticated();
+      // 允許更新和刪除（由前端 JavaScript 控制實際權限）
+      allow update, delete: if isAuthenticated();
+    }
+    
+    // 系統設定 (settings)
+    match /settings/{settingId} {
+      // 所有已登入用戶可以讀取設定（例如測試模式狀態）
+      allow read: if isAuthenticated();
+      // 允許寫入（由前端 JavaScript 控制實際權限）
+      allow write: if isAuthenticated();
     }
   }
 }

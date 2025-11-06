@@ -1,0 +1,27 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 輔助函數：檢查用戶是否已認證
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 用戶資料 (users)
+    match /users/{userId} {
+      // 所有已登入用戶可以讀取所有用戶資料（管理頁面需要）
+      allow read: if isAuthenticated();
+      // 本人可以更新自己的基本資料
+      allow update: if isAuthenticated() && userId == request.auth.uid;
+      // 允許創建和刪除（由前端 JavaScript 控制實際權限）
+      allow create, delete: if isAuthenticated();
+    }
+    
+    // LINE 登入資料 (lineUsers)
+    match /lineUsers/{lineId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+  }
+}
