@@ -89,6 +89,10 @@ body {
     opacity: 0.7;
 }
 
+.input-field:disabled::placeholder {
+    color: #999;
+}
+
 /* 驗證錯誤樣式 */
 .input-field.error {
     border-color: #dc3545 !important;
