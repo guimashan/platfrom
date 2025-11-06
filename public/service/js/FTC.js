@@ -358,6 +358,11 @@ async function handleSubmit() {
         // 7. 呼叫 Cloud Function
         console.log("正在呼叫後端 'submitRegistration'...");
         
+        // 再次檢查登入狀態（防止 token 過期）
+        if (!platformAuth.currentUser) {
+            throw new Error('登入狀態已過期，請重新整理頁面並重新登入');
+        }
+        
         const idToken = await platformAuth.currentUser.getIdToken();
         
         const functionUrl = 'https://asia-east2-service-b9d4a.cloudfunctions.net/submitRegistration';

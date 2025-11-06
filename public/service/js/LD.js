@@ -748,7 +748,12 @@ async function handleSubmit() {
         const otherNote = otherNoteEl.value.trim();
         const totalAmount = parseInt(totalAmountEl.textContent.replace('NT$ ', '').replace(/,/g, ''), 10);
         
-        // 5. 取得 ID Token（使用 Platform Auth 進行跨專案認證）
+        // 5. 再次檢查登入狀態（防止 token 過期）
+        if (!platformAuth.currentUser) {
+            throw new Error('登入狀態已過期，請重新整理頁面並重新登入');
+        }
+        
+        // 6. 取得 ID Token（使用 Platform Auth 進行跨專案認證）
         const idToken = await platformAuth.currentUser.getIdToken();
         
         // 6. 呼叫後端 API
