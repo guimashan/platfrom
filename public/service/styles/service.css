@@ -82,7 +82,7 @@ body {
 
 /* 鎖定欄位樣式 */
 .input-field:disabled {
-    background: white;
+    background: #e0e0e0;
     border: 1.5px solid #e0e0e0;
     color: #999;
     cursor: not-allowed;
