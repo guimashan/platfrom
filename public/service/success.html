@@ -4,80 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>訂單送出成功 - 龜馬山代天府</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
     <link rel="stylesheet" href="styles/service.css">
     <style>
         body {
-            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            background-color: var(--bg-cream);
             min-height: 100vh;
-            padding: 20px;
         }
 
         .success-container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
-            padding-top: 20px;
         }
 
         .success-header {
-            background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%);
-            color: #d4af37;
-            padding: 30px 20px;
-            border-radius: 15px 15px 0 0;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            color: white;
+            padding: 2rem 1.5rem;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .success-header-content {
+            flex: 1;
             text-align: center;
-            position: relative;
         }
 
         .success-icon {
-            font-size: 60px;
-            margin-bottom: 10px;
-            color: #d4af37;
+            font-size: 48px;
+            margin-bottom: 0.5rem;
         }
 
         .success-title {
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 1.5rem;
+            font-weight: 600;
             margin: 0;
-            color: #d4af37;
         }
 
         .liff-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: rgba(212, 175, 55, 0.2);
-            border: 2px solid #d4af37;
-            color: #d4af37;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            font-size: 24px;
+            font-size: 20px;
             cursor: pointer;
             display: none;
             align-items: center;
             justify-content: center;
             transition: background 0.3s;
+            flex-shrink: 0;
         }
 
         .liff-close-btn:hover {
-            background: rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .success-card {
-            background: white;
-            padding: 30px;
-            border-radius: 0 0 15px 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            background: var(--bg-white);
+            padding: 2rem;
+            margin: 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .order-info {
-            margin-bottom: 25px;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary-gold);
         }
 
         .order-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #f0f0f0;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
         }
 
         .order-row:last-child {
@@ -85,40 +96,41 @@
         }
 
         .order-label {
-            color: #666;
+            color: var(--text-secondary);
             font-weight: 500;
         }
 
         .order-value {
-            color: #333;
-            font-weight: bold;
+            color: var(--text-primary);
+            font-weight: 600;
             text-align: right;
         }
 
         .order-id {
-            color: #d4af37;
-            font-size: 18px;
+            color: var(--primary-gold-dark);
+            font-size: 1.125rem;
             font-family: 'Courier New', monospace;
         }
 
         .applicant-list {
-            margin-top: 15px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 8px;
-            border-left: 4px solid #d4af37;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            border-left: 4px solid var(--primary-gold);
         }
 
         .applicant-list-title {
-            color: #d4af37;
-            font-weight: bold;
-            margin-bottom: 10px;
+            color: var(--primary-gold-dark);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
         }
 
         .applicant-item {
-            padding: 10px 0;
-            color: #333;
-            border-bottom: 1px dashed #e0e0e0;
+            padding: 0.75rem 0;
+            color: var(--text-primary);
+            border-bottom: 1px dashed rgba(212, 175, 55, 0.2);
         }
 
         .applicant-item:last-child {
@@ -126,50 +138,57 @@
         }
 
         .applicant-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
         .item-detail {
-            color: #666;
-            font-size: 14px;
-            padding-left: 15px;
-            margin-top: 3px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            padding-left: 1rem;
+            margin-top: 0.25rem;
         }
 
         .total-amount {
-            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
             color: white;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 1.25rem;
+            border-radius: var(--radius-sm);
             text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            margin: 20px 0;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 1.5rem 0;
+            box-shadow: var(--shadow-sm);
         }
 
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 0.75rem;
             flex-wrap: wrap;
-            margin-top: 20px;
+            margin-top: 1.5rem;
         }
 
         .action-btn {
             flex: 1;
             min-width: 140px;
-            padding: 12px 20px;
+            padding: 0.875rem 1.5rem;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: var(--radius-sm);
+            font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
         }
 
         .btn-print {
@@ -179,6 +198,7 @@
 
         .btn-print:hover {
             background: #1976D2;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-share {
@@ -188,38 +208,29 @@
 
         .btn-share:hover {
             background: #F57C00;
+            box-shadow: var(--shadow-md);
         }
 
         .btn-calendar {
-            background: #9C27B0;
+            background: var(--primary-gold);
             color: white;
         }
 
         .btn-calendar:hover {
-            background: #7B1FA2;
-        }
-
-        .btn-close {
-            background: #666;
-            color: white;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        .btn-close:hover {
-            background: #555;
+            background: var(--primary-gold-dark);
+            box-shadow: var(--shadow-md);
         }
 
         .loading {
             text-align: center;
-            padding: 50px;
-            color: #666;
+            padding: 3rem;
+            color: var(--text-secondary);
         }
 
         .error {
             text-align: center;
-            padding: 50px;
-            color: #f44336;
+            padding: 3rem;
+            color: #dc3545;
         }
 
         @media print {
@@ -238,9 +249,12 @@
 <body>
     <div class="success-container">
         <div class="success-header">
+            <div style="width: 40px;"></div>
+            <div class="success-header-content">
+                <div class="success-icon">✓</div>
+                <h1 class="success-title">訂單送出成功！</h1>
+            </div>
             <button class="liff-close-btn" id="liffCloseBtn">✕</button>
-            <div class="success-icon">✓</div>
-            <h1 class="success-title">訂單送出成功！</h1>
         </div>
 
         <div class="success-card">
