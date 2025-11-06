@@ -117,37 +117,13 @@ function displayApplicants() {
         <div class="applicant-list">
             <div class="applicant-list-title">報名人數：${orderData.applicants.length} 位</div>
             ${orderData.applicants.map(app => {
-                const name = app.applicantName || app.name || '（未填寫姓名）';
-                let itemsHtml = '';
-                
-                // 顯示捐獻項目明細（添香油）
-                if (app.donationItems) {
-                    const items = [];
-                    if (app.donationItems.jingzhi > 0) {
-                        items.push(`<div class="item-detail">［金紙］$100 / ${app.donationItems.jingzhi}份</div>`);
-                    }
-                    if (app.donationItems.suixi > 0) {
-                        items.push(`<div class="item-detail">［隨喜功德］NT$ ${app.donationItems.suixi.toLocaleString()}</div>`);
-                    }
-                    itemsHtml = items.join('');
+                let detail = app.applicantName || app.name || '（未填寫姓名）';
+                if (app.category) {
+                    detail += ` (${app.category})`;
+                } else if (app.amount) {
+                    detail += ` - NT$ ${app.amount.toLocaleString()}`;
                 }
-                // 顯示法會類別和金額（點燈、法會等）
-                else if (app.category || app.amount) {
-                    const category = app.category || '';
-                    const amount = app.amount ? `NT$ ${app.amount.toLocaleString()}` : '';
-                    if (category && amount) {
-                        itemsHtml = `<div class="item-detail">［${category}］${amount}</div>`;
-                    } else if (amount) {
-                        itemsHtml = `<div class="item-detail">${amount}</div>`;
-                    }
-                }
-                
-                return `
-                    <div class="applicant-item">
-                        <div class="applicant-name">• ${name}</div>
-                        ${itemsHtml}
-                    </div>
-                `;
+                return `<div class="applicant-item">• ${detail}</div>`;
             }).join('')}
         </div>
     `;
