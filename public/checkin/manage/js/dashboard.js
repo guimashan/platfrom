@@ -70,7 +70,7 @@ async function init() {
 
 async function loadAllRecords() {
     try {
-        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=1000', {
+        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=10000', {
             method: 'GET'
         });
         

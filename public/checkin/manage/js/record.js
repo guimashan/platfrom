@@ -118,7 +118,7 @@ async function loadUsers() {
 
 async function loadAllRecords() {
     try {
-        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=1000', {
+        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=50000', {
             method: 'GET'
         });
         
