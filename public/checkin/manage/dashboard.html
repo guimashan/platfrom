@@ -36,13 +36,13 @@
         <nav class="sub-nav">
             <div class="nav-content">
                 <a href="/checkin/manage/dashboard.html" class="nav-link active">儀表板</a>
+                <a href="/checkin/manage/record.html" class="nav-link">簽到記錄</a>
                 <a href="/checkin/manage/patrol.html" class="nav-link">巡邏點管理</a>
                 <a href="/checkin/manage/user.html" class="nav-link">用戶管理</a>
             </div>
         </nav>
 
         <main style="padding: 2rem;">
-            <!-- 統計卡片 -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">今日簽到</div>
@@ -66,60 +66,9 @@
                 </div>
             </div>
 
-            <!-- 簽到記錄管理 -->
-            <div class="manage-card">
-                <div class="card-header">
-                    <h2>簽到記錄</h2>
-                    <button id="exportBtn" class="btn btn-primary">匯出 Excel</button>
-                </div>
-
-                <!-- 篩選區域 -->
-                <div class="filter-section">
-                    <div class="filter-grid">
-                        <div class="filter-group">
-                            <label>開始日期</label>
-                            <input type="date" id="startDate">
-                        </div>
-                        <div class="filter-group">
-                            <label>結束日期</label>
-                            <input type="date" id="endDate">
-                        </div>
-                        <div class="filter-group">
-                            <label>巡邏點</label>
-                            <select id="patrolFilter">
-                                <option value="">全部</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>簽到方式</label>
-                            <select id="methodFilter">
-                                <option value="">全部</option>
-                                <option value="gps">GPS 定位</option>
-                                <option value="qrcode">QR Code</option>
-                            </select>
-                        </div>
-                        <div class="filter-group">
-                            <label>用戶搜尋</label>
-                            <input type="text" id="userSearch" placeholder="輸入用戶名稱或 ID">
-                        </div>
-                    </div>
-                    <div class="filter-actions">
-                        <button id="resetFilterBtn" class="btn btn-secondary">重置</button>
-                        <button id="applyFilterBtn" class="btn btn-primary">套用篩選</button>
-                    </div>
-                </div>
-
-                <!-- 記錄列表 -->
-                <div id="recordsList" class="data-table">
-                    <p class="loading">載入中...</p>
-                </div>
-
-                <!-- 分頁 -->
-                <div id="pagination" style="display: none; margin-top: 1.5rem; text-align: center;">
-                    <button id="prevPage" class="btn btn-secondary">← 上一頁</button>
-                    <span id="pageInfo" style="margin: 0 1rem; font-weight: 500;"></span>
-                    <button id="nextPage" class="btn btn-secondary">下一頁 →</button>
-                </div>
+            <div class="manage-card" style="margin-top: 2rem; text-align: center;">
+                <p style="color: #666; margin-bottom: 1rem;">查看詳細簽到記錄？</p>
+                <button onclick="window.location.href='/checkin/manage/record.html'" class="btn btn-primary" style="padding: 0.75rem 2rem;">前往簽到記錄</button>
             </div>
         </main>
     </div>
