@@ -3,18 +3,78 @@
  */
 
 import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
+
+const isLiffEnvironment = typeof window.liff !== 'undefined';
+const LIFF_ID = '2008269293-Nl2pZBpV';
 
 let currentUser = null;
 let patrols = [];
 let editingPatrolId = null;
 
-onAuthStateChanged(platformAuth, async (user) => {
+async function initLiffAuth() {
+    try {
+        console.log('開始初始化 LIFF...');
+        
+        await liff.init({ liffId: LIFF_ID });
+        console.log('LIFF 初始化成功');
+        
+        if (!liff.isLoggedIn()) {
+            console.log('用戶未登入，執行登入...');
+            liff.login();
+            return false;
+        }
+        
+        const profile = await liff.getProfile();
+        console.log('LINE 用戶:', profile.displayName);
+        
+        const idToken = liff.getIDToken();
+        console.log('準備交換 Firebase Token...');
+        
+        const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomTokenFromLiff', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                liffIdToken: idToken,
+                lineUserId: profile.userId,
+                displayName: profile.displayName,
+                pictureUrl: profile.pictureUrl
+            })
+        });
+        
+        const data = await response.json();
+        console.log('Token 交換響應:', data);
+        
+        if (!response.ok || !data.ok) {
+            throw new Error(data.message || 'Firebase Token 交換失敗');
+        }
+        
+        await signInWithCustomToken(platformAuth, data.customToken);
+        console.log('Firebase 登入成功');
+        
+        const userAvatarEl = document.getElementById('userAvatar');
+        const userNameEl = document.getElementById('userName');
+        if (userAvatarEl) userAvatarEl.src = profile.pictureUrl;
+        if (userNameEl) userNameEl.textContent = profile.displayName;
+        
+        window.closeLiffWindow = () => liff.closeWindow();
+        
+        return true;
+    } catch (error) {
+        console.error('LIFF 初始化失敗:', error);
+        alert('LIFF 初始化失敗: ' + error.message);
+        return false;
+    }
+}
+
+async function handleAuth(user) {
     if (!user) {
-        window.location.href = '/checkin/manage/index.html';
+        if (!isLiffEnvironment) {
+            window.location.href = '/checkin/manage/index.html';
+        }
         return;
     }
     
@@ -41,7 +101,6 @@ onAuthStateChanged(platformAuth, async (user) => {
         
         currentUser = user;
         
-        // 認證成功：隱藏登入提示，顯示主要內容
         document.getElementById('loginPrompt').style.display = 'none';
         document.getElementById('mainApp').style.display = 'block';
         
@@ -51,7 +110,15 @@ onAuthStateChanged(platformAuth, async (user) => {
         alert('權限驗證失敗');
         window.location.href = '/';
     }
-});
+}
+
+onAuthStateChanged(platformAuth, handleAuth);
+
+if (isLiffEnvironment) {
+    (async () => {
+        await initLiffAuth();
+    })();
+}
 
 async function init() {
     await loadTestModeStatus();
@@ -362,7 +429,10 @@ window.deletePatrol = deletePatrol;
 window.showQRCode = showQRCode;
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    if (!isLiffEnvironment) {
+        document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    }
+    
     document.getElementById('toggleTestMode')?.addEventListener('click', toggleTestMode);
     document.getElementById('addPatrolBtn')?.addEventListener('click', () => openPatrolModal());
     document.getElementById('closeModal')?.addEventListener('click', closePatrolModal);
