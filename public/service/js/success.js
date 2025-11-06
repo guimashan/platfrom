@@ -1,18 +1,4 @@
-import { 
-    serviceApp,
-    platformAuth,
-    serviceDb 
-} from '../../js/firebase-init.js';
-
-import { 
-    collection, 
-    query, 
-    where, 
-    getDocs 
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-
-const auth = platformAuth;
-const db = serviceDb;
+// 不再需要 Firebase 實例，改用公開 API
 
 const SERVICE_NAMES = {
     dd: '線上點燈',
@@ -78,20 +64,27 @@ async function loadOrderData() {
     serviceType = service;
     
     try {
-        const q = query(
-            collection(db, 'registrations'),
-            where('orderId', '==', orderId),
-            where('serviceType', '==', service)
-        );
+        const apiUrl = `https://asia-east2-service-b9d4a.cloudfunctions.net/getPublicOrderDetail?orderId=${encodeURIComponent(orderId)}&service=${encodeURIComponent(service)}`;
         
-        const querySnapshot = await getDocs(q);
+        const response = await fetch(apiUrl);
         
-        if (querySnapshot.empty) {
-            showError('找不到訂單資料');
+        if (!response.ok) {
+            if (response.status === 404) {
+                showError('找不到訂單資料');
+            } else {
+                showError('載入訂單失敗，請稍後再試');
+            }
             return;
         }
         
-        orderData = querySnapshot.docs[0].data();
+        const result = await response.json();
+        
+        if (!result.success || !result.order) {
+            showError('訂單資料格式錯誤');
+            return;
+        }
+        
+        orderData = result.order;
         displayOrderInfo();
     } catch (error) {
         console.error('載入訂單失敗:', error);

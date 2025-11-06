@@ -32,4 +32,5 @@ exports.lineWebhook = messagingFunctions.lineWebhook;
 exports.submitRegistration = serviceFunctions.submitRegistration;
 exports.getRegistrations = serviceFunctions.getRegistrations;
 exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
+exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
 exports.confirmPayment = serviceFunctions.confirmPayment;

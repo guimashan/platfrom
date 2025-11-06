@@ -357,6 +357,67 @@ exports.getRegistrationDetail = onRequest({
 });
 
 /**
+ * 查看訂單詳情（公開 API，用於成功頁面）
+ * 不需要管理員權限，任何人都可以用 orderId 查看基本資訊
+ * 不包含敏感資料（信用卡資訊）
+ */
+exports.getPublicOrderDetail = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'GET') {
+            res.status(405).json({ error: { message: '只接受 GET 請求' } });
+            return;
+        }
+
+        const orderId = req.query.orderId;
+        const serviceType = req.query.service;
+
+        if (!orderId || !serviceType) {
+            res.status(400).json({ error: { message: '缺少訂單編號或服務類型' } });
+            return;
+        }
+
+        const regDoc = await db.collection('registrations').doc(orderId).get();
+        
+        if (!regDoc.exists) {
+            res.status(404).json({ error: { message: '訂單不存在' } });
+            return;
+        }
+
+        const data = regDoc.data();
+        
+        // 驗證服務類型是否匹配
+        if (data.serviceType !== serviceType) {
+            res.status(404).json({ error: { message: '訂單不存在' } });
+            return;
+        }
+
+        // 只返回基本資訊，不包含敏感資料
+        const publicData = {
+            orderId: regDoc.id,
+            serviceType: data.serviceType,
+            contactName: data.contactName,
+            contactPhone: data.contactPhone,
+            contactEmail: data.contactEmail,
+            contactAddress: data.contactAddress,
+            applicants: data.applicants,
+            totalAmount: data.totalAmount,
+            timestamp: data.timestamp,
+            status: data.status || 'pending',
+            otherNote: data.otherNote
+        };
+
+        res.status(200).json({ success: true, order: publicData });
+
+    } catch (error) {
+        console.error('查詢訂單失敗:', error);
+        res.status(500).json({ error: { message: '伺服器錯誤' } });
+    }
+});
+
+/**
  * 確認收款並刪除機密資料
  * 需要 poweruser_service, admin_service 或 superadmin 權限
  */
