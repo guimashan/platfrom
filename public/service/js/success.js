@@ -1,8 +1,18 @@
-import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { 
+    serviceApp,
+    platformAuth,
+    serviceDb 
+} from '../../js/firebase-init.js';
 
-const auth = getAuth(window.firebaseApp);
-const db = getFirestore(window.firebaseApp);
+import { 
+    collection, 
+    query, 
+    where, 
+    getDocs 
+} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+const auth = platformAuth;
+const db = serviceDb;
 
 const SERVICE_NAMES = {
     dd: '線上點燈',
