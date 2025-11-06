@@ -156,6 +156,28 @@ function setupEventListeners() {
     cardNumberEl.addEventListener('input', formatCardNumber);
     cardExpiryEl.addEventListener('input', formatCardExpiry);
     cardCVVEl.addEventListener('input', formatCardCVV);
+    
+    // 感謝狀領取選項變更時，控制通訊地址欄位
+    const receiptOptions = document.querySelectorAll('input[name="receiptOption"]');
+    receiptOptions.forEach(option => {
+        option.addEventListener('change', handleReceiptOptionChange);
+    });
+}
+
+// --- 感謝狀領取選項變更處理 ---
+function handleReceiptOptionChange() {
+    const selectedOption = document.querySelector('input[name="receiptOption"]:checked').value;
+    if (selectedOption === 'self') {
+        // 親自領取：鎖定通訊地址欄位並清空內容
+        contactAddressEl.disabled = true;
+        contactAddressEl.value = '';
+        contactAddressEl.placeholder = '親自領取時無需填寫地址';
+        clearError(contactAddressEl);
+    } else {
+        // 寄發感謝狀：解除鎖定
+        contactAddressEl.disabled = false;
+        contactAddressEl.placeholder = '請輸入感謝狀寄送地址';
+    }
 }
 
 // --- 更新繳款金額顯示 ---
