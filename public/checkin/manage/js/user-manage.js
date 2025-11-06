@@ -105,7 +105,7 @@ function renderUsers() {
         <table>
             <thead>
                 <tr>
-                    <th style="width: 60px;"></th>
+                    <th style="width: 60px;">頭像</th>
                     <th>用戶名稱</th>
                     <th>角色</th>
                     <th>Email</th>
@@ -129,7 +129,7 @@ function renderUsers() {
         
         html += `
             <tr>
-                <td data-label="" style="padding: 0.5rem; text-align: center;">
+                <td data-label="頭像" style="padding: 0.5rem; text-align: center;">
                     <img src="${avatarUrl}" 
                          alt="${displayName}" 
                          style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;"

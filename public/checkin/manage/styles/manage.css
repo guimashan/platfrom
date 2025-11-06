@@ -815,6 +815,20 @@
         flex: 0 0 40%;
     }
     
+    /* 頭像欄位在卡片模式下居中顯示 */
+    .data-table td[data-label="頭像"] {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 0;
+    }
+    
+    .data-table td[data-label="頭像"]::before {
+        flex: none;
+        margin-bottom: 0;
+    }
+    
     /* 巡邏點管理特定樣式 */
     .data-table td[data-label="操作"],
     .data-table td[data-label="角色"] {
