@@ -303,33 +303,33 @@ async function viewUserStats(userId) {
         });
         
         let html = `
-            <div style="margin-bottom: 2rem;">
-                <h4>${user.displayName || '未設定'}</h4>
-                <p style="color: #666;">簽到統計資料</p>
+            <div style="margin-bottom: 1.5rem;">
+                <h4 style="margin: 0 0 0.5rem 0;">${user.displayName || '未設定'}</h4>
+                <p style="color: #666; margin: 0;">簽到統計資料</p>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 700; color: #667eea;">${records.length}</div>
-                    <div style="color: #666; font-size: 0.9rem;">總簽到數</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #667eea;">${records.length}</div>
+                    <div style="color: #666; font-size: 0.85rem;">總簽到數</div>
                 </div>
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 700; color: #11998e;">${monthRecords.length}</div>
-                    <div style="color: #666; font-size: 0.9rem;">本月簽到</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #11998e;">${monthRecords.length}</div>
+                    <div style="color: #666; font-size: 0.85rem;">本月簽到</div>
                 </div>
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 700; color: #f5576c;">${weekRecords.length}</div>
-                    <div style="color: #666; font-size: 0.9rem;">本週簽到</div>
+                    <div style="font-size: 1.8rem; font-weight: 700; color: #f5576c;">${weekRecords.length}</div>
+                    <div style="color: #666; font-size: 0.85rem;">本週簽到</div>
                 </div>
             </div>
             
-            <h4 style="margin-bottom: 1rem;">最近 10 次簽到記錄</h4>
+            <h4 style="margin: 0 0 1rem 0; font-size: 1.1rem;">最近 10 次簽到記錄</h4>
         `;
         
         if (records.length === 0) {
             html += '<p class="no-data">尚無簽到記錄</p>';
         } else {
-            html += '<table style="width: 100%;"><thead><tr><th>時間</th><th>巡邏點</th><th>距離</th></tr></thead><tbody>';
+            html += '<div class="data-table"><table style="width: 100%;"><thead><tr><th>時間</th><th>巡邏點</th><th>距離</th></tr></thead><tbody>';
             
             records.slice(0, 10).forEach(record => {
                 const timestamp = record.timestamp?.toDate() || new Date();
@@ -337,21 +337,31 @@ async function viewUserStats(userId) {
                 
                 html += `
                     <tr>
-                        <td>${formatDateTime(timestamp)}</td>
-                        <td>${record.patrolId}</td>
-                        <td>${distance}</td>
+                        <td data-label="時間">${formatDateTime(timestamp)}</td>
+                        <td data-label="巡邏點">${record.patrolId}</td>
+                        <td data-label="距離">${distance}</td>
                     </tr>
                 `;
             });
             
-            html += '</tbody></table>';
+            html += '</tbody></table></div>';
         }
         
         content.innerHTML = html;
         
     } catch (error) {
         console.error('載入統計失敗:', error);
-        content.innerHTML = '<p class="error">載入失敗</p>';
+        console.error('錯誤詳情:', error.message);
+        console.error('錯誤堆疊:', error.stack);
+        content.innerHTML = `
+            <div class="error" style="padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                <h4 style="margin: 0 0 1rem 0; color: #721c24;">載入失敗</h4>
+                <p style="margin: 0 0 0.5rem 0; color: #721c24;">無法載入簽到統計資料</p>
+                <p style="margin: 0; font-size: 0.9rem; color: #856404;">錯誤：${error.message || '未知錯誤'}</p>
+                <button onclick="location.reload()" class="btn btn-primary" style="margin-top: 1.5rem;">重新整理頁面</button>
+            </div>
+        `;
     }
 }
 
