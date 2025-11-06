@@ -163,11 +163,11 @@ function renderPatrols() {
         
         html += `
             <tr>
-                <td><strong>${patrol.name}</strong></td>
-                <td>${patrol.lat?.toFixed(6)}, ${patrol.lng?.toFixed(6)}</td>
-                <td>${patrol.radius || 30} 公尺</td>
-                <td>${testModeBadge}</td>
-                <td>
+                <td data-label="名稱"><strong>${patrol.name}</strong></td>
+                <td data-label="座標">${patrol.lat?.toFixed(6)}, ${patrol.lng?.toFixed(6)}</td>
+                <td data-label="容許距離">${patrol.radius || 30} 公尺</td>
+                <td data-label="測試模式">${testModeBadge}</td>
+                <td data-label="操作">
                     <button class="btn btn-sm btn-secondary" onclick="window.editPatrol('${patrol.id}')">編輯</button>
                     <button class="btn btn-sm btn-primary" onclick="window.showQRCode('${patrol.id}')">QR Code</button>
                     <button class="btn btn-sm btn-danger" onclick="window.deletePatrol('${patrol.id}')">刪除</button>

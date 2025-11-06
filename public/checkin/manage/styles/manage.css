@@ -762,15 +762,82 @@
         font-size: 0.95rem;
     }
     
-    /* 表格改為卡片式（在下個任務中實現） */
+    /* 表格改為卡片式佈局 */
     .data-table {
         font-size: 0.9rem;
     }
     
-    .data-table th,
+    .data-table table {
+        border: 0;
+    }
+    
+    .data-table thead {
+        display: none;
+    }
+    
+    .data-table tbody {
+        display: block;
+    }
+    
+    .data-table tr {
+        display: block;
+        margin-bottom: 1rem;
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .data-table tr:hover {
+        background: #f8f9fa;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+    
     .data-table td {
-        padding: 0.75rem 0.5rem;
-        font-size: 0.85rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        text-align: right;
+    }
+    
+    .data-table td:last-child {
+        border-bottom: none;
+    }
+    
+    .data-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #555;
+        text-align: left;
+        flex: 0 0 40%;
+    }
+    
+    /* 巡邏點管理特定樣式 */
+    .data-table td[data-label="操作"],
+    .data-table td[data-label="角色"] {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .data-table td[data-label="操作"]::before,
+    .data-table td[data-label="角色"]::before {
+        margin-bottom: 0.5rem;
+    }
+    
+    .data-table td[data-label="操作"] button,
+    .data-table td[data-label="操作"] .btn {
+        width: 100%;
+        margin: 0.25rem 0;
+    }
+    
+    .data-table td[data-label="角色"] .badge {
+        margin: 0.25rem 0;
+        display: block;
+        text-align: center;
     }
 }
 

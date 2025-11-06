@@ -129,26 +129,26 @@ function renderUsers() {
         
         html += `
             <tr>
-                <td style="padding: 0.5rem; text-align: center;">
+                <td data-label="" style="padding: 0.5rem; text-align: center;">
                     <img src="${avatarUrl}" 
                          alt="${displayName}" 
                          style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;"
                          onerror="this.src='/images/default-avatar.svg'">
                 </td>
-                <td>
+                <td data-label="用戶名稱">
                     <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                         <strong style="font-size: 1rem;">${displayName}</strong>
                         <small style="color: #666; font-size: 0.8rem; font-family: monospace;">${user.id.substring(0, 12)}...</small>
                     </div>
                 </td>
-                <td>
+                <td data-label="角色">
                     <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 250px;">
                         ${roleBadges}
                     </div>
                 </td>
-                <td style="color: ${user.email ? '#333' : '#999'};">${user.email || '未綁定'}</td>
-                <td>${statusBadge}</td>
-                <td>
+                <td data-label="Email" style="color: ${user.email ? '#333' : '#999'};">${user.email || '未綁定'}</td>
+                <td data-label="狀態">${statusBadge}</td>
+                <td data-label="操作">
                     <button class="btn btn-sm btn-secondary" onclick="window.editUser('${user.id}')">編輯</button>
                     <button class="btn btn-sm btn-primary" onclick="window.viewUserStats('${user.id}')">統計</button>
                 </td>
