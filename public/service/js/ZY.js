@@ -197,7 +197,7 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                                <input type="text" class="input-field solar-year" data-target="birthDate" placeholder="年" style="width: 70px; text-align: center;">
                                 <span>年</span>
                                 <input type="text" class="input-field solar-month" data-target="birthDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
@@ -234,7 +234,7 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" style="width: 70px; text-align: center;">
                                 <span>年</span>
                                 <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
@@ -408,7 +408,7 @@ function createCategoryCard(category) {
                             <div style="display: flex; align-items: center; gap: 5px;">
                                 <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
                                 <span style="color: #666;">民國</span>
-                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" maxlength="3" style="width: 70px; text-align: center;">
+                                <input type="text" class="input-field solar-year" data-target="deathDate" placeholder="年" style="width: 70px; text-align: center;">
                                 <span>年</span>
                                 <input type="text" class="input-field solar-month" data-target="deathDate" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
                                 <span>月</span>
@@ -493,8 +493,17 @@ function createCategoryCard(category) {
     // 農曆轉換（僅 zuxian 和 qita 需要）
     if (category === 'zuxian' || category === 'qita') {
         // 監聽年月日輸入框的變化
-        card.querySelectorAll('.solar-year, .solar-month, .solar-day').forEach(input => {
-            input.addEventListener('input', () => handleSolarInputChange(card, input.getAttribute('data-target')));
+        card.querySelectorAll('.solar-year').forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
+                handleSolarInputChange(card, input.getAttribute('data-target'));
+            });
+        });
+        card.querySelectorAll('.solar-month, .solar-day').forEach(input => {
+            input.addEventListener('input', (e) => {
+                e.target.value = e.target.value.replace(/[^0-9]/g, '');
+                handleSolarInputChange(card, input.getAttribute('data-target'));
+            });
         });
 
         // 監聽日期選擇器的變化

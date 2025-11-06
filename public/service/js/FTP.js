@@ -226,10 +226,19 @@ function setupDateHandlers() {
         }
     }
 
-    // 監聽民國年、月、日輸入
-    baziYearEl.addEventListener('input', updateDateDisplay);
-    baziMonthEl.addEventListener('input', updateDateDisplay);
-    baziDayEl.addEventListener('input', updateDateDisplay);
+    // 監聽民國年、月、日輸入，並限制長度
+    baziYearEl.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
+        updateDateDisplay();
+    });
+    baziMonthEl.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        updateDateDisplay();
+    });
+    baziDayEl.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        updateDateDisplay();
+    });
 
     // 日曆按鈕點擊
     baziBtnEl.addEventListener('click', () => {
@@ -383,8 +392,17 @@ async function handleSubmit() {
             return;
         }
 
+        // 驗證民國年格式（接受 2-3 位數字）
+        const rocYearNum = parseInt(rocYear, 10);
+        if (isNaN(rocYearNum) || rocYear.length < 2 || rocYear.length > 3 || rocYearNum < 10 || rocYearNum > 200) {
+            showError(baziYearEl, '出生年份格式不正確（民國年，2-3位數字，例如：70、113）');
+            submitBtnEl.disabled = false;
+            submitBtnEl.textContent = '確認報名並送出';
+            return;
+        }
+
         // 驗證日期有效性
-        const westernYear = parseInt(rocYear) + 1911;
+        const westernYear = rocYearNum + 1911;
         const monthNum = parseInt(month);
         const dayNum = parseInt(day);
 
