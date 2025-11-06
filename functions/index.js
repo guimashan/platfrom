@@ -25,8 +25,11 @@ exports.savePatrol = checkinFunctions.savePatrol;
 exports.deletePatrol = checkinFunctions.deletePatrol;
 exports.getDashboardStats = checkinFunctions.getDashboardStats;
 
-// 導出 Service Functions
-exports.submitRegistration = serviceFunctions.submitRegistration;
-
 // 導出 LINE Messaging API Functions
 exports.lineWebhook = messagingFunctions.lineWebhook;
+
+// 導出 Service Functions (神務服務)
+exports.submitRegistration = serviceFunctions.submitRegistration;
+exports.getRegistrations = serviceFunctions.getRegistrations;
+exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
+exports.confirmPayment = serviceFunctions.confirmPayment;

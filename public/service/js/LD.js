@@ -668,10 +668,9 @@ async function handleSubmit() {
                 return;
             }
             
-            // 驗證日期格式（民國年可以是1-3位數字）
-            const yearNum = parseInt(year, 10);
-            if (year.length < 1 || year.length > 3 || isNaN(yearNum) || yearNum < 1) {
-                showError(yearInput, `${cardName} 的生辰年份格式不正確（民國年，例如：70或107）`);
+            // 驗證日期格式
+            if (year.length !== 4 || isNaN(year)) {
+                showError(yearInput, `${cardName} 的生辰年份格式不正確（需4位數字）`);
                 card.querySelector('.applicant-details').style.display = 'block';
                 card.setAttribute('data-open', 'true');
                 submitBtnEl.disabled = false;

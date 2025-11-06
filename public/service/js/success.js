@@ -1,7 +1,8 @@
-import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { serviceDb } from '../js/firebase-init.js';
+import { getAuth } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { getFirestore, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
-const db = serviceDb;
+const auth = getAuth(window.firebaseApp);
+const db = getFirestore(window.firebaseApp);
 
 const SERVICE_NAMES = {
     dd: '線上點燈',
@@ -59,8 +60,6 @@ function getUrlParams() {
 async function loadOrderData() {
     const { orderId, service } = getUrlParams();
     
-    console.log('開始載入訂單:', { orderId, service });
-    
     if (!orderId || !service) {
         showError('缺少訂單資訊');
         return;
@@ -69,7 +68,6 @@ async function loadOrderData() {
     serviceType = service;
     
     try {
-        console.log('查詢資料庫:', 'registrations', { orderId, serviceType: service });
         const q = query(
             collection(db, 'registrations'),
             where('orderId', '==', orderId),
@@ -77,19 +75,17 @@ async function loadOrderData() {
         );
         
         const querySnapshot = await getDocs(q);
-        console.log('查詢結果:', querySnapshot.size, '筆資料');
         
         if (querySnapshot.empty) {
-            showError('找不到訂單資料（訂單編號：' + orderId + '）');
+            showError('找不到訂單資料');
             return;
         }
         
         orderData = querySnapshot.docs[0].data();
-        console.log('訂單資料載入成功:', orderData);
         displayOrderInfo();
     } catch (error) {
         console.error('載入訂單失敗:', error);
-        showError('載入訂單失敗：' + error.message);
+        showError('載入訂單失敗，請稍後再試');
     }
 }
 
