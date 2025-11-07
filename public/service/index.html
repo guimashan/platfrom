@@ -8,185 +8,144 @@
     <link rel="stylesheet" href="/styles/common.css">
     <link rel="stylesheet" href="styles/service.css">
     <style>
-        body {
-            background: linear-gradient(135deg, #f5f1e8 0%, #e8dcc4 100%);
-            min-height: 100vh;
-        }
-
-        .service-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .service-header {
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            color: white;
+        .service-menu-card {
+            background: white;
+            border-radius: 12px;
             padding: 2rem;
-            border-radius: 16px;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(212, 175, 55, 0.1);
         }
 
-        .service-header h1 {
-            margin: 0;
-            font-size: 1.8rem;
-            font-weight: 600;
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
         }
 
-        .service-header p {
-            margin: 0.5rem 0 0 0;
-            opacity: 0.95;
-            font-size: 1rem;
-        }
-
-        .service-menu {
-            background: white;
-            padding: 2.5rem 2rem;
-            border-radius: 20px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .service-button {
+        .service-item {
             display: block;
-            width: 100%;
-            padding: 1.25rem 2rem;
-            margin-bottom: 1.25rem;
+            padding: 1.25rem 1.5rem;
             background: white;
-            border: 2px solid #333;
-            border-radius: 50px;
-            font-size: 1.2rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
             font-weight: 500;
             color: #333;
-            cursor: pointer;
-            transition: all 0.3s;
             text-decoration: none;
             text-align: center;
-            font-family: 'Noto Sans TC', sans-serif;
+            transition: all 0.3s;
+            cursor: pointer;
         }
 
-        .service-button:hover {
-            background: var(--primary-gold);
+        .service-item:hover {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
             border-color: var(--primary-gold);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
 
-        .service-button:active {
+        .service-item:active {
             transform: translateY(0);
         }
 
-        .service-button:last-child {
-            margin-bottom: 0;
-        }
-
-        .back-button {
+        .back-btn {
             display: block;
             width: 100%;
             padding: 1rem;
             margin-top: 1.5rem;
-            background: transparent;
+            background: white;
             border: 1.5px solid var(--primary-gold);
-            border-radius: 50px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 500;
             color: var(--primary-gold);
             cursor: pointer;
             transition: all 0.3s;
-            text-decoration: none;
             text-align: center;
             font-family: 'Noto Sans TC', sans-serif;
         }
 
-        .back-button:hover {
+        .back-btn:hover {
             background: var(--primary-gold);
             color: white;
         }
 
         /* 響應式設計 */
         @media (max-width: 767px) {
-            .service-header {
-                padding: 1.5rem 1.25rem;
+            .service-menu-card {
+                padding: 1.5rem;
             }
 
-            .service-header h1 {
-                font-size: 1.5rem;
-            }
-
-            .service-header p {
-                font-size: 0.9rem;
-            }
-
-            .service-menu {
-                padding: 2rem 1.5rem;
-            }
-
-            .service-button {
-                padding: 1.1rem 1.5rem;
-                font-size: 1.1rem;
+            .service-item {
+                padding: 1.1rem 1.25rem;
+                font-size: 1.05rem;
             }
         }
 
         @media (max-width: 479px) {
-            .service-container {
-                padding: 15px;
+            .service-menu-card {
+                padding: 1.25rem;
             }
 
-            .service-header {
-                padding: 1.25rem 1rem;
-            }
-
-            .service-header h1 {
-                font-size: 1.3rem;
-            }
-
-            .service-header p {
-                font-size: 0.85rem;
-            }
-
-            .service-menu {
-                padding: 1.75rem 1.25rem;
-            }
-
-            .service-button {
-                padding: 1rem 1.25rem;
-                font-size: 1.05rem;
-                margin-bottom: 1rem;
-            }
-        }
-
-        @media (max-width: 359px) {
-            .service-header h1 {
-                font-size: 1.2rem;
-            }
-
-            .service-button {
-                padding: 0.9rem 1rem;
+            .service-item {
+                padding: 1rem;
                 font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="service-container">
-        <!-- Header -->
-        <div class="service-header">
-            <h1>📋 神務服務</h1>
+    <header class="header">
+        <div class="header-left">
+            <h1>神務服務</h1>
             <p>選擇您需要的服務項目</p>
         </div>
+        <div class="header-actions">
+            <button class="btn-logout" onclick="window.location.href='/'">
+                返回首頁
+            </button>
+        </div>
+    </header>
 
-        <!-- Service Menu -->
-        <div class="service-menu">
-            <a href="DD.html" class="service-button">線上點燈</a>
-            <a href="ND.html" class="service-button">年斗法會</a>
-            <a href="LD.html" class="service-button">禮斗法會</a>
-            <a href="ZY.html" class="service-button">中元法會</a>
-            <a href="PS.html" class="service-button">普施法會</a>
-            <a href="QJ.html" class="service-button">秋祭法會</a>
+    <div class="container">
+        <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
             
-            <button class="back-button" onclick="window.location.href='/'">返回首頁</button>
+            <!-- 服務說明卡片 -->
+            <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
+                <h2 class="card-title" style="color: #8B6914; margin-bottom: 1rem;">📋 線上神務服務</h2>
+                <div style="line-height: 1.8; color: #4A3C2F; font-size: 15px;">
+                    <p>提供便捷的線上報名服務，您可以透過以下功能進行法會報名、點燈服務等神務事宜。</p>
+                    <p style="margin-top: 0.5rem; color: #8B6914; font-weight: 500;">請選擇您需要的服務項目：</p>
+                </div>
+            </div>
+
+            <!-- 服務選單 -->
+            <div class="card">
+                <h2 class="card-title">服務項目</h2>
+                <div class="service-grid">
+                    <a href="DD.html" class="service-item">線上點燈</a>
+                    <a href="ND.html" class="service-item">年斗法會</a>
+                    <a href="LD.html" class="service-item">禮斗法會</a>
+                    <a href="ZY.html" class="service-item">中元法會</a>
+                    <a href="PS.html" class="service-item">普施法會</a>
+                    <a href="QJ.html" class="service-item">秋祭法會</a>
+                </div>
+            </div>
+
+            <!-- 其他服務 -->
+            <div class="card">
+                <h2 class="card-title">其他服務</h2>
+                <div class="service-grid">
+                    <a href="BG.html" class="service-item">光明燈</a>
+                    <a href="XY.html" class="service-item">隨喜捐款</a>
+                    <a href="FTP.html" class="service-item">福天堂個人會員</a>
+                    <a href="FTY.html" class="service-item">福天堂青年會員</a>
+                    <a href="FTC.html" class="service-item">福天堂團體會員</a>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -194,12 +153,12 @@
         import { authPlatform } from '/js/firebase-init.js';
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 
-        // 檢查登入狀態（不強制要求登入）
+        // 檢查登入狀態
         onAuthStateChanged(authPlatform, (user) => {
             if (user) {
-                console.log('使用者已登入:', user.displayName);
+                console.log('✅ 使用者已登入:', user.displayName);
             } else {
-                console.log('使用者未登入（訪客模式）');
+                console.log('ℹ️ 使用者未登入（訪客模式）');
             }
         });
     </script>
