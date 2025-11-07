@@ -504,7 +504,15 @@ function getServiceTypeName(type) {
     const names = {
         'dd': '線上點燈',
         'nd': '年斗法會',
-        'zhongyuan': '中元普渡'
+        'ld': '禮斗法會',
+        'qj': '秋祭法會',
+        'ps': '普施法會',
+        'bg': '建宮廟款',
+        'xy': '添香油',
+        'zy': '中元法會',
+        'ftp': '福田會 個人入會',
+        'fty': '福田少年會 個人入會',
+        'ftc': '福田會 企業團體入會'
     };
     return names[type] || type;
 }
