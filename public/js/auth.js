@@ -157,6 +157,8 @@ function showModuleGrid(roles) {
         } else if (module === 'manage') {
             // 系統管理：只有管理員可見
             const isAdmin = roles.some(role => 
+                role === 'poweruser' ||
+                role === 'admin' ||
                 role.startsWith('poweruser_') || 
                 role.startsWith('admin_') || 
                 role === 'superadmin'
