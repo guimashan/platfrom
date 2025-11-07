@@ -18,7 +18,7 @@
             display: block;
             padding: 1.25rem 1.5rem;
             background: white;
-            border: 2px solid #e0e0e0;
+            border: 2px solid #d4af37;
             border-radius: 12px;
             font-size: 1.1rem;
             font-weight: 500;
@@ -73,15 +73,6 @@
     <div class="container">
         <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
             
-            <!-- 服務說明卡片 -->
-            <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
-                <h2 class="card-title" style="color: #8B6914; margin-bottom: 1rem;">📋 線上神務服務</h2>
-                <div style="line-height: 1.8; color: #4A3C2F; font-size: 15px;">
-                    <p>提供便捷的線上報名服務，您可以透過以下功能進行法會報名、點燈服務等神務事宜。</p>
-                    <p style="margin-top: 0.5rem; color: #8B6914; font-weight: 500;">請選擇您需要的服務項目：</p>
-                </div>
-            </div>
-
             <!-- 服務選單 -->
             <div class="card">
                 <h2 class="card-title">服務項目</h2>
@@ -99,11 +90,11 @@
     </div>
 
     <script type="module">
-        import { authPlatform } from '/js/firebase-init.js';
+        import { platformAuth } from '/js/firebase-init.js';
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
 
         // 檢查登入狀態
-        onAuthStateChanged(authPlatform, (user) => {
+        onAuthStateChanged(platformAuth, (user) => {
             if (user) {
                 console.log('✅ 使用者已登入:', user.displayName);
             } else {
