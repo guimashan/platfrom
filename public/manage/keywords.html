@@ -242,6 +242,22 @@
             font-size: 13px;
             color: #666;
         }
+
+        /* 修復按鈕和搜尋框高度不一致的問題 */
+        .card-header .btn {
+            padding: 0.625rem 1.25rem !important;
+            font-size: 0.95rem;
+            margin-top: 0 !important;
+        }
+
+        .card-header .btn-secondary {
+            padding: calc(0.625rem - 2px) calc(1.25rem - 2px) !important;
+        }
+
+        .card-header .search-input {
+            padding: 0.625rem 1rem;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
