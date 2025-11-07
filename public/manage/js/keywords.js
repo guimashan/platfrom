@@ -258,10 +258,10 @@ function renderKeywords(keywords) {
             ` : ''}
             
             <div class="keyword-actions">
-                <button class="btn btn-secondary" onclick="toggleStatus('${kw.id}', ${!kw.enabled})">
+                <button class="btn btn-warning" onclick="toggleStatus('${kw.id}', ${!kw.enabled})">
                     ${kw.enabled ? '停用' : '啟用'}
                 </button>
-                <button class="btn btn-primary" onclick="showEditModal('${kw.id}')">
+                <button class="btn btn-edit" onclick="showEditModal('${kw.id}')">
                     編輯
                 </button>
                 <button class="btn btn-danger" onclick="deleteKeyword('${kw.id}', '${escapeHtml(kw.keyword)}')">

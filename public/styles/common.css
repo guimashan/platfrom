@@ -460,6 +460,55 @@ body {
     border-left: 4px solid #FF9800;
 }
 
+/* 警告按鈕（停用/啟用） */
+.btn-warning {
+    background: linear-gradient(135deg, #FFC107, #FF9800);
+    color: white;
+    font-weight: 500;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(135deg, #FFD54F, #FFC107);
+    box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+/* 編輯按鈕（金色強化） */
+.btn-edit {
+    background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+    color: white;
+    font-weight: 500;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(135deg, var(--primary-gold-light), var(--primary-gold));
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+    transform: translateY(-1px);
+}
+
+/* 搜尋框樣式 */
+.search-input {
+    padding: 0.75rem 1.25rem;
+    border: 2px solid #e0e0e0;
+    border-radius: var(--radius-sm);
+    font-size: 1rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    min-width: 280px;
+    transition: all 0.3s ease;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.search-input::placeholder {
+    color: #999;
+    font-weight: 400;
+}
+
 /* 底部導航欄（手機版） */
 .bottom-nav {
     display: none;
