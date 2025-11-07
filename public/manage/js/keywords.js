@@ -85,6 +85,9 @@ function initEventListeners() {
     // 新增按鈕
     document.getElementById('addKeywordBtn').addEventListener('click', showAddModal);
     
+    // 批量更新 URL 按鈕
+    document.getElementById('updateUrlsBtn').addEventListener('click', batchUpdateUrls);
+    
     // 關閉 Modal
     document.getElementById('closeModal').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
@@ -460,6 +463,63 @@ function showModalError(message) {
     const errorEl = document.getElementById('modalError');
     errorEl.textContent = message;
     errorEl.style.display = 'block';
+}
+
+// 批量更新 LIFF URL 格式
+async function batchUpdateUrls() {
+    if (!confirm('🔧 確定要批量更新所有關鍵詞的 LIFF URL 格式嗎？\n\n將會把舊格式：\nhttps://liff.line.me/ID/path\n\n轉換為新格式：\nhttps://liff.line.me/ID?liff.state=/path')) {
+        return;
+    }
+    
+    try {
+        let updatedCount = 0;
+        let skippedCount = 0;
+        
+        for (const kw of allKeywords) {
+            if (!kw.liffUrl) {
+                skippedCount++;
+                continue;
+            }
+            
+            const oldUrl = kw.liffUrl;
+            const newUrl = convertLiffUrl(oldUrl);
+            
+            if (oldUrl !== newUrl) {
+                console.log(`更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
+                await keywordService.updateKeyword(kw.id, { liffUrl: newUrl });
+                updatedCount++;
+            } else {
+                skippedCount++;
+            }
+        }
+        
+        await loadKeywords();
+        showSuccess(`✅ 批量更新完成！\n\n更新: ${updatedCount} 個\n跳過: ${skippedCount} 個`);
+    } catch (error) {
+        console.error('批量更新失敗:', error);
+        showError('批量更新失敗: ' + error.message);
+    }
+}
+
+// 轉換 LIFF URL 格式
+function convertLiffUrl(url) {
+    if (!url) return url;
+    
+    // 如果已經是新格式，直接返回
+    if (url.includes('liff.state=')) {
+        return url;
+    }
+    
+    // 解析舊格式：https://liff.line.me/ID/path
+    const match = url.match(/^(https:\/\/liff\.line\.me\/[^\/]+)(\/.*)/);
+    
+    if (match) {
+        const baseUrl = match[1]; // https://liff.line.me/ID
+        const path = match[2];     // /path
+        return `${baseUrl}?liff.state=${path}`;
+    }
+    
+    return url;
 }
 
 // 初始化
