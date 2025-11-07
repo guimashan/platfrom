@@ -140,21 +140,37 @@ function showModuleGrid(roles) {
         }
         
         let canAccess = false;
+        let isVisible = false;
         
         if (module === 'checkin') {
+            // 奉香簽到：所有人可見可點擊
             canAccess = true;
+            isVisible = true;
         } else if (module === 'service') {
-            canAccess = roles.includes('poweruser_service') || roles.includes('admin_service') || roles.includes('superadmin');
+            // 神務服務：所有人可見可點擊
+            canAccess = true;
+            isVisible = true;
         } else if (module === 'schedule') {
-            canAccess = roles.includes('admin_schedule') || roles.includes('superadmin');
+            // 排班系統：所有人可見但鎖定（不可點擊）
+            canAccess = false;
+            isVisible = true;
         } else if (module === 'manage') {
-            canAccess = roles.includes('admin_checkin') || roles.includes('admin_service') || 
-                       roles.includes('admin_schedule') || roles.includes('superadmin');
+            // 系統管理：只有管理員可見
+            const isAdmin = roles.some(role => 
+                role.startsWith('poweruser_') || 
+                role.startsWith('admin_') || 
+                role === 'superadmin'
+            );
+            canAccess = isAdmin;
+            isVisible = isAdmin;
         }
         
-        if (canAccess) {
+        if (isVisible) {
             card.style.display = 'block';
-            card.addEventListener('click', () => handleModuleClick(module));
+            // 只有可點擊的模組才綁定事件
+            if (canAccess && !card.classList.contains('module-card-locked')) {
+                card.addEventListener('click', () => handleModuleClick(module));
+            }
         } else {
             card.style.display = 'none';
         }
@@ -221,10 +237,35 @@ function showLoginPage() {
     const logoutBtn = document.getElementById('logoutBtn');
     
     if (loginCard) loginCard.style.display = 'block';
-    // 保持 moduleGrid 顯示（不移除 active class），讓服務入口公開可訪問
-    // if (moduleGrid) moduleGrid.classList.remove('active');
     if (userInfo) userInfo.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'none';
+    
+    // 顯示模組網格，讓未登入使用者也能看到公開模組
+    if (moduleGrid) moduleGrid.classList.add('active');
+    
+    // 控制未登入時的模組顯示
+    const modules = document.querySelectorAll('.module-card');
+    modules.forEach(card => {
+        const module = card.dataset.module;
+        
+        if (!module) {
+            card.style.display = 'block';
+            return;
+        }
+        
+        // 未登入時的顯示規則
+        if (module === 'checkin' || module === 'service' || module === 'schedule') {
+            // 奉香簽到、神務服務、排班系統：所有人可見
+            card.style.display = 'block';
+            // 綁定點擊事件（除了鎖定的排班系統）
+            if (module !== 'schedule' && !card.classList.contains('module-card-locked')) {
+                card.addEventListener('click', () => handleModuleClick(module));
+            }
+        } else if (module === 'manage') {
+            // 系統管理：未登入時隱藏
+            card.style.display = 'none';
+        }
+    });
 }
 
 // 登出功能
