@@ -510,8 +510,8 @@ function getServiceTypeName(type) {
         'bg': '建宮廟款',
         'xy': '添香油',
         'zy': '中元法會',
-        'ftp': '福田會 個人入會',
-        'fty': '福田少年會 個人入會',
+        'ftp': '福田會 信眾個人入會',
+        'fty': '福田會 福田 Young會',
         'ftc': '福田會 企業團體入會'
     };
     return names[type] || type;
