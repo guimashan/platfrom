@@ -54,7 +54,7 @@ async function authenticateWithFirebase() {
             throw new Error('無法取得 LINE ID Token');
         }
         
-        const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken', {
+        const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomTokenFromLiff', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -68,10 +68,18 @@ async function authenticateWithFirebase() {
         });
         
         if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Cloud Function 回應錯誤:', errorData);
             throw new Error('Firebase Token 交換失敗');
         }
         
         const data = await response.json();
+        
+        if (!data.ok || !data.customToken) {
+            console.error('Cloud Function 回應格式錯誤:', data);
+            throw new Error(data.message || 'Firebase Token 交換失敗');
+        }
+        
         const customToken = data.customToken;
         
         const userCredential = await signInWithCustomToken(platformAuth, customToken);
