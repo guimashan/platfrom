@@ -106,6 +106,37 @@
             font-size: 1.5rem;
             color: #999;
         }
+        /* 鎖定的模組卡片 */
+        .module-card-locked {
+            position: relative;
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+        }
+        .module-card-locked:hover {
+            transform: none;
+            box-shadow: none;
+            border-color: #E8E8E8;
+        }
+        .module-card-locked .module-icon {
+            filter: grayscale(100%) opacity(0.5);
+        }
+        .module-card-locked .module-title,
+        .module-card-locked .module-desc {
+            color: #999;
+        }
+        .module-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        }
         .loading {
             text-align: center;
             padding: 2rem;
@@ -173,11 +204,21 @@
                     <div class="arrow-icon">›</div>
                 </div>
 
-                <div class="module-card" data-module="schedule">
+                <div class="module-card module-card-locked" data-module="schedule">
+                    <div class="module-badge">即將開放</div>
                     <div class="module-icon">📅</div>
                     <div class="module-info">
                         <div class="module-title">排班系統</div>
-                        <div class="module-desc">志工排班與出勤統計</div>
+                        <div class="module-desc">志工排班與班表管理</div>
+                    </div>
+                    <div class="arrow-icon">›</div>
+                </div>
+
+                <div class="module-card" data-module="manage" style="display: none;">
+                    <div class="module-icon">⚙️</div>
+                    <div class="module-info">
+                        <div class="module-title">系統管理</div>
+                        <div class="module-desc">使用者與權限管理</div>
                     </div>
                     <div class="arrow-icon">›</div>
                 </div>
@@ -186,13 +227,16 @@
     </div>
 
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script>
+    <script type="module">
+        import { platformDb } from '../js/firebase-init.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
         const LIFF_ID = '2008269293-Nl2pZBpV';
         
         // 模組路徑映射
         const MODULE_PATHS = {
             checkin: 'checkin.html',
-            manage: '../checkin/manage/index.html',
+            manage: '../manage/index.html',
             service: 'service.html',
             schedule: 'schedule.html'
         };
@@ -253,8 +297,47 @@
                 document.getElementById('userAvatar').src = profile.pictureUrl || '';
                 document.getElementById('userName').textContent = profile.displayName || '用戶';
                 document.getElementById('userBadge').style.display = 'flex';
+
+                // 獲取用戶權限並控制模組顯示
+                await checkUserPermissions(profile.userId);
             } catch (error) {
                 console.error('獲取用戶資料失敗:', error);
+            }
+        }
+
+        async function checkUserPermissions(lineUserId) {
+            try {
+                console.log('檢查用戶權限，LINE userId:', lineUserId);
+                
+                // 從 Firebase 獲取用戶角色
+                const userRef = doc(platformDb, 'users', lineUserId);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const roles = userData.roles || ['user'];
+                    console.log('用戶角色:', roles);
+                    
+                    // 檢查是否為管理員
+                    const isAdmin = roles.some(role => 
+                        role === 'poweruser' ||
+                        role === 'admin' ||
+                        role.startsWith('poweruser_') || 
+                        role.startsWith('admin_') || 
+                        role === 'superadmin'
+                    );
+                    
+                    // 顯示或隱藏系統管理模組
+                    const manageCard = document.querySelector('[data-module="manage"]');
+                    if (manageCard) {
+                        manageCard.style.display = isAdmin ? 'flex' : 'none';
+                        console.log('系統管理模組', isAdmin ? '顯示' : '隱藏');
+                    }
+                } else {
+                    console.log('用戶資料不存在於 Firebase');
+                }
+            } catch (error) {
+                console.error('檢查權限失敗:', error);
             }
         }
 
@@ -264,8 +347,15 @@
 
             // 綁定模組卡片點擊事件
             document.querySelectorAll('.module-card').forEach(card => {
+                const module = card.dataset.module;
+                
+                // 排班系統鎖定，不綁定點擊事件
+                if (card.classList.contains('module-card-locked')) {
+                    console.log('模組鎖定，跳過綁定:', module);
+                    return;
+                }
+                
                 card.addEventListener('click', () => {
-                    const module = card.dataset.module;
                     navigateToModule(module);
                 });
             });
