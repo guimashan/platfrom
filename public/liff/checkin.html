@@ -296,7 +296,7 @@
                 
                 // 更新用户界面
                 document.getElementById('userName').textContent = liffProfile.displayName;
-                document.getElementById('userAvatar').src = liffProfile.pictureUrl || document.getElementById('userAvatar').src;
+                document.getElementById('userAvatar').src = liffProfile.pictureUrl || '/images/default-avatar.svg';
                 
                 // Firebase 认证
                 const idToken = liff.getIDToken();

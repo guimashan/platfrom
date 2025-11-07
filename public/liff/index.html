@@ -294,7 +294,7 @@
                 const profile = await liff.getProfile();
                 console.log('用戶資料:', profile);
 
-                document.getElementById('userAvatar').src = profile.pictureUrl || '';
+                document.getElementById('userAvatar').src = profile.pictureUrl || '/images/default-avatar.svg';
                 document.getElementById('userName').textContent = profile.displayName || '用戶';
                 document.getElementById('userBadge').style.display = 'flex';
 
