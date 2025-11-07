@@ -35,23 +35,30 @@
                 </button>
             </div>
 
-            <div id="moduleGrid" class="module-grid active">
-                <div class="module-card" onclick="window.location.href='/service/index.html'">
+            <div id="moduleGrid" class="module-grid">
+                <div class="module-card" data-module="checkin">
                     <div class="module-icon">🙏</div>
+                    <div class="module-title">奉香簽到</div>
+                    <div class="module-desc">簽到打卡與歷程紀錄</div>
+                </div>
+                
+                <div class="module-card" data-module="service">
+                    <div class="module-icon">⚡</div>
                     <div class="module-title">神務服務</div>
                     <div class="module-desc">法會報名與服務管理</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='/service/donation.html'">
-                    <div class="module-icon">💰</div>
-                    <div class="module-title">信眾奉獻</div>
-                    <div class="module-desc">建宮廟款與添香油</div>
+                <div class="module-card module-card-locked" data-module="schedule">
+                    <div class="module-badge">即將開放</div>
+                    <div class="module-icon">📅</div>
+                    <div class="module-title">排班系統</div>
+                    <div class="module-desc">志工排班與班表管理</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='/service/ft.html'">
-                    <div class="module-icon">🌟</div>
-                    <div class="module-title">福田會入會</div>
-                    <div class="module-desc">福田會會員申請</div>
+                <div class="module-card" data-module="manage" style="display: none;">
+                    <div class="module-icon">⚙️</div>
+                    <div class="module-title">系統管理</div>
+                    <div class="module-desc">使用者與權限管理</div>
                 </div>
             </div>
 

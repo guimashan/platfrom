@@ -222,6 +222,43 @@ body {
     color: var(--text-secondary);
 }
 
+/* 鎖定的模組卡片 */
+.module-card-locked {
+    position: relative;
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.module-card-locked:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+    border-color: transparent;
+    background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+}
+
+.module-card-locked .module-icon {
+    filter: grayscale(100%) opacity(0.5);
+}
+
+.module-card-locked .module-title,
+.module-card-locked .module-desc {
+    color: #999;
+}
+
+.module-badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: linear-gradient(135deg, #ff9800, #f57c00);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+}
+
 /* 使用者資訊卡片 */
 .user-info {
     background: white;
