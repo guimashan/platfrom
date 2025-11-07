@@ -132,6 +132,13 @@ function showModuleGrid(roles) {
     const modules = document.querySelectorAll('.module-card');
     modules.forEach(card => {
         const module = card.dataset.module;
+        
+        // 如果沒有 data-module 屬性，代表是公開服務卡片，保持顯示
+        if (!module) {
+            card.style.display = 'block';
+            return;
+        }
+        
         let canAccess = false;
         
         if (module === 'checkin') {
@@ -214,7 +221,8 @@ function showLoginPage() {
     const logoutBtn = document.getElementById('logoutBtn');
     
     if (loginCard) loginCard.style.display = 'block';
-    if (moduleGrid) moduleGrid.classList.remove('active');
+    // 保持 moduleGrid 顯示（不移除 active class），讓服務入口公開可訪問
+    // if (moduleGrid) moduleGrid.classList.remove('active');
     if (userInfo) userInfo.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'none';
 }
