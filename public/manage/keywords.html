@@ -330,8 +330,32 @@
 
                 <div class="form-group">
                     <label for="liffUrl">LIFF 網頁 URL *</label>
-                    <input type="url" id="liffUrl" required placeholder="https://liff.line.me/...">
-                    <small>完整的 LIFF URL，包含 https://</small>
+                    
+                    <!-- 網址轉換工具 -->
+                    <div style="margin-bottom: 10px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 20px;">🔧</span>
+                            <strong>網址轉換工具</strong>
+                            <span style="font-size: 12px; opacity: 0.9;">（新手必看！）</span>
+                        </div>
+                        <p style="margin: 8px 0; font-size: 13px; opacity: 0.95;">
+                            輸入您的網頁路徑，自動轉換成 LIFF URL 格式
+                        </p>
+                        <div style="display: flex; gap: 8px; margin-top: 10px;">
+                            <input type="text" id="pathInput" placeholder="例如：/liff/service/DD.html" 
+                                   style="flex: 1; padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px;">
+                            <button type="button" id="convertBtn" class="btn btn-secondary" 
+                                    style="white-space: nowrap; padding: 8px 16px; background: white; color: #667eea; border: none; font-weight: bold;">
+                                ⚡ 轉換
+                            </button>
+                        </div>
+                        <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">
+                            💡 提示：輸入 <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px;">/liff/service/XX.html</code> 即可
+                        </div>
+                    </div>
+                    
+                    <input type="url" id="liffUrl" required placeholder="https://liff.line.me/2008269293-Nl2pZBpV?liff.state=/liff/service/XX.html">
+                    <small>完整的 LIFF URL，包含 https://（可使用上方轉換工具自動生成）</small>
                 </div>
 
                 <div class="form-group">

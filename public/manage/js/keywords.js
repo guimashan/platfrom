@@ -88,6 +88,15 @@ function initEventListeners() {
     // 批量更新 URL 按鈕
     document.getElementById('updateUrlsBtn').addEventListener('click', batchUpdateUrls);
     
+    // 網址轉換工具
+    document.getElementById('convertBtn').addEventListener('click', convertPathToLiffUrl);
+    document.getElementById('pathInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            convertPathToLiffUrl();
+        }
+    });
+    
     // 關閉 Modal
     document.getElementById('closeModal').addEventListener('click', closeModal);
     document.getElementById('cancelBtn').addEventListener('click', closeModal);
@@ -486,7 +495,14 @@ async function batchUpdateUrls() {
             
             if (oldUrl !== newUrl) {
                 console.log(`更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
-                await keywordService.updateKeyword(kw.id, { liffUrl: newUrl });
+                // 必須傳遞完整的關鍵詞資料
+                await keywordService.updateKeyword(kw.id, {
+                    keyword: kw.keyword,
+                    liffUrl: newUrl,
+                    aliases: kw.aliases || [],
+                    priority: kw.priority || 0,
+                    enabled: kw.enabled !== undefined ? kw.enabled : true
+                });
                 updatedCount++;
             } else {
                 skippedCount++;
@@ -501,7 +517,7 @@ async function batchUpdateUrls() {
     }
 }
 
-// 轉換 LIFF URL 格式
+// 轉換 LIFF URL 格式（批量更新用）
 function convertLiffUrl(url) {
     if (!url) return url;
     
@@ -520,6 +536,40 @@ function convertLiffUrl(url) {
     }
     
     return url;
+}
+
+// 網址轉換工具：將路徑轉換為完整 LIFF URL
+function convertPathToLiffUrl() {
+    const pathInput = document.getElementById('pathInput');
+    const liffUrlInput = document.getElementById('liffUrl');
+    
+    let path = pathInput.value.trim();
+    
+    if (!path) {
+        alert('⚠️ 請輸入網頁路徑');
+        pathInput.focus();
+        return;
+    }
+    
+    // 確保路徑以 / 開頭
+    if (!path.startsWith('/')) {
+        path = '/' + path;
+    }
+    
+    // LIFF ID（固定值）
+    const LIFF_ID = '2008269293-Nl2pZBpV';
+    
+    // 生成完整 LIFF URL
+    const liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${path}`;
+    
+    // 填入 LIFF URL 欄位
+    liffUrlInput.value = liffUrl;
+    
+    // 清空路徑輸入框
+    pathInput.value = '';
+    
+    // 顯示成功提示
+    showSuccess(`✅ 轉換成功！\n\n已生成 LIFF URL：\n${liffUrl}`);
 }
 
 // 初始化
