@@ -1,0 +1,371 @@
+/**
+ * LINE Bot 關鍵詞管理 (網頁版 - LINE Login)
+ */
+
+import { platformAuth, platformDb } from '/js/firebase-init.js';
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import * as keywordService from '/js/keyword-service.js';
+
+let currentUser = null;
+let currentUserId = null;
+let allKeywords = [];
+let currentAliases = [];
+
+// 初始化
+async function init() {
+    try {
+        // 等待 Firebase 認證
+        onAuthStateChanged(platformAuth, async (user) => {
+            if (user) {
+                currentUser = user;
+                currentUserId = user.uid;
+                console.log('使用者已登入:', user.uid);
+                await checkPermission();
+            } else {
+                console.log('使用者未登入，顯示登入提示');
+                document.getElementById('loginPrompt').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+                
+                // 3 秒後導向首頁進行 LINE Login
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3000);
+            }
+        });
+    } catch (error) {
+        console.error('初始化失敗:', error);
+        showError('系統初始化失敗');
+    }
+}
+
+// 檢查權限
+async function checkPermission() {
+    try {
+        const userRef = doc(platformDb, 'users', currentUserId);
+        const userSnap = await getDoc(userRef);
+        
+        if (!userSnap.exists()) {
+            showError('使用者資料不存在');
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+            return;
+        }
+        
+        const userData = userSnap.data();
+        const roles = userData.roles || [];
+        
+        if (!roles.includes('superadmin')) {
+            showError('您沒有權限訪問此頁面（僅限 superadmin）');
+            setTimeout(() => {
+                window.location.href = '/manage/index.html';
+            }, 2000);
+            return;
+        }
+        
+        console.log('✅ 權限驗證通過');
+        
+        // 顯示主要內容
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        
+        await loadKeywords();
+        initEventListeners();
+        
+    } catch (error) {
+        console.error('權限檢查失敗:', error);
+        showError('權限檢查失敗');
+    }
+}
+
+// 初始化事件監聽器
+function initEventListeners() {
+    // 新增按鈕
+    document.getElementById('addKeywordBtn').addEventListener('click', showAddModal);
+    
+    // 關閉 Modal
+    document.getElementById('closeModal').addEventListener('click', closeModal);
+    document.getElementById('cancelBtn').addEventListener('click', closeModal);
+    
+    // 表單提交
+    document.getElementById('keywordForm').addEventListener('submit', handleSubmit);
+    
+    // 搜尋
+    document.getElementById('searchInput').addEventListener('input', filterKeywords);
+    
+    // 新增別名
+    document.getElementById('addAliasBtn').addEventListener('click', addAlias);
+    document.getElementById('aliasInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addAlias();
+        }
+    });
+    
+    // 登出按鈕
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+            await platformAuth.signOut();
+            window.location.href = '/';
+        } catch (error) {
+            console.error('登出失敗:', error);
+        }
+    });
+}
+
+// 載入關鍵詞列表
+async function loadKeywords() {
+    try {
+        allKeywords = await keywordService.getAllKeywords();
+        renderKeywords(allKeywords);
+    } catch (error) {
+        console.error('載入關鍵詞失敗:', error);
+        showError('載入關鍵詞失敗');
+    }
+}
+
+// 渲染關鍵詞列表
+function renderKeywords(keywords) {
+    const listEl = document.getElementById('keywordList');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (keywords.length === 0) {
+        listEl.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    listEl.innerHTML = keywords.map(kw => `
+        <div class="keyword-card ${kw.enabled ? '' : 'disabled'}">
+            <div class="keyword-header">
+                <div class="keyword-title">${escapeHtml(kw.keyword)}</div>
+                <div class="keyword-status ${kw.enabled ? 'enabled' : 'disabled'}">
+                    ${kw.enabled ? '啟用' : '停用'}
+                </div>
+            </div>
+            
+            <div class="keyword-meta">
+                <span>🔢 優先級: ${kw.priority}</span>
+                ${kw.createdAt ? `<span>📅 ${formatDate(kw.createdAt)}</span>` : ''}
+            </div>
+            
+            ${kw.description ? `<div style="margin-bottom: 10px; color: #666;">${escapeHtml(kw.description)}</div>` : ''}
+            
+            <div class="keyword-url">🔗 ${escapeHtml(kw.liffUrl)}</div>
+            
+            ${kw.aliases && kw.aliases.length > 0 ? `
+                <div class="keyword-aliases">
+                    ${kw.aliases.map(alias => `<span class="alias-tag">${escapeHtml(alias)}</span>`).join('')}
+                </div>
+            ` : ''}
+            
+            <div class="keyword-actions">
+                <button class="btn btn-secondary" onclick="toggleStatus('${kw.id}', ${!kw.enabled})">
+                    ${kw.enabled ? '停用' : '啟用'}
+                </button>
+                <button class="btn btn-primary" onclick="showEditModal('${kw.id}')">
+                    編輯
+                </button>
+                <button class="btn btn-danger" onclick="deleteKeyword('${kw.id}', '${escapeHtml(kw.keyword)}')">
+                    刪除
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// 搜尋過濾
+function filterKeywords() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    if (!searchTerm) {
+        renderKeywords(allKeywords);
+        return;
+    }
+    
+    const filtered = allKeywords.filter(kw => 
+        kw.keyword.toLowerCase().includes(searchTerm) ||
+        kw.description?.toLowerCase().includes(searchTerm) ||
+        kw.aliases?.some(alias => alias.toLowerCase().includes(searchTerm))
+    );
+    
+    renderKeywords(filtered);
+}
+
+// 顯示新增 Modal
+function showAddModal() {
+    document.getElementById('modalTitle').textContent = '新增關鍵詞';
+    document.getElementById('keywordForm').reset();
+    document.getElementById('keywordId').value = '';
+    currentAliases = [];
+    renderAliases();
+    document.getElementById('keywordModal').classList.remove('hidden');
+}
+
+// 顯示編輯 Modal
+window.showEditModal = async function(keywordId) {
+    try {
+        const kw = await keywordService.getKeyword(keywordId);
+        
+        document.getElementById('modalTitle').textContent = '編輯關鍵詞';
+        document.getElementById('keywordId').value = kw.id;
+        document.getElementById('keyword').value = kw.keyword;
+        document.getElementById('liffUrl').value = kw.liffUrl;
+        document.getElementById('description').value = kw.description || '';
+        document.getElementById('priority').value = kw.priority || 0;
+        document.getElementById('buttonLabel').value = kw.replyPayload?.label || '立即開啟';
+        document.getElementById('enabled').checked = kw.enabled;
+        
+        currentAliases = kw.aliases || [];
+        renderAliases();
+        
+        document.getElementById('keywordModal').classList.remove('hidden');
+    } catch (error) {
+        console.error('載入關鍵詞失敗:', error);
+        showError('載入關鍵詞失敗');
+    }
+};
+
+// 關閉 Modal
+function closeModal() {
+    document.getElementById('keywordModal').classList.add('hidden');
+    document.getElementById('modalError').style.display = 'none';
+}
+
+// 新增別名
+function addAlias() {
+    const input = document.getElementById('aliasInput');
+    const alias = input.value.trim();
+    
+    if (!alias) return;
+    
+    if (currentAliases.includes(alias)) {
+        showModalError('別名已存在');
+        return;
+    }
+    
+    currentAliases.push(alias);
+    renderAliases();
+    input.value = '';
+}
+
+// 移除別名
+window.removeAlias = function(alias) {
+    currentAliases = currentAliases.filter(a => a !== alias);
+    renderAliases();
+};
+
+// 渲染別名列表
+function renderAliases() {
+    const listEl = document.getElementById('aliasList');
+    
+    if (currentAliases.length === 0) {
+        listEl.innerHTML = '';
+        return;
+    }
+    
+    listEl.innerHTML = currentAliases.map(alias => `
+        <div class="alias-item">
+            ${escapeHtml(alias)}
+            <button type="button" onclick="removeAlias('${escapeHtml(alias)}')">&times;</button>
+        </div>
+    `).join('');
+}
+
+// 處理表單提交
+async function handleSubmit(event) {
+    event.preventDefault();
+    
+    const keywordId = document.getElementById('keywordId').value;
+    const keywordData = {
+        keyword: document.getElementById('keyword').value,
+        liffUrl: document.getElementById('liffUrl').value,
+        description: document.getElementById('description').value,
+        priority: document.getElementById('priority').value,
+        enabled: document.getElementById('enabled').checked,
+        aliases: currentAliases,
+        replyType: 'template',
+        replyPayload: {
+            altText: document.getElementById('keyword').value,
+            text: document.getElementById('keyword').value,
+            label: document.getElementById('buttonLabel').value
+        }
+    };
+    
+    try {
+        if (keywordId) {
+            await keywordService.updateKeyword(keywordId, keywordData, currentUserId);
+            showSuccess('關鍵詞已更新');
+        } else {
+            await keywordService.createKeyword(keywordData, currentUserId);
+            showSuccess('關鍵詞已新增');
+        }
+        
+        closeModal();
+        await loadKeywords();
+    } catch (error) {
+        console.error('儲存失敗:', error);
+        showModalError(error.message || '儲存失敗');
+    }
+}
+
+// 切換狀態
+window.toggleStatus = async function(keywordId, enabled) {
+    try {
+        await keywordService.toggleKeywordStatus(keywordId, enabled, currentUserId);
+        await loadKeywords();
+        showSuccess(enabled ? '關鍵詞已啟用' : '關鍵詞已停用');
+    } catch (error) {
+        console.error('更新狀態失敗:', error);
+        showError('更新狀態失敗');
+    }
+};
+
+// 刪除關鍵詞
+window.deleteKeyword = async function(keywordId, keyword) {
+    if (!confirm(`確定要刪除關鍵詞「${keyword}」嗎？`)) {
+        return;
+    }
+    
+    try {
+        await keywordService.deleteKeyword(keywordId);
+        await loadKeywords();
+        showSuccess('關鍵詞已刪除');
+    } catch (error) {
+        console.error('刪除失敗:', error);
+        showError('刪除失敗');
+    }
+};
+
+// 工具函數
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function formatDate(timestamp) {
+    if (!timestamp) return '';
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return date.toLocaleDateString('zh-TW');
+}
+
+function showError(message) {
+    alert('❌ ' + message);
+}
+
+function showSuccess(message) {
+    alert('✅ ' + message);
+}
+
+function showModalError(message) {
+    const errorEl = document.getElementById('modalError');
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+}
+
+// 初始化
+init();

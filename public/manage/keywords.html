@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE Bot 關鍵詞管理 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/styles/manage.css">
+    <style>
+        .keyword-grid {
+            display: grid;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .keyword-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .keyword-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .keyword-card.disabled {
+            opacity: 0.6;
+            background: #f5f5f5;
+        }
+
+        .keyword-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .keyword-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .keyword-status {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .keyword-status.enabled {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .keyword-status.disabled {
+            background: #9e9e9e;
+            color: white;
+        }
+
+        .keyword-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .keyword-url {
+            font-size: 14px;
+            color: #667eea;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .keyword-aliases {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alias-tag {
+            padding: 4px 10px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+
+        .keyword-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .keyword-actions button {
+            flex: 1;
+        }
+
+        .alias-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .alias-input-group input {
+            flex: 1;
+        }
+
+        .alias-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .alias-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        .alias-item button {
+            background: none;
+            border: none;
+            color: #1976d2;
+            cursor: pointer;
+            padding: 0;
+            font-size: 16px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .error-banner {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success-banner {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登入提示畫面 -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🤖</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">LINE Bot 關鍵詞管理</h2>
+            <p style="margin: 0; opacity: 0.9;">請使用 LINE 帳號登入以存取管理功能</p>
+            <div style="margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                <p style="margin: 0; font-size: 14px;">驗證中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div id="mainApp" class="container" style="display: none;">
+        <header class="header">
+            <div class="header-content">
+                <h1>🤖 LINE Bot 關鍵詞管理</h1>
+                <div class="header-actions">
+                    <button onclick="window.location.href='/manage/index.html'" class="btn-logout">返回管理首頁</button>
+                    <button id="logoutBtn" class="btn-logout">登出</button>
+                </div>
+            </div>
+        </header>
+
+        <main style="padding: 2rem;">
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>關鍵詞列表</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" id="searchInput" placeholder="🔍 搜尋關鍵詞..." style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; min-width: 250px;">
+                        <button id="addKeywordBtn" class="btn btn-primary">➕ 新增關鍵詞</button>
+                    </div>
+                </div>
+
+                <div id="keywordList" class="keyword-grid">
+                    <p class="loading">載入中...</p>
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div style="font-size: 60px; margin-bottom: 20px;">📝</div>
+                    <h3>尚無關鍵詞</h3>
+                    <p>點擊「新增關鍵詞」開始建立您的 LINE Bot 自動回覆</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="keywordModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 id="modalTitle">新增關鍵詞</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+
+            <div id="modalError" class="error-banner" style="display: none;"></div>
+
+            <form id="keywordForm">
+                <input type="hidden" id="keywordId">
+
+                <div class="form-group">
+                    <label for="keyword">關鍵詞 *</label>
+                    <input type="text" id="keyword" required placeholder="例如：點燈">
+                    <small>使用者輸入這個關鍵詞時會觸發回覆</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="liffUrl">LIFF 網頁 URL *</label>
+                    <input type="url" id="liffUrl" required placeholder="https://liff.line.me/...">
+                    <small>完整的 LIFF URL，包含 https://</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">說明</label>
+                    <textarea id="description" placeholder="這個關鍵詞的用途說明" style="min-height: 60px;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>別名（選填）</label>
+                    <div class="alias-input-group">
+                        <input type="text" id="aliasInput" placeholder="輸入別名並按 Enter">
+                        <button type="button" id="addAliasBtn" class="btn btn-secondary">新增</button>
+                    </div>
+                    <div id="aliasList" class="alias-list"></div>
+                    <small>別名也會觸發相同的回覆</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">優先級</label>
+                    <input type="number" id="priority" value="0" min="0" max="100">
+                    <small>數字越大優先級越高（0-100）</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="buttonLabel">按鈕文字</label>
+                    <input type="text" id="buttonLabel" value="立即開啟">
+                    <small>LINE 訊息上的按鈕顯示文字</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="enabled" checked style="width: auto; margin: 0;">
+                        <span>啟用此關鍵詞</span>
+                    </label>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="/manage/js/keywords.js"></script>
+</body>
+</html>
