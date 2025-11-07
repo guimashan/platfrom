@@ -3,129 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神務服務 - 龜馬山 LIFF</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>神務服務 - 龜馬山 goLine</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <style>
-        .liff-header {
-            background: linear-gradient(135deg, #8A2BE2 0%, #9370DB 100%);
-            color: white;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .liff-header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        .user-badge {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            justify-content: center;
-        }
-        .user-badge img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-        .close-btn {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
-        .coming-soon {
-            text-align: center;
-            padding: 3rem 1rem;
-        }
-        .coming-soon h2 {
-            color: #8A2BE2;
-            margin-bottom: 1rem;
-        }
-        .coming-soon p {
-            color: #666;
-            line-height: 1.6;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
-        <header class="liff-header">
-            <h1>⚡ 神務服務</h1>
-            <div class="user-badge">
-                <img id="userAvatar" src="/images/default-avatar.svg" alt="用戶頭像">
-                <span id="userName">載入中...</span>
+        <header class="header">
+            <div>
+                <h1>神務服務</h1>
+                <p class="subtitle">選擇您需要的服務項目</p>
             </div>
-            <button class="close-btn" onclick="closeWindow()">關閉</button>
+            <button class="btn-logout" id="backBtn">返回</button>
         </header>
 
-        <main class="main-content">
-            <div id="loadingIndicator" class="loading">
-                <div class="spinner"></div>
-                <p>正在初始化...</p>
-            </div>
+        <div id="loadingIndicator" class="loading">
+            <div class="spinner"></div>
+            <p>載入中...</p>
+        </div>
 
-            <div id="serviceContent" class="coming-soon" style="display: none;">
-                <h2>🚧 即將推出</h2>
-                <p>神務服務功能正在開發中</p>
-                <p style="margin-top: 2rem;">即將提供以下服務：</p>
-                <ul style="text-align: left; max-width: 300px; margin: 1rem auto;">
-                    <li>法會報名</li>
-                    <li>服務單管理</li>
-                    <li>參與統計</li>
-                    <li>通知提醒</li>
-                </ul>
+        <main class="main-content" id="mainContent" style="display: none;">
+            <div class="module-grid active">
+                <div class="module-card" data-service="DD">
+                    <div class="module-icon">🕯️</div>
+                    <div class="module-title">龜馬山一點靈</div>
+                    <div class="module-desc">祈福點燈，光明祈願</div>
+                </div>
+                
+                <div class="module-card" data-service="ND">
+                    <div class="module-icon">🎊</div>
+                    <div class="module-title">年斗法會</div>
+                    <div class="module-desc">新春祈福，闔家平安</div>
+                </div>
+                
+                <div class="module-card" data-service="LD">
+                    <div class="module-icon">⭐</div>
+                    <div class="module-title">禮斗法會</div>
+                    <div class="module-desc">禮拜星斗，消災延壽</div>
+                </div>
+                
+                <div class="module-card" data-service="ZY">
+                    <div class="module-icon">🏮</div>
+                    <div class="module-title">中元法會</div>
+                    <div class="module-desc">普渡眾生，超薦先靈</div>
+                </div>
+                
+                <div class="module-card" data-service="PS">
+                    <div class="module-icon">🙏</div>
+                    <div class="module-title">普施法會</div>
+                    <div class="module-desc">慈悲布施，廣結善緣</div>
+                </div>
+                
+                <div class="module-card" data-service="QJ">
+                    <div class="module-icon">🍂</div>
+                    <div class="module-title">秋祭法會</div>
+                    <div class="module-desc">秋季祭典，感恩祈福</div>
+                </div>
             </div>
         </main>
     </div>
 
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    
     <script type="module">
-        import { initLiff, getLiffProfile, closeLiffWindow } from '/js/liff-init.js';
-        import { platformAuth } from '/js/firebase-init.js';
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        const LIFF_ID = '2008269293-Nl2pZBpV';
 
-        const LIFF_ID = '2008269293-Nl2pZBpV'; // 暫用簽到 LIFF，建議另建專屬 LIFF App
+        // 服務路徑映射
+        const SERVICE_PATHS = {
+            DD: 'service/DD.html',
+            ND: 'service/ND.html',
+            LD: 'service/LD.html',
+            ZY: 'service/ZY.html',
+            PS: 'service/PS.html',
+            QJ: 'service/QJ.html'
+        };
 
-        window.closeWindow = closeLiffWindow;
-
-        async function init() {
+        async function initializeLIFF() {
             try {
-                const liffData = await initLiff(LIFF_ID);
-                
-                if (!liffData) {
+                console.log('初始化 LIFF...');
+                await liff.init({ liffId: LIFF_ID });
+
+                if (!liff.isLoggedIn()) {
+                    console.log('用戶未登入，執行登入');
+                    liff.login({ redirectUri: window.location.href });
                     return;
                 }
 
-                onAuthStateChanged(platformAuth, async (user) => {
-                    if (user) {
-                        const profile = getLiffProfile();
-                        
-                        document.getElementById('userName').textContent = profile.displayName;
-                        document.getElementById('userAvatar').src = profile.pictureUrl || '/images/default-avatar.svg';
-                        
-                        document.getElementById('loadingIndicator').style.display = 'none';
-                        document.getElementById('serviceContent').style.display = 'block';
-                    }
-                });
+                console.log('LIFF 初始化成功');
+                showContent();
 
             } catch (error) {
-                console.error('初始化失敗:', error);
-                alert('系統初始化失敗，請稍後再試');
+                console.error('LIFF 初始化失敗:', error);
+                alert('系統初始化失敗：' + error.message);
             }
         }
 
-        init();
+        function showContent() {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+
+            // 綁定服務卡片點擊事件
+            document.querySelectorAll('.module-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const service = card.dataset.service;
+                    navigateToService(service);
+                });
+            });
+
+            // 綁定返回按鈕
+            document.getElementById('backBtn').addEventListener('click', () => {
+                window.location.href = 'index.html';
+            });
+        }
+
+        function navigateToService(service) {
+            const path = SERVICE_PATHS[service];
+            if (path) {
+                console.log('導航到服務:', service, path);
+                window.location.href = path;
+            } else {
+                alert('服務路徑未配置');
+            }
+        }
+
+        // 初始化
+        initializeLIFF();
     </script>
 </body>
 </html>
