@@ -78,8 +78,13 @@
             border-bottom: 1px solid #f0f0f0;
         }
         
-        tr:hover {
+        tbody tr:hover {
             background: #f9f9f9;
+        }
+        
+        /* 防止表頭 hover 時反白 */
+        thead tr:hover {
+            background: transparent;
         }
         
         .status-badge {
