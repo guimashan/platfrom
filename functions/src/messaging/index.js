@@ -8,10 +8,16 @@ const {defineSecret} = require('firebase-functions/params');
 const {logger} = require('firebase-functions');
 const line = require('@line/bot-sdk');
 const express = require('express');
+const admin = require('firebase-admin');
 
 // LINE Messaging API 憑證 (需要在 Firebase Console 設定)
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
+
+// 關鍵詞快取（避免每次都查詢 Firestore）
+let keywordsCache = null;
+let keywordsCacheTime = 0;
+const CACHE_TTL = 60 * 1000; // 快取 60 秒
 
 // LIFF App IDs
 const LIFF_IDS = {
@@ -48,9 +54,83 @@ async function replyMessage(replyToken, messages, accessToken) {
 }
 
 /**
+ * 載入關鍵詞（帶快取）
+ */
+async function loadKeywords() {
+  const now = Date.now();
+  
+  // 如果快取有效，直接返回
+  if (keywordsCache && (now - keywordsCacheTime < CACHE_TTL)) {
+    return keywordsCache;
+  }
+  
+  try {
+    const snapshot = await admin.firestore()
+        .collection('lineKeywordMappings')
+        .where('enabled', '==', true)
+        .orderBy('priority', 'desc')
+        .get();
+    
+    const keywords = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      keywords.push({
+        id: doc.id,
+        ...data,
+      });
+    });
+    
+    keywordsCache = keywords;
+    keywordsCacheTime = now;
+    
+    logger.info(`已載入 ${keywords.length} 個啟用的關鍵詞`);
+    return keywords;
+  } catch (error) {
+    logger.error('載入關鍵詞失敗:', error);
+    return [];
+  }
+}
+
+/**
+ * 正規化文字（移除空白、轉小寫）
+ */
+function normalizeText(text) {
+  return text.trim().toLowerCase().replace(/\s+/g, '');
+}
+
+/**
+ * 檢查文字是否符合關鍵詞
+ */
+function matchKeyword(text, keyword) {
+  const normalizedText = normalizeText(text);
+  const normalizedKeyword = normalizeText(keyword.keyword);
+  
+  // 精確匹配關鍵詞
+  if (normalizedText === normalizedKeyword) {
+    return true;
+  }
+  
+  // 檢查別名
+  if (keyword.aliases && keyword.aliases.length > 0) {
+    for (const alias of keyword.aliases) {
+      if (normalizedText === normalizeText(alias)) {
+        return true;
+      }
+    }
+  }
+  
+  // 部分匹配（包含）
+  if (normalizedText.includes(normalizedKeyword)) {
+    return true;
+  }
+  
+  return false;
+}
+
+/**
  * 處理文字訊息
  */
-function handleTextMessage(text) {
+async function handleTextMessage(text) {
   const originalText = text.trim();
   text = originalText.toLowerCase();
 
@@ -82,7 +162,45 @@ function handleTextMessage(text) {
     return null; // 不回覆
   }
 
-  // === 神務服務項目 ===
+  // === 動態關鍵詞比對 ===
+  try {
+    const keywords = await loadKeywords();
+    
+    // 依優先級排序後比對（高優先級優先）
+    for (const keyword of keywords) {
+      if (matchKeyword(originalText, keyword)) {
+        logger.info(`關鍵詞匹配成功: ${keyword.keyword}`);
+        
+        // 根據 replyType 建立回覆
+        if (keyword.replyType === 'template' && keyword.liffUrl) {
+          return {
+            type: 'template',
+            altText: keyword.replyPayload?.altText || keyword.keyword,
+            template: {
+              type: 'buttons',
+              text: keyword.replyPayload?.text || keyword.keyword,
+              actions: [
+                {
+                  type: 'uri',
+                  label: keyword.replyPayload?.label || '立即開啟',
+                  uri: keyword.liffUrl,
+                },
+              ],
+            },
+          };
+        } else if (keyword.replyType === 'text' && keyword.replyPayload?.text) {
+          return {
+            type: 'text',
+            text: keyword.replyPayload.text,
+          };
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('處理動態關鍵詞時發生錯誤:', error);
+  }
+
+  // === 硬編碼關鍵詞（作為後備）===
   
   // 龜馬山一點靈（較長關鍵字優先）
   if (text.includes('龜馬山一點靈') || text.includes('線上點燈') || 
@@ -432,7 +550,7 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
         logger.info('收到文字訊息:', userMessage);
 
         // 產生回覆訊息
-        const replyContent = handleTextMessage(userMessage);
+        const replyContent = await handleTextMessage(userMessage);
 
         // 只在有回覆內容時才回覆
         if (replyContent) {
