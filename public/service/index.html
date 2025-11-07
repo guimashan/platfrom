@@ -4,88 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>神務服務 - 龜馬山 goLine</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
-    <link rel="stylesheet" href="styles/service.css">
-    <style>
-        .service-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .service-item {
-            display: block;
-            padding: 1.25rem 1.5rem;
-            background: white;
-            border: 2px solid #d4af37;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #333;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .service-item:hover {
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            border-color: var(--primary-gold);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .service-item:active {
-            transform: translateY(0);
-        }
-
-        /* 響應式設計 */
-        @media (max-width: 767px) {
-            .service-item {
-                padding: 1.1rem 1.25rem;
-                font-size: 1.05rem;
-            }
-        }
-
-        @media (max-width: 479px) {
-            .service-item {
-                padding: 1rem;
-                font-size: 1rem;
-            }
-        }
-    </style>
 </head>
 <body>
-    <header class="header">
-        <div class="header-left">
-            <h1>神務服務</h1>
-            <p>選擇您需要的服務項目</p>
-        </div>
-        <div class="header-actions">
-            <button class="btn-logout" onclick="window.location.href='/'">
-                返回首頁
-            </button>
-        </div>
-    </header>
-
     <div class="container">
-        <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
-            
-            <!-- 服務選單 -->
-            <div class="card">
-                <h2 class="card-title">服務項目</h2>
-                <div class="service-grid">
-                    <a href="DD.html" class="service-item">線上點燈</a>
-                    <a href="ND.html" class="service-item">年斗法會</a>
-                    <a href="LD.html" class="service-item">禮斗法會</a>
-                    <a href="ZY.html" class="service-item">中元法會</a>
-                    <a href="PS.html" class="service-item">普施法會</a>
-                    <a href="QJ.html" class="service-item">秋祭法會</a>
+        <header class="header">
+            <div>
+                <h1>神務服務</h1>
+                <p class="subtitle">選擇您需要的服務項目</p>
+            </div>
+            <button class="btn-logout" onclick="window.location.href='/'">返回首頁</button>
+        </header>
+
+        <main class="main-content">
+            <div class="module-grid active">
+                <div class="module-card" onclick="window.location.href='DD.html'">
+                    <div class="module-icon">🕯️</div>
+                    <div class="module-title">龜馬山一點靈</div>
+                    <div class="module-desc">祈福點燈，光明祈願</div>
+                </div>
+                
+                <div class="module-card" onclick="window.location.href='ND.html'">
+                    <div class="module-icon">🎊</div>
+                    <div class="module-title">年斗法會</div>
+                    <div class="module-desc">新春祈福，闔家平安</div>
+                </div>
+                
+                <div class="module-card" onclick="window.location.href='LD.html'">
+                    <div class="module-icon">⭐</div>
+                    <div class="module-title">禮斗法會</div>
+                    <div class="module-desc">禮拜星斗，消災延壽</div>
+                </div>
+                
+                <div class="module-card" onclick="window.location.href='ZY.html'">
+                    <div class="module-icon">🏮</div>
+                    <div class="module-title">中元法會</div>
+                    <div class="module-desc">普渡眾生，超薦先靈</div>
+                </div>
+                
+                <div class="module-card" onclick="window.location.href='PS.html'">
+                    <div class="module-icon">🙏</div>
+                    <div class="module-title">普施法會</div>
+                    <div class="module-desc">慈悲布施，廣結善緣</div>
+                </div>
+                
+                <div class="module-card" onclick="window.location.href='QJ.html'">
+                    <div class="module-icon">🍂</div>
+                    <div class="module-title">秋祭法會</div>
+                    <div class="module-desc">秋季祭典，感恩祈福</div>
                 </div>
             </div>
+        </main>
 
+        <div class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="/" class="bottom-nav-item">
+                    <span class="icon">🏠</span>
+                    <span>首頁</span>
+                </a>
+                <a href="/checkin/index.html" class="bottom-nav-item">
+                    <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                    <span>簽到</span>
+                </a>
+                <a href="/checkin/history.html" class="bottom-nav-item">
+                    <span class="icon">📋</span>
+                    <span>歷程表</span>
+                </a>
+                <a href="/manage/index.html" class="bottom-nav-item">
+                    <span class="icon">🔔</span>
+                    <span>通知中心</span>
+                </a>
+            </div>
         </div>
     </div>
 
