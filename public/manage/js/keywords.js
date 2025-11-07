@@ -495,14 +495,21 @@ async function batchUpdateUrls() {
             
             if (oldUrl !== newUrl) {
                 console.log(`更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
-                // 必須傳遞完整的關鍵詞資料
+                // 必須傳遞完整的關鍵詞資料（包含所有欄位避免覆蓋）
                 await keywordService.updateKeyword(kw.id, {
                     keyword: kw.keyword,
                     liffUrl: newUrl,
                     aliases: kw.aliases || [],
                     priority: kw.priority || 0,
-                    enabled: kw.enabled !== undefined ? kw.enabled : true
-                });
+                    enabled: kw.enabled !== undefined ? kw.enabled : true,
+                    description: kw.description || '',
+                    replyType: kw.replyType || 'template',
+                    replyPayload: kw.replyPayload || {
+                        altText: kw.keyword,
+                        text: kw.keyword,
+                        label: '立即開啟'
+                    }
+                }, currentUserId);
                 updatedCount++;
             } else {
                 skippedCount++;
