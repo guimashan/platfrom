@@ -92,5 +92,28 @@
 
     <script type="module" src="/js/firebase-init.js"></script>
     <script type="module" src="/js/auth.js"></script>
+    <script>
+        // 檢查 liff.state 參數並自動跳轉
+        (function() {
+            const queryString = decodeURIComponent(window.location.search);
+            console.log('首頁檢測到 query string:', queryString);
+            
+            if (queryString.includes('liff.state=')) {
+                const cleaned = queryString.replace('?liff.state=', '');
+                console.log('檢測到 liff.state 參數:', cleaned);
+                
+                // 如果是直接路徑（以 / 開頭），直接跳轉
+                if (cleaned.startsWith('/')) {
+                    console.log('自動跳轉到:', cleaned);
+                    window.location.href = cleaned;
+                }
+                // 如果是查詢參數格式（?module=xxx），跳轉到 /liff/
+                else if (cleaned.startsWith('?')) {
+                    console.log('自動跳轉到 LIFF 入口:', '/liff/' + cleaned);
+                    window.location.href = '/liff/' + cleaned;
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
