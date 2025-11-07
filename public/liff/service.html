@@ -70,6 +70,10 @@
 
     <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <script type="module">
+        import { initLiff } from '/js/liff-init.js';
+        import { platformAuth } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+
         const LIFF_ID = '2008269293-Nl2pZBpV';
 
         // 服務路徑映射
@@ -82,23 +86,29 @@
             QJ: 'service/QJ.html'
         };
 
-        async function initializeLIFF() {
+        async function init() {
             try {
-                console.log('初始化 LIFF...');
-                await liff.init({ liffId: LIFF_ID });
-
-                if (!liff.isLoggedIn()) {
-                    console.log('用戶未登入，執行登入');
-                    liff.login({ redirectUri: window.location.href });
+                // 使用共用的 LIFF 初始化模組
+                const liffData = await initLiff(LIFF_ID);
+                
+                if (!liffData) {
                     return;
                 }
 
-                console.log('LIFF 初始化成功');
-                showContent();
+                // 等待 Firebase 認證完成
+                onAuthStateChanged(platformAuth, async (user) => {
+                    if (user) {
+                        console.log('✅ Firebase 使用者已登入:', user.displayName);
+                        showContent();
+                    } else {
+                        console.log('ℹ️ 使用者未登入 Firebase，但可繼續使用');
+                        showContent();
+                    }
+                });
 
             } catch (error) {
-                console.error('LIFF 初始化失敗:', error);
-                alert('系統初始化失敗：' + error.message);
+                console.error('初始化失敗:', error);
+                alert('系統初始化失敗，請稍後再試');
             }
         }
 
@@ -131,7 +141,7 @@
         }
 
         // 初始化
-        initializeLIFF();
+        init();
     </script>
 </body>
 </html>
