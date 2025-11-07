@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信眾奉獻 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/service/styles/service.css">
+    <style>
+        .card {
+            padding-bottom: 15px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .service-item {
+            display: block;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 2px solid #d4af37;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .service-item:hover {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            border-color: var(--primary-gold);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .service-item:active {
+            transform: translateY(0);
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 767px) {
+            .service-item {
+                padding: 1.1rem 1.25rem;
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .service-item {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>信眾奉獻</h1>
+            <p>選擇您的捐款項目</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-logout" onclick="window.location.href='/'">
+                返回首頁
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            
+            <!-- 服務選單 -->
+            <div class="card">
+                <h2 class="card-title">捐款項目</h2>
+                <div class="service-grid">
+                    <a href="BG.html" class="service-item">建宮廟款</a>
+                    <a href="XY.html" class="service-item">添香油</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { platformAuth } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+
+        // 檢查登入狀態
+        onAuthStateChanged(platformAuth, (user) => {
+            if (user) {
+                console.log('✅ 使用者已登入:', user.displayName);
+            } else {
+                console.log('ℹ️ 使用者未登入（訪客模式）');
+            }
+        });
+    </script>
+</body>
+</html>
