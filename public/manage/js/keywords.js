@@ -11,6 +11,7 @@ let currentUser = null;
 let currentUserId = null;
 let allKeywords = [];
 let currentAliases = [];
+let currentViewMode = 'list'; // 'list' or 'group'
 
 // 初始化
 async function init() {
@@ -94,6 +95,10 @@ function initEventListeners() {
     // 搜尋
     document.getElementById('searchInput').addEventListener('input', filterKeywords);
     
+    // 檢視模式切換
+    document.getElementById('listViewBtn').addEventListener('click', () => switchView('list'));
+    document.getElementById('groupViewBtn').addEventListener('click', () => switchView('group'));
+    
     // 新增別名
     document.getElementById('addAliasBtn').addEventListener('click', addAlias);
     document.getElementById('aliasInput').addEventListener('keypress', (e) => {
@@ -118,11 +123,101 @@ function initEventListeners() {
 async function loadKeywords() {
     try {
         allKeywords = await keywordService.getAllKeywords();
-        renderKeywords(allKeywords);
+        
+        // 根據當前檢視模式渲染
+        if (currentViewMode === 'list') {
+            renderKeywords(allKeywords);
+        } else {
+            renderGroupView(allKeywords);
+        }
     } catch (error) {
         console.error('載入關鍵詞失敗:', error);
         showError('載入關鍵詞失敗');
     }
+}
+
+// 切換檢視模式
+function switchView(mode) {
+    currentViewMode = mode;
+    
+    // 更新按鈕樣式
+    if (mode === 'list') {
+        document.getElementById('listViewBtn').classList.add('active');
+        document.getElementById('groupViewBtn').classList.remove('active');
+        document.getElementById('listView').style.display = 'block';
+        document.getElementById('groupView').style.display = 'none';
+        renderKeywords(allKeywords);
+    } else {
+        document.getElementById('listViewBtn').classList.remove('active');
+        document.getElementById('groupViewBtn').classList.add('active');
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('groupView').style.display = 'block';
+        renderGroupView(allKeywords);
+    }
+}
+
+// 渲染分組檢視（按 LIFF URL 分組）
+function renderGroupView(keywords) {
+    const groupTable = document.getElementById('groupTable');
+    const emptyState = document.getElementById('emptyState');
+    
+    if (keywords.length === 0) {
+        groupTable.innerHTML = '';
+        emptyState.style.display = 'block';
+        return;
+    }
+    
+    emptyState.style.display = 'none';
+    
+    // 按 LIFF URL 分組
+    const groupedByUrl = {};
+    keywords.forEach(kw => {
+        const url = kw.liffUrl || '無 LIFF URL';
+        if (!groupedByUrl[url]) {
+            groupedByUrl[url] = [];
+        }
+        groupedByUrl[url].push(kw);
+    });
+    
+    // 渲染分組表格
+    const html = Object.entries(groupedByUrl).map(([url, kwList]) => {
+        // 收集所有關鍵詞（主關鍵詞 + 別名）
+        const allKeywordTexts = [];
+        kwList.forEach(kw => {
+            allKeywordTexts.push({text: kw.keyword, isMain: true, id: kw.id});
+            if (kw.aliases && kw.aliases.length > 0) {
+                kw.aliases.forEach(alias => {
+                    allKeywordTexts.push({text: alias, isMain: false, id: kw.id});
+                });
+            }
+        });
+        
+        const enabledCount = kwList.filter(kw => kw.enabled).length;
+        const disabledCount = kwList.length - enabledCount;
+        
+        return `
+            <div class="group-row">
+                <div class="group-url">🔗 ${escapeHtml(url)}</div>
+                <div class="group-keywords">
+                    ${allKeywordTexts.map(item => `
+                        <span class="group-keyword-tag ${item.isMain ? 'main' : ''}" 
+                              onclick="showEditModal('${item.id}')"
+                              title="${item.isMain ? '主關鍵詞（點擊編輯）' : '別名（點擊編輯）'}">
+                            ${escapeHtml(item.text)}
+                        </span>
+                    `).join('')}
+                </div>
+                <div class="group-stats">
+                    📊 共 ${kwList.length} 個主關鍵詞 
+                    | ✅ ${enabledCount} 個啟用 
+                    | ❌ ${disabledCount} 個停用
+                    | 🏷️ ${allKeywordTexts.length - kwList.length} 個別名
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    groupTable.innerHTML = html;
 }
 
 // 渲染關鍵詞列表

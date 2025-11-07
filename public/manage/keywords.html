@@ -159,6 +159,89 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
+
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .view-toggle button {
+            padding: 8px 16px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .view-toggle button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .group-view {
+            display: none;
+        }
+
+        .group-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .group-row {
+            border-bottom: 1px solid #eee;
+            padding: 20px;
+        }
+
+        .group-row:last-child {
+            border-bottom: none;
+        }
+
+        .group-url {
+            font-size: 16px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            word-break: break-all;
+        }
+
+        .group-keywords {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .group-keyword-tag {
+            padding: 6px 12px;
+            background: #f0f0f0;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .group-keyword-tag:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .group-keyword-tag.main {
+            background: #667eea;
+            color: white;
+            font-weight: 500;
+        }
+
+        .group-stats {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
@@ -196,8 +279,24 @@
                     </div>
                 </div>
 
-                <div id="keywordList" class="keyword-grid">
-                    <p class="loading">載入中...</p>
+                <!-- 檢視模式切換 -->
+                <div class="view-toggle">
+                    <button id="listViewBtn" class="active">📋 列表檢視</button>
+                    <button id="groupViewBtn">📊 分組檢視（按網址）</button>
+                </div>
+
+                <!-- 列表檢視 -->
+                <div id="listView">
+                    <div id="keywordList" class="keyword-grid">
+                        <p class="loading">載入中...</p>
+                    </div>
+                </div>
+
+                <!-- 分組檢視 -->
+                <div id="groupView" class="group-view">
+                    <div id="groupTable" class="group-table">
+                        <p class="loading">載入中...</p>
+                    </div>
                 </div>
 
                 <div id="emptyState" class="empty-state" style="display: none;">
