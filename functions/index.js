@@ -7,6 +7,7 @@ const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
+const adminFunctions = require('./src/admin/migrate-keywords');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -34,3 +35,6 @@ exports.getRegistrations = serviceFunctions.getRegistrations;
 exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
 exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
 exports.confirmPayment = serviceFunctions.confirmPayment;
+
+// 導出 Admin Functions (管理功能)
+exports.migrateKeywords = adminFunctions.migrateKeywords;
