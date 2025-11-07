@@ -241,20 +241,27 @@
             schedule: 'schedule.html'
         };
 
-        // 從 URL 中提取模組參數（處理 liff.state）
-        function getModuleFromURL() {
+        // 從 URL 中提取模組參數或直接路徑（處理 liff.state）
+        function getTargetFromURL() {
             const queryString = decodeURIComponent(window.location.search);
             console.log('原始 query string:', queryString);
             
-            // 處理 liff.state 格式：?liff.state=?module=checkin
+            // 處理 liff.state 格式：?liff.state=/service/DD.html 或 ?liff.state=?module=checkin
             const cleaned = queryString.replace('?liff.state=', '');
             console.log('清理後的 query string:', cleaned);
             
+            // 檢查是否為直接路徑（以 / 開頭）
+            if (cleaned.startsWith('/')) {
+                console.log('檢測到直接路徑:', cleaned);
+                return { type: 'path', value: cleaned };
+            }
+            
+            // 否則解析為查詢參數
             const params = new URLSearchParams(cleaned);
             const module = params.get('module');
             console.log('提取的模組:', module);
             
-            return module;
+            return module ? { type: 'module', value: module } : null;
         }
 
         async function initializeLIFF() {
@@ -271,13 +278,21 @@
                 console.log('LIFF 初始化成功');
                 await loadUserProfile();
 
-                // 檢查是否有模組參數，自動導航
-                const module = getModuleFromURL();
+                // 檢查是否有目標參數，自動導航
+                const target = getTargetFromURL();
                 
-                if (module && MODULE_PATHS[module]) {
-                    console.log('自動導航到模組:', module);
-                    window.location.href = MODULE_PATHS[module];
-                    return;
+                if (target) {
+                    if (target.type === 'path') {
+                        // 直接路徑跳轉 (例如: /service/DD.html)
+                        console.log('直接導航到路徑:', target.value);
+                        window.location.href = target.value;
+                        return;
+                    } else if (target.type === 'module' && MODULE_PATHS[target.value]) {
+                        // 模組跳轉 (例如: ?module=checkin)
+                        console.log('自動導航到模組:', target.value);
+                        window.location.href = MODULE_PATHS[target.value];
+                        return;
+                    }
                 }
 
                 // 沒有參數，顯示選單

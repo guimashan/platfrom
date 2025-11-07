@@ -46,7 +46,7 @@ const keywords = [
   {
     keyword: '點燈',
     aliases: ['龜馬山一點靈', '線上點燈', '安太歲', '元辰燈', '文昌燈', '財利燈', '光明燈'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/DD.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/DD.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -59,7 +59,7 @@ const keywords = [
   {
     keyword: '年斗',
     aliases: ['年斗法會', '闔家年斗', '元辰年斗', '紫微年斗', '事業年斗'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ND.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ND.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -72,7 +72,7 @@ const keywords = [
   {
     keyword: '禮斗',
     aliases: ['禮斗法會', '闔家斗', '元辰斗', '事業斗'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/LD.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/LD.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -85,7 +85,7 @@ const keywords = [
   {
     keyword: '中元',
     aliases: ['中元法會', '普渡', '超拔', '歷代祖先', '祖先', '冤親債主', '嬰靈', '地基主'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ZY.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ZY.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -98,7 +98,7 @@ const keywords = [
   {
     keyword: '普施',
     aliases: ['普施大法會', '普施法會', '普桌', '白米', '隨喜功德'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/PS.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/PS.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -111,7 +111,7 @@ const keywords = [
   {
     keyword: '秋祭',
     aliases: ['秋祭法會', '文昌帝君拱斗'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/QJ.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/QJ.html`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -126,7 +126,7 @@ const keywords = [
   {
     keyword: '建宮廟款',
     aliases: ['青石板', '鋼筋', '水泥', '琉璃瓦'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/BG.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/BG.html`,
     priority: 80,
     replyType: 'template',
     replyPayload: {
@@ -139,7 +139,7 @@ const keywords = [
   {
     keyword: '添香油',
     aliases: [],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/XY.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/XY.html`,
     priority: 80,
     replyType: 'template',
     replyPayload: {
@@ -152,7 +152,7 @@ const keywords = [
   {
     keyword: '福田會',
     aliases: [],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ft.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ft.html`,
     priority: 80,
     replyType: 'template',
     replyPayload: {
@@ -165,7 +165,7 @@ const keywords = [
   {
     keyword: '奉獻',
     aliases: [],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}/liff/service/donation.html`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/donation.html`,
     priority: 70,
     replyType: 'template',
     replyPayload: {
@@ -180,7 +180,7 @@ const keywords = [
   {
     keyword: '簽到',
     aliases: ['奉香簽到', '奉香', '打卡'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?module=checkin`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=checkin`,
     priority: 95,
     replyType: 'template',
     replyPayload: {
@@ -193,7 +193,7 @@ const keywords = [
   {
     keyword: '管理',
     aliases: ['簽到管理'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?module=manage`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=manage`,
     priority: 85,
     replyType: 'template',
     replyPayload: {
@@ -206,7 +206,7 @@ const keywords = [
   {
     keyword: '神務服務',
     aliases: ['神務', '服務', '法會'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?module=service`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=?module=service`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
@@ -219,7 +219,7 @@ const keywords = [
   {
     keyword: '排班',
     aliases: ['排班系統', '班表', '志工'],
-    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?module=schedule`,
+    liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=schedule`,
     priority: 90,
     replyType: 'template',
     replyPayload: {
