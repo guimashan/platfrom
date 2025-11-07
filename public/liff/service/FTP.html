@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>福田會 - 龜馬山 goLine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="../styles/service.css">
+</head>
+<body>
+    <!-- 未登入畫面 (預設顯示) -->
+    <div id="loginPrompt" class="login-prompt">
+        <div class="welcome-card">
+            <h2>歡迎</h2>
+            <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
+            <button id="loginBtn" class="btn btn-primary">
+                LINE 登入
+            </button>
+        </div>
+    </div>
+
+    <!-- 主要內容 (預設隱藏，登入後才顯示) -->
+    <div id="mainApp" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1>福田會 個人入會</h1>
+                <p>三年期護持建宮 - 功德圓滿</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-logout" onclick="window.location.href='/'">
+                    返回首頁
+                </button>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            
+            <!-- 福田會說明 -->
+            <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
+                <h2 class="card-title">福田會 個人入會說明</h2>
+                <div style="line-height: 1.8; color: #4A3C2F;">
+                    <p>感恩您發心護持龜馬山紫皇天乙真慶宮建宮大業</p>
+                    <p style="margin-top: 10px;"><strong>護持方案</strong>：三年期捐助 NT$ 30,000</p>
+                    <p style="margin-top: 5px;"><strong>繳款方式</strong>：可選擇季繳、半年繳、年繳或全繳</p>
+                    <p style="margin-top: 5px;"><strong>功德回向</strong>：每期自動扣款，功德持續累積</p>
+                </div>
+            </div>
+
+            <!-- I. 報名聯絡資訊 -->
+            <div class="card">
+                <h2 class="card-title">報名聯絡資訊</h2>
+                <div class="form-group">
+                    <label for="contactName">會員 姓名</label>
+                    <input type="text" id="contactName" class="input-field" placeholder="請輸入姓名">
+                </div>
+
+                <div class="form-group">
+                    <label>性別</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="男" checked>
+                            <span>男</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="gender" value="女">
+                            <span>女</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="idNumber">身分證字號</label>
+                    <input type="text" id="idNumber" class="input-field" placeholder="請輸入身分證字號" maxlength="10">
+                </div>
+
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px;">出生日期 (國曆)</label>
+                    <div style="margin-bottom: 4px;">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
+                            <span style="color: #666;">民國</span>
+                            <input type="text" id="bazi-year" class="input-field" placeholder="年" style="width: 60px; text-align: center;">
+                            <span>年</span>
+                            <input type="text" id="bazi-month" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>月</span>
+                            <input type="text" id="bazi-day" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
+                            <span>日</span>
+                            <button type="button" id="bazi-btn" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
+                            <input type="date" id="bazi" style="position: absolute; opacity: 0; pointer-events: none;">
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="western-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="western-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">月</span>
+                        <span id="western-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
+                    <div id="lunar-display" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
+                        <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
+                        <span style="visibility: hidden;">民國</span>
+                        <span id="lunar-year" style="display: inline-block; width: 60px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">年</span>
+                        <span id="lunar-month" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">月</span>
+                        <span id="lunar-day" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
+                        <span style="color: #666;">日</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactPhone">連絡電話</label>
+                    <input type="tel" id="contactPhone" class="input-field" placeholder="請輸入電話">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactEmail">電子信箱</label>
+                    <input type="email" id="contactEmail" class="input-field" placeholder="請輸入 Email">
+                </div>
+
+                <div class="form-group">
+                    <label>感謝狀抬頭</label>
+                    <div class="radio-group" style="flex-direction: column; gap: 10px;">
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="donor" checked>
+                            <span>同會員姓名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="cardholder">
+                            <span>同持卡人姓名</span>
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="certificateName" value="custom">
+                            <span>其他</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="customNameField" class="form-group" style="display: none;">
+                    <label for="customName">自訂感謝狀抬頭</label>
+                    <input type="text" id="customName" class="input-field" placeholder="請輸入感謝狀抬頭名稱">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contactAddress">通訊地址</label>
+                    <input type="text" id="contactAddress" class="input-field" placeholder="請輸入感謝狀寄送地址">
+                </div>
+            </div>
+
+            <!-- II. 繳款方式 -->
+            <div class="card">
+                <h2 class="card-title">繳款方式選擇</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    三年期總額 NT$ 30,000，請選擇您的繳款方式
+                </p>
+
+                <div class="form-group">
+                    <div class="radio-group" style="flex-direction: column; gap: 15px;">
+                        <label class="radio-label payment-option">
+                            <input type="radio" name="paymentPlan" value="quarterly" checked>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--primary-gold-dark);">季繳</div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
+                                    共 12 期，每期 NT$ 2,500
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-label payment-option">
+                            <input type="radio" name="paymentPlan" value="halfYearly">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--primary-gold-dark);">半年繳</div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
+                                    共 6 期，每期 NT$ 5,000
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-label payment-option">
+                            <input type="radio" name="paymentPlan" value="yearly">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--primary-gold-dark);">年繳</div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
+                                    共 3 期，每期 NT$ 10,000
+                                </div>
+                            </div>
+                        </label>
+                        
+                        <label class="radio-label payment-option">
+                            <input type="radio" name="paymentPlan" value="fullPayment">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; color: var(--primary-gold-dark);">全繳</div>
+                                <div style="font-size: 0.9rem; color: #666; margin-top: 3px;">
+                                    一次繳清，NT$ 30,000
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="background: #FFF9E6; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid var(--primary-gold);">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #666;">首期扣款金額：</span>
+                        <span id="firstPayment" style="font-size: 1.3rem; font-weight: 700; color: var(--primary-gold-dark);">NT$ 2,500</span>
+                    </div>
+                    <div style="font-size: 0.85rem; color: #888; margin-top: 8px;">
+                        ※ 後續將按期自動扣款，直到三年期滿
+                    </div>
+                </div>
+            </div>
+
+            <!-- IV. 信用卡資訊 -->
+            <div class="card payment-card">
+                <h2 class="card-title">信用卡資訊 (手動刷卡用)</h2>
+                <p style="color: #666; font-size: 14px; margin-bottom: 20px;">
+                    請填寫信用卡資訊，廟方將與您聯絡確認後手動刷卡
+                </p>
+                
+                <div class="form-group">
+                    <label for="cardHolderName">持卡人姓名</label>
+                    <input type="text" id="cardHolderName" class="input-field">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cardNumber">信用卡卡號</label>
+                    <input type="text" id="cardNumber" class="input-field" placeholder="xxxx-xxxx-xxxx-xxxx">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardExpiry">有效年月 (MM/YY)</label>
+                        <input type="text" id="cardExpiry" class="input-field" placeholder="MM/YY">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cardCVV">背面末三碼 (CVV)</label>
+                        <input type="text" id="cardCVV" class="input-field" placeholder="CVV">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他備註 -->
+            <div class="card">
+                <h2 class="card-title">其他備註</h2>
+                <div class="form-group">
+                    <textarea id="otherNote" class="input-field" rows="4" placeholder="若有其他需求請填寫於此"></textarea>
+                </div>
+            </div>
+
+            </div>
+        </div>
+
+        <!-- 浮動總結欄位 -->
+        <div id="floatingFooter">
+            <div class="footer-content">
+                <div class="footer-summary">
+                    <div class="summary-item">
+                        <span class="summary-label">三年期總額：</span>
+                        <span class="summary-value total-price">NT$ 30,000</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">首期扣款：</span>
+                        <span id="footerFirstPayment" class="summary-value">NT$ 2,500</span>
+                    </div>
+                </div>
+                <button id="submitBtn" class="btn-submit">確認報名並送出</button>
+            </div>
+        </div>
+    </div> <!-- 關閉 mainApp -->
+
+    <script src="../../lib/lunar.js" defer></script>
+    <script src="../../js/firebase-init.js" type="module"></script>
+    <script src="../js/FTP.js" type="module"></script>
+</body>
+</html>
