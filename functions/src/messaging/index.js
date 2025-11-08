@@ -19,11 +19,11 @@ let keywordsCache = null;
 let keywordsCacheTime = 0;
 const CACHE_TTL = 60 * 1000; // 快取 60 秒
 
-// LIFF App IDs
+// LIFF App IDs（每個功能模組使用專屬 LIFF App）
 const LIFF_IDS = {
-  checkin: '2008269293-Nl2pZBpV',
-  service: '2008269293-Nl2pZBpV', // 暫用簽到 LIFF，建議另建專屬 LIFF App
-  schedule: '2008269293-Nl2pZBpV', // 暫用簽到 LIFF，建議另建專屬 LIFF App
+  checkin: '2008269293-nYBm3JmV',  // 奉香簽到
+  service: '2008269293-Nl2pZBpV',  // 神務服務
+  schedule: '2008269293-N0wnqknr', // 排班系統
 };
 
 // LINE Bot SDK 簽名驗證方法已內建，不需要自己實作
@@ -416,7 +416,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '開始簽到',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=checkin`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin.html`,
           },
         ],
       },
@@ -435,7 +435,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?module=manage`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/checkin/manage/index.html`,
           },
         ],
       },
@@ -454,7 +454,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入服務',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?module=service`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service.html`,
           },
         ],
       },
@@ -473,7 +473,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '查看班表',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?module=schedule`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule.html`,
           },
         ],
       },
@@ -491,7 +491,7 @@ async function handleTextMessage(text) {
         {
           type: 'uri',
           label: '開啟平台',
-          uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
+          uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/index.html`,
         },
       ],
     },
