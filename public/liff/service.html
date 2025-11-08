@@ -96,24 +96,27 @@
                 if (liffState) {
                     console.log('檢測到 liff.state 參數:', liffState);
                     
-                    // 🎯 處理兩種格式的 liff.state：
+                    // 🎯 處理三種格式的 liff.state：
                     // 1. 完整路徑格式：/liff/service/DD.html
-                    // 2. 服務代碼格式：DD
+                    // 2. 短格式：/DD（關鍵詞管理頁面生成的格式）
+                    // 3. 服務代碼格式：DD
                     let targetUrl;
                     
-                    if (liffState.includes('/')) {
-                        // 格式1：完整路徑，直接拼接到 BASE_URL
-                        targetUrl = `${BASE_URL}${liffState}`;
+                    // 移除開頭的 / 以便統一處理
+                    const cleanState = liffState.startsWith('/') ? liffState.substring(1) : liffState;
+                    
+                    if (cleanState.startsWith('liff/service/')) {
+                        // 格式1：完整路徑 /liff/service/DD.html
+                        targetUrl = `${BASE_URL}/${cleanState}`;
                         console.log('完整路徑格式，導航到:', targetUrl);
-                    } else {
-                        // 格式2：服務代碼，從 SERVICE_PATHS 查找或構建路徑
-                        if (SERVICE_PATHS[liffState]) {
-                            targetUrl = SERVICE_PATHS[liffState];
-                        } else {
-                            // 其他服務代碼（donation, ft, BG, XY, FTC, FTP, FTY 等）
-                            targetUrl = `${BASE_URL}/liff/service/${liffState}.html`;
-                        }
+                    } else if (SERVICE_PATHS[cleanState]) {
+                        // 格式2 & 3：服務代碼（DD, ND, LD 等）
+                        targetUrl = SERVICE_PATHS[cleanState];
                         console.log('服務代碼格式，導航到:', targetUrl);
+                    } else {
+                        // 其他服務代碼（donation, ft, BG, XY, FTC, FTP, FTY 等）
+                        targetUrl = `${BASE_URL}/liff/service/${cleanState}.html`;
+                        console.log('其他服務格式，導航到:', targetUrl);
                     }
                     
                     window.location.replace(targetUrl);
