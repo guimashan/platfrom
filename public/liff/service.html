@@ -95,6 +95,30 @@
                     return;
                 }
 
+                // 🎯 檢查 liff.state 參數，如果有則直接導航到對應頁面
+                const state = liff.getDecodedIDToken()?.amr || [];
+                const urlParams = new URLSearchParams(window.location.search);
+                const liffState = urlParams.get('liff.state');
+                
+                if (liffState) {
+                    console.log('檢測到 liff.state 參數:', liffState);
+                    // 移除開頭的 /
+                    const serviceCode = liffState.replace(/^\//, '');
+                    
+                    // 檢查是否為有效的服務代碼
+                    if (SERVICE_PATHS[serviceCode]) {
+                        console.log('自動導航到:', serviceCode);
+                        window.location.href = SERVICE_PATHS[serviceCode];
+                        return;
+                    } else if (serviceCode === 'donation' || serviceCode === 'ft') {
+                        // 特殊頁面處理
+                        window.location.href = `service/${serviceCode}.html`;
+                        return;
+                    } else {
+                        console.warn('未知的服務代碼:', serviceCode);
+                    }
+                }
+
                 // 等待 Firebase 認證完成
                 onAuthStateChanged(platformAuth, async (user) => {
                     if (user) {

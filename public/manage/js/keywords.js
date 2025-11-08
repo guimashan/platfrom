@@ -588,8 +588,37 @@ function convertPathToLiffUrl() {
         return;
     }
     
-    // 生成正確的 LIFF URL（不需要 liff.state 參數）
-    const liffUrl = `https://liff.line.me/${LIFF_ID}`;
+    // 🎯 判斷是否需要 liff.state 參數
+    let liffUrl;
+    let explanation;
+    
+    // 如果是主頁面（checkin.html, service.html, schedule.html），不需要 liff.state
+    if (path === '/liff/checkin.html' || path === '/liff/service.html' || path === '/liff/schedule.html') {
+        liffUrl = `https://liff.line.me/${LIFF_ID}`;
+        explanation = '📋 這是主頁面，不需要 liff.state 參數';
+    } else {
+        // 子頁面需要 liff.state 參數來路由
+        // 例如 /liff/service/DD.html → liff.state=/DD
+        let statePath;
+        
+        if (path.startsWith('/liff/service/')) {
+            // 提取服務代碼，例如 /liff/service/DD.html → /DD
+            const fileName = path.split('/').pop().replace('.html', '');
+            statePath = `/${fileName}`;
+        } else if (path.startsWith('/liff/checkin/')) {
+            // 簽到子頁面
+            statePath = path.replace('/liff', '');
+        } else if (path.startsWith('/liff/schedule/')) {
+            // 排班子頁面
+            statePath = path.replace('/liff', '');
+        } else {
+            // 其他情況，使用完整路徑
+            statePath = path;
+        }
+        
+        liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${statePath}`;
+        explanation = `📍 子頁面需要 liff.state 參數來路由到：${statePath}`;
+    }
     
     // 填入 LIFF URL 欄位
     liffUrlInput.value = liffUrl;
@@ -605,7 +634,7 @@ function convertPathToLiffUrl() {
     };
     
     // 顯示成功提示
-    showSuccess(`✅ 轉換成功！\n\n模組：${moduleNameMap[moduleName]}\nLIFF ID：${LIFF_ID}\n\n已生成 LIFF URL：\n${liffUrl}\n\n💡 提示：路徑 "${path}" 已自動對應到正確的 LIFF App`);
+    showSuccess(`✅ 轉換成功！\n\n模組：${moduleNameMap[moduleName]}\nLIFF ID：${LIFF_ID}\n\n已生成 LIFF URL：\n${liffUrl}\n\n${explanation}`);
 }
 
 // 初始化
