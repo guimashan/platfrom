@@ -435,7 +435,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/dashboard`,
+            uri: 'https://go.guimashan.org.tw/checkin/manage/index.html',
           },
         ],
       },
