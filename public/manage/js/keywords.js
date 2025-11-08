@@ -604,11 +604,16 @@ function convertPathToLiffUrl() {
             const fileName = path.split('/').pop().replace('.html', '');
             statePath = `/${fileName}`;
         } else if (path.startsWith('/liff/checkin/')) {
-            // 簽到子頁面
-            statePath = path.replace('/liff', '');
+            // 簽到子頁面：保持完整路徑
+            // 例如 /liff/checkin/dashboard.html → liff.state=/liff/checkin/dashboard.html
+            statePath = path;
+        } else if (path.startsWith('/checkin/manage/')) {
+            // 簽到管理頁面（非 LIFF）：保持完整路徑
+            // 例如 /checkin/manage/index.html → liff.state=/checkin/manage/index.html
+            statePath = path;
         } else if (path.startsWith('/liff/schedule/')) {
-            // 排班子頁面
-            statePath = path.replace('/liff', '');
+            // 排班子頁面：保持完整路徑
+            statePath = path;
         } else {
             // 其他情況，使用完整路徑
             statePath = path;
