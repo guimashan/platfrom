@@ -26,7 +26,8 @@ import {
 
 // LINE Login Web API 設定
 const LINE_CHANNEL_ID = '2008269293';
-const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
+const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
+const LINE_CALLBACK_URL = CANONICAL_ORIGIN + '/callback.html';
 
 // 監聽認證狀態
 onAuthStateChanged(platformAuth, async (user) => {
@@ -42,6 +43,18 @@ onAuthStateChanged(platformAuth, async (user) => {
 // 處理 LINE 登入
 async function handleLineLogin() {
     try {
+        // 🔒 確保在正式域名上執行 OAuth（避免 sessionStorage 跨域問題）
+        const currentOrigin = window.location.origin;
+        if (currentOrigin !== CANONICAL_ORIGIN) {
+            console.log(`🔄 重定向到正式域名: ${CANONICAL_ORIGIN}`);
+            // 保存當前路徑，稍後導回
+            const returnPath = window.location.pathname + window.location.search;
+            sessionStorage.setItem('line_login_return_url', returnPath);
+            // 導向正式域名，讓用戶從正式域名啟動 OAuth
+            window.location.href = CANONICAL_ORIGIN + returnPath;
+            return;
+        }
+        
         // 🔒 產生密碼學安全的隨機 state 用於 CSRF 防護
         const state = crypto.randomUUID();
         sessionStorage.setItem('line_login_state', state);
