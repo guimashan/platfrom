@@ -233,11 +233,17 @@ npm run emulators
   - 測試: http://localhost:5000/callback.html
 
 ### LINE LIFF (Front-end Framework)
-使用同一個 LINE Login Channel (2008269293)
-- 奉香簽到 LIFF App: /liff/checkin.html
-- 神務服務 LIFF App: /liff/service.html
-- 排班系統 LIFF App: /liff/schedule.html
-- LIFF IDs: 需在 LINE Developers Console 建立後更新
+使用同一個 LINE Login Channel (2008269293)，已建立三個獨立 LIFF App：
+
+| LIFF App | LIFF ID | Endpoint URL | 頁面路徑 |
+|---------|---------|--------------|---------|
+| 奉香簽到 | 2008269293-nYBm3JmV | https://go.guimashan.org.tw/liff/checkin.html | public/liff/checkin.html |
+| 排班系統 | 2008269293-N0wnqknr | https://go.guimashan.org.tw/liff/schedule.html | public/liff/schedule.html |
+| 神務服務 | 2008269293-Nl2pZBpV | https://go.guimashan.org.tw/liff/service.html | public/liff/service.html |
+
+**注意**：
+- 每個 LIFF App 使用專屬的 LIFF ID，確保獨立的權限管理和錯誤追蹤
+- public/liff/index.html 作為通用入口頁面，使用神務服務的 LIFF ID (2008269293-Nl2pZBpV)
 
 ### LINE Messaging API (官方帳號)
 - 需建立 Messaging API Channel
@@ -245,6 +251,45 @@ npm run emulators
 - 支援關鍵字觸發 LIFF App
 
 ## 最近變更
+
+### 2025-11-08 LIFF App 架構優化 + LINE Login 修復
+
+**LIFF 架構重構**：
+- ✅ **建立三個獨立 LIFF App**（LINE Developers Console）：
+  - 奉香簽到：2008269293-nYBm3JmV
+  - 排班系統：2008269293-N0wnqknr
+  - 神務服務：2008269293-Nl2pZBpV
+- ✅ **更新所有 LIFF 頁面使用專屬 LIFF ID**：
+  - public/liff/checkin.html → 2008269293-nYBm3JmV
+  - public/liff/schedule.html → 2008269293-N0wnqknr
+  - public/liff/service.html → 2008269293-Nl2pZBpV（保持）
+  - public/liff/index.html → 2008269293-Nl2pZBpV（通用入口）
+
+**LINE Login 修復**：
+- ✅ **修復 state 參數不匹配錯誤**（sessionStorage 跨域問題）：
+  - 強制所有 OAuth 流程在正式域名 (https://go.guimashan.org.tw) 上執行
+  - 新增 CANONICAL_ORIGIN 常數
+  - 啟動登入前自動檢查並重定向到正式域名
+- ✅ **修復 LIFF redirect_uri mismatch 錯誤**：
+  - 每個 LIFF App 使用專屬的 LIFF ID
+  - Endpoint URL 統一設定為 https://go.guimashan.org.tw
+
+**架構優勢**：
+- 🎯 更清楚的權限管理（每個功能獨立追蹤）
+- 🎯 更好的錯誤追蹤（可定位到具體模組）
+- 🎯 更靈活的功能擴展（可獨立設定 LIFF 參數）
+- 🎯 解決跨域 sessionStorage 問題（統一在正式域名執行）
+
+**檔案更新**：
+- 前端：public/js/auth.js（LINE Login 域名檢查）
+- LIFF：checkin.html, schedule.html（LIFF ID 更新）
+- 文件：replit.md（LIFF ID 映射表）
+
+**部署狀態**：
+- ✅ Frontend workflow 已重啟並正常運行
+- ⏳ 用戶需更新 LINE Developers Console 設定
+
+---
 
 ### 2025-11-05 完成全站手機版響應式設計優化
 
