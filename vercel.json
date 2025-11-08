@@ -2,8 +2,6 @@
   "buildCommand": null,
   "outputDirectory": "public",
   "framework": null,
-  "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/liff/:path*",
