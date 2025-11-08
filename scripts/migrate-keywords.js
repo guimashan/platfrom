@@ -19,8 +19,9 @@ const db = admin.firestore();
 
 // LIFF App IDs
 const LIFF_IDS = {
-    checkin: '2008269293-Nl2pZBpV',
-    service: '2008269293-Nl2pZBpV'
+    checkin: '2008269293-nYBm3JmV',  // 奉香簽到
+    service: '2008269293-Nl2pZBpV',  // 神務服務
+    schedule: '2008269293-N0wnqknr'  // 排班系統
 };
 
 // 定義所有現有的關鍵詞映射
