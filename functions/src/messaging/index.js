@@ -217,7 +217,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '立即點燈',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/DD.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/DD.html`,
           },
         ],
       },
@@ -238,7 +238,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ND.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ND.html`,
           },
         ],
       },
@@ -258,7 +258,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/LD.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/LD.html`,
           },
         ],
       },
@@ -279,7 +279,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ZY.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ZY.html`,
           },
         ],
       },
@@ -299,7 +299,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/PS.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/PS.html`,
           },
         ],
       },
@@ -318,7 +318,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/QJ.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/QJ.html`,
           },
         ],
       },
@@ -338,7 +338,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要奉獻',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/BG.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/BG.html`,
           },
         ],
       },
@@ -357,7 +357,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要奉獻',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/XY.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/XY.html`,
           },
         ],
       },
@@ -376,7 +376,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '了解詳情',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/ft.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ft.html`,
           },
         ],
       },
@@ -395,7 +395,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '選擇奉獻項目',
-            uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/donation.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/donation.html`,
           },
         ],
       },
