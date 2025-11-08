@@ -88,15 +88,7 @@
 
         async function init() {
             try {
-                // 使用共用的 LIFF 初始化模組
-                const liffData = await initLiff(LIFF_ID);
-                
-                if (!liffData) {
-                    return;
-                }
-
-                // 🎯 檢查 liff.state 參數，如果有則直接導航到對應頁面
-                const state = liff.getDecodedIDToken()?.amr || [];
+                // 🎯 優先檢查 liff.state 參數，如果有則直接導航（不需要等 LIFF 初始化）
                 const urlParams = new URLSearchParams(window.location.search);
                 const liffState = urlParams.get('liff.state');
                 
@@ -110,13 +102,20 @@
                         console.log('自動導航到:', serviceCode);
                         window.location.href = SERVICE_PATHS[serviceCode];
                         return;
-                    } else if (serviceCode === 'donation' || serviceCode === 'ft') {
+                    } else if (serviceCode === 'donation' || serviceCode === 'ft' || serviceCode === 'BG' || serviceCode === 'XY') {
                         // 特殊頁面處理
                         window.location.href = `service/${serviceCode}.html`;
                         return;
                     } else {
                         console.warn('未知的服務代碼:', serviceCode);
                     }
+                }
+
+                // 使用共用的 LIFF 初始化模組
+                const liffData = await initLiff(LIFF_ID);
+                
+                if (!liffData) {
+                    return;
                 }
 
                 // 等待 Firebase 認證完成
