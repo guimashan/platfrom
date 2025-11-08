@@ -313,15 +313,10 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
             <label for="name-${cardId}">報名者姓名</label>
             <input type="text" id="name-${cardId}" class="input-field card-input-name" value="${prefillName}" placeholder="請填寫報名者姓名">
             
-            <label>性別</label>
-            <div class="radio-group">
-                <label class="radio-label">
-                    <input type="radio" name="gender-${cardId}" value="男" checked>
-                    <span>男</span>
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="gender-${cardId}" value="女">
-                    <span>女</span>
+            <div class="form-group" style="margin-top: 15px;">
+                <label class="checkbox-label" style="display: flex; align-items: center; cursor: pointer;">
+                    <input type="checkbox" id="wenchang-${cardId}" class="checkbox-input" checked style="width: 20px; height: 20px; margin-right: 10px; cursor: pointer;">
+                    <span style="font-size: 1rem;">文昌帝君拱斗</span>
                 </label>
             </div>
             
@@ -350,11 +345,35 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
         syncFirstCardToName(card);
     });
+    
+    // 綁定核選方塊事件
+    const checkbox = card.querySelector(`#wenchang-${cardId}`);
+    if (checkbox) {
+        checkbox.addEventListener('change', (e) => {
+            const summaryInfo = card.querySelector('.card-summary-info');
+            if (e.target.checked) {
+                summaryInfo.textContent = '文昌帝君拱斗';
+                summaryInfo.style.color = '';
+            } else {
+                summaryInfo.textContent = '(未選擇服務)';
+                summaryInfo.style.color = '#999';
+            }
+            calculateTotal();
+        });
+    }
 }
 
 function calculateTotal() {
     const cards = applicantCardListEl.querySelectorAll('.applicant-card');
-    const totalPositions = cards.length;
+    
+    // 只計算已勾選的服務
+    let totalPositions = 0;
+    cards.forEach(card => {
+        const checkbox = card.querySelector('input[id^="wenchang-"]');
+        if (checkbox && checkbox.checked) {
+            totalPositions++;
+        }
+    });
     
     const totalAmount = totalPositions * POSITION_PRICE;
     totalPositionsEl.textContent = `${totalPositions} 位`;
@@ -444,12 +463,30 @@ function validateForm() {
         return false;
     }
 
+    // 檢查是否至少有一個服務被選中
+    let hasCheckedService = false;
+    cards.forEach(card => {
+        const checkbox = card.querySelector('input[id^="wenchang-"]');
+        if (checkbox && checkbox.checked) {
+            hasCheckedService = true;
+        }
+    });
+    if (!hasCheckedService) {
+        alert('請至少選擇一項服務');
+        return false;
+    }
+
     let cardIndex = 0;
     for (const card of cards) {
         cardIndex++;
         const cardName = card.querySelector('.card-summary-name').textContent || `第 ${cardIndex} 位報名者`;
         
-        // 檢查姓名
+        // 檢查姓名（只檢查已勾選服務的報名者）
+        const checkbox = card.querySelector('input[id^="wenchang-"]');
+        if (!checkbox || !checkbox.checked) {
+            continue; // 跳過未勾選的報名者
+        }
+        
         const nameInput = card.querySelector('.card-input-name');
         if (!nameInput.value.trim()) {
             showError(nameInput, `請填寫 ${cardName} 的姓名`);
@@ -530,17 +567,17 @@ async function handleSubmit() {
         const applicants = [];
         const cards = applicantCardListEl.querySelectorAll('.applicant-card');
         cards.forEach(card => {
-            // 獲取性別（單選按鈕）
-            const genderRadio = card.querySelector('input[name^="gender-"]:checked');
+            // 獲取文昌帝君拱斗核選方塊
+            const wenchangCheckbox = card.querySelector('input[id^="wenchang-"]');
             
-            const cardData = {
-                applicantName: card.querySelector('.card-input-name').value.trim(),
-                bazi: {
-                    gender: genderRadio ? genderRadio.value : '',
-                },
-                serviceItem: '文昌帝君拱斗'
-            };
-            applicants.push(cardData);
+            // 只收集已勾選的報名者
+            if (wenchangCheckbox && wenchangCheckbox.checked) {
+                const cardData = {
+                    applicantName: card.querySelector('.card-input-name').value.trim(),
+                    serviceItem: '文昌帝君拱斗'
+                };
+                applicants.push(cardData);
+            }
         });
 
         // 3. 收集信用卡資訊
