@@ -76,14 +76,14 @@
 
         const LIFF_ID = '2008269293-Nl2pZBpV';
 
-        // 服務路徑映射
+        // 服務路徑映射（使用絕對路徑，確保在 LINE App 內也能正確跳轉）
         const SERVICE_PATHS = {
-            DD: 'service/DD.html',
-            ND: 'service/ND.html',
-            LD: 'service/LD.html',
-            ZY: 'service/ZY.html',
-            PS: 'service/PS.html',
-            QJ: 'service/QJ.html'
+            DD: '/liff/service/DD.html',
+            ND: '/liff/service/ND.html',
+            LD: '/liff/service/LD.html',
+            ZY: '/liff/service/ZY.html',
+            PS: '/liff/service/PS.html',
+            QJ: '/liff/service/QJ.html'
         };
 
         async function init() {
@@ -102,9 +102,9 @@
                         console.log('自動導航到:', serviceCode);
                         window.location.href = SERVICE_PATHS[serviceCode];
                         return;
-                    } else if (serviceCode === 'donation' || serviceCode === 'ft' || serviceCode === 'BG' || serviceCode === 'XY') {
-                        // 特殊頁面處理
-                        window.location.href = `service/${serviceCode}.html`;
+                    } else if (serviceCode === 'donation' || serviceCode === 'ft' || serviceCode === 'BG' || serviceCode === 'XY' || serviceCode === 'FTC' || serviceCode === 'FTP' || serviceCode === 'FTY') {
+                        // 特殊頁面處理（使用絕對路徑）
+                        window.location.href = `/liff/service/${serviceCode}.html`;
                         return;
                     } else {
                         console.warn('未知的服務代碼:', serviceCode);
@@ -149,7 +149,7 @@
 
             // 綁定返回按鈕
             document.getElementById('backBtn').addEventListener('click', () => {
-                window.location.href = 'index.html';
+                window.location.href = '/liff/index.html';
             });
         }
 
