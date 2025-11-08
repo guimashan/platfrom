@@ -95,23 +95,29 @@
                 
                 if (liffState) {
                     console.log('檢測到 liff.state 參數:', liffState);
-                    // 移除開頭的 /
-                    const serviceCode = liffState.replace(/^\//, '');
                     
-                    // 檢查是否為有效的服務代碼
-                    if (SERVICE_PATHS[serviceCode]) {
-                        console.log('自動導航到:', SERVICE_PATHS[serviceCode]);
-                        // 使用 replace 而非 href，避免 LIFF 環境中的 URL 拼接問題
-                        window.location.replace(SERVICE_PATHS[serviceCode]);
-                        return;
-                    } else if (serviceCode === 'donation' || serviceCode === 'ft' || serviceCode === 'BG' || serviceCode === 'XY' || serviceCode === 'FTC' || serviceCode === 'FTP' || serviceCode === 'FTY') {
-                        // 特殊頁面處理（使用完整 URL）
-                        console.log('自動導航到:', `${BASE_URL}/liff/service/${serviceCode}.html`);
-                        window.location.replace(`${BASE_URL}/liff/service/${serviceCode}.html`);
-                        return;
+                    // 🎯 處理兩種格式的 liff.state：
+                    // 1. 完整路徑格式：/liff/service/DD.html
+                    // 2. 服務代碼格式：DD
+                    let targetUrl;
+                    
+                    if (liffState.includes('/')) {
+                        // 格式1：完整路徑，直接拼接到 BASE_URL
+                        targetUrl = `${BASE_URL}${liffState}`;
+                        console.log('完整路徑格式，導航到:', targetUrl);
                     } else {
-                        console.warn('未知的服務代碼:', serviceCode);
+                        // 格式2：服務代碼，從 SERVICE_PATHS 查找或構建路徑
+                        if (SERVICE_PATHS[liffState]) {
+                            targetUrl = SERVICE_PATHS[liffState];
+                        } else {
+                            // 其他服務代碼（donation, ft, BG, XY, FTC, FTP, FTY 等）
+                            targetUrl = `${BASE_URL}/liff/service/${liffState}.html`;
+                        }
+                        console.log('服務代碼格式，導航到:', targetUrl);
                     }
+                    
+                    window.location.replace(targetUrl);
+                    return;
                 }
 
                 // 使用共用的 LIFF 初始化模組
