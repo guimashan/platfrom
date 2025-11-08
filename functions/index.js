@@ -8,6 +8,7 @@ const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
 const adminFunctions = require('./src/admin/migrate-keywords');
+const fixLiffUrlsFunctions = require('./src/admin/fix-liff-urls');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -38,3 +39,4 @@ exports.confirmPayment = serviceFunctions.confirmPayment;
 
 // 導出 Admin Functions (管理功能)
 exports.migrateKeywords = adminFunctions.migrateKeywords;
+exports.fixLiffUrls = fixLiffUrlsFunctions.fixLiffUrls;
