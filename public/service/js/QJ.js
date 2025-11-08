@@ -324,67 +324,25 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                     <span>女</span>
                 </label>
             </div>
-            
-            <label style="display: block; margin-bottom: 8px;">生辰 (國曆)</label>
-            <div style="margin-bottom: 4px;">
-                <div style="display: flex; align-items: center; gap: 5px;">
-                    <span style="color: #666; white-space: nowrap; width: 50px;">國曆:</span>
-                    <span style="color: #666;">民國</span>
-                    <input type="text" id="bazi-year-${cardId}" class="input-field" placeholder="年" style="width: 70px; text-align: center;">
-                    <span>年</span>
-                    <input type="text" id="bazi-month-${cardId}" class="input-field" placeholder="月" maxlength="2" style="width: 50px; text-align: center;">
-                    <span>月</span>
-                    <input type="text" id="bazi-day-${cardId}" class="input-field" placeholder="日" maxlength="2" style="width: 50px; text-align: center;">
-                    <span>日</span>
-                    <button type="button" id="bazi-btn-${cardId}" style="width: 40px; padding: 12px 0; border: 1.5px solid #e0e0e0; border-radius: 8px; background: white; font-size: 20px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">🗓️</button>
-                    <input type="date" id="bazi-${cardId}" style="position: absolute; opacity: 0; pointer-events: none;">
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px; margin-bottom: 4px;">
-                <span style="color: #666; white-space: nowrap; width: 50px;">西曆:</span>
-                <span style="visibility: hidden;">民國</span>
-                <span id="western-year-${cardId}" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">年</span>
-                <span id="western-month-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">月</span>
-                <span id="western-day-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">日</span>
-            </div>
-            <div id="lunar-display-${cardId}" style="display: flex; align-items: center; gap: 5px; margin-bottom: 15px;">
-                <span style="color: #666; white-space: nowrap; width: 50px;">農曆:</span>
-                <span style="visibility: hidden;">民國</span>
-                <span id="lunar-year-${cardId}" style="display: inline-block; width: 70px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">年</span>
-                <span id="lunar-month-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">月</span>
-                <span id="lunar-day-${cardId}" style="display: inline-block; width: 50px; color: #666; text-align: center;"></span>
-                <span style="color: #666;">日</span>
-            </div>
 
-            <div class="shengxiao-time-grid">
-                <div>
-                    <label for="shengxiao-${cardId}" style="display: block; margin-bottom: 8px;">生肖</label>
-                    <input type="text" id="shengxiao-${cardId}" class="input-field shengxiao-field" readonly placeholder="選擇日期後自動顯示" style="background-color: #f5f5f5; cursor: not-allowed; width: 100%; height: 55px; font-size: 1rem;">
-                </div>
-                <div>
-                    <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
-                    <select id="time-${cardId}" class="input-field" style="width: 100%; height: 55px; font-size: 1rem;">
-                        <option value="">請選擇時辰</option>
-                        <option value="吉時">吉時</option>
-                        <option value="子時">子時 (23:00-01:00)</option>
-                        <option value="丑時">丑時 (01:00-03:00)</option>
-                        <option value="寅時">寅時 (03:00-05:00)</option>
-                        <option value="卯時">卯時 (05:00-07:00)</option>
-                        <option value="辰時">辰時 (07:00-09:00)</option>
-                        <option value="巳時">巳時 (09:00-11:00)</option>
-                        <option value="午時">午時 (11:00-13:00)</option>
-                        <option value="未時">未時 (13:00-15:00)</option>
-                        <option value="申時">申時 (15:00-17:00)</option>
-                        <option value="酉時">酉時 (17:00-19:00)</option>
-                        <option value="戌時">戌時 (19:00-21:00)</option>
-                        <option value="亥時">亥時 (21:00-23:00)</option>
-                    </select>
-                </div>
+            <div class="form-group">
+                <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
+                <select id="time-${cardId}" class="input-field" style="width: 100%; height: 55px; font-size: 1rem;">
+                    <option value="">請選擇時辰</option>
+                    <option value="吉時">吉時</option>
+                    <option value="子時">子時 (23:00-01:00)</option>
+                    <option value="丑時">丑時 (01:00-03:00)</option>
+                    <option value="寅時">寅時 (03:00-05:00)</option>
+                    <option value="卯時">卯時 (05:00-07:00)</option>
+                    <option value="辰時">辰時 (07:00-09:00)</option>
+                    <option value="巳時">巳時 (09:00-11:00)</option>
+                    <option value="午時">午時 (11:00-13:00)</option>
+                    <option value="未時">未時 (13:00-15:00)</option>
+                    <option value="申時">申時 (15:00-17:00)</option>
+                    <option value="酉時">酉時 (17:00-19:00)</option>
+                    <option value="戌時">戌時 (19:00-21:00)</option>
+                    <option value="亥時">亥時 (21:00-23:00)</option>
+                </select>
             </div>
             
             <div class="card-actions">
@@ -411,88 +369,6 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
     card.querySelector('.card-input-name').addEventListener('input', (e) => {
         card.querySelector('.card-summary-name').textContent = e.target.value || '未命名';
         syncFirstCardToName(card);
-    });
-    
-    // 同步生辰輸入：日期選擇器 → 三個手動輸入欄位
-    const dateInput = card.querySelector(`#bazi-${cardId}`);
-    const dateButton = card.querySelector(`#bazi-btn-${cardId}`);
-    const yearInput = card.querySelector(`#bazi-year-${cardId}`);
-    const monthInput = card.querySelector(`#bazi-month-${cardId}`);
-    const dayInput = card.querySelector(`#bazi-day-${cardId}`);
-    
-    // 點擊日曆圖示時觸發日期選擇器（兼容 Safari/iOS）
-    dateButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        dateInput.style.pointerEvents = 'auto';
-        
-        if (typeof dateInput.showPicker === 'function') {
-            // Chrome/Edge 支援 showPicker()
-            try {
-                dateInput.showPicker();
-            } catch (err) {
-                dateInput.click();
-            }
-        } else {
-            // Safari/iOS 不支援 showPicker()，使用 click()
-            dateInput.click();
-        }
-        
-        setTimeout(() => { dateInput.style.pointerEvents = 'none'; }, 100);
-    });
-    
-    dateInput.addEventListener('change', (e) => {
-        if (e.target.value) {
-            const [westernYear, month, day] = e.target.value.split('-');
-            const rocYear = parseInt(westernYear) - 1911;
-            yearInput.value = rocYear;
-            monthInput.value = parseInt(month, 10);
-            dayInput.value = parseInt(day, 10);
-            autoFillShengxiao(card, e.target.value);
-        } else {
-            yearInput.value = '';
-            monthInput.value = '';
-            dayInput.value = '';
-            autoFillShengxiao(card, '');
-        }
-    });
-    
-    // 同步生辰輸入：手動輸入 → 日期選擇器
-    const syncManualToDate = () => {
-        const rocYear = yearInput.value.trim();
-        const month = monthInput.value.trim();
-        const day = dayInput.value.trim();
-        
-        if (!rocYear && !month && !day) {
-            dateInput.value = '';
-            autoFillShengxiao(card, '');
-            return;
-        }
-        
-        if (rocYear.length >= 2 && rocYear.length <= 3 && month && day) {
-            const westernYear = parseInt(rocYear) + 1911;
-            const paddedMonth = month.padStart(2, '0');
-            const paddedDay = day.padStart(2, '0');
-            const dateValue = `${westernYear}-${paddedMonth}-${paddedDay}`;
-            dateInput.value = dateValue;
-            autoFillShengxiao(card, dateValue);
-        } else {
-            autoFillShengxiao(card, '');
-        }
-    };
-    
-    yearInput.addEventListener('blur', syncManualToDate);
-    monthInput.addEventListener('blur', syncManualToDate);
-    dayInput.addEventListener('blur', syncManualToDate);
-    
-    // 限制只能輸入數字，並限制長度
-    yearInput.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 3);
-    });
-    monthInput.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
-    });
-    dayInput.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
     });
 }
 
@@ -602,62 +478,6 @@ function validateForm() {
             card.setAttribute('data-open', 'true');
             return false;
         }
-
-        // 檢查生辰（國曆）- 年、月、日都要填寫
-        const cardId = card.id;
-        const yearInput = card.querySelector(`#bazi-year-${cardId}`);
-        const monthInput = card.querySelector(`#bazi-month-${cardId}`);
-        const dayInput = card.querySelector(`#bazi-day-${cardId}`);
-        
-        const year = yearInput.value.trim();
-        const month = monthInput.value.trim();
-        const day = dayInput.value.trim();
-        
-        if (!year || !month || !day) {
-            // 找到第一個空白的欄位並顯示錯誤
-            let errorInput;
-            let errorField;
-            if (!year) {
-                errorInput = yearInput;
-                errorField = '年';
-            } else if (!month) {
-                errorInput = monthInput;
-                errorField = '月';
-            } else {
-                errorInput = dayInput;
-                errorField = '日';
-            }
-            showError(errorInput, `請填寫 ${cardName} 的生辰（${errorField}）`);
-            // 展開卡片以顯示錯誤
-            card.querySelector('.applicant-details').style.display = 'block';
-            card.setAttribute('data-open', 'true');
-            return false;
-        }
-        
-        // 驗證日期格式（民國年：接受 2-3 位數字）
-        const yearNum = parseInt(year, 10);
-        if (isNaN(yearNum) || year.length < 2 || year.length > 3 || yearNum < 10 || yearNum > 200) {
-            showError(yearInput, `${cardName} 的生辰年份格式不正確（民國年，2-3位數字，例如：70、113）`);
-            card.querySelector('.applicant-details').style.display = 'block';
-            card.setAttribute('data-open', 'true');
-            return false;
-        }
-        
-        const monthNum = parseInt(month, 10);
-        if (monthNum < 1 || monthNum > 12) {
-            showError(monthInput, `${cardName} 的生辰月份必須在 1-12 之間`);
-            card.querySelector('.applicant-details').style.display = 'block';
-            card.setAttribute('data-open', 'true');
-            return false;
-        }
-        
-        const dayNum = parseInt(day, 10);
-        if (dayNum < 1 || dayNum > 31) {
-            showError(dayInput, `${cardName} 的生辰日期必須在 1-31 之間`);
-            card.querySelector('.applicant-details').style.display = 'block';
-            card.setAttribute('data-open', 'true');
-            return false;
-        }
     }
 
     // 信用卡驗證
@@ -732,14 +552,13 @@ async function handleSubmit() {
         cards.forEach(card => {
             // 獲取性別（單選按鈕）
             const genderRadio = card.querySelector('input[name^="gender-"]:checked');
+            const timeSelect = card.querySelector('select[id^="time-"]');
             
             const cardData = {
                 applicantName: card.querySelector('.card-input-name').value.trim(),
                 bazi: {
                     gender: genderRadio ? genderRadio.value : '',
-                    birthDate: card.querySelector('input[type="date"]').value,
-                    shengxiao: card.querySelector('[id^="shengxiao-"]').value,
-                    time: card.querySelector('[id^="time-"]').value,
+                    time: timeSelect ? timeSelect.value : '',
                 },
                 serviceItem: '文昌帝君拱斗'
             };

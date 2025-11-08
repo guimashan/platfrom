@@ -20,7 +20,7 @@ import {
 
 // --- 全域變數 ---
 const SERVICE_TYPE = "nd";
-const DOU_PRICE = 36000;
+const DOU_PRICE = 26000;
 let currentUser = null; 
 let userData = null;
 
