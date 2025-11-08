@@ -549,7 +549,7 @@ async function batchUpdateUrls() {
             }
             
             const oldUrl = kw.liffUrl;
-            const newUrl = convertLiffUrl(oldUrl);
+            const newUrl = convertLiffUrl(oldUrl, kw.keyword);
             
             if (oldUrl !== newUrl) {
                 console.log(`🔧 更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
@@ -584,7 +584,7 @@ async function batchUpdateUrls() {
 }
 
 // 轉換 LIFF URL 格式（批量更新用）
-function convertLiffUrl(url) {
+function convertLiffUrl(url, keyword) {
     if (!url) return url;
     
     // ❌ 錯誤格式1：https://liff.line.me/ID/liff/service （主頁面錯誤帶了路徑）
@@ -596,9 +596,38 @@ function convertLiffUrl(url) {
         return `https://liff.line.me/${match[1]}`;
     }
     
-    // ✅ 正確格式1：https://liff.line.me/ID （主頁面）
-    // ✅ 正確格式2：https://liff.line.me/ID?liff.state=/DD （子頁面）
-    // 這些格式不需要轉換，直接返回
+    // 🎯 智能修復：為服務關鍵詞添加缺少的 liff.state 參數
+    const serviceMapping = {
+        '點燈': '/DD',
+        '龜馬山一點靈': '/DD',
+        '年斗': '/ND',
+        '年斗法會': '/ND',
+        '禮斗': '/LD',
+        '禮斗法會': '/LD',
+        '中元': '/ZY',
+        '中元法會': '/ZY',
+        '普施': '/PS',
+        '普施法會': '/PS',
+        '秋祭': '/QJ',
+        '秋祭法會': '/QJ',
+        '建宮廟款': '/BG',
+        '添香油': '/XY',
+        '福田會': '/FT',
+        '奉獻': '/donation'
+    };
+    
+    // 檢查是否是服務關鍵詞但缺少 liff.state
+    if (serviceMapping[keyword]) {
+        const serviceCode = serviceMapping[keyword];
+        // 如果 URL 是純 LIFF ID（沒有 liff.state），添加它
+        if (url === 'https://liff.line.me/2008269293-Nl2pZBpV') {
+            const newUrl = `${url}?liff.state=${serviceCode}`;
+            console.log(`🔧 添加 liff.state: ${keyword} - ${url} → ${newUrl}`);
+            return newUrl;
+        }
+    }
+    
+    // ✅ 其他格式不需要轉換，直接返回
     return url;
 }
 
