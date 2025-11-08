@@ -1,24 +1,50 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-08 修復 LINE Bot 硬編碼關鍵字的 LIFF URL 格式錯誤（第 2 次修復）
+**最近更新**: 2025-11-08 完成 LINE Bot LIFF URL 完整修復（全面性檢查與修復）
 
-## 重要修復記錄 (2025-11-08)
+## 重要修復記錄 (2025-11-08) - 完整版
 
 ### 問題診斷
-用戶報告從 LINE App 點擊關鍵字回覆按鈕後仍然收到 404 錯誤。
+用戶報告從 LINE App 點擊關鍵字回覆按鈕後持續收到 404 錯誤。經過全面性系統檢查，發現多處 LIFF URL 格式錯誤。
 
 ### 根本原因
-`functions/src/messaging/index.js` 中有 **10 個硬編碼關鍵字**使用了錯誤的 LIFF URL 格式：
+1. **functions/src/messaging/index.js**：10 個硬編碼關鍵字使用錯誤格式
+2. **scripts/migrate-keywords.js**：LIFF_IDS 定義錯誤 + 4 個平台功能關鍵字格式錯誤
 
-**❌ 錯誤格式**（舊代碼）：
+**❌ 錯誤格式 1**（舊代碼）：
 ```javascript
 uri: `https://liff.line.me/${LIFF_IDS.service}/liff/service/DD.html`
+```
+
+**❌ 錯誤格式 2**（scripts 腳本）：
+```javascript
+liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=checkin`
+```
+
+**❌ 錯誤格式 3**（LIFF_IDS 定義）：
+```javascript
+const LIFF_IDS = {
+    checkin: '2008269293-Nl2pZBpV',  // ❌ 錯誤！這是 service 的 ID
+    service: '2008269293-Nl2pZBpV'   // ✅ 正確
+    // ❌ 缺少 schedule!
+};
 ```
 
 **✅ 正確格式**（已修復）：
 ```javascript
 uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/DD.html`
+
+const LIFF_IDS = {
+    checkin: '2008269293-nYBm3JmV',  // 奉香簽到
+    service: '2008269293-Nl2pZBpV',  // 神務服務
+    schedule: '2008269293-N0wnqknr'  // 排班系統
+};
 ```
+
+### 已修復的檔案
+1. ✅ **functions/src/messaging/index.js**（15 個 LIFF URL）
+2. ✅ **functions/src/admin/migrate-keywords.js**（14 個 LIFF URL，格式已正確）
+3. ✅ **scripts/migrate-keywords.js**（LIFF_IDS 定義 + 18 個 LIFF URL）
 
 ### 已修復的關鍵字
 1. 點燈相關：龜馬山一點靈、線上點燈、安太歲、元辰燈、文昌燈、財利燈、光明燈、點燈
@@ -31,17 +57,32 @@ uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/DD.html`
 8. 添香油：添香油
 9. 福田會：福田會
 10. 奉獻：奉獻
+11. 奉香簽到：簽到、奉香簽到、奉香、打卡
+12. 簽到管理：管理、簽到管理
+13. 神務服務：神務服務、神務、服務、法會
+14. 排班系統：排班、排班系統、班表、志工
 
 ### 部署狀態
-- ✅ Cloud Functions 已重新部署（2025-11-08）
+- ✅ Cloud Functions 已重新部署（2025-11-08 21:20）
 - ✅ 所有 20 個函數更新成功
-- ✅ 關鍵字快取將在 60 秒後自動清除
+- ✅ Firestore 關鍵字資料已強制重新遷移（15 個主關鍵字 + 48 個別名）
+- ✅ LINE Developers Console LIFF Endpoint URL 已確認正確
+- ✅ Vercel 前端部署正常（所有 LIFF 頁面 HTTP 200）
+- ✅ Architect 審查通過：所有修復完整且一致
+
+### LINE Developers Console 確認
+| LIFF App | LIFF ID | Endpoint URL | 狀態 |
+|----------|---------|--------------|------|
+| 奉香簽到 | 2008269293-nYBm3JmV | https://go.guimashan.org.tw/liff/checkin.html | ✅ 正確 |
+| 神務服務 | 2008269293-Nl2pZBpV | https://go.guimashan.org.tw/liff/service.html | ✅ 正確 |
+| 排班系統 | 2008269293-N0wnqknr | https://go.guimashan.org.tw/liff/schedule.html | ✅ 正確 |
 
 ### 測試指引
-從 LINE App 測試以下關鍵字，確認能正確打開 LIFF 頁面：
+**等待 60 秒**讓 Cloud Function 關鍵字快取過期，然後從 LINE App 測試：
+
 1. 輸入「點燈」→ 點擊「立即點燈」→ 應打開點燈服務頁面
 2. 輸入「年斗」→ 點擊「我要報名」→ 應打開年斗法會頁面
-3. 輸入「神務服務」→ 點擊「進入服務」→ 應打開神務服務首頁
+3. 輸入「神務服務」→ 點擊「進入服務」→ 應打開神務服務首頁（6 個服務選項）
 4. 輸入「奉香簽到」→ 點擊「開始簽到」→ 應打開簽到頁面
 5. 輸入「排班系統」→ 點擊「查看班表」→ 應打開排班頁面
 
