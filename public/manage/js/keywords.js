@@ -528,18 +528,18 @@ async function batchUpdateUrls() {
 function convertLiffUrl(url) {
     if (!url) return url;
     
-    // 如果已經是新格式，直接返回
-    if (url.includes('liff.state=')) {
+    // 如果已經是正確的簡短格式，直接返回
+    if (/^https:\/\/liff\.line\.me\/[^?]+$/.test(url)) {
         return url;
     }
     
-    // 解析舊格式：https://liff.line.me/ID/path
-    const match = url.match(/^(https:\/\/liff\.line\.me\/[^\/]+)(\/.*)/);
+    // 移除錯誤的 liff.state 參數
+    const match = url.match(/https:\/\/liff\.line\.me\/([^?]+)(\?liff\.state=(.+))?/);
     
     if (match) {
-        const baseUrl = match[1]; // https://liff.line.me/ID
-        const path = match[2];     // /path
-        return `${baseUrl}?liff.state=${path}`;
+        const liffId = match[1];
+        // 只返回基礎 URL，不需要 liff.state
+        return `https://liff.line.me/${liffId}`;
     }
     
     return url;
@@ -588,8 +588,8 @@ function convertPathToLiffUrl() {
         return;
     }
     
-    // 生成完整 LIFF URL
-    const liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${path}`;
+    // 生成正確的 LIFF URL（不需要 liff.state 參數）
+    const liffUrl = `https://liff.line.me/${LIFF_ID}`;
     
     // 填入 LIFF URL 欄位
     liffUrlInput.value = liffUrl;
@@ -605,7 +605,7 @@ function convertPathToLiffUrl() {
     };
     
     // 顯示成功提示
-    showSuccess(`✅ 轉換成功！\n\n模組：${moduleNameMap[moduleName]}\nLIFF ID：${LIFF_ID}\n\n已生成 LIFF URL：\n${liffUrl}`);
+    showSuccess(`✅ 轉換成功！\n\n模組：${moduleNameMap[moduleName]}\nLIFF ID：${LIFF_ID}\n\n已生成 LIFF URL：\n${liffUrl}\n\n💡 提示：路徑 "${path}" 已自動對應到正確的 LIFF App`);
 }
 
 // 初始化

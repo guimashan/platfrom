@@ -351,11 +351,11 @@
                     <div style="margin-bottom: 10px; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; color: white;">
                         <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
                             <span style="font-size: 20px;">🔧</span>
-                            <strong>網址轉換工具</strong>
-                            <span style="font-size: 12px; opacity: 0.9;">（新手必看！）</span>
+                            <strong>智能 LIFF ID 選擇工具</strong>
+                            <span style="font-size: 12px; opacity: 0.9;">（自動判斷！）</span>
                         </div>
                         <p style="margin: 8px 0; font-size: 13px; opacity: 0.95;">
-                            輸入您的網頁路徑，自動轉換成 LIFF URL 格式
+                            輸入網頁路徑，系統會自動選擇正確的 LIFF App 並生成 LIFF URL
                         </p>
                         <div style="display: flex; gap: 8px; margin-top: 10px;">
                             <input type="text" id="pathInput" placeholder="例如：/liff/service/DD.html" 
@@ -366,12 +366,15 @@
                             </button>
                         </div>
                         <div style="margin-top: 8px; font-size: 12px; opacity: 0.9;">
-                            💡 提示：輸入 <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px;">/liff/service/XX.html</code> 即可
+                            💡 路徑範例：<br>
+                            • <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px;">/liff/checkin.html</code> → 奉香簽到<br>
+                            • <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px;">/liff/service/DD.html</code> → 神務服務<br>
+                            • <code style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 3px;">/liff/schedule.html</code> → 排班系統
                         </div>
                     </div>
                     
-                    <input type="url" id="liffUrl" required placeholder="https://liff.line.me/2008269293-Nl2pZBpV?liff.state=/liff/service/XX.html">
-                    <small>完整的 LIFF URL，包含 https://（可使用上方轉換工具自動生成）</small>
+                    <input type="url" id="liffUrl" required placeholder="https://liff.line.me/2008269293-Nl2pZBpV">
+                    <small>正確的 LIFF URL 格式（不需要 liff.state 參數，使用上方工具自動生成）</small>
                 </div>
 
                 <div class="form-group">
