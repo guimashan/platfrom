@@ -416,7 +416,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '開始簽到',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
           },
         ],
       },
@@ -435,7 +435,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/checkin/manage/index.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/dashboard`,
           },
         ],
       },
@@ -454,7 +454,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入服務',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}`,
           },
         ],
       },
