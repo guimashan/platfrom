@@ -96,6 +96,39 @@
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
         const LIFF_ID = '2008269293-N0wnqknr';
+        
+        // 🎯 排班頁面映射表（短格式支持）
+        const BASE_URL = 'https://go.guimashan.org.tw';
+        const SCHEDULE_PATHS = {
+            // 未來可以添加排班相關頁面
+            // 'view': `${BASE_URL}/liff/schedule/view.html`,
+            // 'manage': `${BASE_URL}/liff/schedule/manage.html`,
+        };
+        
+        // 🎯 優先檢查 liff.state 參數，如果有則直接導航
+        const urlParams = new URLSearchParams(window.location.search);
+        const liffState = urlParams.get('liff.state');
+        
+        if (liffState) {
+            console.log('檢測到 liff.state 參數:', liffState);
+            
+            // 移除開頭的 /
+            const cleanState = liffState.startsWith('/') ? liffState.substring(1) : liffState;
+            
+            // 檢查是否是短格式
+            if (SCHEDULE_PATHS[cleanState]) {
+                const targetUrl = SCHEDULE_PATHS[cleanState];
+                console.log('短格式，導航到:', targetUrl);
+                window.location.replace(targetUrl);
+            } else if (cleanState.startsWith('liff/schedule/')) {
+                // 檢查是否是完整路徑
+                const targetUrl = `${BASE_URL}/${cleanState}`;
+                console.log('完整路徑格式，導航到:', targetUrl);
+                window.location.replace(targetUrl);
+            } else {
+                console.log('無法識別的 liff.state 格式，顯示主頁面');
+            }
+        }
 
         window.closeWindow = closeLiffWindow;
 

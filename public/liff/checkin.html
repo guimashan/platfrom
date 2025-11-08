@@ -249,6 +249,46 @@
     <script>
         const LIFF_ID = '2008269293-nYBm3JmV';
         
+        // 🎯 簽到頁面映射表（短格式支持）
+        const BASE_URL = 'https://go.guimashan.org.tw';
+        const CHECKIN_PATHS = {
+            'dashboard': `${BASE_URL}/liff/checkin/dashboard.html`,
+            'record': `${BASE_URL}/liff/checkin/record.html`,
+            'patrol': `${BASE_URL}/liff/checkin/patrol.html`,
+            'user': `${BASE_URL}/liff/checkin/user.html`
+        };
+        
+        // 🎯 優先檢查 liff.state 參數，如果有則直接導航
+        (function checkLiffState() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const liffState = urlParams.get('liff.state');
+            
+            if (liffState) {
+                console.log('檢測到 liff.state 參數:', liffState);
+                
+                // 移除開頭的 /
+                const cleanState = liffState.startsWith('/') ? liffState.substring(1) : liffState;
+                
+                // 檢查是否是短格式（dashboard, record, patrol, user）
+                if (CHECKIN_PATHS[cleanState]) {
+                    const targetUrl = CHECKIN_PATHS[cleanState];
+                    console.log('短格式，導航到:', targetUrl);
+                    window.location.replace(targetUrl);
+                    return;
+                }
+                
+                // 檢查是否是完整路徑（/liff/checkin/dashboard.html）
+                if (cleanState.startsWith('liff/checkin/')) {
+                    const targetUrl = `${BASE_URL}/${cleanState}`;
+                    console.log('完整路徑格式，導航到:', targetUrl);
+                    window.location.replace(targetUrl);
+                    return;
+                }
+                
+                console.log('無法識別的 liff.state 格式，顯示主頁面');
+            }
+        })();
+        
         // Firebase 配置
         const firebaseConfig = {
             apiKey: "AIzaSyAcQJA7Tx0LnW8M51WM9bChvlAS_J7qcEw",
