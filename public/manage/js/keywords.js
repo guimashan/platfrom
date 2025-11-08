@@ -476,7 +476,16 @@ function showModalError(message) {
 
 // 批量更新 LIFF URL 格式
 async function batchUpdateUrls() {
-    if (!confirm('🔧 確定要批量更新所有關鍵詞的 LIFF URL 格式嗎？\n\n將會把舊格式：\nhttps://liff.line.me/ID/path\n\n轉換為新格式：\nhttps://liff.line.me/ID?liff.state=/path')) {
+    // 🔍 先診斷：顯示所有 URL
+    let diagnostic = '📊 當前數據庫中的 LIFF URL：\n\n';
+    for (const kw of allKeywords) {
+        if (kw.liffUrl) {
+            diagnostic += `• ${kw.keyword}: ${kw.liffUrl}\n`;
+        }
+    }
+    console.log(diagnostic);
+    
+    if (!confirm('🔧 確定要批量更新所有關鍵詞的 LIFF URL 格式嗎？\n\n將會修復錯誤格式：\n❌ https://liff.line.me/ID/liff/service\n✅ https://liff.line.me/ID\n\n點擊「確定」前，請查看瀏覽器控制台的診斷日誌')) {
         return;
     }
     
@@ -486,6 +495,7 @@ async function batchUpdateUrls() {
         
         for (const kw of allKeywords) {
             if (!kw.liffUrl) {
+                console.log(`⏭️ 跳過（無 URL）: ${kw.keyword}`);
                 skippedCount++;
                 continue;
             }
@@ -494,7 +504,7 @@ async function batchUpdateUrls() {
             const newUrl = convertLiffUrl(oldUrl);
             
             if (oldUrl !== newUrl) {
-                console.log(`更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
+                console.log(`🔧 更新 ${kw.keyword}: ${oldUrl} → ${newUrl}`);
                 // 必須傳遞完整的關鍵詞資料（包含所有欄位避免覆蓋）
                 await keywordService.updateKeyword(kw.id, {
                     keyword: kw.keyword,
@@ -512,12 +522,13 @@ async function batchUpdateUrls() {
                 }, currentUserId);
                 updatedCount++;
             } else {
+                console.log(`✅ 跳過（已正確）: ${kw.keyword} - ${oldUrl}`);
                 skippedCount++;
             }
         }
         
         await loadKeywords();
-        showSuccess(`✅ 批量更新完成！\n\n更新: ${updatedCount} 個\n跳過: ${skippedCount} 個`);
+        showSuccess(`✅ 批量更新完成！\n\n更新: ${updatedCount} 個\n跳過: ${skippedCount} 個\n\n詳細日誌請查看瀏覽器控制台（F12）`);
     } catch (error) {
         console.error('批量更新失敗:', error);
         showError('批量更新失敗: ' + error.message);
