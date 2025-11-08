@@ -190,7 +190,7 @@ const keywords = [
     {
         keyword: '簽到',
         aliases: ['奉香簽到', '奉香', '打卡'],
-        liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=checkin`,
+        liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin.html`,
         priority: 95,
         replyType: 'template',
         replyPayload: {
@@ -203,7 +203,7 @@ const keywords = [
     {
         keyword: '管理',
         aliases: ['簽到管理'],
-        liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=manage`,
+        liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/checkin/manage/index.html`,
         priority: 85,
         replyType: 'template',
         replyPayload: {
@@ -216,7 +216,7 @@ const keywords = [
     {
         keyword: '神務服務',
         aliases: ['神務', '服務', '法會'],
-        liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=?module=service`,
+        liffUrl: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service.html`,
         priority: 90,
         replyType: 'template',
         replyPayload: {
@@ -229,7 +229,7 @@ const keywords = [
     {
         keyword: '排班',
         aliases: ['排班系統', '班表', '志工'],
-        liffUrl: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=?module=schedule`,
+        liffUrl: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule.html`,
         priority: 90,
         replyType: 'template',
         replyPayload: {
