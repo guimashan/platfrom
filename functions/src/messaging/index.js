@@ -17,7 +17,7 @@ const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 // 關鍵詞快取（避免每次都查詢 Firestore）
 let keywordsCache = null;
 let keywordsCacheTime = 0;
-const CACHE_TTL = 60 * 1000; // 快取 60 秒
+const CACHE_TTL = 5 * 60 * 1000; // 快取 5 分鐘
 
 // LIFF App IDs（每個功能模組使用專屬 LIFF App）
 const LIFF_IDS = {
