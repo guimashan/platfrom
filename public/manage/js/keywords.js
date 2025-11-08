@@ -85,6 +85,9 @@ function initEventListeners() {
     // 新增按鈕
     document.getElementById('addKeywordBtn').addEventListener('click', showAddModal);
     
+    // 診斷按鈕
+    document.getElementById('diagnosticBtn').addEventListener('click', showDiagnostic);
+    
     // 批量更新 URL 按鈕
     document.getElementById('updateUrlsBtn').addEventListener('click', batchUpdateUrls);
     
@@ -474,9 +477,54 @@ function showModalError(message) {
     errorEl.style.display = 'block';
 }
 
+// 🔍 診斷功能：顯示所有 URL
+function showDiagnostic() {
+    let diagnostic = '📊 當前數據庫中的 LIFF URL：\n\n';
+    let urlList = [];
+    
+    for (const kw of allKeywords) {
+        if (kw.liffUrl) {
+            const line = `${kw.keyword}: ${kw.liffUrl}`;
+            diagnostic += `• ${line}\n`;
+            urlList.push(line);
+        }
+    }
+    
+    console.log(diagnostic);
+    
+    // 創建一個可複製的對話框
+    const textarea = document.createElement('textarea');
+    textarea.value = diagnostic;
+    textarea.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;max-width:800px;height:400px;padding:20px;font-family:monospace;font-size:14px;border:2px solid #667eea;border-radius:8px;background:white;z-index:10000;box-shadow:0 4px 20px rgba(0,0,0,0.3);';
+    
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✓ 關閉';
+    closeBtn.className = 'btn btn-primary';
+    closeBtn.style.cssText = 'position:fixed;top:calc(50% + 220px);left:50%;transform:translateX(-50%);z-index:10001;';
+    
+    closeBtn.onclick = () => {
+        document.body.removeChild(textarea);
+        document.body.removeChild(overlay);
+        document.body.removeChild(closeBtn);
+    };
+    
+    overlay.onclick = closeBtn.onclick;
+    
+    document.body.appendChild(overlay);
+    document.body.appendChild(textarea);
+    document.body.appendChild(closeBtn);
+    
+    textarea.select();
+    
+    showSuccess('✅ 診斷結果已顯示！您可以直接選取並複製文字');
+}
+
 // 批量更新 LIFF URL 格式
 async function batchUpdateUrls() {
-    // 🔍 先診斷：顯示所有 URL
+    // 🔍 先在控制台輸出診斷
     let diagnostic = '📊 當前數據庫中的 LIFF URL：\n\n';
     for (const kw of allKeywords) {
         if (kw.liffUrl) {
