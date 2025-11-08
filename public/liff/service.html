@@ -100,12 +100,14 @@
                     
                     // 檢查是否為有效的服務代碼
                     if (SERVICE_PATHS[serviceCode]) {
-                        console.log('自動導航到:', serviceCode);
-                        window.location.href = SERVICE_PATHS[serviceCode];
+                        console.log('自動導航到:', SERVICE_PATHS[serviceCode]);
+                        // 使用 replace 而非 href，避免 LIFF 環境中的 URL 拼接問題
+                        window.location.replace(SERVICE_PATHS[serviceCode]);
                         return;
                     } else if (serviceCode === 'donation' || serviceCode === 'ft' || serviceCode === 'BG' || serviceCode === 'XY' || serviceCode === 'FTC' || serviceCode === 'FTP' || serviceCode === 'FTY') {
                         // 特殊頁面處理（使用完整 URL）
-                        window.location.href = `${BASE_URL}/liff/service/${serviceCode}.html`;
+                        console.log('自動導航到:', `${BASE_URL}/liff/service/${serviceCode}.html`);
+                        window.location.replace(`${BASE_URL}/liff/service/${serviceCode}.html`);
                         return;
                     } else {
                         console.warn('未知的服務代碼:', serviceCode);
@@ -150,7 +152,7 @@
 
             // 綁定返回按鈕
             document.getElementById('backBtn').addEventListener('click', () => {
-                window.location.href = `${BASE_URL}/liff/index.html`;
+                window.location.replace(`${BASE_URL}/liff/index.html`);
             });
         }
 
@@ -158,7 +160,7 @@
             const path = SERVICE_PATHS[service];
             if (path) {
                 console.log('導航到服務:', service, path);
-                window.location.href = path;
+                window.location.replace(path);
             } else {
                 alert('服務路徑未配置');
             }
