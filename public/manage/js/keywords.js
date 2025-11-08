@@ -528,20 +528,18 @@ async function batchUpdateUrls() {
 function convertLiffUrl(url) {
     if (!url) return url;
     
-    // 如果已經是正確的簡短格式，直接返回
-    if (/^https:\/\/liff\.line\.me\/[^?]+$/.test(url)) {
-        return url;
+    // ❌ 錯誤格式1：https://liff.line.me/ID/liff/service （主頁面錯誤帶了路徑）
+    // ❌ 錯誤格式2：https://liff.line.me/ID/liff/checkin.html （主頁面錯誤帶了路徑）
+    const wrongMainPagePattern = /https:\/\/liff\.line\.me\/([^/]+)\/liff\/(service|checkin|schedule)(\.html)?$/;
+    if (wrongMainPagePattern.test(url)) {
+        const match = url.match(/https:\/\/liff\.line\.me\/([^/]+)\//);
+        console.log(`🔧 修復主頁面 URL: ${url} → https://liff.line.me/${match[1]}`);
+        return `https://liff.line.me/${match[1]}`;
     }
     
-    // 移除錯誤的 liff.state 參數
-    const match = url.match(/https:\/\/liff\.line\.me\/([^?]+)(\?liff\.state=(.+))?/);
-    
-    if (match) {
-        const liffId = match[1];
-        // 只返回基礎 URL，不需要 liff.state
-        return `https://liff.line.me/${liffId}`;
-    }
-    
+    // ✅ 正確格式1：https://liff.line.me/ID （主頁面）
+    // ✅ 正確格式2：https://liff.line.me/ID?liff.state=/DD （子頁面）
+    // 這些格式不需要轉換，直接返回
     return url;
 }
 
@@ -592,10 +590,10 @@ function convertPathToLiffUrl() {
     let liffUrl;
     let explanation;
     
-    // 如果是主頁面（checkin.html, service.html, schedule.html），不需要 liff.state
+    // 🎯 主頁面邏輯：直接使用 LIFF ID，不帶任何路徑
     if (path === '/liff/checkin.html' || path === '/liff/service.html' || path === '/liff/schedule.html') {
         liffUrl = `https://liff.line.me/${LIFF_ID}`;
-        explanation = '📋 這是主頁面，不需要 liff.state 參數';
+        explanation = '📋 這是主頁面，直接使用 LIFF ID（LIFF Endpoint URL 已配置在 LINE Developers Console）';
     } else {
         // 子頁面需要 liff.state 參數來路由
         // 例如 /liff/service/DD.html → liff.state=/DD
