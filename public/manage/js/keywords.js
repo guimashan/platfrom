@@ -688,20 +688,24 @@ function convertPathToLiffUrl() {
         let statePath;
         
         if (path.startsWith('/liff/service/')) {
-            // 提取服務代碼，例如 /liff/service/DD.html → /DD
+            // 🎯 神務服務：提取服務代碼，使用短格式
+            // 例如 /liff/service/DD.html → /DD
             const fileName = path.split('/').pop().replace('.html', '');
             statePath = `/${fileName}`;
         } else if (path.startsWith('/liff/checkin/')) {
-            // 簽到子頁面：保持完整路徑
-            // 例如 /liff/checkin/dashboard.html → liff.state=/liff/checkin/dashboard.html
-            statePath = path;
+            // 🎯 簽到子頁面：使用短格式（與 checkin.html 映射表一致）
+            // 例如 /liff/checkin/dashboard.html → /dashboard
+            const fileName = path.split('/').pop().replace('.html', '');
+            statePath = `/${fileName}`;
         } else if (path.startsWith('/checkin/manage/')) {
             // 簽到管理頁面（非 LIFF）：保持完整路徑
             // 例如 /checkin/manage/index.html → liff.state=/checkin/manage/index.html
             statePath = path;
         } else if (path.startsWith('/liff/schedule/')) {
-            // 排班子頁面：保持完整路徑
-            statePath = path;
+            // 🎯 排班子頁面：使用短格式（與 schedule.html 映射表一致）
+            // 例如 /liff/schedule/view.html → /view
+            const fileName = path.split('/').pop().replace('.html', '');
+            statePath = `/${fileName}`;
         } else {
             // 其他情況，使用完整路徑
             statePath = path;
