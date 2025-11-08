@@ -123,10 +123,20 @@
                     return;
                 }
 
+                // 設置初始化超時（10 秒）
+                const timeoutId = setTimeout(() => {
+                    console.warn('LIFF 初始化超時，嘗試顯示內容');
+                    showContent();
+                }, 10000);
+
                 // 使用共用的 LIFF 初始化模組
                 const liffData = await initLiff(LIFF_ID);
                 
+                clearTimeout(timeoutId);
+                
                 if (!liffData) {
+                    console.warn('LIFF 初始化返回 null，但仍顯示內容');
+                    showContent();
                     return;
                 }
 
@@ -143,7 +153,16 @@
 
             } catch (error) {
                 console.error('初始化失敗:', error);
-                alert('系統初始化失敗，請稍後再試');
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('mainContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                        <h3 style="margin-bottom: 10px;">初始化失敗</h3>
+                        <p style="color: #666; margin-bottom: 20px;">請重新整理頁面或稍後再試</p>
+                        <button onclick="location.reload()" class="btn btn-primary">重新整理</button>
+                    </div>
+                `;
+                document.getElementById('mainContent').style.display = 'block';
             }
         }
 
