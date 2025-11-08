@@ -563,8 +563,30 @@ function convertPathToLiffUrl() {
         path = '/' + path;
     }
     
-    // LIFF ID（固定值）
-    const LIFF_ID = '2008269293-Nl2pZBpV';
+    // 🎯 智能 LIFF ID 分類：根據路徑自動選擇對應的 LIFF App
+    const LIFF_ID_MAP = {
+        '/liff/checkin': '2008269293-nYBm3JmV',  // 奉香簽到
+        '/liff/schedule': '2008269293-N0wnqknr', // 排班系統
+        '/liff/service': '2008269293-Nl2pZBpV'   // 神務服務
+    };
+    
+    // 判斷路徑屬於哪個模組
+    let LIFF_ID = null;
+    let moduleName = '';
+    
+    for (const [prefix, liffId] of Object.entries(LIFF_ID_MAP)) {
+        if (path.startsWith(prefix)) {
+            LIFF_ID = liffId;
+            moduleName = prefix.split('/').pop(); // 提取模組名稱
+            break;
+        }
+    }
+    
+    // 如果無法自動判斷，提示用戶
+    if (!LIFF_ID) {
+        alert(`⚠️ 無法自動判斷 LIFF ID！\n\n請確認路徑格式：\n• /liff/checkin/xxx.html（奉香簽到）\n• /liff/schedule/xxx.html（排班系統）\n• /liff/service/xxx.html（神務服務）\n\n您輸入的路徑：${path}`);
+        return;
+    }
     
     // 生成完整 LIFF URL
     const liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${path}`;
@@ -575,8 +597,15 @@ function convertPathToLiffUrl() {
     // 清空路徑輸入框
     pathInput.value = '';
     
+    // 模組名稱對照表
+    const moduleNameMap = {
+        'checkin': '奉香簽到',
+        'schedule': '排班系統',
+        'service': '神務服務'
+    };
+    
     // 顯示成功提示
-    showSuccess(`✅ 轉換成功！\n\n已生成 LIFF URL：\n${liffUrl}`);
+    showSuccess(`✅ 轉換成功！\n\n模組：${moduleNameMap[moduleName]}\nLIFF ID：${LIFF_ID}\n\n已生成 LIFF URL：\n${liffUrl}`);
 }
 
 // 初始化
