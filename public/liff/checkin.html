@@ -253,9 +253,13 @@
         const BASE_URL = 'https://go.guimashan.org.tw';
         const CHECKIN_PATHS = {
             'dashboard': `${BASE_URL}/liff/checkin/dashboard.html`,
+            'DM': `${BASE_URL}/liff/checkin/dashboard.html`, // 短代碼：Dashboard Management
             'record': `${BASE_URL}/liff/checkin/record.html`,
+            'RD': `${BASE_URL}/liff/checkin/record.html`, // 短代碼：Record
             'patrol': `${BASE_URL}/liff/checkin/patrol.html`,
-            'user': `${BASE_URL}/liff/checkin/user.html`
+            'PT': `${BASE_URL}/liff/checkin/patrol.html`, // 短代碼：Patrol
+            'user': `${BASE_URL}/liff/checkin/user.html`,
+            'US': `${BASE_URL}/liff/checkin/user.html` // 短代碼：User
         };
         
         // 🎯 優先檢查 liff.state 參數，如果有則直接導航
