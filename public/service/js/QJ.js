@@ -324,26 +324,6 @@ function createApplicantCard(name = '家人/親友', canRemove = true) {
                     <span>女</span>
                 </label>
             </div>
-
-            <div class="form-group">
-                <label for="time-${cardId}" style="display: block; margin-bottom: 8px;">時辰</label>
-                <select id="time-${cardId}" class="input-field" style="width: 100%; height: 55px; font-size: 1rem;">
-                    <option value="">請選擇時辰</option>
-                    <option value="吉時">吉時</option>
-                    <option value="子時">子時 (23:00-01:00)</option>
-                    <option value="丑時">丑時 (01:00-03:00)</option>
-                    <option value="寅時">寅時 (03:00-05:00)</option>
-                    <option value="卯時">卯時 (05:00-07:00)</option>
-                    <option value="辰時">辰時 (07:00-09:00)</option>
-                    <option value="巳時">巳時 (09:00-11:00)</option>
-                    <option value="午時">午時 (11:00-13:00)</option>
-                    <option value="未時">未時 (13:00-15:00)</option>
-                    <option value="申時">申時 (15:00-17:00)</option>
-                    <option value="酉時">酉時 (17:00-19:00)</option>
-                    <option value="戌時">戌時 (19:00-21:00)</option>
-                    <option value="亥時">亥時 (21:00-23:00)</option>
-                </select>
-            </div>
             
             <div class="card-actions">
                 ${canRemove ? `<button class="remove-btn" data-card-id="${cardId}">移除此人</button>` : ''}
@@ -552,13 +532,11 @@ async function handleSubmit() {
         cards.forEach(card => {
             // 獲取性別（單選按鈕）
             const genderRadio = card.querySelector('input[name^="gender-"]:checked');
-            const timeSelect = card.querySelector('select[id^="time-"]');
             
             const cardData = {
                 applicantName: card.querySelector('.card-input-name').value.trim(),
                 bazi: {
                     gender: genderRadio ? genderRadio.value : '',
-                    time: timeSelect ? timeSelect.value : '',
                 },
                 serviceItem: '文昌帝君拱斗'
             };
