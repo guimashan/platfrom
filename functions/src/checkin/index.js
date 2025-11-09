@@ -407,7 +407,7 @@ exports.verifyCheckinV2 = onRequest(
             .collection('settings')
             .doc('system')
             .get();
-        const testMode = settingsDoc.exists ? settingsDoc.data().testMode : false;
+        const testMode = settingsDoc.exists ? (settingsDoc.data().testMode || false) : false;
 
         // QR Code 模式
         if (checkinMode === 'qr') {
@@ -465,7 +465,7 @@ exports.verifyCheckinV2 = onRequest(
             distance: distance,
             timestamp: admin.firestore.FieldValue.serverTimestamp(),
             mode: 'gps',
-            testMode: testMode || patrolData.skipDistanceCheck,
+            testMode: Boolean(testMode || patrolData.skipDistanceCheck),
             patrolTestMode: patrolData.skipDistanceCheck || false,
           };
 
@@ -484,7 +484,7 @@ exports.verifyCheckinV2 = onRequest(
             mode: 'gps',
             distanceMeters: distance,
             patrolId: patrolId,
-            testMode: testMode || patrolData.skipDistanceCheck,
+            testMode: Boolean(testMode || patrolData.skipDistanceCheck),
           });
         } else {
           logger.warn('GPS 簽到失敗 - 超出範圍', {
