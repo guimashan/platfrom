@@ -10,6 +10,7 @@ const serviceFunctions = require('./src/service');
 const adminFunctions = require('./src/admin/migrate-keywords');
 const migrateAllKeywordsFunctions = require('./src/admin/migrate-all-keywords');
 const fixLiffUrlsFunctions = require('./src/admin/fix-liff-urls');
+const rebuildFunctions = require('./src/admin/rebuild');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -42,3 +43,4 @@ exports.confirmPayment = serviceFunctions.confirmPayment;
 exports.migrateKeywords = adminFunctions.migrateKeywords;
 exports.migrateAllKeywords = migrateAllKeywordsFunctions.migrateAllKeywords;
 exports.fixLiffUrls = fixLiffUrlsFunctions.fixLiffUrls;
+exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
