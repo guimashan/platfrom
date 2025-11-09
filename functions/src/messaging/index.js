@@ -217,7 +217,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '開始簽到',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin/index.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/checkin/index.html`,
           },
         ],
       },
@@ -236,7 +236,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin/manage/dashboard.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/checkin/manage/dashboard.html`,
           },
         ],
       },
@@ -261,7 +261,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '立即點燈',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/DD.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/DD.html`,
           },
         ],
       },
@@ -283,7 +283,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ND.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/ND.html`,
           },
         ],
       },
@@ -304,7 +304,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/LD.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/LD.html`,
           },
         ],
       },
@@ -326,7 +326,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ZY.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/ZY.html`,
           },
         ],
       },
@@ -347,7 +347,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/PS.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/PS.html`,
           },
         ],
       },
@@ -367,7 +367,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要報名',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/QJ.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/QJ.html`,
           },
         ],
       },
@@ -388,7 +388,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要奉獻',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/BG.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/BG.html`,
           },
         ],
       },
@@ -408,7 +408,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '我要奉獻',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/XY.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/XY.html`,
           },
         ],
       },
@@ -428,7 +428,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '了解詳情',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/ft.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/ft.html`,
           },
         ],
       },
@@ -448,7 +448,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入服務',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/index.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/index.html`,
           },
         ],
       },
@@ -467,7 +467,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/manage/index.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/service/manage/index.html`,
           },
         ],
       },
@@ -488,7 +488,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/manage/dashboard.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/schedule/manage/dashboard.html`,
           },
         ],
       },
@@ -508,7 +508,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '查看本週',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/week.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/schedule/week.html`,
           },
         ],
       },
@@ -528,7 +528,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '查看本月',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/month.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/schedule/month.html`,
           },
         ],
       },
@@ -548,7 +548,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '查看班表',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/roste.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/schedule/roste.html`,
           },
         ],
       },
@@ -568,7 +568,7 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入排班',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/schedule.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/schedule/schedule.html`,
           },
         ],
       },
@@ -586,7 +586,7 @@ async function handleTextMessage(text) {
         {
           type: 'uri',
           label: '開啟平台',
-          uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/index.html`,
+          uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/index.html`,
         },
       ],
     },
