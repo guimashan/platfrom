@@ -202,11 +202,54 @@ async function handleTextMessage(text) {
 
   // === 硬編碼關鍵詞（作為後備）===
   
-  // 龜馬山一點靈（較長關鍵字優先）
+  // === Step 2: Checkin (checkin-76c77) 簽到相關 ===
+  
+  // 1. 奉香簽到
+  if (text === '奉香簽到' || text === '奉香' || text === '打卡簽到') {
+    return {
+      type: 'template',
+      altText: '開啟奉香簽到',
+      template: {
+        type: 'buttons',
+        text: '🙏 奉香簽到系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '開始簽到',
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin/index.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 2. 簽到管理
+  if (text === '簽到管理' || text === '奉香管理' || text === '1111') {
+    return {
+      type: 'template',
+      altText: '開啟簽到管理',
+      template: {
+        type: 'buttons',
+        text: '📊 簽到管理系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入管理',
+            uri: `https://liff.line.me/${LIFF_IDS.checkin}?liff.state=/liff/checkin/manage/dashboard.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // === Step 3: Service (service-b9d4a) 神務相關 ===
+  
+  // 1. 龜馬山一點靈
   if (text.includes('龜馬山一點靈') || text.includes('線上點燈') || 
       text.includes('安太歲') || text.includes('元辰燈') || 
       text.includes('文昌燈') || text.includes('財利燈') || 
-      text.includes('光明燈') || text.includes('點燈')) {
+      text.includes('光明燈') || text.includes('點燈') ||
+      text === 'dd' || text === 'DD') {
     return {
       type: 'template',
       altText: '龜馬山一點靈',
@@ -224,10 +267,11 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 年斗法會
+  // 2. 年斗法會
   if (text.includes('年斗法會') || text.includes('闔家年斗') || 
       text.includes('元辰年斗') || text.includes('紫微年斗') || 
-      text.includes('事業年斗') || text.includes('年斗')) {
+      text.includes('事業年斗') || text.includes('年斗') ||
+      text === 'nd' || text === 'ND') {
     return {
       type: 'template',
       altText: '年斗法會',
@@ -245,9 +289,10 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 禮斗法會
+  // 3. 禮斗法會
   if (text.includes('禮斗法會') || text.includes('闔家斗') || 
-      text.includes('元辰斗') || text.includes('事業斗') || text.includes('禮斗')) {
+      text.includes('元辰斗') || text.includes('事業斗') || text.includes('禮斗') ||
+      text === 'ld' || text === 'LD') {
     return {
       type: 'template',
       altText: '禮斗法會',
@@ -265,10 +310,11 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 中元法會
+  // 4. 中元法會
   if (text.includes('中元法會') || text.includes('中元') || text.includes('普渡') || 
       text.includes('超拔') || text.includes('歷代祖先') || text.includes('祖先') || 
-      text.includes('冤親債主') || text.includes('嬰靈') || text.includes('地基主')) {
+      text.includes('冤親債主') || text.includes('嬰靈') || text.includes('地基主') ||
+      text === 'zy' || text === 'ZY') {
     return {
       type: 'template',
       altText: '中元法會',
@@ -286,9 +332,10 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 普施法會
+  // 5. 普施法會
   if (text.includes('普施大法會') || text.includes('普施') || 
-      text.includes('普桌') || text.includes('白米') || text.includes('隨喜功德')) {
+      text.includes('普桌') || text.includes('白米') || text.includes('隨喜功德') ||
+      text === 'ps' || text === 'PS') {
     return {
       type: 'template',
       altText: '普施法會',
@@ -306,8 +353,9 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 秋祭法會
-  if (text.includes('秋祭法會') || text.includes('文昌帝君拱斗')) {
+  // 6. 秋祭法會
+  if (text.includes('秋祭法會') || text.includes('秋祭') || text.includes('文昌帝君拱斗') ||
+      text === 'qj' || text === 'QJ') {
     return {
       type: 'template',
       altText: '秋祭法會',
@@ -325,9 +373,10 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 建宮廟款
+  // 7. 建宮廟款
   if (text.includes('建宮廟款') || text.includes('青石板') || 
-      text.includes('鋼筋') || text.includes('水泥') || text.includes('琉璃瓦')) {
+      text.includes('鋼筋') || text.includes('水泥') || text.includes('琉璃瓦') ||
+      text === 'bg' || text === 'BG') {
     return {
       type: 'template',
       altText: '建宮廟款',
@@ -345,8 +394,9 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 添香油
-  if (text.includes('添香油')) {
+  // 8. 添香油
+  if (text.includes('添香油') || text.includes('香油') ||
+      text === 'xy' || text === 'XY') {
     return {
       type: 'template',
       altText: '添香油',
@@ -364,8 +414,9 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 福田會
-  if (text.includes('福田會')) {
+  // 9. 福田會
+  if (text.includes('福田會') || text.includes('福田') ||
+      text === 'ft' || text === 'FT') {
     return {
       type: 'template',
       altText: '福田會入會',
@@ -383,67 +434,9 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 奉獻（入口頁）
-  if (text.includes('奉獻')) {
-    return {
-      type: 'template',
-      altText: '信眾奉獻',
-      template: {
-        type: 'buttons',
-        text: '💰 信眾奉獻',
-        actions: [
-          {
-            type: 'uri',
-            label: '選擇奉獻項目',
-            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/donation.html`,
-          },
-        ],
-      },
-    };
-  }
-
-  // === 平台功能 ===
-
-  // 奉香簽到（精確匹配關鍵詞）
-  if (text === '奉香簽到' || text === '奉香' || text === '簽到' || text === '打卡') {
-    return {
-      type: 'template',
-      altText: '開啟奉香簽到',
-      template: {
-        type: 'buttons',
-        text: '🙏 奉香簽到系統',
-        actions: [
-          {
-            type: 'uri',
-            label: '開始簽到',
-            uri: `https://liff.line.me/${LIFF_IDS.checkin}`,
-          },
-        ],
-      },
-    };
-  }
-
-  // 簽到管理
-  if (text === '簽到管理' || text === '管理') {
-    return {
-      type: 'template',
-      altText: '開啟簽到管理',
-      template: {
-        type: 'buttons',
-        text: '📊 簽到管理系統',
-        actions: [
-          {
-            type: 'uri',
-            label: '進入管理',
-            uri: 'https://go.guimashan.org.tw/checkin/manage/index.html',
-          },
-        ],
-      },
-    };
-  }
-
-  // 神務服務（精確匹配關鍵詞）
-  if (text === '神務服務' || text === '神務' || text === '服務' || text === '法會') {
+  // 10. 神務服務
+  if (text === '神務服務' || text === '神務' || 
+      text === 'se' || text === 'SE') {
     return {
       type: 'template',
       altText: '開啟神務服務',
@@ -454,26 +447,127 @@ async function handleTextMessage(text) {
           {
             type: 'uri',
             label: '進入服務',
-            uri: `https://liff.line.me/${LIFF_IDS.service}`,
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/index.html`,
           },
         ],
       },
     };
   }
 
-  // 排班系統（精確匹配關鍵詞）
-  if (text === '排班系統' || text === '排班' || text === '班表' || text === '志工') {
+  // 11. 神務管理
+  if (text === '神務管理' || text === '2222') {
     return {
       type: 'template',
-      altText: '開啟排班系統',
+      altText: '開啟神務管理',
       template: {
         type: 'buttons',
-        text: '📅 排班系統',
+        text: '⚙️ 神務管理系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入管理',
+            uri: `https://liff.line.me/${LIFF_IDS.service}?liff.state=/liff/service/manage/index.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // === Step 4: Schedule (schedule-48ff9) 排班相關（還沒有開發）===
+  
+  // 1. 志工排班
+  if (text.includes('志工排班') || text.includes('工作人員') || text.includes('排班') ||
+      text === 'sc' || text === 'SC' || text === 'ss') {
+    return {
+      type: 'template',
+      altText: '志工排班',
+      template: {
+        type: 'buttons',
+        text: '👥 志工排班系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入排班',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/schedule.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 2. 班表
+  if (text.includes('組班表') || text === '班表' ||
+      text === 'ro' || text === 'RO') {
+    return {
+      type: 'template',
+      altText: '班表',
+      template: {
+        type: 'buttons',
+        text: '📋 班表系統',
         actions: [
           {
             type: 'uri',
             label: '查看班表',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule.html`,
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/roste.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 3. 本週班表
+  if (text.includes('本週班表') || text.includes('週班表') ||
+      text === 'we' || text === 'WE') {
+    return {
+      type: 'template',
+      altText: '本週班表',
+      template: {
+        type: 'buttons',
+        text: '📅 本週班表',
+        actions: [
+          {
+            type: 'uri',
+            label: '查看本週',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/week.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 4. 本月班表
+  if (text.includes('本月班表') || text.includes('月班表') ||
+      text === 'mo' || text === 'MO') {
+    return {
+      type: 'template',
+      altText: '本月班表',
+      template: {
+        type: 'buttons',
+        text: '📆 本月班表',
+        actions: [
+          {
+            type: 'uri',
+            label: '查看本月',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/month.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 5. 排班管理
+  if (text === '排班管理' || text === '3333') {
+    return {
+      type: 'template',
+      altText: '開啟排班管理',
+      template: {
+        type: 'buttons',
+        text: '⚙️ 排班管理系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入管理',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/manage/dashboard.html`,
           },
         ],
       },
