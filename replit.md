@@ -1,6 +1,129 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-08 完成 LINE Bot LIFF URL 完整修復（全面性檢查與修復）
+**最近更新**: 2025-11-09 完成雙保險關鍵字管理系統（方案 A：硬編碼 + Firestore 動態系統）
+
+## 重要實現記錄 (2025-11-09) - 雙保險關鍵字管理系統
+
+### 專案目標
+建立「龜馬山整合服務平台」雙保險關鍵字管理架構：
+- **動態系統（優先）**：Firestore 關鍵字資料庫，透過網站後台 /manage/keywords.html 管理，5分鐘快取
+- **硬編碼（後備）**：functions/src/messaging/index.js 內建 18 個關鍵字，保障系統穩定性
+
+### 完整實施流程
+
+#### 步驟 1：重新編寫硬編碼（18 個關鍵字）
+- ✅ **Step 2 (Checkin - 2 個關鍵字)**：
+  - 奉香簽到（DD/dd）、簽到管理（1111）
+- ✅ **Step 3 (Service - 11 個關鍵字)**：
+  - 線上點燈（DD/dd）、年斗法會（ND/nd）、禮斗法會（LD/ld）、秋祭法會（QJ/qj）
+  - 中元法會（ZY/zy）、普施法會（PS/ps）、建宮廟款（BG/bg）、添香油（XY/xy）
+  - 福田會（FT/ft）、奉獻（ON/on）、神務管理（2222）
+- ✅ **Step 4 (Schedule - 5 個關鍵字)**：
+  - 排班管理（3333）、本週班表（WE/we）、本月班表（MO/mo）、班表（RO/ro）、志工排班（SC/ss）
+
+#### 步驟 2：部署到正式環境
+- ✅ Firebase Functions 成功部署（platform-bc783）
+- ✅ lineWebhook Function 更新完成
+
+#### 步驟 3：清空 Firestore 舊資料
+- ✅ 刪除 lineKeywordMappings collection 中的 12 筆舊資料
+
+#### 步驟 4：批量寫入 Firestore（18 個關鍵字）
+- ✅ 建立批量寫入腳本：functions/src/admin/migrate-all-keywords.js
+- ✅ 成功寫入 18 個關鍵字：
+  - Step 2 (Checkin): 2 個
+  - Step 3 (Service): 11 個
+  - Step 4 (Schedule): 5 個
+
+#### 步驟 5：修復關鍵順序問題
+- ✅ **問題診斷**：Step 4 硬編碼中「志工排班」使用 `includes('排班')`，會錯誤攔截「排班管理」或 3333
+- ✅ **修復方案**：重新排序 Step 4，將「排班管理」移到「志工排班」之前
+- ✅ **Architect 審查通過**：Pass - 雙保險架構完全一致，所有 18 個關鍵字路由正確
+
+### 技術架構
+
+**雙保險邏輯順序**（messaging/index.js）：
+```javascript
+// Line 165: 動態關鍵詞比對（Firestore 優先）
+const keywordDoc = await getKeywordMapping(text);
+if (keywordDoc) {
+  return keywordDoc.replyPayload;
+}
+
+// Line 203: 硬編碼關鍵詞（後備保險）
+// Step 2, 3, 4 總計 18 個關鍵字...
+```
+
+**關鍵字資料結構**：
+```javascript
+{
+  keyword: '排班管理',          // 主關鍵字
+  aliases: ['3333'],           // 別名陣列
+  category: 'schedule',        // 類別
+  module: 'schedule',          // 模組
+  step: 4,                     // 步驟
+  priority: 1,                 // 優先級（排序用）
+  liffUrl: 'https://liff.line.me/...',
+  replyPayload: { /* LINE 回覆格式 */ }
+}
+```
+
+**同步機制**：
+- 網站後台 /manage/keywords.html → Firestore（即時同步）
+- Firestore → LINE Bot（5分鐘快取）
+- 硬編碼 → 後備保險（Firestore 找不到時觸發）
+
+### 完整關鍵字列表（18 個）
+
+| 步驟 | 關鍵字 | 別名 | 模組 | LIFF URL |
+|------|--------|------|------|----------|
+| **Step 2: Checkin** |
+| 2.1 | 奉香簽到 | DD, dd | checkin | /liff/checkin/index.html |
+| 2.2 | 簽到管理 | 1111 | checkin | /liff/checkin/manage/index.html |
+| **Step 3: Service** |
+| 3.1 | 線上點燈 | DD, dd | service | /liff/service/DD.html |
+| 3.2 | 年斗法會 | ND, nd | service | /liff/service/ND.html |
+| 3.3 | 禮斗法會 | LD, ld | service | /liff/service/LD.html |
+| 3.4 | 秋祭法會 | QJ, qj | service | /liff/service/QJ.html |
+| 3.5 | 中元法會 | ZY, zy | service | /liff/service/ZY.html |
+| 3.6 | 普施法會 | PS, ps | service | /liff/service/PS.html |
+| 3.7 | 建宮廟款 | BG, bg | service | /liff/service/BG.html |
+| 3.8 | 添香油 | XY, xy | service | /liff/service/XY.html |
+| 3.9 | 福田會 | FT, ft | service | /liff/service/FTP.html |
+| 3.10 | 奉獻 | ON, on | service | /liff/service/ON.html |
+| 3.11 | 神務管理 | 2222 | service | /liff/service/manage/index.html |
+| **Step 4: Schedule** |
+| 4.1 | 排班管理 | 3333 | schedule | /liff/schedule/manage/dashboard.html |
+| 4.2 | 本週班表 | WE, we | schedule | /liff/schedule/week.html |
+| 4.3 | 本月班表 | MO, mo | schedule | /liff/schedule/month.html |
+| 4.4 | 班表 | RO, ro | schedule | /liff/schedule/roste.html |
+| 4.5 | 志工排班 | SC, ss | schedule | /liff/schedule/schedule.html |
+
+### 部署狀態
+- ✅ Cloud Functions 已部署（2025-11-09）
+- ✅ lineWebhook Function 成功更新
+- ✅ Firestore 關鍵字資料庫已建立（18 個關鍵字）
+- ✅ 網站後台管理介面已就緒（/manage/keywords.html）
+- ✅ Architect 審查通過：雙保險架構完全一致
+
+### 檔案更新
+- functions/src/messaging/index.js（重新編寫硬編碼 + 修復排序）
+- functions/src/admin/migrate-all-keywords.js（批量寫入腳本）
+- functions/src/admin/clear-keywords.js（清空腳本）
+- functions/index.js（導出新函數）
+
+### 已知問題
+- ⚠️ **安全性警告**：LINE webhook 簽名驗證仍被禁用（待修復 rawBody 處理問題）
+
+### 測試指引
+等待 5 分鐘讓快取過期，然後從 LINE App 測試：
+1. 輸入「排班管理」或「3333」→ 應打開排班管理頁面（不會被志工排班攔截）
+2. 輸入「簽到管理」或「1111」→ 應打開簽到管理頁面
+3. 輸入「神務管理」或「2222」→ 應打開神務管理頁面
+4. 從網站後台 /manage/keywords.html 新增/修改/刪除關鍵字 → 應即時同步到 Firestore
+5. 等待 5 分鐘 → LINE Bot 應使用新的關鍵字設定
+
+---
 
 ## 重要修復記錄 (2025-11-08) - 完整版
 
