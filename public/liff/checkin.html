@@ -479,7 +479,8 @@
                     
                     setTimeout(() => closeLiffWindow(), 2000);
                 } else {
-                    status.innerHTML = `<p style="color: #ef4444;">❌ ${result.message}</p>`;
+                    const errorMsg = result.message || result.code || '簽到失敗，請稍後再試';
+                    status.innerHTML = `<p style="color: #ef4444;">❌ ${errorMsg}</p>`;
                 }
                 
             } catch (error) {
