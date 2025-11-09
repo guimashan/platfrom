@@ -111,18 +111,13 @@ function matchKeyword(text, keyword) {
     return true;
   }
   
-  // 檢查別名
+  // 檢查別名（精確匹配）
   if (keyword.aliases && keyword.aliases.length > 0) {
     for (const alias of keyword.aliases) {
       if (normalizedText === normalizeText(alias)) {
         return true;
       }
     }
-  }
-  
-  // 部分匹配（包含）
-  if (normalizedText.includes(normalizedKeyword)) {
-    return true;
   }
   
   return false;
