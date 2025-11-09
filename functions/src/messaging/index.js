@@ -617,9 +617,16 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
 
     // 驗證 LINE webhook 簽名（使用 rawBody）
     try {
+      // 確認 channelSecret 存在
+      if (!channelSecret) {
+        logger.error('Channel Secret 未設定');
+        res.status(500).send('Internal Server Error: Missing channel secret');
+        return;
+      }
+
       const body = req.rawBody.toString('utf-8');
       const hash = crypto
-          .createHmac('sha256', channelSecret.value())
+          .createHmac('sha256', channelSecret)
           .update(body)
           .digest('base64');
 
