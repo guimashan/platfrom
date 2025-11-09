@@ -123,8 +123,20 @@ if (keywordDoc) {
 - ✅ **Architect 審查通過**：簽名驗證邏輯正確，不會影響現有功能
 - ✅ **部署完成**：lineWebhook Function 已更新（2025-11-09）
 
+#### 步驟 7：修復 Firebase Secret Manager 同步問題（2025-11-09）
+- ✅ **問題診斷**：LINE Webhook 驗證持續失敗（401 Unauthorized）
+- ✅ **根本原因**：Firebase Secret Manager 中的 `LINE_MESSAGING_CHANNEL_SECRET` 仍是舊值 `2008221557`（Channel ID），並非正確的 Channel Secret
+- ✅ **修復方案**：
+  - 使用 `printf "%s" "$SECRET" | firebase functions:secrets:set --force --data-file -` 強制更新
+  - Channel Secret 更新為 version 4（正確值：32 字元十六進位碼）
+  - Access Token 同步更新為 version 4
+  - Firebase 自動重新部署 lineWebhook Function 使用新 secrets
+- ✅ **驗證成功**：LINE Developers Console Webhook 驗證通過（HTTP 200 OK）
+
 ### 安全狀態
 - ✅ **LINE webhook 簽名驗證已啟用**：保護系統免受偽造請求攻擊
+- ✅ **Firebase Secrets 已正確設定**：Channel Secret 和 Access Token 已同步（version 4）
+- ✅ **Webhook URL 已驗證**：https://linewebhook-4yprhpbawa-df.a.run.app（HTTP 200 OK）
 
 ### 測試指引
 等待 5 分鐘讓快取過期，然後從 LINE App 測試：
