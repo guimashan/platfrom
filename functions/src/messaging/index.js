@@ -9,6 +9,7 @@ const {logger} = require('firebase-functions');
 const line = require('@line/bot-sdk');
 const express = require('express');
 const admin = require('firebase-admin');
+const crypto = require('crypto');
 
 // LINE Messaging API 憑證 (需要在 Firebase Console 設定)
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
@@ -614,10 +615,28 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       return;
     }
 
-    // ⚠️ 臨時禁用簽名驗證以確認功能正常
-    // TODO: 修復 rawBody 問題後重新啟用簽名驗證
-    // 問題：Firebase Functions v2 的 CORS middleware 將 rawBody 轉換為 object
-    logger.info('⚠️ 簽名驗證已暫時禁用 - 用於測試功能');
+    // 驗證 LINE webhook 簽名（使用 rawBody）
+    try {
+      const body = req.rawBody.toString('utf-8');
+      const hash = crypto
+          .createHmac('sha256', channelSecret.value())
+          .update(body)
+          .digest('base64');
+
+      if (hash !== signature) {
+        logger.error('簽名驗證失敗');
+        logger.error('Expected:', hash);
+        logger.error('Received:', signature);
+        res.status(401).send('Unauthorized: Invalid signature');
+        return;
+      }
+
+      logger.info('✅ 簽名驗證成功');
+    } catch (error) {
+      logger.error('簽名驗證過程發生錯誤:', error);
+      res.status(500).send('Internal Server Error: Signature verification failed');
+      return;
+    }
 
     // 處理事件
     const events = req.body.events || [];
