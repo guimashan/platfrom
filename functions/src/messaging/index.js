@@ -475,47 +475,26 @@ async function handleTextMessage(text) {
 
   // === Step 4: Schedule (schedule-48ff9) 排班相關（還沒有開發）===
   
-  // 1. 志工排班
-  if (text.includes('志工排班') || text.includes('工作人員') || text.includes('排班') ||
-      text === 'sc' || text === 'SC' || text === 'ss') {
+  // 1. 排班管理（優先匹配，避免被「排班」攔截）
+  if (text === '排班管理' || text === '3333') {
     return {
       type: 'template',
-      altText: '志工排班',
+      altText: '開啟排班管理',
       template: {
         type: 'buttons',
-        text: '👥 志工排班系統',
+        text: '⚙️ 排班管理系統',
         actions: [
           {
             type: 'uri',
-            label: '進入排班',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/schedule.html`,
+            label: '進入管理',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/manage/dashboard.html`,
           },
         ],
       },
     };
   }
 
-  // 2. 班表
-  if (text.includes('組班表') || text === '班表' ||
-      text === 'ro' || text === 'RO') {
-    return {
-      type: 'template',
-      altText: '班表',
-      template: {
-        type: 'buttons',
-        text: '📋 班表系統',
-        actions: [
-          {
-            type: 'uri',
-            label: '查看班表',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/roste.html`,
-          },
-        ],
-      },
-    };
-  }
-
-  // 3. 本週班表
+  // 2. 本週班表
   if (text.includes('本週班表') || text.includes('週班表') ||
       text === 'we' || text === 'WE') {
     return {
@@ -535,7 +514,7 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 4. 本月班表
+  // 3. 本月班表
   if (text.includes('本月班表') || text.includes('月班表') ||
       text === 'mo' || text === 'MO') {
     return {
@@ -555,19 +534,40 @@ async function handleTextMessage(text) {
     };
   }
 
-  // 5. 排班管理
-  if (text === '排班管理' || text === '3333') {
+  // 4. 班表
+  if (text.includes('組班表') || text === '班表' ||
+      text === 'ro' || text === 'RO') {
     return {
       type: 'template',
-      altText: '開啟排班管理',
+      altText: '班表',
       template: {
         type: 'buttons',
-        text: '⚙️ 排班管理系統',
+        text: '📋 班表系統',
         actions: [
           {
             type: 'uri',
-            label: '進入管理',
-            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/manage/dashboard.html`,
+            label: '查看班表',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/roste.html`,
+          },
+        ],
+      },
+    };
+  }
+
+  // 5. 志工排班（最後匹配，避免攔截其他關鍵字）
+  if (text.includes('志工排班') || text.includes('工作人員') || text.includes('排班') ||
+      text === 'sc' || text === 'SC' || text === 'ss') {
+    return {
+      type: 'template',
+      altText: '志工排班',
+      template: {
+        type: 'buttons',
+        text: '👥 志工排班系統',
+        actions: [
+          {
+            type: 'uri',
+            label: '進入排班',
+            uri: `https://liff.line.me/${LIFF_IDS.schedule}?liff.state=/liff/schedule/schedule.html`,
           },
         ],
       },
