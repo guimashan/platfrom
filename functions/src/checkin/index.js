@@ -500,6 +500,7 @@ exports.verifyCheckinV2 = onRequest(
             mode: 'gps',
             distanceMeters: distance,
             allowedMeters: tolerance,
+            message: `超出簽到範圍（距離: ${distance.toFixed(1)}m，允許: ${tolerance}m）`,
           });
         }
       } catch (error) {
