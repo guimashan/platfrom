@@ -112,8 +112,19 @@ if (keywordDoc) {
 - functions/src/admin/clear-keywords.js（清空腳本）
 - functions/index.js（導出新函數）
 
-### 已知問題
-- ⚠️ **安全性警告**：LINE webhook 簽名驗證仍被禁用（待修復 rawBody 處理問題）
+#### 步驟 6：修復 LINE webhook 簽名驗證（2025-11-09）
+- ✅ **問題診斷**：簽名驗證被禁用，因為 rawBody 處理問題
+- ✅ **修復方案**：使用 Firebase Functions v2 自動提供的 `req.rawBody`
+- ✅ **實作細節**：
+  - 加入 crypto 模組計算 HMAC-SHA256
+  - 使用 `req.rawBody.toString('utf-8')` 取得原始請求內容
+  - 比對簽名，不符則回傳 401 Unauthorized
+  - 加入詳細的錯誤日誌和 channelSecret 存在性檢查
+- ✅ **Architect 審查通過**：簽名驗證邏輯正確，不會影響現有功能
+- ✅ **部署完成**：lineWebhook Function 已更新（2025-11-09）
+
+### 安全狀態
+- ✅ **LINE webhook 簽名驗證已啟用**：保護系統免受偽造請求攻擊
 
 ### 測試指引
 等待 5 分鐘讓快取過期，然後從 LINE App 測試：
