@@ -82,17 +82,18 @@
     </div>
 
     <script type="module">
-        import { platformAuth } from '/js/firebase-init.js';
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
-
-        // 檢查登入狀態
-        onAuthStateChanged(platformAuth, (user) => {
-            if (user) {
-                console.log('✅ 使用者已登入:', user.displayName);
-            } else {
-                console.log('ℹ️ 使用者未登入（訪客模式）');
-            }
-        });
+        // Firebase 延遲載入 - 只在需要時才載入
+        // 服務頁面允許訪客瀏覽，無需立即載入 Firebase
+        console.log('✅ 神務服務頁面已載入（訪客模式）');
+        
+        // 如果未來需要檢查登入狀態，可以延遲載入：
+        // async function checkLoginStatus() {
+        //     const firebaseInit = await import('/js/firebase-init.js');
+        //     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
+        //     onAuthStateChanged(firebaseInit.platformAuth, (user) => {
+        //         console.log(user ? '✅ 已登入' : 'ℹ️ 訪客模式');
+        //     });
+        // }
     </script>
 </body>
 </html>
