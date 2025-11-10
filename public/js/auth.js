@@ -195,8 +195,8 @@ function showModuleGrid(roles) {
 // 處理模組點擊
 function handleModuleClick(module) {
     const routes = {
-        'checkin': '/checkin/index.html',
-        'service': '/service/index.html',
+        'checkin': '/checkin/checkin.html',
+        'service': '/service/service.html',
         'schedule': '/schedule/index.html',
         'manage': '/manage/index.html'
     };

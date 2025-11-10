@@ -225,7 +225,7 @@ function handleCalendar() {
 }
 
 function handleClose() {
-    window.location.href = 'https://go.guimashan.org.tw/service/index.html';
+    window.location.href = 'https://go.guimashan.org.tw/service/service.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
