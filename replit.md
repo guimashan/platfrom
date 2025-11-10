@@ -1,6 +1,76 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 19:30 完成微服務架構清理與 LINE Bot 快取修復
+**最近更新**: 2025-11-10 20:00 移除所有 LIFF 程式碼，準備實作標準 LINE Login
+
+## 🧹 移除 LIFF 程式碼 (2025-11-10 20:00)
+
+**背景：**
+第三版系統採用 LINE LIFF 混合架構（16個共用 + 3個獨立 LIFF App），讓用戶在 LINE 內開啟表單。現階段移除所有 LIFF 程式碼，準備未來實作標準 LINE Login（非 LIFF）重新架構。
+
+**移除範圍：**
+
+### 1. 刪除核心模組
+- ❌ 刪除 `public/js/liff-init.js` (181行)
+  - 封裝了 LIFF 初始化、LINE 登入、Firebase Token 交換
+
+### 2. 清理成功頁面
+- ✅ `public/service/success.html` - 移除 LIFF SDK CDN 引用
+- ✅ `public/service/js/success.js` - 移除 initLiff()、liff.closeWindow() 等
+
+### 3. 清理簽到管理系統（4 個檔案）
+- ✅ `public/checkin/manage/js/user-manage.js` - 移除 LIFF 認證邏輯
+- ✅ `public/checkin/manage/js/record.js` - 移除 LIFF 認證邏輯
+- ✅ `public/checkin/manage/js/patrol-manage.js` - 移除 LIFF 認證邏輯
+- ✅ `public/checkin/manage/js/dashboard.js` - 移除 LIFF 認證邏輯
+
+**保留的內容：**
+- ✅ 所有 HTML 檔案結構
+- ✅ 所有 CSS 樣式
+- ✅ Firebase 初始化（`firebase-init.js`）
+- ✅ 非 LIFF 相關的業務邏輯（訂單顯示、列印、分享、行事曆等）
+- ✅ Firebase Auth 的 `onAuthStateChanged` 監聽器
+
+**影響說明：**
+
+### 管理頁面（4 個檔案）
+- ❌ **目前無法登入**：原本透過 LIFF 認證，現在需要替代方案
+- 🔄 **未來方案**：實作標準 LINE Login + Firebase Auth
+
+### 成功頁面（success.html/js）
+- ✅ **基本功能正常**：可顯示訂單、列印、分享、加入行事曆
+- ❌ **無法關閉視窗**：移除 liff.closeWindow()，改為導向首頁
+- 🔄 **未來方案**：實作標準網頁關閉按鈕或返回導航
+
+### LINE Bot 關鍵字流程
+- ❌ **目前會失效**：Firestore 中的 LIFF URLs 會導向空白頁面
+- 🔄 **未來方案**：
+  1. 實作標準 LINE Login 網頁
+  2. 更新 Firestore `lineKeywordMappings` 的 URL
+  3. 重新部署 `lineMessaging` 函數
+
+**下一步計畫：**
+
+### Phase 1: 實作標準 LINE Login 認證
+1. 在 LINE Developers Console 設定 Web App（取代 LIFF App）
+2. 實作 LINE Login 認證流程（使用 Authorization Code Flow）
+3. 更新 4 個管理頁面的登入邏輯
+4. 更新 Firebase Auth 整合
+
+### Phase 2: 更新成功頁面
+1. 實作標準網頁返回導航（取代 liff.closeWindow()）
+2. 優化用戶體驗（非 LINE 環境也能正常使用）
+
+### Phase 3: 更新 LINE Bot 流程
+1. 更新所有關鍵字 URL（從 LIFF URL 改為標準 HTTPS）
+2. 執行 `rebuildKeywords` 同步到 Firestore
+3. 重新部署 `lineMessaging` 函數
+
+**技術備註：**
+- 保留了所有網頁檔案，確保未來可以快速實作新的認證方案
+- Firebase Auth 的角色檢查邏輯（`onAuthStateChanged`）仍然存在
+- 所有業務邏輯（訂單處理、簽到記錄、統計等）都保持完整
+
+---
 
 ## ✅ 微服務架構清理與部署優化 (2025-11-10 19:30)
 
