@@ -1,6 +1,41 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 20:00 移除所有 LIFF 程式碼，準備實作標準 LINE Login
+**最近更新**: 2025-11-10 22:00 重新命名簽到頁面 index.html → checkin.html
+
+## 📝 檔案重新命名：簽到頁面 (2025-11-10 22:00)
+
+**變更內容：**
+- ✅ 檔案重新命名：`/checkin/index.html` → `/checkin/checkin.html`
+
+**已更新的引用（6 個檔案）：**
+
+### 前端網頁（4 個）
+1. ✅ `public/index.html` - 底部導航連結
+2. ✅ `public/service/index.html` - 底部導航連結
+3. ✅ `public/checkin/history.html` - 返回簽到連結
+4. ✅ `public/manage/keywords.html` - 路徑範例說明
+
+### JavaScript（1 個）
+5. ✅ `public/js/auth.js` - 路由配置 (`handleModuleClick`)
+
+### Cloud Functions（1 個）
+6. ✅ `functions/src/shared/keywords.js` - 「奉香簽到」關鍵字路徑定義
+
+**影響範圍：**
+- ✅ 所有內部導航連結已更新
+- ✅ LINE Bot 關鍵字定義已更新（`functions/src/shared/keywords.js`）
+- ⚠️ 需要重新部署 `lineMessaging` 函數或執行 `rebuildKeywords` 來更新 Firestore
+
+**下一步（可選）：**
+```bash
+# 重新部署 Platform functions 以更新 LINE Bot
+firebase deploy --project platform-bc783 --only functions:lineMessaging
+
+# 或執行 rebuildKeywords 更新 Firestore（如果函數可用）
+curl https://rebuildkeywords-4yprhpbawa-df.a.run.app
+```
+
+---
 
 ## 🧹 移除 LIFF 程式碼 (2025-11-10 20:00)
 

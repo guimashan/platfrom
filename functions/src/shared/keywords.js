@@ -20,7 +20,7 @@ const KEYWORDS = [
   {
     keyword: '奉香簽到',
     liffApp: 'checkin',
-    path: '/checkin/index.html',
+    path: '/checkin/checkin.html',
     replyPayload: {
       altText: '開啟奉香簽到',
       text: '🙏 奉香簽到系統',
