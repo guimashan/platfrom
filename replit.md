@@ -1,6 +1,89 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 22:00 重新命名簽到頁面 index.html → checkin.html
+**最近更新**: 2025-11-10 23:00 完全移除 LINE Bot 關鍵字系統和 LIFF URL
+
+## 🗑️ 完全移除 LINE Bot 關鍵字系統 (2025-11-10 23:00)
+
+**背景：**
+用戶要求徹底移除 LINE Bot 關鍵字自動回覆功能和所有 LIFF URL，簡化系統架構。
+
+**移除的功能：**
+1. ❌ LINE Bot 關鍵字匹配和自動回覆（包括 LIFF URL 按鈕）
+2. ❌ 關鍵字管理介面（keywords.html）
+3. ❌ LIFF 轉發器頁面（/liff/ 資料夾）
+4. ❌ Firestore 關鍵字查詢功能
+5. ❌ 關鍵字管理工具（rebuild, export）
+
+**刪除的檔案（9 個）：**
+- `public/liff/checkin.html` - LIFF 轉發器（簽到）
+- `public/liff/service.html` - LIFF 轉發器（神務）
+- `public/liff/schedule.html` - LIFF 轉發器（排班）
+- `public/manage/keywords.html` - 關鍵字管理介面
+- `public/manage/js/keywords.js` - 關鍵字管理邏輯
+- `functions/src/shared/keywords.js` - 關鍵字定義和 LIFF URL 配置
+- `functions/src/admin/rebuild.js` - 重建 Firestore 關鍵字
+- `functions/src/admin/export-keywords.js` - 匯出關鍵字程式碼
+
+**修改的檔案（3 個）：**
+
+### 1. functions/index.js
+- 移除 `rebuildKeywords`、`exportKeywordsToCode` 函數導出
+- 保留 `clearKeywords` 工具函數
+
+### 2. functions/src/messaging/index.js（完全重寫）
+**舊版（362 行）：**
+- 3 層查詢機制（Firestore → 硬編碼 → 預設訊息）
+- 21 個關鍵字定義
+- LIFF URL 生成邏輯
+- Firestore 快取（5 分鐘 TTL）
+
+**新版（145 行）：**
+```javascript
+// 簡單的靜態回覆
+function handleTextMessage(text) {
+  return {
+    type: 'text',
+    text: '🙏 感謝您聯繫龜馬山整合服務平台\n\n' +
+          '請直接瀏覽我們的網站：\n' +
+          'https://go.guimashan.org.tw\n\n' +
+          '或聯繫服務人員獲取協助。'
+  };
+}
+```
+
+### 3. public/index.html
+- 移除 liff.state 參數檢測和自動跳轉邏輯（22 行程式碼）
+
+### 4. public/manage/index.html
+- 移除「LINE Bot 關鍵詞管理」模組方塊
+
+**LINE Bot 新行為：**
+- ✅ **Webhook 仍然運作**：滿足 LINE 平台的傳遞檢查
+- ✅ **收到任何訊息**：回覆固定的網站連結訊息
+- ❌ **不再有關鍵字匹配**：所有訊息都收到相同的回覆
+- ❌ **不再有 LIFF URL 按鈕**：只有純文字訊息
+
+**Firestore 資料影響：**
+- ⚠️ `lineKeywordMappings` collection 已過時但未刪除
+- 💡 建議：可選擇性清理或保留作為歷史記錄
+
+**部署需求：**
+```bash
+# 重新部署 Platform functions（更新 webhook 行為）
+firebase deploy --project platform-bc783 --only functions:lineMessaging
+
+# 選擇性：清理 Firestore 關鍵字資料
+firebase deploy --project platform-bc783 --only functions:clearKeywords
+curl https://clearkeywords-xxx.cloudfunctions.net
+```
+
+**影響評估：**
+- ✅ **簡化系統架構**：移除複雜的關鍵字匹配和 LIFF 轉發邏輯
+- ✅ **降低維護成本**：不需要管理關鍵字和 LIFF App 配置
+- ⚠️ **用戶體驗變化**：LINE Bot 不再提供快捷服務按鈕，需引導用戶到網站
+- ⚠️ **現有用戶習慣**：習慣使用關鍵字的用戶需要重新適應
+
+---
 
 ## 📝 檔案重新命名：簽到頁面 (2025-11-10 22:00)
 

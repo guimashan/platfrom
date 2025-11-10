@@ -51,7 +51,10 @@ async function replyMessage(replyToken, messages, accessToken) {
     throw new Error('Failed to reply message');
   }
   
-  return await response.json();
+  // LINE API 成功回覆時返回空 body，所以只讀取 text
+  const responseText = await response.text();
+  logger.info('✅ LINE API 回應:', responseText || '(empty)');
+  return responseText ? JSON.parse(responseText) : {};
 }
 
 /**
@@ -85,8 +88,8 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       return;
     }
     
-    const bodyString = JSON.stringify(req.body);
-    if (!validateSignature(bodyString, signature, channelSecret)) {
+    // 使用 rawBody（Buffer）進行簽名驗證，這是 LINE 發送的原始 payload
+    if (!validateSignature(req.rawBody, signature, channelSecret)) {
       logger.error('❌ 簽名驗證失敗');
       res.status(403).send('Forbidden: Invalid signature');
       return;
