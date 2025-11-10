@@ -76,6 +76,25 @@
 - Firebase Auth 的角色檢查邏輯（`onAuthStateChanged`）仍然存在
 - 所有業務邏輯（訂單處理、簽到記錄、統計等）都保持完整
 
+**重要技術差異：LIFF vs 標準 LINE Login**
+
+本次移除的是 **LIFF（LINE Front-end Framework）**，保留了 **標準 LINE Login（OAuth 2.0）**：
+
+| 特性 | LIFF（已移除 ✅） | 標準 LINE Login（保留 ✅） |
+|------|-----------------|------------------------|
+| **SDK 依賴** | 需要 `https://static.line-scdn.net/liff/edge/2/sdk.js` | 不需要任何 SDK |
+| **API 調用** | `liff.init()`, `liff.login()`, `liff.getProfile()` | 標準 OAuth 2.0 URL redirect |
+| **運行環境** | 只能在 LINE App 內嵌 WebView | 任何瀏覽器（包括桌面、手機） |
+| **認證流程** | LIFF SDK 自動處理 | Authorization Code Flow（`/oauth2/v2.1/authorize`） |
+| **使用位置** | 之前在所有頁面 | 現在只在三個福田會表單（FTP, FTC, FTY） |
+
+**保留標準 LINE Login 的檔案：**
+- `public/service/js/FTP.js` - 使用 `handleLineLogin()` 函數
+- `public/service/js/FTC.js` - 使用 `handleLineLogin()` 函數
+- `public/service/js/FTY.js` - 使用 `handleLineLogin()` 函數
+
+這三個表單使用標準 OAuth 2.0 流程，不依賴 LIFF SDK，可以在任何環境中運行。
+
 ---
 
 ## ✅ 微服務架構清理與部署優化 (2025-11-10 19:30)
