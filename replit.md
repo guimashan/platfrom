@@ -1,6 +1,101 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 防摸魚 Cloud Functions 完成並部署，QR Code 自動更新與異常偵測功能上線
+**最近更新**: 2025-11-10 Dashboard 儀表板、User 管理頁面完成，CSS 統一整合完成，防摸魚 Cloud Functions 完成並部署
+
+## 🎉 簽到管理後台完成 (2025-11-10 20:30)
+
+### Dashboard 儀表板頁面 (A)
+**檔案**: `public/checkin/manage/dashboard.html`, `public/checkin/manage/js/dashboard.js`
+
+**功能特性**:
+- ✅ KPI 統計卡片：總簽到數、今日簽到、異常簽到、測試模式簽到
+- ✅ 趨勢圖表：使用 Chart.js 顯示簽到趨勢（7 天、30 天）
+- ✅ 異常警報列表：顯示最近的異常簽到記錄
+- ✅ 即時數據更新：自動刷新功能
+- ✅ 權限控制：僅 superadmin/admin_checkin 可訪問
+
+### User 角色權限管理頁面 (B)
+**檔案**: `public/checkin/manage/user.html`, `public/checkin/manage/js/user.js`
+
+**功能特性**:
+- ✅ 用戶列表顯示：頭像、姓名、Email、角色、最後登入時間
+- ✅ 角色編輯 Modal：superadmin、admin_checkin、poweruser_checkin
+- ✅ 操作日誌：記錄所有角色變更歷史
+- ✅ 嚴格權限控制：僅 superadmin 可訪問
+- ✅ 實時更新：角色變更後立即同步
+
+### User 管理 Cloud Functions (platform-bc783)
+**已部署的安全強化函數**:
+
+#### 1. listManageUsers
+- **URL**: https://asia-east2-platform-bc783.cloudfunctions.net/listManageUsers
+- **安全機制**:
+  - ✅ 雙重驗證：Auth custom claims + Firestore roles
+  - ✅ 僅 superadmin 可訪問
+  - ✅ 分頁游標支援（cursor 參數 + startAfter）
+  - ✅ 角色篩選功能（role 參數）
+
+#### 2. updateUserRoles
+- **URL**: https://asia-east2-platform-bc783.cloudfunctions.net/updateUserRoles
+- **安全機制**:
+  - ✅ 雙重驗證：Auth claims + Firestore roles（防止過期 token）
+  - ✅ Firestore Transaction 包裝（確保原子性）
+  - ✅ Transactional counter：system_metadata/superadmin_count
+  - ✅ 防止移除最後一個 superadmin
+  - ✅ 防止自我降級（superadmin 不能移除自己的角色）
+  - ✅ 操作日誌記錄（admin_logs 集合）
+  - ✅ 同步更新 Auth custom claims
+
+#### 3. getUserActivityLog
+- **URL**: https://asia-east2-platform-bc783.cloudfunctions.net/getUserActivityLog
+- **安全機制**:
+  - ✅ 雙重驗證：Auth claims + Firestore roles
+  - ✅ 僅 superadmin 可訪問
+  - ✅ 分頁游標支援（cursor 參數）
+  - ✅ 用戶篩選功能（targetUserId 參數）
+
+### CSS 統一整合完成
+**完成的工作**:
+- ✅ 將 manage.css (495行) 合併到 common.css (3001行)
+- ✅ 採用 `.theme-admin` 主題切換方案
+- ✅ 保留原有 class 名稱（manage-sidebar, kpi-grid 等）
+- ✅ 刪除 manage.css 檔案
+- ✅ 更新所有管理頁面 HTML 引用
+- ✅ 金色主題為預設，紫色漸層為管理後台專用
+
+**主題設計**:
+- 一般頁面：金色主題（預設）
+- 管理後台：紫色漸層主題（`<body class="theme-admin">`）
+
+### Firestore 索引配置
+**firestore.indexes.json 已添加**:
+
+1. **admin_logs 集合**:
+   - targetUserId ASC + timestamp DESC（複合索引）
+   - 支援按用戶篩選操作日誌
+
+2. **users 集合**:
+   - roles array-contains（陣列索引）
+   - createdAt DESC（排序索引）
+   - 支援角色篩選和創建時間排序
+
+### Architect 安全審查通過
+**審查結果**:
+- ✅ 所有安全機制符合要求
+- ✅ 雙重驗證（Auth claims + Firestore roles）正確實作
+- ✅ Transaction 包裝防止競爭條件
+- ✅ Superadmin count 計數器機制安全
+- ✅ Frontend 正確呼叫安全 API
+- ✅ 錯誤處理和用戶體驗流暢
+- ⚠️ 無安全問題發現
+
+### 待部署事項
+1. 部署 platform-bc783 User 管理 Cloud Functions
+2. 在 Firebase Console 應用 Firestore 索引
+3. 整合測試 Dashboard 和 User 管理功能
+4. 測試角色變更流程和並發更新
+
+---
 
 ## 🔐 防摸魚 Cloud Functions 完成 (2025-11-10 20:30)
 
