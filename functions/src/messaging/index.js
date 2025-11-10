@@ -15,17 +15,16 @@ const crypto = require('crypto');
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 
+// 導入共享的關鍵字定義（用於硬編碼後備）
+const { KEYWORDS, buildLiffUrl } = require('./shared/keywords');
+
 // 關鍵詞快取（避免每次都查詢 Firestore）
 let keywordsCache = null;
 let keywordsCacheTime = 0;
 const CACHE_TTL = 5 * 60 * 1000; // 快取 5 分鐘
 
-// LIFF App IDs（每個功能模組使用專屬 LIFF App）
-const LIFF_IDS = {
-  checkin: '2008269293-nYBm3JmV',  // 奉香簽到
-  service: '2008269293-Nl2pZBpV',  // 神務服務
-  schedule: '2008269293-N0wnqknr', // 排班系統
-};
+// 後備使用計數器（用於監控 Firestore 健康狀況）
+let fallbackUsageCount = 0;
 
 // LINE Bot SDK 簽名驗證方法已內建，不需要自己實作
 
@@ -196,16 +195,110 @@ async function handleTextMessage(text) {
     logger.error('處理動態關鍵詞時發生錯誤:', error);
   }
 
-  // === 硬編碼關鍵詞（作為後備）===
-  
-  // === Step 2: Checkin (checkin-76c77) 簽到相關 ===
-  
-  // 1. 奉香簽到
-  if (text === '奉香簽到' || text === '奉香' || text === '打卡簽到') {
-    return {
-      type: 'template',
-      altText: '開啟奉香簽到',
-      template: {
+  // === 硬編碼關鍵詞後備系統（使用共享模組）===
+  // 如果 Firestore 查詢失敗或沒有匹配，使用硬編碼後備
+  try {
+    for (const keyword of KEYWORDS) {
+      // 檢查主關鍵字
+      if (normalizeText(originalText) === normalizeText(keyword.keyword)) {
+        fallbackUsageCount++;
+        logger.warn(`使用後備關鍵字: ${keyword.keyword} (總計: ${fallbackUsageCount} 次)`);
+        
+        const liffUrl = buildLiffUrl(keyword);
+        return {
+          type: 'template',
+          altText: keyword.replyPayload.altText,
+          template: {
+            type: 'buttons',
+            text: keyword.replyPayload.text,
+            actions: [
+              {
+                type: 'uri',
+                label: keyword.replyPayload.label,
+                uri: liffUrl,
+              },
+            ],
+          },
+        };
+      }
+      
+      // 檢查別名
+      if (keyword.aliases && keyword.aliases.length > 0) {
+        for (const alias of keyword.aliases) {
+          if (normalizeText(originalText) === normalizeText(alias)) {
+            fallbackUsageCount++;
+            logger.warn(`使用後備別名: ${alias} -> ${keyword.keyword} (總計: ${fallbackUsageCount} 次)`);
+            
+            const liffUrl = buildLiffUrl(keyword);
+            return {
+              type: 'template',
+              altText: keyword.replyPayload.altText,
+              template: {
+                type: 'buttons',
+                text: keyword.replyPayload.text,
+                actions: [
+                  {
+                    type: 'uri',
+                    label: keyword.replyPayload.label,
+                    uri: liffUrl,
+                  },
+                ],
+              },
+            };
+          }
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('處理硬編碼後備時發生錯誤:', error);
+  }
+
+  // 預設回覆：顯示說明訊息
+  return {
+    type: 'text',
+    text: '🙏 歡迎使用龜馬山 goLine 平台\n\n' +
+          '請輸入關鍵字查詢服務，例如：\n' +
+          '• 點燈、年斗、禮斗、中元\n' +
+          '• 簽到、排班\n' +
+          '• 福田Young會、企業團體、信眾個人\n\n' +
+          '輸入「幫助」查看完整功能列表'
+  };
+}
+
+/**
+ * LINE Messaging API Webhook 處理器
+ */
+async function handleWebhook(req, res, channelSecret, accessToken) {
+  try {
+    logger.info('收到 Webhook 請求');
+
+    // 只接受 POST 請求
+    if (req.method !== 'POST') {
+      res.status(405).send('Method Not Allowed');
+      return;
+    }
+
+    // 獲取簽名
+    const signature = req.headers['x-line-signature'];
+
+    if (!signature) {
+      logger.error('缺少 x-line-signature header');
+      res.status(401).send('Unauthorized: Missing signature');
+      return;
+    }
+
+    // 驗證 LINE webhook 簽名（使用 rawBody）
+    try {
+      // 確認 channelSecret 存在
+      if (!channelSecret) {
+        logger.error('Channel Secret 未設定');
+        res.status(500).send('Internal Server Error: Missing channel secret');
+        return;
+      }
+
+      const body = req.rawBody.toString('utf-8');
+      const hash = crypto
+          .createHmac('sha256', channelSecret)
         type: 'buttons',
         text: '🙏 奉香簽到系統',
         actions: [

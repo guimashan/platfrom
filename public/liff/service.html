@@ -3,204 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>神務服務 - 龜馬山整合服務平台</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div>
-                <h1>神務服務</h1>
-                <p class="subtitle">選擇您需要的服務項目</p>
-            </div>
-            <button class="btn-logout" id="backBtn">返回</button>
-        </header>
-
-        <div id="loadingIndicator" class="loading">
-            <div class="spinner"></div>
-            <p>載入中...</p>
-        </div>
-
-        <main class="main-content" id="mainContent" style="display: none;">
-            <div class="module-grid active">
-                <div class="module-card" data-service="DD">
-                    <div class="module-icon">🕯️</div>
-                    <div class="module-title">龜馬山一點靈</div>
-                    <div class="module-desc">祈福點燈，光明祈願</div>
-                </div>
-                
-                <div class="module-card" data-service="ND">
-                    <div class="module-icon">🎊</div>
-                    <div class="module-title">年斗法會</div>
-                    <div class="module-desc">新春祈福，闔家平安</div>
-                </div>
-                
-                <div class="module-card" data-service="LD">
-                    <div class="module-icon">⭐</div>
-                    <div class="module-title">禮斗法會</div>
-                    <div class="module-desc">禮拜星斗，消災延壽</div>
-                </div>
-                
-                <div class="module-card" data-service="ZY">
-                    <div class="module-icon">🏮</div>
-                    <div class="module-title">中元法會</div>
-                    <div class="module-desc">普渡眾生，超薦先靈</div>
-                </div>
-                
-                <div class="module-card" data-service="PS">
-                    <div class="module-icon">🙏</div>
-                    <div class="module-title">普施法會</div>
-                    <div class="module-desc">慈悲布施，廣結善緣</div>
-                </div>
-                
-                <div class="module-card" data-service="QJ">
-                    <div class="module-icon">🍂</div>
-                    <div class="module-title">秋祭法會</div>
-                    <div class="module-desc">秋季祭典，感恩祈福</div>
-                </div>
-            </div>
-        </main>
+    <div style="text-align: center; padding: 2rem;">
+        <p>載入中...</p>
     </div>
 
-    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-    <script type="module">
-        import { initLiff } from '/js/liff-init.js';
-        import { platformAuth } from '/js/firebase-init.js';
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-
-        const LIFF_ID = '2008269293-Nl2pZBpV';
-
-        // 服務路徑映射（使用完整 URL，確保在 LINE App LIFF 環境中正確跳轉）
-        const BASE_URL = 'https://go.guimashan.org.tw';
-        const SERVICE_PATHS = {
-            DD: `${BASE_URL}/service/DD.html`,
-            ND: `${BASE_URL}/service/ND.html`,
-            LD: `${BASE_URL}/service/LD.html`,
-            ZY: `${BASE_URL}/service/ZY.html`,
-            PS: `${BASE_URL}/service/PS.html`,
-            QJ: `${BASE_URL}/service/QJ.html`
-        };
-
-        async function init() {
-            try {
-                // 🎯 優先檢查 liff.state 參數，如果有則直接導航（不需要等 LIFF 初始化）
-                const urlParams = new URLSearchParams(window.location.search);
-                const liffState = urlParams.get('liff.state');
-                
-                if (liffState) {
-                    console.log('檢測到 liff.state 參數:', liffState);
-                    
-                    // 🚫 防止錯誤格式：/liff/service 或 /liff/service.html（主頁面不應有 liff.state）
-                    if (liffState === '/liff/service' || liffState === '/liff/service.html' || liffState === 'liff/service') {
-                        console.warn('⚠️ 檢測到錯誤的主頁面 liff.state 參數，忽略並顯示主頁面');
-                        // 不導航，直接顯示主頁面
-                    } else {
-                        // 🎯 處理子頁面格式：
-                        // 1. 完整路徑格式：/service/DD.html
-                        // 2. 服務代碼格式：DD
-                        let targetUrl;
-                        
-                        // 移除開頭的 / 以便統一處理
-                        const cleanState = liffState.startsWith('/') ? liffState.substring(1) : liffState;
-                        
-                        if (cleanState.startsWith('service/')) {
-                            // 格式1：完整路徑 /service/DD.html
-                            targetUrl = `${BASE_URL}/${cleanState}`;
-                            console.log('完整路徑格式，導航到:', targetUrl);
-                        } else if (SERVICE_PATHS[cleanState]) {
-                            // 格式2：服務代碼（DD, ND, LD 等）
-                            targetUrl = SERVICE_PATHS[cleanState];
-                            console.log('服務代碼格式，導航到:', targetUrl);
-                        } else {
-                            // 其他服務代碼（donation, ft, BG, XY, FTC, FTP, FTY 等）
-                            targetUrl = `${BASE_URL}/service/${cleanState}.html`;
-                            console.log('其他服務格式，導航到:', targetUrl);
-                        }
-                        
-                        window.location.replace(targetUrl);
-                        return;
-                    }
-                }
-
-                // 設置初始化超時（10 秒）
-                const timeoutId = setTimeout(() => {
-                    console.warn('LIFF 初始化超時，嘗試顯示內容');
-                    showContent();
-                }, 10000);
-
-                // 使用共用的 LIFF 初始化模組
-                const liffData = await initLiff(LIFF_ID);
-                
-                clearTimeout(timeoutId);
-                
-                if (!liffData) {
-                    console.warn('LIFF 初始化返回 null，但仍顯示內容');
-                    showContent();
-                    return;
-                }
-
-                // 等待 Firebase 認證完成
-                onAuthStateChanged(platformAuth, async (user) => {
-                    if (user) {
-                        console.log('✅ Firebase 使用者已登入:', user.displayName);
-                        showContent();
-                    } else {
-                        console.log('ℹ️ 使用者未登入 Firebase，但可繼續使用');
-                        showContent();
-                    }
-                });
-
-            } catch (error) {
-                console.error('初始化失敗:', error);
-                document.getElementById('loadingIndicator').style.display = 'none';
-                document.getElementById('mainContent').innerHTML = `
-                    <div style="text-align: center; padding: 40px 20px;">
-                        <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
-                        <h3 style="margin-bottom: 10px;">初始化失敗</h3>
-                        <p style="color: #666; margin-bottom: 20px;">請重新整理頁面或稍後再試</p>
-                        <button onclick="location.reload()" class="btn btn-primary">重新整理</button>
-                    </div>
-                `;
-                document.getElementById('mainContent').style.display = 'block';
-            }
+    <script>
+        // 簡化的轉發器：解析 liff.state 參數並轉發到目標頁面
+        const urlParams = new URLSearchParams(window.location.search);
+        const liffState = urlParams.get('liff.state');
+        
+        if (liffState) {
+            // 移除開頭的 / 以便統一處理
+            const targetPath = liffState.startsWith('/') ? liffState : '/' + liffState;
+            const baseUrl = window.location.origin;
+            const targetUrl = baseUrl + targetPath;
+            
+            console.log('轉發到:', targetUrl);
+            window.location.replace(targetUrl);
+        } else {
+            // 沒有 liff.state 參數，顯示錯誤
+            document.body.innerHTML = '<div style="text-align: center; padding: 2rem;"><h2>❌ 缺少 liff.state 參數</h2><p>請透過 LINE Bot 關鍵字開啟此頁面</p></div>';
         }
-
-        function showContent() {
-            document.getElementById('loadingIndicator').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-
-            // 綁定服務卡片點擊事件
-            document.querySelectorAll('.module-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const service = card.dataset.service;
-                    navigateToService(service);
-                });
-            });
-
-            // 綁定返回按鈕
-            document.getElementById('backBtn').addEventListener('click', () => {
-                window.location.replace(`${BASE_URL}/liff/index.html`);
-            });
-        }
-
-        function navigateToService(service) {
-            const path = SERVICE_PATHS[service];
-            if (path) {
-                console.log('導航到服務:', service, path);
-                window.location.replace(path);
-            } else {
-                alert('服務路徑未配置');
-            }
-        }
-
-        // 初始化
-        init();
     </script>
 </body>
 </html>
