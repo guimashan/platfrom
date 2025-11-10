@@ -621,9 +621,11 @@ const LIFF_IDS = {
 ### Replit 配置 (.replit)
 
 **已安裝模組：**
-- `nodejs-20` - Node.js 20.x (主要開發語言)
-- `python-3.11` - Python 3.11 (輔助工具)
-- `postgresql-16` - PostgreSQL 16 (資料庫)
+- `nodejs-20` - Node.js 20.x (唯一使用的語言)
+
+**已移除的模組：**（2025-11-10 清理）
+- ~~`python-3.11`~~ - 未使用，已移除
+- ~~`postgresql-16`~~ - 未使用，已移除（專案使用 Firebase Firestore）
 
 **Workflow 配置：**
 - **前端伺服器**（frontend）
