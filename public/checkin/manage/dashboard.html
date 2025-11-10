@@ -21,51 +21,54 @@
     </div>
 
     <!-- 主要內容（預設隱藏） -->
-    <div id="mainApp" class="container" style="display: none;">
-        <header class="header">
-            <div class="header-content">
-                <h1>奉香簽到管理</h1>
-                <div class="header-actions">
-                    <button onclick="window.location.href='/'" class="btn-logout">回首頁</button>
-                    <button id="logoutBtn" class="btn-logout">登出</button>
+    <div id="mainApp" class="manage-layout" style="display: none;">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>🙏 奉香簽到管理</h1>
+                    <p>簽到儀表板 - 查看統計總覽</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
                 </div>
             </div>
         </header>
         
-        <nav class="sub-nav">
-            <div class="nav-content">
-                <a href="/checkin/manage/dashboard.html" class="nav-link active">儀表板</a>
-                <a href="/checkin/manage/record.html" class="nav-link">簽到記錄</a>
-                <a href="/checkin/manage/patrol.html" class="nav-link">巡邏點管理</a>
-                <a href="/checkin/manage/user.html" class="nav-link">用戶管理</a>
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/checkin/manage/dashboard.html" class="manage-subnav-link active">儀表板</a>
+                <a href="/checkin/manage/record.html" class="manage-subnav-link">簽到記錄</a>
+                <a href="/checkin/manage/patrol.html" class="manage-subnav-link">巡邏點管理</a>
+                <a href="/checkin/manage/user.html" class="manage-subnav-link">用戶管理</a>
             </div>
         </nav>
 
-        <main style="padding: 2rem;">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">今日簽到</div>
-                    <div class="stat-value" id="todayCount">-</div>
-                    <div class="stat-trend" id="todayTrend">載入中...</div>
+        <main class="manage-main">
+            <div class="manage-stats-grid">
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">今日簽到</div>
+                    <div class="manage-stat-value" id="todayCount">-</div>
+                    <div class="manage-stat-trend" id="todayTrend">載入中...</div>
                 </div>
-                <div class="stat-card green">
-                    <div class="stat-label">本週簽到</div>
-                    <div class="stat-value" id="weekCount">-</div>
-                    <div class="stat-trend" id="weekTrend">載入中...</div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">本週簽到</div>
+                    <div class="manage-stat-value" id="weekCount">-</div>
+                    <div class="manage-stat-trend" id="weekTrend">載入中...</div>
                 </div>
-                <div class="stat-card orange">
-                    <div class="stat-label">活躍用戶</div>
-                    <div class="stat-value" id="activeUsers">-</div>
-                    <div class="stat-trend">本週有簽到記錄</div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">活躍用戶</div>
+                    <div class="manage-stat-value" id="activeUsers">-</div>
+                    <div class="manage-stat-trend">本週有簽到記錄</div>
                 </div>
-                <div class="stat-card blue">
-                    <div class="stat-label">總簽到數</div>
-                    <div class="stat-value" id="totalCount">-</div>
-                    <div class="stat-trend">歷史累計</div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">總簽到數</div>
+                    <div class="manage-stat-value" id="totalCount">-</div>
+                    <div class="manage-stat-trend">歷史累計</div>
                 </div>
             </div>
 
-            <div class="manage-card" style="margin-top: 2rem; text-align: center;">
+            <div class="manage-card" style="text-align: center;">
                 <p style="color: #666; margin-bottom: 1rem;">查看詳細簽到記錄？</p>
                 <button onclick="window.location.href='/checkin/manage/record.html'" class="btn btn-primary" style="padding: 0.75rem 2rem;">前往簽到記錄</button>
             </div>

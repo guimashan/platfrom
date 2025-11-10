@@ -21,27 +21,30 @@
     </div>
 
     <!-- 主要內容（預設隱藏） -->
-    <div id="mainApp" class="container" style="display: none;">
-        <header class="header">
-            <div class="header-content">
-                <h1>奉香簽到管理</h1>
-                <div class="header-actions">
-                    <button onclick="window.location.href='/'" class="btn-logout">回首頁</button>
-                    <button id="logoutBtn" class="btn-logout">登出</button>
+    <div id="mainApp" class="manage-layout" style="display: none;">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>🙏 奉香簽到管理</h1>
+                    <p>用戶管理 - 管理使用者角色與權限</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
                 </div>
             </div>
         </header>
         
-        <nav class="sub-nav">
-            <div class="nav-content">
-                <a href="/checkin/manage/dashboard.html" class="nav-link">儀表板</a>
-                <a href="/checkin/manage/record.html" class="nav-link">簽到記錄</a>
-                <a href="/checkin/manage/patrol.html" class="nav-link">巡邏點管理</a>
-                <a href="/checkin/manage/user.html" class="nav-link active">用戶管理</a>
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/checkin/manage/dashboard.html" class="manage-subnav-link">儀表板</a>
+                <a href="/checkin/manage/record.html" class="manage-subnav-link">簽到記錄</a>
+                <a href="/checkin/manage/patrol.html" class="manage-subnav-link">巡邏點管理</a>
+                <a href="/checkin/manage/user.html" class="manage-subnav-link active">用戶管理</a>
             </div>
         </nav>
 
-        <main style="padding: 2rem;">
+        <main class="manage-main">
             <!-- 用戶列表 -->
             <div class="manage-card">
                 <div class="card-header">
