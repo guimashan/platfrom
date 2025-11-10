@@ -1,6 +1,40 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 17:56 恢復福田會表單文件（FTY/FTC/FTP）
+**最近更新**: 2025-11-10 18:15 修復所有關鍵字 404 問題（Firestore 資料錯誤）
+
+## ✅ 關鍵字路由問題修復 (2025-11-10 18:15)
+
+**問題現象：**
+- 用戶在 LINE 輸入任何關鍵字（如「龜馬山一點靈」、「年斗法會」等）都跳轉到 404 頁面
+- 所有共用 LIFF App 關鍵字都跳轉到通用首頁（/service/index.html），而不是專屬頁面
+
+**根本原因：**
+- ❌ **不是** firebase.json 或 vercel.json 的 rewrites 配置問題
+- ❌ **不是** DNS 或域名配置問題  
+- ✅ **是** Firestore `lineKeywordMappings` 集合中的資料錯誤
+  - LINE Bot 優先使用 Firestore 資料，而非硬編碼（keywords.js）
+  - Firestore 中的 `liffUrl` 欄位指向錯誤的頁面（如 `/service/index.html`）
+  - 覆蓋了硬編碼中正確的路徑（如 `/service/DD.html`）
+
+**修復方法：**
+執行 `rebuildKeywords` 工具重建 Firestore 資料：
+```bash
+curl https://rebuildkeywords-4yprhpbawa-df.a.run.app
+```
+
+**修復結果：**
+✅ 成功重建 19 個關鍵字，包括：
+- 龜馬山一點靈 → `https://liff.line.me/2008269293-Nl2pZBpV?liff.state=/service/DD.html`
+- 年斗法會 → `https://liff.line.me/2008269293-Nl2pZBpV?liff.state=/service/ND.html`
+- 禮斗法會 → `https://liff.line.me/2008269293-Nl2pZBpV?liff.state=/service/LD.html`
+- （其他 16 個關鍵字）
+
+**重要提醒：**
+- 三層同步機制中，**LINE Bot 優先使用 Firestore**，硬編碼只是後備
+- 如果網站後台修改關鍵字，需要執行 `rebuildKeywords` 同步到 Firestore
+- 硬編碼（keywords.js）需要手動導出並重新部署才會生效
+
+---
 
 ## ✅ 福田會表單文件恢復完成 (2025-11-10 17:56)
 
