@@ -9,6 +9,7 @@ const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
 const rebuildFunctions = require('./src/admin/rebuild');
 const clearFunctions = require('./src/admin/clear-keywords');
+const exportFunctions = require('./src/admin/export-keywords');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -40,3 +41,4 @@ exports.confirmPayment = serviceFunctions.confirmPayment;
 // 導出 Admin Functions (管理功能)
 exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
 exports.clearKeywords = clearFunctions.clearKeywords;
+exports.exportKeywordsToCode = exportFunctions.exportKeywordsToCode;
