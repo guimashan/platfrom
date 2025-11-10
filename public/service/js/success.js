@@ -18,32 +18,6 @@ const EVENT_SERVICES = ['nd', 'ld', 'qj', 'ps', 'zy'];
 
 let orderData = null;
 let serviceType = null;
-let isLiffEnv = false;
-
-async function initLiff() {
-    try {
-        const liffId = '2006582260-YBnDz9Xk';
-        await liff.init({ liffId });
-        
-        isLiffEnv = liff.isInClient();
-        
-        if (isLiffEnv) {
-            document.getElementById('liffCloseBtn').style.display = 'flex';
-            document.getElementById('closeBtn').style.display = 'none';
-        }
-        
-        if (!liff.isLoggedIn()) {
-            liff.login();
-            return;
-        }
-        
-        loadOrderData();
-    } catch (error) {
-        console.error('LIFF 初始化失敗:', error);
-        // 不是 LIFF 環境，關閉按鈕保持顯示（已在 HTML 中預設顯示）
-        loadOrderData();
-    }
-}
 
 function getUrlParams() {
     const params = new URLSearchParams(window.location.search);
@@ -251,11 +225,7 @@ function handleCalendar() {
 }
 
 function handleClose() {
-    if (isLiffEnv) {
-        liff.closeWindow();
-    } else {
-        window.location.href = 'https://go.guimashan.org.tw/service/index.html';
-    }
+    window.location.href = 'https://go.guimashan.org.tw/service/index.html';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -264,5 +234,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calendarBtn').addEventListener('click', handleCalendar);
     document.getElementById('liffCloseBtn').addEventListener('click', handleClose);
     
-    initLiff();
+    loadOrderData();
 });
