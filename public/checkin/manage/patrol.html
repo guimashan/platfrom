@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>巡邏點管理 - 簽到管理後台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/css/manage.css">
+    <style>
+        .patrol-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .patrol-card-item {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s;
+        }
+
+        .patrol-card-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .patrol-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .patrol-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 5px 0;
+        }
+
+        .patrol-coords {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+        }
+
+        .patrol-status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .patrol-status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .patrol-status-badge.inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .patrol-info {
+            margin: 15px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .patrol-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+        }
+
+        .patrol-info-label {
+            color: #666;
+        }
+
+        .patrol-info-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .patrol-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .close-btn {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: #000;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-help {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .qr-preview-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .qr-code-display {
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 登入提示畫面 -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">簽到管理後台</h2>
+            <p style="margin: 0; opacity: 0.9;">驗證權限中...</p>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div id="mainApp" class="manage-container" style="display: none;">
+        <!-- 側邊欄 -->
+        <aside class="manage-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/guimashan-logo.png" alt="龜馬山" class="sidebar-logo">
+                <h2 class="sidebar-title">簽到管理</h2>
+                <p class="sidebar-subtitle">龜馬山整合服務平台</p>
+            </div>
+            <nav id="manageSidebar" class="sidebar-nav">
+                <!-- 由 JS 動態生成 -->
+            </nav>
+        </aside>
+
+        <!-- 主內容區 -->
+        <main class="manage-main">
+            <!-- 頂部導航 -->
+            <header class="manage-header">
+                <div class="header-left">
+                    <h1>📍 巡邏點管理</h1>
+                    <p class="header-breadcrumb">
+                        <a href="/">首頁</a> / 
+                        <a href="/checkin/checkin.html">簽到</a> / 
+                        <span>巡邏點</span>
+                    </p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <p id="userName" class="user-name">載入中...</p>
+                        <p id="userRole" class="user-role">-</p>
+                    </div>
+                    <button id="logoutBtn" class="btn-manage btn-secondary btn-sm">登出</button>
+                </div>
+            </header>
+
+            <!-- 內容區域 -->
+            <div class="manage-content">
+                <!-- 操作區 -->
+                <div class="manage-card">
+                    <div class="card-header">
+                        <h3 class="card-title">巡邏點列表</h3>
+                        <div class="card-actions">
+                            <button id="addPatrolBtn" class="btn-manage btn-primary">➕ 新增巡邏點</button>
+                        </div>
+                    </div>
+
+                    <div id="patrolList" class="patrol-grid">
+                        <p style="text-align: center; color: #999; padding: 40px;">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/編輯巡邏點 Modal -->
+    <div id="patrolModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" class="modal-title">新增巡邏點</h2>
+                <span class="close-btn" onclick="closePatrolModal()">&times;</span>
+            </div>
+
+            <form id="patrolForm">
+                <input type="hidden" id="patrolId">
+
+                <div class="form-group">
+                    <label class="form-label">巡邏點名稱 *</label>
+                    <input type="text" id="patrolName" class="form-input" placeholder="例如：辦公室" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">GPS 座標 *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <input type="number" id="patrolLat" class="form-input" placeholder="緯度 (例如: 25.149038)" step="0.000001" required>
+                        <input type="number" id="patrolLng" class="form-input" placeholder="經度 (例如: 121.410853)" step="0.000001" required>
+                    </div>
+                    <p class="form-help">💡 提示：可使用 Google Maps 取得精確座標</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">容許範圍（公尺）</label>
+                    <input type="number" id="patrolTolerance" class="form-input" placeholder="預設 50 公尺" value="50" min="10" max="500">
+                    <p class="form-help">簽到時允許的 GPS 誤差範圍</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">驗證模式 *</label>
+                    <select id="patrolVerificationMode" class="form-select">
+                        <option value="gps">📍 僅 GPS 驗證</option>
+                        <option value="qr">📷 僅 QR Code 驗證</option>
+                        <option value="both">📍+📷 GPS + QR Code 雙重驗證</option>
+                    </select>
+                    <p class="form-help">🛡️ 雙重驗證可有效防止摸魚</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">最小簽到間隔（分鐘）</label>
+                    <input type="number" id="patrolMinInterval" class="form-input" placeholder="預設 5 分鐘" value="5" min="1" max="60">
+                    <p class="form-help">防止連續快速簽到</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">是否需要拍照</label>
+                    <select id="patrolRequirePhoto" class="form-select">
+                        <option value="false">不需要</option>
+                        <option value="true">需要拍照證明</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">狀態</label>
+                    <select id="patrolActive" class="form-select">
+                        <option value="true">✓ 啟用</option>
+                        <option value="false">✗ 停用</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">描述（選填）</label>
+                    <textarea id="patrolDescription" class="form-input" rows="3" placeholder="巡邏點說明..."></textarea>
+                </div>
+
+                <!-- QR Code 預覽 -->
+                <div id="qrPreviewSection" class="qr-preview-section" style="display: none;">
+                    <h4>QR Code 預覽</h4>
+                    <div id="qrCodeDisplay" class="qr-code-display"></div>
+                    <button type="button" id="downloadQRBtn" class="btn-manage btn-outline btn-sm">下載 QR Code</button>
+                    <button type="button" id="refreshQRBtn" class="btn-manage btn-warning btn-sm">🔄 更新 QR Code</button>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button type="submit" class="btn-manage btn-primary" style="flex: 1;">💾 儲存</button>
+                    <button type="button" class="btn-manage btn-secondary" onclick="closePatrolModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 全域訊息 -->
+    <div id="globalMessage" class="global-message"></div>
+
+    <!-- 載入中 -->
+    <div id="globalLoading" class="global-loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- QRCode.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <script type="module" src="/js/firebase-init.js"></script>
+    <script type="module" src="/checkin/manage/js/patrol.js"></script>
+</body>
+</html>

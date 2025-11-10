@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一覽表 - 簽到管理後台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/css/manage.css">
+</head>
+<body>
+    <!-- 登入提示畫面 -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">簽到管理後台</h2>
+            <p style="margin: 0; opacity: 0.9;">驗證權限中...</p>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div id="mainApp" class="manage-container" style="display: none;">
+        <!-- 側邊欄 -->
+        <aside class="manage-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/guimashan-logo.png" alt="龜馬山" class="sidebar-logo">
+                <h2 class="sidebar-title">簽到管理</h2>
+                <p class="sidebar-subtitle">龜馬山整合服務平台</p>
+            </div>
+            <nav id="manageSidebar" class="sidebar-nav">
+                <!-- 由 JS 動態生成 -->
+            </nav>
+        </aside>
+
+        <!-- 主內容區 -->
+        <main class="manage-main">
+            <!-- 頂部導航 -->
+            <header class="manage-header">
+                <div class="header-left">
+                    <h1>📊 一覽表</h1>
+                    <p class="header-breadcrumb">
+                        <a href="/">首頁</a> / 
+                        <a href="/checkin/checkin.html">簽到</a> / 
+                        <span>管理後台</span>
+                    </p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <p id="userName" class="user-name">載入中...</p>
+                        <p id="userRole" class="user-role">-</p>
+                    </div>
+                    <button id="logoutBtn" class="btn-manage btn-secondary btn-sm">登出</button>
+                </div>
+            </header>
+
+            <!-- 內容區域 -->
+            <div class="manage-content">
+                <!-- KPI 統計卡片 -->
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">📝</div>
+                        <div class="kpi-label">今日簽到數</div>
+                        <h3 id="todayCount" class="kpi-value">-</h3>
+                        <p class="kpi-change">與昨日相比</p>
+                    </div>
+                    
+                    <div class="kpi-card success">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-label">活躍用戶</div>
+                        <h3 id="activeUsers" class="kpi-value">-</h3>
+                        <p class="kpi-change">本週</p>
+                    </div>
+                    
+                    <div class="kpi-card warning">
+                        <div class="kpi-icon">⚠️</div>
+                        <div class="kpi-label">異常簽到</div>
+                        <h3 id="anomalyCount" class="kpi-value">-</h3>
+                        <p class="kpi-change">需要審核</p>
+                    </div>
+                    
+                    <div class="kpi-card info">
+                        <div class="kpi-icon">📍</div>
+                        <div class="kpi-label">巡邏點</div>
+                        <h3 id="patrolCount" class="kpi-value">-</h3>
+                        <p class="kpi-change">已啟用</p>
+                    </div>
+                </div>
+
+                <!-- 異常警報區 -->
+                <div id="anomalyAlerts" class="manage-card" style="display: none;">
+                    <div class="card-header">
+                        <h3 class="card-title">🚨 異常警報</h3>
+                        <div class="card-actions">
+                            <a href="/checkin/manage/record.html?filter=anomaly" class="btn-manage btn-outline btn-sm">查看全部</a>
+                        </div>
+                    </div>
+                    <div id="anomalyList">
+                        <!-- 異常列表由 JS 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 今日簽到動態 -->
+                <div class="manage-card">
+                    <div class="card-header">
+                        <h3 class="card-title">📋 今日簽到動態</h3>
+                        <div class="card-actions">
+                            <button id="refreshBtn" class="btn-manage btn-outline btn-sm">🔄 重新整理</button>
+                        </div>
+                    </div>
+                    <div id="recentCheckins">
+                        <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
+                    </div>
+                </div>
+
+                <!-- 巡邏點狀態 -->
+                <div class="manage-card">
+                    <div class="card-header">
+                        <h3 class="card-title">📍 巡邏點狀態</h3>
+                        <div class="card-actions">
+                            <a href="/checkin/manage/patrol.html" class="btn-manage btn-primary btn-sm">管理巡邏點</a>
+                        </div>
+                    </div>
+                    <div id="patrolStatus">
+                        <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 全域訊息 -->
+    <div id="globalMessage" class="global-message"></div>
+
+    <!-- 載入中 -->
+    <div id="globalLoading" class="global-loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script type="module" src="/js/firebase-init.js"></script>
+    <script type="module" src="/checkin/manage/js/dashboard.js"></script>
+</body>
+</html>
