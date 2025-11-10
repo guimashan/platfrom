@@ -44,7 +44,15 @@
 **修改的檔案：**
 - ✅ `public/service/js/success.js` - 移除 LIFF SDK，改為普通網頁
 - ✅ `public/service/ft.html` - 移除 LIFF URL，改為本地頁面連結（FTP/FTC/FTY.html）
-- ✅ `public/index.html` - 簡化 liff.state 參數處理
+- ✅ `public/index.html` - 移除 liff.state 參數清理程式碼（第 95-112 行）
+- ✅ `public/service/success.html` - 移除 LIFF SDK、關閉按鈕及所有相關 CSS
+
+**徹底清理詳情（2025-11-10 最終清理）：**
+1. `public/index.html` - 移除 18 行 liff.state 清理程式碼
+2. `public/service/success.html` - 移除：
+   - LIFF SDK CDN (`https://static.line-scdn.net/liff/edge/2/sdk.js`)
+   - LIFF 關閉按鈕 HTML (`<button class="liff-close-btn">`)
+   - 所有 `.liff-close-btn` CSS 樣式（4 處：主樣式 + 3 個 @media）
 
 **保留的檔案（使用 LINE Login OAuth）：**
 - ✅ `public/service/js/*.js` (DD, ND, LD, FTP, FTY, FTC 等) - 使用 Firebase Auth + LINE Login
