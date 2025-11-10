@@ -19,11 +19,6 @@ if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
   // Platform Functions - 用戶登入與權限管理
   exports.generateCustomToken = platformFunctions.generateCustomToken;
   exports.updateUserRole = platformFunctions.updateUserRole;
-  
-  // User 管理 Functions（僅 superadmin）
-  exports.listManageUsers = platformFunctions.listManageUsers;
-  exports.updateUserRoles = platformFunctions.updateUserRoles;
-  exports.getUserActivityLog = platformFunctions.getUserActivityLog;
 
   // LINE Messaging API Functions - LINE Bot Webhook
   exports.lineMessaging = messagingFunctions.lineMessaging;
@@ -42,8 +37,6 @@ if (!PROJECT_ID || PROJECT_ID === 'checkin-76c77') {
   exports.savePatrol = checkinFunctions.savePatrol;
   exports.deletePatrol = checkinFunctions.deletePatrol;
   exports.getDashboardStats = checkinFunctions.getDashboardStats;
-  exports.refreshPatrolQRCode = checkinFunctions.refreshPatrolQRCode;
-  exports.detectAnomalies = checkinFunctions.detectAnomalies;
 }
 
 // === Service 專案 (service-b9d4a) ===

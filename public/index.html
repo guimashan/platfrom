@@ -74,7 +74,7 @@
                     <span class="icon">🏠</span>
                     <span>首頁</span>
                 </a>
-                <a href="/checkin/checkin.html" class="bottom-nav-item">
+                <a href="/checkin/index.html" class="bottom-nav-item">
                     <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
                     <span>簽到</span>
                 </a>
@@ -92,5 +92,23 @@
 
     <script type="module" src="/js/firebase-init.js"></script>
     <script type="module" src="/js/auth.js"></script>
+    <script>
+        // URL 參數清理（移除 LINE 自動添加的參數）
+        (function() {
+            const queryString = decodeURIComponent(window.location.search);
+            if (queryString) {
+                console.log('首頁檢測到 query string:', queryString);
+                
+                // 清理 URL 中的 liff.state 參數（LINE 自動添加，已不使用）
+                if (queryString.includes('liff.state=')) {
+                    const cleaned = queryString.replace('?liff.state=', '');
+                    console.log('清理 liff.state 參數:', cleaned);
+                    
+                    // 移除參數，保持乾淨的首頁 URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }
+        })();
+    </script>
 </body>
 </html>
