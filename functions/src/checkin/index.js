@@ -6,6 +6,15 @@
 const {onCall, onRequest, HttpsError} = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
 const {logger} = require('firebase-functions/v2');
+const {
+  generateSecureToken,
+  generateQRPayload,
+  parseQRPayload,
+  shouldRefreshToken,
+} = require('./services/qr-generator');
+const {
+  detectCheckinAnomalies,
+} = require('./services/anomaly-detector');
 
 // 初始化 Firebase Admin (如果尚未初始化)
 if (admin.apps.length === 0) {
@@ -861,12 +870,26 @@ exports.savePatrol = onRequest(
         const decodedToken = await verifyPlatformToken(req, res);
         if (!decodedToken) return;
 
-        const {id, name, lat, lng, radius, qr, active, skipDistanceCheck} = req.body;
+        const {
+          id,
+          name,
+          lat,
+          lng,
+          radius,
+          qr,
+          active,
+          skipDistanceCheck,
+          verificationMode,
+          minInterval,
+          requirePhoto,
+          tolerance,
+          description,
+        } = req.body;
 
-        if (!name || lat === undefined || lng === undefined || !radius) {
+        if (!name || lat === undefined || lng === undefined) {
           res.status(400).json({
             ok: false,
-            message: 'Missing required fields: name, lat, lng, radius',
+            message: 'Missing required fields: name, lat, lng',
           });
           return;
         }
@@ -875,10 +898,15 @@ exports.savePatrol = onRequest(
           name,
           lat: parseFloat(lat),
           lng: parseFloat(lng),
-          radius: parseInt(radius),
+          radius: parseInt(radius) || 50,
           qr: qr || '',
           active: active !== false,
           skipDistanceCheck: skipDistanceCheck || false,
+          verificationMode: verificationMode || 'gps',
+          minInterval: parseInt(minInterval) || 5,
+          requirePhoto: requirePhoto || false,
+          tolerance: parseInt(tolerance) || 50,
+          description: description || '',
           updatedAt: admin.firestore.FieldValue.serverTimestamp(),
         };
 
@@ -1047,6 +1075,242 @@ exports.getDashboardStats = onRequest(
         res.status(500).json({
           ok: false,
           message: `獲取儀表板統計失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 更新巡邏點 QR Code (HTTP Endpoint)
+ * 防摸魚功能：定期或手動更新 QR Code 以防止偽造
+ */
+exports.refreshPatrolQRCode = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        const {patrolId} = req.body;
+
+        if (!patrolId) {
+          res.status(400).json({
+            ok: false,
+            message: 'Missing patrolId',
+          });
+          return;
+        }
+
+        // 取得巡邏點資料
+        const patrolRef = admin.firestore()
+            .collection('patrols')
+            .doc(patrolId);
+        const patrolDoc = await patrolRef.get();
+
+        if (!patrolDoc.exists) {
+          res.status(404).json({
+            ok: false,
+            message: '巡邏點不存在',
+          });
+          return;
+        }
+
+        const patrolData = patrolDoc.data();
+
+        // 檢查是否可以更新（避免過於頻繁）
+        const minRotationMinutes = patrolData.minQrRotationMinutes || 15;
+        if (!shouldRefreshToken(patrolData.qrTokenUpdatedAt, minRotationMinutes)) {
+          res.status(429).json({
+            ok: false,
+            message: `QR Code 更新過於頻繁，請至少間隔 ${minRotationMinutes} 分鐘`,
+          });
+          return;
+        }
+
+        // 生成新的 QR Token
+        const newToken = generateSecureToken();
+        const newQRCode = generateQRPayload(patrolId, newToken);
+        const newVersion = (patrolData.qrTokenVersion || 0) + 1;
+
+        // 更新巡邏點（使用 transaction 防止競爭條件）
+        await admin.firestore().runTransaction(async (transaction) => {
+          transaction.update(patrolRef, {
+            qr: newQRCode,
+            qrToken: newToken,
+            qrTokenVersion: newVersion,
+            qrTokenUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          });
+        });
+
+        logger.info('巡邏點 QR Code 已更新', {
+          userId: decodedToken.uid,
+          patrolId,
+          version: newVersion,
+        });
+
+        res.status(200).json({
+          ok: true,
+          qrCode: newQRCode,
+          version: newVersion,
+        });
+      } catch (error) {
+        logger.error('更新 QR Code 失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `更新 QR Code 失敗: ${error.message}`,
+        });
+      }
+    },
+);
+
+/**
+ * 批次異常偵測 (HTTP Endpoint)
+ * 防摸魚功能：分析最近的簽到記錄，標記異常行為
+ */
+exports.detectAnomalies = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
+      try {
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            ok: false,
+            message: 'Only POST method is allowed',
+          });
+          return;
+        }
+
+        const decodedToken = await verifyPlatformToken(req, res);
+        if (!decodedToken) return;
+
+        // 取得最近 X 小時的簽到記錄
+        const hoursAgo = parseInt(req.body.hoursAgo) || 24;
+        const cutoffTimeMs = Date.now() - (hoursAgo * 60 * 60 * 1000);
+        const cutoffTime = admin.firestore.Timestamp.fromMillis(cutoffTimeMs);
+
+        const checkinsSnapshot = await admin.firestore()
+            .collection('checkins')
+            .where('timestamp', '>=', cutoffTime)
+            .orderBy('timestamp', 'desc')
+            .get();
+
+        logger.info('開始批次異常偵測', {
+          hoursAgo,
+          totalRecords: checkinsSnapshot.size,
+        });
+
+        let anomalyCount = 0;
+        const batch = admin.firestore().batch();
+
+        // 按用戶分組檢測
+        const userCheckins = {};
+        checkinsSnapshot.forEach((doc) => {
+          const data = doc.data();
+          const userId = data.userId;
+          if (!userCheckins[userId]) {
+            userCheckins[userId] = [];
+          }
+          userCheckins[userId].push({
+            id: doc.id,
+            ref: doc.ref,
+            ...data,
+          });
+        });
+
+        // 檢測每個用戶的簽到異常
+        for (const userId in userCheckins) {
+          if (Object.hasOwnProperty.call(userCheckins, userId)) {
+            const checkins = userCheckins[userId].sort((a, b) => b.timestamp - a.timestamp);
+
+            for (let i = 0; i < checkins.length; i++) {
+              const checkin = checkins[i];
+              const prevCheckin = i < checkins.length - 1 ? checkins[i + 1] : null;
+
+              // 跳過已標記的異常
+              if (checkin.anomaly) continue;
+
+              // 取得巡邏點設定
+              let minInterval = 5;
+              try {
+                const patrolDoc = await admin.firestore()
+                    .collection('patrols')
+                    .doc(checkin.patrolId)
+                    .get();
+                if (patrolDoc.exists) {
+                  minInterval = patrolDoc.data().minInterval || 5;
+                }
+              } catch (error) {
+                logger.warn('無法取得巡邏點設定', {patrolId: checkin.patrolId});
+              }
+
+              // 轉換當前簽到的時間戳
+              let currentTimestamp = checkin.timestamp;
+              if (typeof currentTimestamp !== 'number') {
+                if (currentTimestamp && currentTimestamp.toMillis) {
+                  currentTimestamp = currentTimestamp.toMillis();
+                } else if (currentTimestamp && currentTimestamp.seconds) {
+                  currentTimestamp = currentTimestamp.seconds * 1000;
+                } else {
+                  currentTimestamp = Date.now();
+                }
+              }
+
+              // 執行異常偵測
+              const anomalyResult = detectCheckinAnomalies({
+                lastCheckin: prevCheckin,
+                currentTimestamp: currentTimestamp,
+                minIntervalMinutes: minInterval,
+                currentLat: checkin.location?._latitude || checkin.location?.latitude,
+                currentLng: checkin.location?._longitude || checkin.location?.longitude,
+                currentPatrolId: checkin.patrolId,
+              });
+
+              // 如果有異常，更新記錄
+              if (anomalyResult.anomaly) {
+                batch.update(checkin.ref, {
+                  anomaly: true,
+                  anomalyReasons: anomalyResult.anomalyReasons,
+                  anomalyScore: anomalyResult.anomalyScore,
+                  processedAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+                anomalyCount++;
+              }
+            }
+          }
+        }
+
+        // 批次提交更新
+        await batch.commit();
+
+        logger.info('批次異常偵測完成', {
+          totalRecords: checkinsSnapshot.size,
+          anomalyCount,
+        });
+
+        res.status(200).json({
+          ok: true,
+          totalRecords: checkinsSnapshot.size,
+          anomalyCount,
+        });
+      } catch (error) {
+        logger.error('批次異常偵測失敗', error);
+        res.status(500).json({
+          ok: false,
+          message: `批次異常偵測失敗: ${error.message}`,
         });
       }
     },

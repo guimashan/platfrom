@@ -76,6 +76,9 @@ export const API_ENDPOINTS = {
     getCheckinHistory: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getCheckinHistory',
     // 儀表板 API
     getDashboardStats: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getDashboardStats',
+    // 防摸魚功能 API
+    refreshPatrolQRCode: 'https://asia-east2-checkin-76c77.cloudfunctions.net/refreshPatrolQRCode',
+    detectAnomalies: 'https://asia-east2-checkin-76c77.cloudfunctions.net/detectAnomalies',
     // 測試模式 API
     getTestModeStatus: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getTestModeStatus',
     updateTestMode: 'https://asia-east2-checkin-76c77.cloudfunctions.net/updateTestMode'
