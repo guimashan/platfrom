@@ -4,10 +4,6 @@
   "framework": null,
   "rewrites": [
     {
-      "source": "/liff/:path*",
-      "destination": "/liff/:path*"
-    },
-    {
       "source": "/checkin/:path*",
       "destination": "/checkin/:path*"
     },
