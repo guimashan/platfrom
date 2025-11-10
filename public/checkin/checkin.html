@@ -92,29 +92,20 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <script type="module">
-        // Firebase 延遲載入 - 只在需要時才載入
-        let firebaseLoaded = false;
+        import { createAuthGuard } from '/js/firebase-lazy.js';
 
-        async function loadFirebase() {
-            if (firebaseLoaded) return;
-            
-            try {
-                await import('/js/firebase-init.js');
-                firebaseLoaded = true;
-                console.log('✅ Firebase 已載入');
-            } catch (error) {
-                console.error('❌ Firebase 載入失敗:', error);
-                alert('系統載入失敗，請重新整理頁面');
-                throw error;
+        // 使用 Auth Guard 延遲載入 - 檢測到認證後才載入完整功能
+        createAuthGuard(
+            // 已認證：載入簽到功能
+            async (user) => {
+                await import('/checkin/js/checkin.js');
+            },
+            // 未認證：返回首頁
+            async () => {
+                sessionStorage.setItem('line_login_return_url', window.location.pathname);
+                window.location.href = '/';
             }
-        }
-
-        // 頁面載入時立即載入 Firebase（因為簽到功能需要認證）
-        (async function init() {
-            await loadFirebase();
-            // Firebase 載入完成後，載入簽到功能
-            await import('/checkin/js/checkin.js');
-        })();
+        );
     </script>
 </body>
 </html>

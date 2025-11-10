@@ -155,7 +155,17 @@
     </div>
     </div> <!-- 關閉 mainApp -->
 
-    <script src="../js/firebase-init.js" type="module"></script>
-    <script src="js/XY.js" type="module"></script>
+    <script type="module">
+        // Firebase 延遲載入 - 只在點擊登入時才載入
+        import { loadAuthModule } from '/js/firebase-lazy.js';
+        
+        document.getElementById('loginBtn')?.addEventListener('click', async () => {
+            const authModule = await loadAuthModule();
+            authModule.handleLineLogin();
+        });
+        
+        // 動態載入頁面功能模組
+        import('/service/js/XY.js');
+    </script>
 </body>
 </html>

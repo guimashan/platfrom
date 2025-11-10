@@ -99,17 +99,8 @@
     </div>
 
     <script type="module">
-        import { platformAuth } from '/js/firebase-init.js';
-        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
-
-        // 檢查登入狀態
-        onAuthStateChanged(platformAuth, (user) => {
-            if (user) {
-                console.log('✅ 使用者已登入:', user.displayName);
-            } else {
-                console.log('ℹ️ 使用者未登入（訪客模式）');
-            }
-        });
+        // 福田會選單頁面 - 無需載入 Firebase（訪客可瀏覽）
+        console.log('✅ 福田會選單頁面已載入');
     </script>
 </body>
 </html>

@@ -192,21 +192,8 @@
         <div id="moduleGrid" class="module-grid" style="display: none;"></div>
     </div>
 
-    <script type="module" src="/js/firebase-init.js"></script>
     <script type="module">
-        import { 
-            platformAuth, 
-            platformDb 
-        } from '/js/firebase-init.js';
-        
-        import { 
-            onAuthStateChanged
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        
-        import { 
-            doc,
-            getDoc
-        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { ensureAuth, ensureFirestore } from '/js/firebase-lazy.js';
 
         const modules = [
             {
@@ -248,24 +235,30 @@
             }
         ];
 
-        onAuthStateChanged(platformAuth, async (user) => {
-            if (!user) {
-                // 💾 保存當前頁面，登入後返回
-                const returnUrl = window.location.pathname + window.location.search;
-                sessionStorage.setItem('line_login_return_url', returnUrl);
-                console.log('🔵 [/manage/] 未登入，儲存返回URL:', returnUrl);
-                
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 100);
-                return;
-            }
+        // 延遲載入 Firebase Auth
+        (async function init() {
+            const { platformAuth, onAuthStateChanged } = await ensureAuth();
+            
+            onAuthStateChanged(platformAuth, async (user) => {
+                if (!user) {
+                    // 💾 保存當前頁面，登入後返回
+                    const returnUrl = window.location.pathname + window.location.search;
+                    sessionStorage.setItem('line_login_return_url', returnUrl);
+                    console.log('🔵 [/manage/] 未登入，儲存返回URL:', returnUrl);
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 100);
+                    return;
+                }
 
-            await loadManageModules(user);
-        });
+                await loadManageModules(user);
+            });
+        })();
 
         async function loadManageModules(user) {
             try {
+                const { platformDb, doc, getDoc } = await ensureFirestore();
                 const userRef = doc(platformDb, 'users', user.uid);
                 const userSnap = await getDoc(userRef);
 
@@ -365,6 +358,7 @@
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             try {
+                const { platformAuth } = await ensureAuth();
                 await platformAuth.signOut();
                 window.location.href = '/';
             } catch (error) {

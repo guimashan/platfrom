@@ -43,7 +43,21 @@
         </main>
     </div>
 
-    <script type="module" src="/js/firebase-init.js"></script>
-    <script type="module" src="/checkin/js/history.js"></script>
+    <script type="module">
+        import { createAuthGuard } from '/js/firebase-lazy.js';
+
+        // 使用 Auth Guard 延遲載入
+        createAuthGuard(
+            // 已認證：載入歷史記錄功能
+            async (user) => {
+                await import('/checkin/js/history.js');
+            },
+            // 未認證：返回首頁
+            async () => {
+                sessionStorage.setItem('line_login_return_url', window.location.pathname);
+                window.location.href = '/';
+            }
+        );
+    </script>
 </body>
 </html>
