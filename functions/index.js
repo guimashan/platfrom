@@ -19,6 +19,11 @@ if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
   // Platform Functions - 用戶登入與權限管理
   exports.generateCustomToken = platformFunctions.generateCustomToken;
   exports.updateUserRole = platformFunctions.updateUserRole;
+  
+  // User 管理 Functions（僅 superadmin）
+  exports.listManageUsers = platformFunctions.listManageUsers;
+  exports.updateUserRoles = platformFunctions.updateUserRoles;
+  exports.getUserActivityLog = platformFunctions.getUserActivityLog;
 
   // LINE Messaging API Functions - LINE Bot Webhook
   exports.lineMessaging = messagingFunctions.lineMessaging;

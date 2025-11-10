@@ -14,6 +14,8 @@ import {
 
 let stats = null;
 let recentCheckins = [];
+let trendChart = null;
+let currentPeriod = 30;
 
 // 初始化頁面
 (async function init() {
@@ -61,6 +63,9 @@ async function loadDashboardData() {
 
         // 更新異常警報
         updateAnomalyAlerts(recentCheckins);
+
+        // 初始化趨勢圖表
+        await initTrendChart(currentPeriod);
 
     } catch (error) {
         console.error('載入資料失敗:', error);
@@ -250,6 +255,90 @@ function updateAnomalyAlerts(checkins) {
 }
 
 /**
+ * 初始化趨勢圖表
+ */
+async function initTrendChart(days = 30) {
+    try {
+        const response = await manageAPI(`${API_ENDPOINTS.getDashboardStats}?days=${days}`);
+        const chartData = response.trendData || generateMockTrendData(days);
+
+        const ctx = document.getElementById('checkinTrendChart');
+        if (!ctx) return;
+
+        // 銷毀現有圖表
+        if (trendChart) {
+            trendChart.destroy();
+        }
+
+        // 創建新圖表
+        trendChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: '簽到數',
+                    data: chartData.checkins,
+                    borderColor: '#B8860B',
+                    backgroundColor: 'rgba(184, 134, 11, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: '異常數',
+                    data: chartData.anomalies,
+                    borderColor: '#DC3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error('初始化圖表失敗:', error);
+    }
+}
+
+/**
+ * 生成模擬趨勢數據（當 API 未提供時）
+ */
+function generateMockTrendData(days) {
+    const labels = [];
+    const checkins = [];
+    const anomalies = [];
+
+    for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        labels.push(`${date.getMonth() + 1}/${date.getDate()}`);
+        checkins.push(Math.floor(Math.random() * 20) + 5);
+        anomalies.push(Math.floor(Math.random() * 3));
+    }
+
+    return { labels, checkins, anomalies };
+}
+
+/**
  * 設置事件監聽器
  */
 function setupEventListeners() {
@@ -261,4 +350,31 @@ function setupEventListeners() {
             showMessage('資料已更新', 'success');
         });
     }
+
+    // 圖表週期切換
+    const chart7Days = document.getElementById('chart7Days');
+    const chart30Days = document.getElementById('chart30Days');
+
+    if (chart7Days) {
+        chart7Days.addEventListener('click', async () => {
+            currentPeriod = 7;
+            chart7Days.classList.add('btn-primary');
+            chart30Days.classList.remove('btn-primary');
+            await initTrendChart(7);
+        });
+    }
+
+    if (chart30Days) {
+        chart30Days.addEventListener('click', async () => {
+            currentPeriod = 30;
+            chart30Days.classList.add('btn-primary');
+            chart7Days.classList.remove('btn-primary');
+            await initTrendChart(30);
+        });
+    }
+
+    // 自動刷新（每30秒）
+    setInterval(async () => {
+        await loadDashboardData();
+    }, 30000);
 }
