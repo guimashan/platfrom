@@ -1,23 +1,71 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 15:30 完成第三版系統部署（硬編碼 + Firebase + 網站後台）
+**最近更新**: 2025-11-10 16:00 完成方案 C - 自動導出工具（三層同步機制）
+
+## 🎉 方案 C - 自動導出工具部署成功 (2025-11-10 16:00)
+
+**部署狀態：** 🟢 已上線運行
+
+**核心功能：exportKeywordsToCode - 自動導出工具**
+- URL: `https://exportkeywordstocode-4yprhpbawa-df.a.run.app`
+- 功能：從 Firestore 讀取關鍵字，生成 keywords.js 代碼
+- 模式：
+  - 預覽模式（瀏覽器訪問）：顯示 HTML 界面，包含統計、下載按鈕、操作指南
+  - 下載模式（`?download=true`）：直接下載 keywords.js 文件
+- 安全特性：
+  - ✅ 使用 JSON.stringify 轉義所有字符串（防止注入攻擊）
+  - ✅ Template literals 改用字符串拼接（避免反引號問題）
+  - ✅ HTML 完整轉義（防止 XSS）
+  - ✅ 通過 Architect 審查（無安全問題）
+
+**三層同步機制：**
+```
+硬編碼（keywords.js）←─┐
+                        │
+                        ├─→ 三者保持同步
+                        │
+Firestore（動態資料）  ←─┤
+                        │
+網站後台（可編輯）     ←─┘
+```
+
+**同步工作流程：**
+1. ✏️ 在網站後台 `/manage/keywords.html` 修改關鍵字
+2. 🔄 Firestore 即時更新
+3. 📦 訪問 `https://exportkeywordstocode-4yprhpbawa-df.a.run.app`
+4. 💾 點擊「下載 keywords.js」按鈕
+5. 📝 替換 `functions/src/shared/keywords.js`
+6. 🚀 重新部署：`cd functions && npm run deploy`
+7. ✅ 三者同步完成！（硬編碼 = Firestore = 網站後台）
+
+**重要提醒：**
+- ⚠️ 修改後台後，需執行導出工具並手動更新硬編碼
+- ⚠️ 只有重新部署後，硬編碼才會與 Firestore 同步
+- ⚠️ 導出的代碼已通過語法驗證（`node -c`）
+
+---
 
 ## ✅ 第三版系統部署成功 (2025-11-10 15:30)
 
 **部署狀態：** 🟢 已上線運行
 
 **核心 Cloud Functions：**
-- ✅ `lineMessaging` - LINE Bot Webhook (新)
+- ✅ `lineMessaging` - LINE Bot Webhook
   - URL: `https://asia-east2-platform-bc783.cloudfunctions.net/lineMessaging`
   - 狀態：已部署並運行
   
-- ✅ `clearKeywords` - 清空關鍵字工具 (新)
+- ✅ `clearKeywords` - 清空關鍵字工具
   - URL: `https://asia-east2-platform-bc783.cloudfunctions.net/clearKeywords`
   - 狀態：已執行（刪除 18 個舊關鍵字）
   
-- ✅ `rebuildKeywords` - 重建關鍵字工具 (更新)
+- ✅ `rebuildKeywords` - 重建關鍵字工具
   - URL: `https://rebuildkeywords-4yprhpbawa-df.a.run.app`
   - 狀態：已執行（創建 19 個新關鍵字）
+
+- ✅ `exportKeywordsToCode` - 自動導出工具 ⭐ 新增
+  - URL: `https://exportkeywordstocode-4yprhpbawa-df.a.run.app`
+  - 狀態：已部署並通過測試
+  - 功能：實現三層同步機制（硬編碼 ←→ Firestore ←→ 網站後台）
 
 **已清理的舊系統：**
 - ❌ `lineWebhook` (asia-east2) - 已刪除
@@ -30,6 +78,7 @@
 - ✅ 19 個關鍵字已重建完成
 - ✅ 架構：16 個共用 LIFF App + 3 個獨立 LIFF App
 - ✅ 雙保險機制已啟動（Firestore + 硬編碼後備）
+- ✅ 三層同步機制已啟動（透過 exportKeywordsToCode 工具）
 
 **⚠️ 重要：LINE Webhook URL 設定**
 
