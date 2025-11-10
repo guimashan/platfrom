@@ -1,8 +1,9 @@
 /**
- * Cloud Function: 批量清空並重建 21 個關鍵字（混合架構）
+ * Cloud Function: 批量清空並重建 19 個關鍵字（混合架構）
  * HTTP Trigger: 直接訪問 URL 即可執行
  * 
- * 架構：18 個共用 LIFF App + 3 個獨立 LIFF App
+ * 架構：16 個共用 LIFF App + 3 個獨立 LIFF App
+ * 註：已移除不存在頁面的關鍵字
  */
 
 const { onRequest } = require('firebase-functions/v2/https');
@@ -51,9 +52,9 @@ exports.rebuildKeywords = onRequest(
       
       output.push('');
       
-      // === 步驟 2：批量寫入 21 個關鍵字（混合架構）===
-      output.push('📝 步驟 2：批量寫入 21 個關鍵字...');
-      output.push('   ⚙️  架構：18 個共用 LIFF App + 3 個獨立 LIFF App');
+      // === 步驟 2：批量寫入關鍵字（混合架構）===
+      output.push(`📝 步驟 2：批量寫入 ${KEYWORDS.length} 個關鍵字...`);
+      output.push('   ⚙️  架構：16 個共用 LIFF App + 3 個獨立 LIFF App');
       logger.info('批量寫入關鍵字...');
       
       let successCount = 0;
@@ -94,7 +95,7 @@ exports.rebuildKeywords = onRequest(
           
           successCount++;
           const mode = kw.liffUrl ? '[獨立]' : '[共用]';
-          output.push(`✅ [${successCount}/21] ${mode} ${kw.keyword} → ${liffUrl}`);
+          output.push(`✅ [${successCount}/${KEYWORDS.length}] ${mode} ${kw.keyword} → ${liffUrl}`);
           logger.info(`成功: ${kw.keyword}`);
           
         } catch (error) {
@@ -129,8 +130,8 @@ exports.rebuildKeywords = onRequest(
       
       if (successCount === KEYWORDS.length) {
         output.push('');
-        output.push('🎉 所有 21 個關鍵字已成功重建！');
-        output.push('✅ 混合架構：18 個共用 + 3 個獨立 LIFF App');
+        output.push(`🎉 所有 ${KEYWORDS.length} 個關鍵字已成功重建！`);
+        output.push('✅ 混合架構：16 個共用 + 3 個獨立 LIFF App');
         output.push('✅ 雙保險機制已啟動：Firestore + 硬編碼後備');
         
         logger.info('批量重建成功！');

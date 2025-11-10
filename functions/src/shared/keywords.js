@@ -26,17 +26,17 @@ const KEYWORDS = [
       text: '🙏 奉香簽到系統',
       label: '開始簽到'
     },
-    aliases: ['奉香', '打卡簽到'],
+    aliases: ['簽到', '奉香', '打卡', '打卡簽到'],
     priority: 100
   },
   {
     keyword: '簽到管理',
     liffApp: 'checkin',
-    path: '/checkin/manage/dashboard.html',
+    path: '/checkin/history.html',
     replyPayload: {
       altText: '開啟簽到管理',
-      text: '📊 簽到管理系統',
-      label: '進入管理'
+      text: '📊 簽到歷史記錄',
+      label: '查看記錄'
     },
     aliases: ['奉香管理', '1111'],
     priority: 99
@@ -118,7 +118,7 @@ const KEYWORDS = [
   {
     keyword: '建宮廟款',
     liffApp: 'service',
-    path: '/service/JG.html',
+    path: '/service/BG.html',
     replyPayload: {
       altText: '建宮廟款',
       text: '🏛️ 建宮廟款',
@@ -130,7 +130,7 @@ const KEYWORDS = [
   {
     keyword: '添香油',
     liffApp: 'service',
-    path: '/service/TX.html',
+    path: '/service/XY.html',
     replyPayload: {
       altText: '添香油',
       text: '🕯️ 添香油',
@@ -142,7 +142,7 @@ const KEYWORDS = [
   {
     keyword: '福田會',
     liffApp: 'service',
-    path: '/service/FT.html',
+    path: '/service/ft.html',
     replyPayload: {
       altText: '福田會',
       text: '💝 福田會',
@@ -163,56 +163,8 @@ const KEYWORDS = [
     aliases: ['神務', 'service', 'se', 'SE'],
     priority: 89
   },
-  {
-    keyword: '神務管理',
-    liffApp: 'service',
-    path: '/service/manage/dashboard.html',
-    replyPayload: {
-      altText: '神務管理',
-      text: '⚙️ 神務管理系統',
-      label: '進入管理'
-    },
-    aliases: ['服務管理', '2222'],
-    priority: 88
-  },
-  {
-    keyword: '服務列表',
-    liffApp: 'service',
-    path: '/service/list.html',
-    replyPayload: {
-      altText: '服務列表',
-      text: '📄 服務列表',
-      label: '查看列表'
-    },
-    aliases: ['列表', 'list'],
-    priority: 87
-  },
-  {
-    keyword: '登記紀錄',
-    liffApp: 'service',
-    path: '/service/records.html',
-    replyPayload: {
-      altText: '登記紀錄',
-      text: '📝 登記紀錄',
-      label: '查看紀錄'
-    },
-    aliases: ['紀錄', 'records'],
-    priority: 86
-  },
   
   // === Schedule 排班專案（5個）- 共用 LIFF App ===
-  {
-    keyword: '排班管理',
-    liffApp: 'schedule',
-    path: '/schedule/admin.html',
-    replyPayload: {
-      altText: '排班管理',
-      text: '⚙️ 排班管理系統',
-      label: '進入管理'
-    },
-    aliases: ['管理排班', '3333'],
-    priority: 88
-  },
   {
     keyword: '本週班表',
     liffApp: 'schedule',
