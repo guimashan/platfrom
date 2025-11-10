@@ -9,19 +9,28 @@ const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
+const rebuildFunctions = require('./src/admin/rebuild');
+const clearFunctions = require('./src/admin/clear-keywords');
+const exportFunctions = require('./src/admin/export-keywords');
 
 // 取得當前專案 ID（部署時由 Firebase 自動設定）
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT;
 
 // === Platform 專案 (platform-bc783) ===
-// 功能：LINE Bot + 用戶管理（LIFF 相關功能已移除）
+// 功能：LINE Bot + 用戶管理 + 關鍵字管理
 if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
   // Platform Functions - 用戶登入與權限管理
   exports.generateCustomToken = platformFunctions.generateCustomToken;
+  exports.generateCustomTokenFromLiff = platformFunctions.generateCustomTokenFromLiff;
   exports.updateUserRole = platformFunctions.updateUserRole;
 
   // LINE Messaging API Functions - LINE Bot Webhook
   exports.lineMessaging = messagingFunctions.lineMessaging;
+
+  // Admin Functions - 關鍵字管理工具
+  exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
+  exports.clearKeywords = clearFunctions.clearKeywords;
+  exports.exportKeywordsToCode = exportFunctions.exportKeywordsToCode;
 }
 
 // === Check-in 專案 (checkin-76c77) ===

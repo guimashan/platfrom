@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶管理 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/styles/manage.css">
+</head>
+<body>
+    <!-- 登入提示畫面（預設顯示） -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">用戶管理系統</h2>
+            <p style="margin: 0; opacity: 0.9;">請使用 LINE 帳號登入以存取管理功能</p>
+            <div style="margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                <p style="margin: 0; font-size: 14px;">驗證中...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容（預設隱藏） -->
+    <div id="mainApp" class="container" style="display: none;">
+        <header class="header">
+            <div class="header-content">
+                <h1>奉香簽到管理</h1>
+                <div class="header-actions">
+                    <button onclick="window.location.href='/'" class="btn-logout">回首頁</button>
+                    <button id="logoutBtn" class="btn-logout">登出</button>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="sub-nav">
+            <div class="nav-content">
+                <a href="/checkin/manage/dashboard.html" class="nav-link">儀表板</a>
+                <a href="/checkin/manage/record.html" class="nav-link">簽到記錄</a>
+                <a href="/checkin/manage/patrol.html" class="nav-link">巡邏點管理</a>
+                <a href="/checkin/manage/user.html" class="nav-link active">用戶管理</a>
+            </div>
+        </nav>
+
+        <main style="padding: 2rem;">
+            <!-- 用戶列表 -->
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>用戶列表</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <input type="text" id="searchInput" placeholder="搜尋用戶名稱..." style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; min-width: 250px;">
+                        <button id="searchBtn" class="btn btn-secondary">查詢</button>
+                    </div>
+                </div>
+
+                <div id="usersList" class="data-table">
+                    <p class="loading">載入中...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 編輯用戶角色 Modal -->
+    <div id="editUserModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>編輯用戶角色</h3>
+                <button id="closeModal" class="close-btn">&times;</button>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <p><strong>用戶名稱：</strong><span id="editUserName"></span></p>
+                <p><strong>用戶 ID：</strong><span id="editUserId" style="font-family: monospace; font-size: 0.9rem;"></span></p>
+            </div>
+
+            <form id="editUserForm">
+                <div class="form-group">
+                    <label>角色 * (可多選)</label>
+                    <div style="border: 1px solid #ddd; border-radius: 6px; padding: 1rem; background: #f8f9fa;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="user" style="width: auto; margin: 0;">
+                            <span>一般用戶</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_checkin" style="width: auto; margin: 0;">
+                            <span>簽到幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_service" style="width: auto; margin: 0;">
+                            <span>神務幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_schedule" style="width: auto; margin: 0;">
+                            <span>排班幹部</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_checkin" style="width: auto; margin: 0;">
+                            <span>簽到管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_service" style="width: auto; margin: 0;">
+                            <span>神務管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_schedule" style="width: auto; margin: 0;">
+                            <span>排班管理員</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="superadmin" style="width: auto; margin: 0;">
+                            <span>超級管理員</span>
+                        </label>
+                    </div>
+                    <small>
+                        <strong>一般用戶：</strong>只能簽到和查看自己的記錄<br>
+                        <strong>幹部：</strong>可查看對應模組所有記錄、篩選匯出、免GPS驗證<br>
+                        <strong>管理員：</strong>可管理對應模組的所有功能<br>
+                        <strong>超級管理員：</strong>擁有所有權限
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="userActive" checked style="width: auto; margin: 0;">
+                        <span>啟用此帳號</span>
+                    </label>
+                    <small>停用後，用戶將無法使用系統</small>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" id="cancelBtn" class="btn btn-secondary">取消</button>
+                    <button type="submit" class="btn btn-primary">儲存變更</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 用戶統計 Modal -->
+    <div id="statsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>簽到統計</h3>
+                <button id="closeStatsModal" class="close-btn">&times;</button>
+            </div>
+            
+            <div id="statsContent">
+                <p class="loading">載入中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/checkin/manage/js/user-manage.js"></script>
+</body>
+</html>

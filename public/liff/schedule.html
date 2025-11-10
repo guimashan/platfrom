@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班系統 - 龜馬山整合服務平台</title>
+</head>
+<body>
+    <div style="text-align: center; padding: 2rem;">
+        <p>載入中...</p>
+    </div>
+
+    <script>
+        // 簡化的轉發器：解析 liff.state 參數並轉發到目標頁面
+        const urlParams = new URLSearchParams(window.location.search);
+        const liffState = urlParams.get('liff.state');
+        
+        if (liffState) {
+            // 移除開頭的 / 以便統一處理
+            const targetPath = liffState.startsWith('/') ? liffState : '/' + liffState;
+            const baseUrl = window.location.origin;
+            const targetUrl = baseUrl + targetPath;
+            
+            console.log('轉發到:', targetUrl);
+            window.location.replace(targetUrl);
+        } else {
+            // 沒有 liff.state 參數，顯示錯誤
+            document.body.innerHTML = '<div style="text-align: center; padding: 2rem;"><h2>❌ 缺少 liff.state 參數</h2><p>請透過 LINE Bot 關鍵字開啟此頁面</p></div>';
+        }
+    </script>
+</body>
+</html>
