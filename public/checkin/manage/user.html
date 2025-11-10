@@ -7,72 +7,40 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
     <style>
-        .user-table-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            overflow-x: auto;
-        }
-
-        .user-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .user-table thead {
-            background: #f8f9fa;
-        }
-
-        .user-table th,
-        .user-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-        }
-
-        .user-table th {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .user-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
         }
 
         .role-checkbox {
-            margin-right: 5px;
+            margin-right: 8px;
         }
 
         .role-item {
             display: inline-block;
-            margin-right: 15px;
+            margin-right: 20px;
+            margin-bottom: 10px;
         }
 
         .activity-log-section {
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .log-item {
-            padding: 15px;
+            padding: 20px;
             background: white;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border-left: 4px solid #D4AF37;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .log-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .log-operator {
@@ -86,32 +54,113 @@
         }
 
         .log-details {
-            font-size: 13px;
             color: #666;
-        }
-
-        .badge-added {
-            background: #d4edda;
-            color: #155724;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin: 0 3px;
-        }
-
-        .badge-removed {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin: 0 3px;
+            font-size: 14px;
+            line-height: 1.6;
         }
 
         .no-data {
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
             color: #999;
+        }
+
+        .modal-modern {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content-modern {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 550px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-title-modern {
+            margin: 0 0 30px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .modal-user-info {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .modal-user-info p {
+            margin: 0 0 8px 0;
+            font-size: 15px;
+        }
+
+        .modal-user-info strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .modal-roles-section {
+            margin-bottom: 30px;
+        }
+
+        .modal-roles-title {
+            margin: 0 0 16px 0;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+
+        .role-item-modern {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .role-item-modern:hover {
+            background: #ebe5d8;
+        }
+
+        .role-item-modern input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .role-item-modern label {
+            cursor: pointer;
+            font-size: 15px;
+            margin: 0;
+        }
+
+        .modal-actions-modern {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content-modern {
+                padding: 24px;
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -126,117 +175,105 @@
     </div>
 
     <!-- 主要內容 -->
-    <div id="mainApp" class="manage-container" style="display: none;">
-        <!-- 側邊欄 -->
-        <aside class="manage-sidebar">
-            <div class="sidebar-header">
-                <img src="/assets/guimashan-logo.png" alt="龜馬山" class="sidebar-logo">
-                <h2 class="sidebar-title">簽到管理</h2>
-                <p class="sidebar-subtitle">龜馬山整合服務平台</p>
+    <div id="mainApp" class="modern-layout" style="display: none;">
+        <!-- 頂部金色區塊 -->
+        <header class="modern-header">
+            <div class="modern-header-content">
+                <div class="modern-header-left">
+                    <h1>簽到管理</h1>
+                    <p>龜馬山整合服務平台 · <span id="userName" style="font-weight: 600;">載入中...</span> (<span id="userRole">-</span>)</p>
+                </div>
+                <div class="modern-header-right">
+                    <a href="/" class="modern-header-btn">回首頁</a>
+                    <button id="logoutBtn" class="modern-header-btn">登出</button>
+                </div>
             </div>
-            <nav id="manageSidebar" class="sidebar-nav">
-                <!-- 由 JS 動態生成 -->
-            </nav>
-        </aside>
+        </header>
+
+        <!-- 水平導航欄 -->
+        <nav class="modern-nav">
+            <a href="/checkin/manage/dashboard.html" class="modern-nav-item" data-page="dashboard">一覽表</a>
+            <a href="/checkin/manage/record.html" class="modern-nav-item" data-page="record">簽到紀錄</a>
+            <a href="/checkin/manage/patrol.html" class="modern-nav-item" data-page="patrol">巡邏點管理</a>
+            <a href="/checkin/manage/user.html" class="modern-nav-item is-active" data-page="user">角色權限</a>
+        </nav>
 
         <!-- 主內容區 -->
-        <main class="manage-main">
-            <!-- 頂部導航 -->
-            <header class="manage-header">
-                <div class="header-left">
-                    <h1>👥 用戶管理</h1>
-                    <p class="header-breadcrumb">
-                        <a href="/">首頁</a> / 
-                        <a href="/checkin/checkin.html">簽到</a> / 
-                        <span>用戶管理</span>
-                    </p>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <p id="userName" class="user-name">載入中...</p>
-                        <p id="userRole" class="user-role">-</p>
-                    </div>
-                    <button id="logoutBtn" class="btn-manage btn-secondary btn-sm">登出</button>
-                </div>
-            </header>
-
-            <!-- 內容區域 -->
-            <div class="manage-content">
-                <!-- 用戶列表 -->
-                <div class="manage-card">
-                    <div class="card-header">
-                        <h2 class="card-title">用戶列表</h2>
-                        <div class="card-actions">
-                            <button id="refreshBtn" class="btn-manage btn-primary btn-sm">🔄 重新整理</button>
-                        </div>
-                    </div>
-
-                    <div class="user-table-container">
-                        <table class="user-table">
-                            <thead>
-                                <tr>
-                                    <th>頭像</th>
-                                    <th>姓名</th>
-                                    <th>Email</th>
-                                    <th>角色權限</th>
-                                    <th>最後登入</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody">
-                                <tr>
-                                    <td colspan="6" class="no-data">載入中...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+        <main class="modern-content">
+            <!-- 用戶列表 -->
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h2 class="modern-card-title">👥 用戶列表</h2>
+                    <div class="modern-card-actions">
+                        <button id="refreshBtn" class="modern-btn modern-btn-primary">🔄 重新整理</button>
                     </div>
                 </div>
 
-                <!-- 操作日誌 -->
-                <div class="manage-card activity-log-section">
-                    <div class="card-header">
-                        <h2 class="card-title">操作日誌</h2>
-                        <div class="card-actions">
-                            <button id="refreshLogBtn" class="btn-manage btn-outline btn-sm">🔄 重新整理</button>
-                        </div>
+                <div class="modern-table-wrapper">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>頭像</th>
+                                <th>姓名</th>
+                                <th>Email</th>
+                                <th>角色權限</th>
+                                <th>最後登入</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="6" class="no-data">載入中...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 操作日誌 -->
+            <div class="modern-card activity-log-section">
+                <div class="modern-card-header">
+                    <h2 class="modern-card-title">📜 操作日誌</h2>
+                    <div class="modern-card-actions">
+                        <button id="refreshLogBtn" class="modern-btn modern-btn-outline">🔄 重新整理</button>
                     </div>
-                    <div id="activityLogContainer">
-                        <div class="no-data">載入中...</div>
-                    </div>
+                </div>
+                <div id="activityLogContainer">
+                    <div class="no-data">載入中...</div>
                 </div>
             </div>
         </main>
     </div>
 
     <!-- 角色編輯 Modal -->
-    <div id="roleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
-        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
-            <h3 style="margin: 0 0 20px 0; font-size: 20px; color: #333;">編輯用戶角色</h3>
+    <div id="roleModal" class="modal-modern">
+        <div class="modal-content-modern">
+            <h3 class="modal-title-modern">編輯用戶角色</h3>
             
-            <div style="margin-bottom: 20px;">
-                <p style="margin: 0 0 10px 0; font-weight: 600;">用戶：<span id="modalUserName"></span></p>
-                <p style="margin: 0; color: #666; font-size: 14px;">用戶 ID：<span id="modalUserId"></span></p>
+            <div class="modal-user-info">
+                <p><strong>用戶：</strong><span id="modalUserName"></span></p>
+                <p style="margin: 0; color: #666;"><strong>用戶 ID：</strong><span id="modalUserId"></span></p>
             </div>
 
-            <div style="margin-bottom: 25px;">
-                <p style="margin: 0 0 10px 0; font-weight: 600;">角色權限：</p>
-                <div class="role-item">
+            <div class="modal-roles-section">
+                <p class="modal-roles-title">角色權限：</p>
+                <div class="role-item-modern">
                     <input type="checkbox" id="roleSuperadmin" class="role-checkbox" value="superadmin">
                     <label for="roleSuperadmin">超級管理員</label>
                 </div>
-                <div class="role-item">
+                <div class="role-item-modern">
                     <input type="checkbox" id="roleAdmin" class="role-checkbox" value="admin_checkin">
                     <label for="roleAdmin">簽到管理員</label>
                 </div>
-                <div class="role-item">
+                <div class="role-item-modern">
                     <input type="checkbox" id="rolePoweruser" class="role-checkbox" value="poweruser_checkin">
                     <label for="rolePoweruser">簽到進階用戶</label>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                <button id="cancelRoleBtn" class="btn-manage btn-secondary">取消</button>
-                <button id="saveRoleBtn" class="btn-manage btn-primary">儲存</button>
+            <div class="modal-actions-modern">
+                <button id="cancelRoleBtn" class="modern-btn modern-btn-secondary">取消</button>
+                <button id="saveRoleBtn" class="modern-btn modern-btn-primary">儲存</button>
             </div>
         </div>
     </div>
@@ -250,10 +287,7 @@
     <div id="globalMessage" class="global-message"></div>
 
     <!-- Firebase & Scripts -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="/js/firebase-init.js"></script>
-    <script src="/checkin/manage/js/manage-common.js"></script>
-    <script src="/checkin/manage/js/user.js"></script>
+    <script type="module" src="/js/firebase-init.js"></script>
+    <script type="module" src="/checkin/manage/js/user.js"></script>
 </body>
 </html>

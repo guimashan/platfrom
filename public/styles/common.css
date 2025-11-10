@@ -3001,3 +3001,393 @@ input[type="number"]::-webkit-inner-spin-button {
         gap: 15px;
     }
 }
+
+/* ========================================
+   2025 現代化布局 (Modern Layout)
+   基於用戶提供的設計參考圖
+   ======================================== */
+
+/* ===== 現代化布局容器 ===== */
+.modern-layout {
+    min-height: 100vh;
+    background: #f5f1e8;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ===== 頂部金色區塊 ===== */
+.modern-header {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+    padding: 40px 60px;
+    border-radius: 0 0 32px 32px;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.25);
+    margin: 0 40px 0 40px;
+}
+
+.modern-header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modern-header-left h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 8px 0;
+    letter-spacing: 0.5px;
+}
+
+.modern-header-left p {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+}
+
+.modern-header-right {
+    display: flex;
+    gap: 15px;
+}
+
+.modern-header-btn {
+    background: white;
+    color: #D4AF37;
+    padding: 12px 28px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modern-header-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== 水平導航欄 ===== */
+.modern-nav {
+    background: white;
+    border-radius: 24px;
+    margin: -20px 60px 30px 60px;
+    padding: 0 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    display: flex;
+    gap: 10px;
+    position: relative;
+    z-index: 10;
+}
+
+.modern-nav-item {
+    color: #666;
+    text-decoration: none;
+    padding: 20px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s;
+    border-bottom: 3px solid transparent;
+    position: relative;
+}
+
+.modern-nav-item:hover {
+    color: #D4AF37;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.modern-nav-item.is-active,
+.modern-nav-item[aria-current="page"] {
+    color: #D4AF37;
+    border-bottom-color: #D4AF37;
+    font-weight: 600;
+}
+
+/* ===== 主內容區 ===== */
+.modern-content {
+    flex: 1;
+    padding: 0 60px 60px 60px;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* ===== 現代化卡片 ===== */
+.modern-card {
+    background: white;
+    border-radius: 32px;
+    padding: 50px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    margin-bottom: 30px;
+    border: 2px solid rgba(212, 175, 55, 0.1);
+    transition: all 0.3s;
+}
+
+.modern-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.modern-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f5f1e8;
+}
+
+.modern-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.modern-card-actions {
+    display: flex;
+    gap: 12px;
+}
+
+/* ===== 現代化 KPI 卡片 ===== */
+.modern-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.modern-kpi-card {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+    border-radius: 24px;
+    padding: 36px;
+    color: white;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s;
+}
+
+.modern-kpi-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(212, 175, 55, 0.4);
+}
+
+.modern-kpi-label {
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0.95;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modern-kpi-value {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+}
+
+.modern-kpi-icon {
+    font-size: 28px;
+}
+
+/* ===== 現代化表格 ===== */
+.modern-table-wrapper {
+    overflow-x: auto;
+    border-radius: 16px;
+    border: 1px solid #e5e5e5;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.modern-table thead {
+    background: #f8f8f8;
+}
+
+.modern-table th {
+    padding: 18px 20px;
+    text-align: left;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 2px solid #e5e5e5;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.modern-table td {
+    padding: 18px 20px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+}
+
+.modern-table tbody tr {
+    transition: background 0.2s;
+}
+
+.modern-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.modern-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ===== 現代化按鈕 ===== */
+.modern-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.modern-btn-primary {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.modern-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+}
+
+.modern-btn-outline {
+    background: white;
+    color: #D4AF37;
+    border: 2px solid #D4AF37;
+}
+
+.modern-btn-outline:hover {
+    background: #D4AF37;
+    color: white;
+}
+
+.modern-btn-secondary {
+    background: #f5f1e8;
+    color: #666;
+}
+
+.modern-btn-secondary:hover {
+    background: #ebe5d8;
+}
+
+/* ===== 響應式設計 (現代化布局) ===== */
+@media (max-width: 992px) {
+    .modern-header {
+        padding: 30px 40px;
+        margin: 0 20px 0 20px;
+    }
+
+    .modern-nav {
+        margin: -20px 40px 30px 40px;
+        padding: 0 20px;
+    }
+
+    .modern-content {
+        padding: 0 40px 40px 40px;
+    }
+
+    .modern-card {
+        padding: 35px;
+    }
+}
+
+@media (max-width: 768px) {
+    .modern-header {
+        padding: 25px 30px;
+        margin: 0 15px 0 15px;
+        border-radius: 0 0 24px 24px;
+    }
+
+    .modern-header-content {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    .modern-header-left h1 {
+        font-size: 28px;
+    }
+
+    .modern-header-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .modern-nav {
+        margin: -15px 30px 20px 30px;
+        padding: 0 15px;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .modern-nav-item {
+        padding: 15px 18px;
+        font-size: 14px;
+    }
+
+    .modern-content {
+        padding: 0 30px 30px 30px;
+    }
+
+    .modern-card {
+        padding: 25px;
+        border-radius: 24px;
+    }
+
+    .modern-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modern-card-title {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .modern-header {
+        margin: 0;
+        border-radius: 0 0 20px 20px;
+    }
+
+    .modern-nav {
+        margin: -10px 20px 15px 20px;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .modern-nav-item {
+        border-bottom: none;
+        border-left: 3px solid transparent;
+        padding: 15px 20px;
+    }
+
+    .modern-nav-item.is-active,
+    .modern-nav-item[aria-current="page"] {
+        border-bottom-color: transparent;
+        border-left-color: #D4AF37;
+        background: rgba(212, 175, 55, 0.1);
+    }
+
+    .modern-content {
+        padding: 0 20px 20px 20px;
+    }
+
+    .modern-kpi-value {
+        font-size: 36px;
+    }
+}

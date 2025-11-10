@@ -41,7 +41,10 @@ export async function initManagePage(options = {}) {
                 // 設置用戶資訊
                 setupUserInfo(userData);
                 
-                // 設置側邊欄導航
+                // 設置導航高亮（現代化布局）
+                setupModernNav(activePage);
+                
+                // 設置側邊欄導航（舊版布局，向後兼容）
                 setupSidebar(activePage);
                 
                 // 設置登出按鈕
@@ -86,7 +89,37 @@ function setupUserInfo(userData) {
 }
 
 /**
- * 設置側邊欄導航
+ * 設置現代化導航高亮（2025 新版）
+ */
+function setupModernNav(activePage) {
+    const navItems = document.querySelectorAll('.modern-nav-item');
+    if (navItems.length === 0) return;
+
+    const roles = currentUserData?.roles || [];
+    const isSuperadmin = roles.includes('superadmin');
+
+    navItems.forEach(item => {
+        const page = item.getAttribute('data-page');
+        
+        // 移除所有 active class
+        item.classList.remove('is-active');
+        item.removeAttribute('aria-current');
+        
+        // 設置當前頁面高亮
+        if (page === activePage) {
+            item.classList.add('is-active');
+            item.setAttribute('aria-current', 'page');
+        }
+
+        // 隱藏角色權限頁（非 superadmin）
+        if (page === 'user' && !isSuperadmin) {
+            item.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * 設置側邊欄導航（舊版布局，向後兼容）
  */
 function setupSidebar(activePage) {
     const navItems = [

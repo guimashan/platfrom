@@ -18,96 +18,86 @@
     </div>
 
     <!-- 主要內容 -->
-    <div id="mainApp" class="manage-container" style="display: none;">
-        <!-- 側邊欄 -->
-        <aside class="manage-sidebar">
-            <div class="sidebar-header">
-                <img src="/assets/guimashan-logo.png" alt="龜馬山" class="sidebar-logo">
-                <h2 class="sidebar-title">簽到管理</h2>
-                <p class="sidebar-subtitle">龜馬山整合服務平台</p>
+    <div id="mainApp" class="modern-layout" style="display: none;">
+        <!-- 頂部金色區塊 -->
+        <header class="modern-header">
+            <div class="modern-header-content">
+                <div class="modern-header-left">
+                    <h1>簽到管理</h1>
+                    <p>龜馬山整合服務平台 · <span id="userName" style="font-weight: 600;">載入中...</span> (<span id="userRole">-</span>)</p>
+                </div>
+                <div class="modern-header-right">
+                    <a href="/" class="modern-header-btn">回首頁</a>
+                    <button id="logoutBtn" class="modern-header-btn">登出</button>
+                </div>
             </div>
-            <nav id="manageSidebar" class="sidebar-nav">
-                <!-- 由 JS 動態生成 -->
-            </nav>
-        </aside>
+        </header>
+
+        <!-- 水平導航欄 -->
+        <nav class="modern-nav">
+            <a href="/checkin/manage/dashboard.html" class="modern-nav-item is-active" data-page="dashboard">一覽表</a>
+            <a href="/checkin/manage/record.html" class="modern-nav-item" data-page="record">簽到紀錄</a>
+            <a href="/checkin/manage/patrol.html" class="modern-nav-item" data-page="patrol">巡邏點管理</a>
+            <a href="/checkin/manage/user.html" class="modern-nav-item" data-page="user">角色權限</a>
+        </nav>
 
         <!-- 主內容區 -->
-        <main class="manage-main">
-            <!-- 頂部導航 -->
-            <header class="manage-header">
-                <div class="header-left">
-                    <h1>📊 一覽表</h1>
-                    <p class="header-breadcrumb">
-                        <a href="/">首頁</a> / 
-                        <a href="/checkin/checkin.html">簽到</a> / 
-                        <span>管理後台</span>
-                    </p>
-                </div>
-                <div class="header-right">
-                    <div class="user-info">
-                        <p id="userName" class="user-name">載入中...</p>
-                        <p id="userRole" class="user-role">-</p>
+        <main class="modern-content">
+            <!-- KPI 統計卡片 -->
+            <div class="modern-kpi-grid">
+                <div class="modern-kpi-card">
+                    <div class="modern-kpi-label">
+                        <span class="modern-kpi-icon">📝</span>
+                        今日簽到數
                     </div>
-                    <button id="logoutBtn" class="btn-manage btn-secondary btn-sm">登出</button>
+                    <h3 id="todayCount" class="modern-kpi-value">-</h3>
                 </div>
-            </header>
+                
+                <div class="modern-kpi-card">
+                    <div class="modern-kpi-label">
+                        <span class="modern-kpi-icon">⚠️</span>
+                        異常簽到
+                    </div>
+                    <h3 id="anomalyCount" class="modern-kpi-value">-</h3>
+                </div>
+            </div>
 
-            <!-- 內容區域 -->
-            <div class="manage-content">
-                <!-- KPI 統計卡片 -->
-                <div class="kpi-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-                    <div class="kpi-card">
-                        <div class="kpi-icon">📝</div>
-                        <div class="kpi-label">今日簽到數</div>
-                        <h3 id="todayCount" class="kpi-value">-</h3>
-                        <p class="kpi-change">與昨日相比</p>
-                    </div>
-                    
-                    <div class="kpi-card warning">
-                        <div class="kpi-icon">⚠️</div>
-                        <div class="kpi-label">異常簽到</div>
-                        <h3 id="anomalyCount" class="kpi-value">-</h3>
-                        <p class="kpi-change">需要審核</p>
+            <!-- 異常警報區 -->
+            <div id="anomalyAlerts" class="modern-card" style="display: none;">
+                <div class="modern-card-header">
+                    <h3 class="modern-card-title">🚨 異常警報</h3>
+                    <div class="modern-card-actions">
+                        <a href="/checkin/manage/record.html?filter=anomaly" class="modern-btn modern-btn-outline">查看全部</a>
                     </div>
                 </div>
+                <div id="anomalyList">
+                    <!-- 異常列表由 JS 動態生成 -->
+                </div>
+            </div>
 
-                <!-- 異常警報區 -->
-                <div id="anomalyAlerts" class="manage-card" style="display: none;">
-                    <div class="card-header">
-                        <h3 class="card-title">🚨 異常警報</h3>
-                        <div class="card-actions">
-                            <a href="/checkin/manage/record.html?filter=anomaly" class="btn-manage btn-outline btn-sm">查看全部</a>
-                        </div>
-                    </div>
-                    <div id="anomalyList">
-                        <!-- 異常列表由 JS 動態生成 -->
+            <!-- 今日簽到動態 -->
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h3 class="modern-card-title">📋 今日簽到動態</h3>
+                    <div class="modern-card-actions">
+                        <button id="refreshBtn" class="modern-btn modern-btn-outline">🔄 重新整理</button>
                     </div>
                 </div>
+                <div id="recentCheckins">
+                    <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
+                </div>
+            </div>
 
-                <!-- 今日簽到動態 -->
-                <div class="manage-card">
-                    <div class="card-header">
-                        <h3 class="card-title">📋 今日簽到動態</h3>
-                        <div class="card-actions">
-                            <button id="refreshBtn" class="btn-manage btn-outline btn-sm">🔄 重新整理</button>
-                        </div>
-                    </div>
-                    <div id="recentCheckins">
-                        <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
+            <!-- 巡邏點狀態 -->
+            <div class="modern-card">
+                <div class="modern-card-header">
+                    <h3 class="modern-card-title">📍 巡邏點狀態</h3>
+                    <div class="modern-card-actions">
+                        <a href="/checkin/manage/patrol.html" class="modern-btn modern-btn-primary">管理巡邏點</a>
                     </div>
                 </div>
-
-                <!-- 巡邏點狀態 -->
-                <div class="manage-card">
-                    <div class="card-header">
-                        <h3 class="card-title">📍 巡邏點狀態</h3>
-                        <div class="card-actions">
-                            <a href="/checkin/manage/patrol.html" class="btn-manage btn-primary btn-sm">管理巡邏點</a>
-                        </div>
-                    </div>
-                    <div id="patrolStatus">
-                        <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
-                    </div>
+                <div id="patrolStatus">
+                    <p style="text-align: center; color: #999; padding: 20px;">載入中...</p>
                 </div>
             </div>
         </main>
