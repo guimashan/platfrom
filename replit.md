@@ -23,6 +23,12 @@
 - ✅ `public/checkin/manage/js/patrol-manage.js` - 移除 LIFF 認證邏輯
 - ✅ `public/checkin/manage/js/dashboard.js` - 移除 LIFF 認證邏輯
 
+### 4. 更新福田會選單頁面
+- ✅ `public/service/ft.html` - 將 LIFF URL 連結改為普通網頁連結
+  - `https://liff.line.me/2008269293-71e3y43M` → `/service/FTP.html`
+  - `https://liff.line.me/2008269293-LKR2Nr2x` → `/service/FTC.html`
+  - `https://liff.line.me/2008269293-XPgaLra8` → `/service/FTY.html`
+
 **保留的內容：**
 - ✅ 所有 HTML 檔案結構
 - ✅ 所有 CSS 樣式
