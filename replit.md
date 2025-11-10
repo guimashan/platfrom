@@ -1,6 +1,6 @@
 # 龜馬山整合服務平台 - 系統文檔
 
-**最近更新**: 2025-11-10
+**最近更新**: 2025-11-10 (管理介面 UI 統一化完成)
 
 ## 系統概述
 
@@ -11,6 +11,7 @@
 - 條件式 Cloud Functions 導出，避免跨專案衝突
 - 標準 LINE Login OAuth 2.0 認證
 - Firestore 資料庫 + Firebase Authentication
+- **統一管理介面 UI**（所有管理頁面使用單一 CSS 架構）
 
 ---
 
@@ -111,6 +112,48 @@ https://go.guimashan.org.tw
 - `generateCustomToken` - 一般登入
 - `generateCustomTokenFromLiff` - LIFF 登入（已停用）
 - `updateUserRole` - 更新用戶角色
+
+---
+
+## 前端樣式架構
+
+### 單一 CSS 檔案架構 (2025-11-10)
+
+**檔案：** `public/styles/common.css` (1,154 行)
+- 全站基礎樣式：915 行
+- **統一管理介面樣式：239 行**
+
+**統一管理介面設計：**
+所有管理頁面（簽到管理 + 神務服務管理）使用相同的 UI 架構：
+
+1. **金色漸層頂部** (.manage-header)
+   - 標題 + 副標題
+   - 右側按鈕（回首頁、登出）
+   - 金色配色：#D4AF37
+
+2. **白色導航列** (.manage-subnav)
+   - 簽到管理：儀表板、簽到記錄、巡邏點管理、用戶管理
+   - 金色底線強調
+
+3. **主要內容區** (.manage-main)
+   - 白色背景，圓角卡片
+   - 統一的統計卡片樣式
+
+**已統一的管理頁面（7 個）：**
+- Checkin: index.html, dashboard.html, record.html, patrol.html, user.html
+- Service: index.html, orders.html
+
+**核心類別：**
+- `.manage-layout` - 主容器
+- `.manage-header` - 金色頂部
+- `.manage-subnav` - 白色導航列
+- `.manage-main` - 主要內容區
+- `.manage-card` - 內容卡片
+- `.manage-stat-card` - 統計卡片
+
+**已移除：**
+- ❌ `public/checkin/manage/styles/manage.css` (已刪除)
+- ❌ `public/service/manage/styles/manage.css` (已刪除)
 
 ---
 
