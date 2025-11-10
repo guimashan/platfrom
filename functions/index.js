@@ -9,9 +9,7 @@ const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
-const rebuildFunctions = require('./src/admin/rebuild');
 const clearFunctions = require('./src/admin/clear-keywords');
-const exportFunctions = require('./src/admin/export-keywords');
 
 // 取得當前專案 ID（部署時由 Firebase 自動設定）
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT;
@@ -27,10 +25,8 @@ if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
   // LINE Messaging API Functions - LINE Bot Webhook
   exports.lineMessaging = messagingFunctions.lineMessaging;
 
-  // Admin Functions - 關鍵字管理工具
-  exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
+  // Admin Functions - 資料清理工具
   exports.clearKeywords = clearFunctions.clearKeywords;
-  exports.exportKeywordsToCode = exportFunctions.exportKeywordsToCode;
 }
 
 // === Check-in 專案 (checkin-76c77) ===
