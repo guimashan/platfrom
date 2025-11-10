@@ -649,14 +649,11 @@ function convertPathToLiffUrl() {
         path = '/' + path;
     }
     
-    // 🎯 智能 LIFF ID 分類：根據路徑自動選擇對應的 LIFF App（支持新舊兩種格式）
+    // 🎯 智能 LIFF ID 分類：根據路徑自動選擇對應的 LIFF App
     const LIFF_ID_MAP = {
-        '/liff/checkin': '2008269293-nYBm3JmV',  // 奉香簽到（舊格式）
-        '/checkin': '2008269293-nYBm3JmV',       // 奉香簽到（新格式）
-        '/liff/schedule': '2008269293-N0wnqknr', // 排班系統（舊格式）
-        '/schedule': '2008269293-N0wnqknr',      // 排班系統（新格式）
-        '/liff/service': '2008269293-Nl2pZBpV',  // 神務服務（舊格式）
-        '/service': '2008269293-Nl2pZBpV'        // 神務服務（新格式）
+        '/checkin': '2008269293-nYBm3JmV',       // 奉香簽到
+        '/schedule': '2008269293-N0wnqknr',      // 排班系統
+        '/service': '2008269293-Nl2pZBpV'        // 神務服務
     };
     
     // 判斷路徑屬於哪個模組
@@ -666,15 +663,15 @@ function convertPathToLiffUrl() {
     for (const [prefix, liffId] of Object.entries(LIFF_ID_MAP)) {
         if (path.startsWith(prefix)) {
             LIFF_ID = liffId;
-            // 提取模組名稱（移除 /liff 前綴）
-            moduleName = prefix.replace('/liff/', '').replace('/', ''); 
+            // 提取模組名稱
+            moduleName = prefix.replace('/', ''); 
             break;
         }
     }
     
     // 如果無法自動判斷，提示用戶
     if (!LIFF_ID) {
-        alert(`⚠️ 無法自動判斷 LIFF ID！\n\n請確認路徑格式：\n• /checkin/xxx.html 或 /liff/checkin/xxx.html（奉香簽到）\n• /schedule/xxx.html 或 /liff/schedule/xxx.html（排班系統）\n• /service/xxx.html 或 /liff/service/xxx.html（神務服務）\n\n您輸入的路徑：${path}`);
+        alert(`⚠️ 無法自動判斷 LIFF ID！\n\n請確認路徑格式：\n• /checkin/xxx.html（奉香簽到）\n• /schedule/xxx.html（排班系統）\n• /service/xxx.html（神務服務）\n\n您輸入的路徑：${path}`);
         return;
     }
     
@@ -688,34 +685,9 @@ function convertPathToLiffUrl() {
         explanation = '📋 這是主頁面，直接使用 LIFF ID（LIFF Endpoint URL 已配置在 LINE Developers Console）';
     } else {
         // 子頁面需要 liff.state 參數來路由
-        // 支持新格式（/service/DD.html）和舊格式（/liff/service/DD.html）
-        let statePath;
-        
-        // 先將舊格式轉換為新格式（移除 /liff 前綴）
-        let normalizedPath = path;
-        if (path.startsWith('/liff/')) {
-            normalizedPath = path.replace('/liff', '');
-        }
-        
-        if (normalizedPath.startsWith('/service/')) {
-            // 🎯 神務服務：使用新格式的完整路徑
-            // 例如 /service/DD.html → liff.state=/service/DD.html
-            statePath = normalizedPath;
-        } else if (normalizedPath.startsWith('/checkin/')) {
-            // 🎯 簽到頁面：使用新格式的完整路徑
-            // 例如 /checkin/index.html → liff.state=/checkin/index.html
-            statePath = normalizedPath;
-        } else if (normalizedPath.startsWith('/schedule/')) {
-            // 🎯 排班頁面：使用新格式的完整路徑
-            // 例如 /schedule/week.html → liff.state=/schedule/week.html
-            statePath = normalizedPath;
-        } else {
-            // 其他情況，使用完整路徑
-            statePath = normalizedPath;
-        }
-        
-        liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${statePath}`;
-        explanation = `📍 子頁面需要 liff.state 參數來路由到：${statePath}`;
+        // 格式：/service/DD.html → liff.state=/service/DD.html
+        liffUrl = `https://liff.line.me/${LIFF_ID}?liff.state=${path}`;
+        explanation = `📍 子頁面需要 liff.state 參數來路由到：${path}`;
     }
     
     // 填入 LIFF URL 欄位

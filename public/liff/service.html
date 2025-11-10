@@ -101,26 +101,20 @@
                         console.warn('⚠️ 檢測到錯誤的主頁面 liff.state 參數，忽略並顯示主頁面');
                         // 不導航，直接顯示主頁面
                     } else {
-                        // 🎯 處理正確的子頁面格式：
-                        // 1. 新格式（無 /liff 前綴）：/service/DD.html
-                        // 2. 舊格式（有 /liff 前綴）：/liff/service/DD.html
-                        // 3. 服務代碼格式：DD
+                        // 🎯 處理子頁面格式：
+                        // 1. 完整路徑格式：/service/DD.html
+                        // 2. 服務代碼格式：DD
                         let targetUrl;
                         
                         // 移除開頭的 / 以便統一處理
                         const cleanState = liffState.startsWith('/') ? liffState.substring(1) : liffState;
                         
                         if (cleanState.startsWith('service/')) {
-                            // 格式1：新格式 /service/DD.html（無 /liff 前綴）
+                            // 格式1：完整路徑 /service/DD.html
                             targetUrl = `${BASE_URL}/${cleanState}`;
-                            console.log('新格式（無 /liff 前綴），導航到:', targetUrl);
-                        } else if (cleanState.startsWith('liff/service/')) {
-                            // 格式2：舊格式 /liff/service/DD.html（移除 /liff 前綴）
-                            const pathWithoutLiff = cleanState.replace('liff/', '');
-                            targetUrl = `${BASE_URL}/${pathWithoutLiff}`;
-                            console.log('舊格式（移除 /liff 前綴），導航到:', targetUrl);
+                            console.log('完整路徑格式，導航到:', targetUrl);
                         } else if (SERVICE_PATHS[cleanState]) {
-                            // 格式3：服務代碼（DD, ND, LD 等）
+                            // 格式2：服務代碼（DD, ND, LD 等）
                             targetUrl = SERVICE_PATHS[cleanState];
                             console.log('服務代碼格式，導航到:', targetUrl);
                         } else {
