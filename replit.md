@@ -1,6 +1,77 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 18:15 修復所有關鍵字 404 問題（Firestore 資料錯誤）
+**最近更新**: 2025-11-10 19:30 完成微服務架構清理與 LINE Bot 快取修復
+
+## ✅ 微服務架構清理與部署優化 (2025-11-10 19:30)
+
+**完成的工作：**
+
+### 1. 修復 LINE Bot 快取問題
+- **問題**：lineMessaging 函數有 5 分鐘快取（TTL），即使 Firestore 更新也不會生效
+- **解決方案**：重新部署 lineMessaging 函數到 platform-bc783
+- **結果**：強制清除記憶體快取，用戶立即看到正確的 LIFF URL
+
+### 2. 重構 Functions 導出邏輯（微服務架構）
+- **問題**：`functions/index.js` 無條件導出所有 21 個 functions，導致每個專案都部署全部 functions
+- **解決方案**：添加條件導出邏輯，根據 `GCLOUD_PROJECT` 環境變數只導出對應的 functions
+- **結果**：
+  ```javascript
+  // Platform 專案只導出 7 個 functions
+  if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') { ... }
+  
+  // Checkin 專案只導出 10 個 functions
+  if (!PROJECT_ID || PROJECT_ID === 'checkin-76c77') { ... }
+  
+  // Service 專案只導出 5 個 functions
+  if (!PROJECT_ID || PROJECT_ID === 'service-b9d4a') { ... }
+  ```
+
+### 3. 清理重複部署的 Functions
+- **Platform (platform-bc783)**：從 21 個減少到 7 個（刪除 14 個）
+- **Checkin (checkin-76c77)**：從 18 個減少到 10 個（刪除 8 個）
+- **Service (service-b9d4a)**：從 19 個減少到 5 個（刪除 14 個）
+
+### 4. 更新部署腳本
+```json
+{
+  "deploy:platform": "firebase deploy --project platform-bc783 --only functions",
+  "deploy:checkin": "firebase deploy --project checkin-76c77 --only functions",
+  "deploy:service": "firebase deploy --project service-b9d4a --only functions",
+  "deploy:all": "npm run deploy:platform && npm run deploy:checkin && npm run deploy:service"
+}
+```
+
+**使用方式：**
+```bash
+# 部署單一專案（自動根據條件導出機制部署對應的 functions）
+npm run deploy:platform   # 部署 Platform 專案的所有 functions
+npm run deploy:checkin     # 部署 Checkin 專案的所有 functions
+npm run deploy:service     # 部署 Service 專案的所有 functions
+
+# 一次部署全部
+npm run deploy:all         # 依序部署三個專案
+
+# 驗證部署結果
+firebase functions:list --project platform-bc783   # 查看 Platform 已部署的 functions
+firebase functions:list --project checkin-76c77     # 查看 Checkin 已部署的 functions
+firebase functions:list --project service-b9d4a     # 查看 Service 已部署的 functions
+```
+
+**微服務架構當前狀態 (2025-11-10)：**
+
+| 專案 | Functions 數量 | 用途 | 條件導出區塊 |
+|------|---------------|------|------------|
+| **platform-bc783** | 7 個 | LINE Bot + 用戶管理 + 關鍵字管理 | `PROJECT_ID === 'platform-bc783'` |
+| **checkin-76c77** | 10 個 | GPS 簽到系統 | `PROJECT_ID === 'checkin-76c77'` |
+| **service-b9d4a** | 5 個 | 神務服務（法會報名、訂單管理） | `PROJECT_ID === 'service-b9d4a'` |
+
+**重要提醒：**
+- 每個專案只會部署在 `functions/index.js` 對應條件區塊中導出的 functions
+- **添加新 function 時**：必須在 `functions/index.js` 中將 function 添加到對應專案的條件區塊
+- **驗證部署**：部署後使用 `firebase functions:list --project <project-id>` 確認實際部署的 functions
+- **條件導出機制**：透過檢查 `GCLOUD_PROJECT` 環境變數自動選擇要導出的 functions
+
+---
 
 ## ✅ 關鍵字路由問題修復 (2025-11-10 18:15)
 
