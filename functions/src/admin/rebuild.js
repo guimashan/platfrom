@@ -9,8 +9,8 @@ const logger = require('firebase-functions/logger');
 
 // LIFF ID 配置（硬編碼，與文檔一致）
 const LIFF_IDS = {
-  service: '2008269293-nYBm3JmV',   // Service 神務
-  checkin: '2008269293-Nl2pZBpV',   // Checkin 簽到
+  service: '2008269293-Nl2pZBpV',   // Service 神務
+  checkin: '2008269293-nYBm3JmV',   // Checkin 簽到
   schedule: '2008269293-N0wnqknr'   // Schedule 排班
 };
 
