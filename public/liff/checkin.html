@@ -252,14 +252,14 @@
         // 🎯 簽到頁面映射表（短格式支持）
         const BASE_URL = 'https://go.guimashan.org.tw';
         const CHECKIN_PATHS = {
-            'dashboard': `${BASE_URL}/liff/checkin/dashboard.html`,
-            'DM': `${BASE_URL}/liff/checkin/dashboard.html`, // 短代碼：Dashboard Management
-            'record': `${BASE_URL}/liff/checkin/record.html`,
-            'RD': `${BASE_URL}/liff/checkin/record.html`, // 短代碼：Record
-            'patrol': `${BASE_URL}/liff/checkin/patrol.html`,
-            'PT': `${BASE_URL}/liff/checkin/patrol.html`, // 短代碼：Patrol
-            'user': `${BASE_URL}/liff/checkin/user.html`,
-            'US': `${BASE_URL}/liff/checkin/user.html` // 短代碼：User
+            'dashboard': `${BASE_URL}/checkin/manage/dashboard.html`,
+            'DM': `${BASE_URL}/checkin/manage/dashboard.html`, // 短代碼：Dashboard Management
+            'record': `${BASE_URL}/checkin/manage/record.html`,
+            'RD': `${BASE_URL}/checkin/manage/record.html`, // 短代碼：Record
+            'patrol': `${BASE_URL}/checkin/manage/patrol.html`,
+            'PT': `${BASE_URL}/checkin/manage/patrol.html`, // 短代碼：Patrol
+            'user': `${BASE_URL}/checkin/manage/user.html`,
+            'US': `${BASE_URL}/checkin/manage/user.html` // 短代碼：User
         };
         
         // 🎯 優先檢查 liff.state 參數，如果有則直接導航
@@ -283,16 +283,17 @@
                 
                 // 檢查是否是新格式（無 /liff 前綴）：/checkin/index.html
                 if (cleanState.startsWith('checkin/')) {
-                    const targetUrl = `${BASE_URL}/liff/${cleanState}`;
+                    const targetUrl = `${BASE_URL}/${cleanState}`;
                     console.log('新格式（無 /liff 前綴），導航到:', targetUrl);
                     window.location.replace(targetUrl);
                     return;
                 }
                 
-                // 檢查是否是舊格式（有 /liff 前綴）：/liff/checkin/dashboard.html
+                // 檢查是否是舊格式（有 /liff 前綴）：/liff/checkin/dashboard.html（移除 /liff 前綴）
                 if (cleanState.startsWith('liff/checkin/')) {
-                    const targetUrl = `${BASE_URL}/${cleanState}`;
-                    console.log('舊格式（有 /liff 前綴），導航到:', targetUrl);
+                    const pathWithoutLiff = cleanState.replace('liff/', '');
+                    const targetUrl = `${BASE_URL}/${pathWithoutLiff}`;
+                    console.log('舊格式（移除 /liff 前綴），導航到:', targetUrl);
                     window.location.replace(targetUrl);
                     return;
                 }
