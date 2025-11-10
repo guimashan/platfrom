@@ -67,25 +67,120 @@
 - 企業團體 → 獨立 LIFF URL (2008269293-LKR2Nr2x)
 - 信眾個人 → 獨立 LIFF URL (2008269293-71e3y43M)
 
-### 部署步驟
+### 部署步驟（完整重寫版）
 
-1. **部署 Cloud Functions**：
-   ```bash
-   cd functions
-   npm run deploy
-   ```
+**準備工作：**
+- ✅ Firebase Admin SDK 已初始化（所有 Cloud Functions）
+- ✅ 共享模組架構（keywords.js）
+- ✅ 3 層查詢機制（Firestore → 硬編碼後備 → 預設）
+- ✅ 舊檔案已清理
 
-2. **清空 Firestore 舊關鍵字**：
-   訪問：`https://asia-east2-platform-bc783.cloudfunctions.net/clearKeywords`
+**步驟 1：部署 Cloud Functions**
+```bash
+cd functions
+npm run deploy
+```
 
-3. **重建 Firestore 關鍵字**：
-   訪問：`https://asia-east2-platform-bc783.cloudfunctions.net/rebuildKeywords`
+**預期導出的 Functions：**
+- `lineMessaging` - LINE Bot Webhook（新）
+- `clearKeywords` - 清空關鍵字（新）
+- `rebuildKeywords` - 重建關鍵字（使用共享模組）
 
-4. **測試關鍵字**：
-   - 簽到、奉香、打卡
-   - 點燈、年斗、福田會
-   - 福田Young會、企業團體、信眾個人
-   - 排班、本週班表
+**步驟 2：清空 Firestore 舊關鍵字**
+```
+訪問：https://asia-east2-platform-bc783.cloudfunctions.net/clearKeywords
+```
+
+**預期輸出：**
+```
+🗑️  步驟 1：掃描現有關鍵字...
+📊 找到 X 個關鍵字
+
+🗑️  步驟 2：批量刪除...
+🗑️  已刪除 X/X 筆
+
+🎉 清空完成！
+```
+
+**步驟 3：重建 Firestore 關鍵字**
+```
+訪問：https://asia-east2-platform-bc783.cloudfunctions.net/rebuildKeywords
+```
+
+**預期輸出：**
+```
+📝 步驟 2：批量寫入 19 個關鍵字...
+   ⚙️  架構：16 個共用 LIFF App + 3 個獨立 LIFF App
+
+✅ [1/19] [共用] 奉香簽到 → https://liff.line.me/...
+✅ [2/19] [共用] 簽到管理 → https://liff.line.me/...
+...
+✅ [19/19] [獨立] 信眾個人 → https://liff.line.me/...
+
+📊 架構統計：
+   🔗 共用 LIFF App：16 個
+   ⭐ 獨立 LIFF App：3 個
+
+🎉 所有 19 個關鍵字已成功重建！
+```
+
+**步驟 4：測試 LINE Bot**
+
+在 LINE 中測試以下關鍵字：
+
+**簽到系統（共用 LIFF App）：**
+- `簽到` / `奉香` / `打卡` → 奉香簽到
+- `簽到管理` / `奉香管理` / `1111` → 簽到管理
+
+**神務服務（共用 LIFF App）：**
+- `點燈` / `龜馬山一點靈` / `DD` → 龜馬山一點靈
+- `年斗` / `年斗法會` / `ND` → 年斗法會
+- `福田會` / `福田` / `FT` → 福田會入會
+
+**排班系統（共用 LIFF App）：**
+- `排班` / `志工排班` / `SC` → 志工排班
+- `本週班表` / `週班表` / `WE` → 本週班表
+
+**獨立 LIFF App：**
+- `福田Young會` → 獨立 LIFF URL
+- `企業團體` → 獨立 LIFF URL
+- `信眾個人` → 獨立 LIFF URL
+
+**預期行為：**
+1. 用戶輸入關鍵字
+2. LINE Bot 回覆含有按鈕的訊息
+3. 用戶點擊按鈕
+4. 在 LINE 內開啟對應的 LIFF 表單頁面
+
+**步驟 5：監控系統健康**
+
+查看 Cloud Functions 日誌：
+```bash
+# 查看 messaging 日誌
+firebase functions:log --only lineMessaging
+
+# 關鍵指標：
+# ✅ [Firestore] 匹配: XXX - Firestore 成功
+# ⚠️  [硬編碼後備] 匹配: XXX - 後備觸發（應極少）
+# 💬 用戶訊息: XXX - 收到訊息
+```
+
+**故障排除：**
+
+1. **如果關鍵字無回應：**
+   - 檢查 Firestore 是否有資料（19 筆）
+   - 查看 Cloud Functions 日誌是否有錯誤
+   - 確認 LINE Webhook URL 正確設定
+
+2. **如果後備計數器持續增加：**
+   - Firestore 可能有問題
+   - 重新執行 rebuildKeywords
+   - 檢查關鍵字快取是否正常
+
+3. **如果 LIFF URL 無法開啟：**
+   - 確認 LIFF App ID 正確
+   - 檢查檔案路徑是否存在
+   - 確認轉發器（service/checkin/schedule.html）運作正常
 
 ---
 
