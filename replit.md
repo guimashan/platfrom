@@ -1,6 +1,120 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 完成全站 CSS 架構統一，整合所有模組樣式到單一 common.css
+**最近更新**: 2025-11-10 防摸魚 Cloud Functions 完成並部署，QR Code 自動更新與異常偵測功能上線
+
+## 🔐 防摸魚 Cloud Functions 完成 (2025-11-10 20:30)
+
+### 重大里程碑：簽到防作弊系統上線
+
+**已部署的 Cloud Functions（checkin-76c77 專案）：**
+
+#### 1. refreshPatrolQRCode
+- **功能**：手動或自動更新巡邏點 QR Code，防止 QR Code 被截圖偽造
+- **URL**: https://asia-east2-checkin-76c77.cloudfunctions.net/refreshPatrolQRCode
+- **特性**：
+  - ✅ 生成安全的隨機 Token（UUID + 32-bit hash）
+  - ✅ QR Payload 格式：`PATROL:{patrolId}:{token}`
+  - ✅ 最小更新間隔保護（預設 15 分鐘，可配置）
+  - ✅ 使用 Firestore Transaction 防止競爭條件
+  - ✅ 版本號自動遞增（qrTokenVersion）
+  - ✅ 支援後續 Cloud Scheduler 定時自動更新
+
+#### 2. detectAnomalies
+- **功能**：批次掃描簽到記錄，自動偵測異常行為
+- **URL**: https://asia-east2-checkin-76c77.cloudfunctions.net/detectAnomalies
+- **異常偵測演算法**：
+  - ✅ **時間間隔異常**：檢測簽到間隔過短（可疑的快速簽到）
+  - ✅ **移動速度異常**：檢測不合理的移動速度（預設 >100 km/h）
+  - ✅ **重複簽到異常**：檢測短時間內重複簽到同一點（預設 60 分鐘）
+  - ✅ **異常分數計算**：0-100 分，綜合評估可疑程度
+  - ✅ **按用戶分組**：針對每個用戶的簽到序列進行分析
+  - ✅ **批次更新**：使用 Firestore Batch 高效更新異常記錄
+
+#### 3. savePatrol 擴展
+- **新增防摸魚設定欄位**：
+  - `verificationMode`: 'gps' | 'qr' | 'both'（驗證模式）
+  - `minInterval`: number（最小簽到間隔，分鐘）
+  - `requirePhoto`: boolean（是否需要拍照證明）
+  - `tolerance`: number（GPS 容許誤差，公尺）
+  - `description`: string（巡邏點描述）
+
+**關鍵技術突破：**
+
+#### Firestore Timestamp 處理修復
+- **問題**：Firestore Timestamp 對象不能直接與 Date.now() 進行數學運算，導致所有異常偵測返回 NaN
+- **解決方案**：統一使用 `.toMillis()` 轉換 Timestamp 為毫秒數
+- **影響範圍**：
+  - ✅ anomaly-detector.js 所有檢測函數
+  - ✅ detectAnomalies Cloud Function 批次掃描邏輯
+  - ✅ 歷史批次掃描使用實際事件時間而非當前時間
+- **Architect 審查通過**：所有 Timestamp 處理已完全修復，異常偵測功能正常運作
+
+**模組化架構設計：**
+
+#### 服務層 (functions/src/checkin/services/)
+1. **qr-generator.js**：
+   - generateSecureToken()：生成安全 token
+   - generateQRPayload()：生成 QR Code payload
+   - parseQRPayload()：解析 QR Code
+   - shouldRefreshToken()：檢查是否需要更新
+
+2. **anomaly-detector.js**：
+   - calculateDistance()：計算兩點間 GPS 距離
+   - checkIntervalAnomaly()：時間間隔檢測
+   - checkSpeedAnomaly()：速度異常檢測
+   - checkRepeatAnomaly()：重複簽到檢測
+   - detectCheckinAnomalies()：綜合異常偵測
+
+**資料結構擴展：**
+
+#### Patrols 集合新增欄位
+```javascript
+{
+  qr: string,                    // QR Code payload
+  qrToken: string,               // 當前有效的安全 token
+  qrTokenVersion: number,        // Token 版本號
+  qrTokenUpdatedAt: Timestamp,   // Token 更新時間
+  verificationMode: string,      // 驗證模式
+  minInterval: number,           // 最小簽到間隔（分鐘）
+  requirePhoto: boolean,         // 是否需要拍照
+  tolerance: number,             // GPS 容許誤差（公尺）
+  description: string            // 巡邏點描述
+}
+```
+
+#### Checkins 集合新增欄位
+```javascript
+{
+  anomaly: boolean,              // 是否異常
+  anomalyReasons: string[],      // 異常原因列表
+  anomalyScore: number,          // 異常分數（0-100）
+  photoUrl: string,              // 簽到照片 URL（待實作）
+  verifiedBy: string             // 驗證方式（待實作）
+}
+```
+
+**API Endpoints 更新：**
+- ✅ firebase-init.js 已添加新 API 端點
+- ✅ 所有端點指向 asia-east2-checkin-76c77.cloudfunctions.net
+
+**部署配置修復：**
+- ✅ 修復主 index.js 導出配置，新增兩個函數的導出
+- ✅ firebase-functions 套件已升級至最新版本
+- ✅ 成功部署到 checkin-76c77 專案
+
+**測試狀態：**
+- ✅ 函數語法檢查通過
+- ✅ Firestore Timestamp 轉換邏輯驗證
+- ✅ Architect 最終審查通過
+- ⏳ 待整合測試（實際簽到流程）
+
+**後續工作：**
+1. 整合到 verifyCheckinV2 函數（實時異常偵測）
+2. 開發前端拍照上傳功能
+3. 設定 Cloud Scheduler 定時更新 QR Code
+4. Dashboard 頁面顯示異常統計
+
+---
 
 ## 🎨 全站 CSS 架構統一完成 (2025-11-10 17:40)
 

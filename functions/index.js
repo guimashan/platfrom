@@ -37,6 +37,8 @@ if (!PROJECT_ID || PROJECT_ID === 'checkin-76c77') {
   exports.savePatrol = checkinFunctions.savePatrol;
   exports.deletePatrol = checkinFunctions.deletePatrol;
   exports.getDashboardStats = checkinFunctions.getDashboardStats;
+  exports.refreshPatrolQRCode = checkinFunctions.refreshPatrolQRCode;
+  exports.detectAnomalies = checkinFunctions.detectAnomalies;
 }
 
 // === Service 專案 (service-b9d4a) ===
