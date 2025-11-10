@@ -10,6 +10,11 @@ const { onRequest } = require('firebase-functions/v2/https');
 const admin = require('firebase-admin');
 const logger = require('firebase-functions/logger');
 
+// 初始化 Firebase Admin（只初始化一次）
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
 // 導入共享的關鍵字定義
 const { KEYWORDS, buildLiffUrl, normalizeKeyword } = require('../shared/keywords');
 

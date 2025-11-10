@@ -7,10 +7,8 @@ const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
-const adminFunctions = require('./src/admin/migrate-keywords');
-const migrateAllKeywordsFunctions = require('./src/admin/migrate-all-keywords');
-const fixLiffUrlsFunctions = require('./src/admin/fix-liff-urls');
 const rebuildFunctions = require('./src/admin/rebuild');
+const clearFunctions = require('./src/admin/clear-keywords');
 
 // 導出 Platform Functions
 exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -30,7 +28,7 @@ exports.deletePatrol = checkinFunctions.deletePatrol;
 exports.getDashboardStats = checkinFunctions.getDashboardStats;
 
 // 導出 LINE Messaging API Functions
-exports.lineWebhook = messagingFunctions.lineWebhook;
+exports.lineMessaging = messagingFunctions.lineMessaging;
 
 // 導出 Service Functions (神務服務)
 exports.submitRegistration = serviceFunctions.submitRegistration;
@@ -40,7 +38,5 @@ exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
 exports.confirmPayment = serviceFunctions.confirmPayment;
 
 // 導出 Admin Functions (管理功能)
-exports.migrateKeywords = adminFunctions.migrateKeywords;
-exports.migrateAllKeywords = migrateAllKeywordsFunctions.migrateAllKeywords;
-exports.fixLiffUrls = fixLiffUrlsFunctions.fixLiffUrls;
 exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
+exports.clearKeywords = clearFunctions.clearKeywords;

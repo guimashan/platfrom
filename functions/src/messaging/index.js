@@ -1,117 +1,94 @@
 /**
- * LINE Messaging API Webhook 處理
- * 處理來自 LINE 官方帳號的用戶訊息，並回覆 LIFF App 連結
+ * LINE Messaging API Webhook - 混合架構關鍵字系統
+ * 
+ * 3 層查詢機制：
+ * 1. Firestore 動態關鍵字（優先，5分鐘快取）
+ * 2. 硬編碼後備（使用共享模組 keywords.js）
+ * 3. 預設說明訊息
  */
 
-const {onRequest} = require('firebase-functions/v2/https');
-const {defineSecret} = require('firebase-functions/params');
-const {logger} = require('firebase-functions');
-const line = require('@line/bot-sdk');
-const express = require('express');
+const { onRequest } = require('firebase-functions/v2/https');
+const { defineSecret } = require('firebase-functions/params');
+const { logger } = require('firebase-functions');
 const admin = require('firebase-admin');
 const crypto = require('crypto');
 
-// LINE Messaging API 憑證 (需要在 Firebase Console 設定)
+// 初始化 Firebase Admin（只初始化一次）
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
+// LINE Messaging API 密鑰
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 
 // 導入共享的關鍵字定義（用於硬編碼後備）
 const { KEYWORDS, buildLiffUrl } = require('../shared/keywords');
 
-// 關鍵詞快取（避免每次都查詢 Firestore）
+// Firestore 關鍵字快取（5 分鐘 TTL）
 let keywordsCache = null;
-let keywordsCacheTime = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 快取 5 分鐘
+let cacheTime = 0;
+const CACHE_TTL = 5 * 60 * 1000;
 
-// 後備使用計數器（用於監控 Firestore 健康狀況）
-let fallbackUsageCount = 0;
+// 後備使用計數器（監控 Firestore 健康）
+let fallbackCount = 0;
 
 /**
- * 回覆訊息給用戶
+ * 正規化文字（移除空白、轉小寫）
  */
-async function replyMessage(replyToken, messages, accessToken) {
-  const response = await fetch('https://api.line.me/v2/bot/message/reply', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${accessToken}`,
-    },
-    body: JSON.stringify({
-      replyToken: replyToken,
-      messages: messages,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    logger.error('回覆訊息失敗:', error);
-    throw new Error('Failed to reply message');
-  }
-
-  return await response.json();
+function normalize(text) {
+  return text.trim().toLowerCase().replace(/\s+/g, '');
 }
 
 /**
- * 載入關鍵詞（帶快取）
+ * 載入 Firestore 關鍵字（帶快取）
  */
-async function loadKeywords() {
+async function loadFirestoreKeywords() {
   const now = Date.now();
   
-  // 如果快取有效，直接返回
-  if (keywordsCache && (now - keywordsCacheTime < CACHE_TTL)) {
+  // 快取有效，直接返回
+  if (keywordsCache && (now - cacheTime < CACHE_TTL)) {
     return keywordsCache;
   }
   
   try {
     const snapshot = await admin.firestore()
-        .collection('lineKeywordMappings')
-        .where('enabled', '==', true)
-        .orderBy('priority', 'desc')
-        .get();
+      .collection('lineKeywordMappings')
+      .where('enabled', '==', true)
+      .orderBy('priority', 'desc')
+      .get();
     
     const keywords = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      keywords.push({
-        id: doc.id,
-        ...data,
-      });
+    snapshot.forEach(doc => {
+      keywords.push({ id: doc.id, ...doc.data() });
     });
     
     keywordsCache = keywords;
-    keywordsCacheTime = now;
+    cacheTime = now;
     
-    logger.info(`已載入 ${keywords.length} 個啟用的關鍵詞`);
+    logger.info(`✅ 載入 ${keywords.length} 個 Firestore 關鍵字（快取 5 分鐘）`);
     return keywords;
   } catch (error) {
-    logger.error('載入關鍵詞失敗:', error);
+    logger.error('❌ Firestore 載入失敗:', error);
     return [];
   }
 }
 
 /**
- * 正規化文字（移除空白、轉小寫）
+ * 匹配 Firestore 關鍵字
  */
-function normalizeText(text) {
-  return text.trim().toLowerCase().replace(/\s+/g, '');
-}
-
-/**
- * 檢查文字是否符合關鍵詞
- */
-function matchKeyword(text, keyword) {
-  const normalizedText = normalizeText(text);
-  const normalizedKeyword = normalizeText(keyword.keyword);
+function matchFirestoreKeyword(text, keyword) {
+  const normalizedText = normalize(text);
   
-  // 精確匹配關鍵詞
-  if (normalizedText === normalizedKeyword) {
+  // 匹配主關鍵字
+  if (normalizedText === normalize(keyword.keyword)) {
     return true;
   }
   
-  // 檢查別名（精確匹配）
-  if (keyword.aliases && keyword.aliases.length > 0) {
+  // 匹配別名
+  if (keyword.aliases && Array.isArray(keyword.aliases)) {
     for (const alias of keyword.aliases) {
-      if (normalizedText === normalizeText(alias)) {
+      if (normalizedText === normalize(alias)) {
         return true;
       }
     }
@@ -121,14 +98,104 @@ function matchKeyword(text, keyword) {
 }
 
 /**
- * 處理文字訊息
+ * 查詢 Firestore 關鍵字（第 1 層）
+ */
+async function queryFirestore(text) {
+  try {
+    const keywords = await loadFirestoreKeywords();
+    
+    for (const keyword of keywords) {
+      if (matchFirestoreKeyword(text, keyword)) {
+        logger.info(`✅ [Firestore] 匹配: ${keyword.keyword}`);
+        
+        if (keyword.replyType === 'template' && keyword.liffUrl) {
+          return {
+            type: 'template',
+            altText: keyword.replyPayload?.altText || keyword.keyword,
+            template: {
+              type: 'buttons',
+              text: keyword.replyPayload?.text || keyword.keyword,
+              actions: [{
+                type: 'uri',
+                label: keyword.replyPayload?.label || '立即開啟',
+                uri: keyword.liffUrl
+              }]
+            }
+          };
+        }
+      }
+    }
+  } catch (error) {
+    logger.error('❌ Firestore 查詢失敗:', error);
+  }
+  
+  return null;
+}
+
+/**
+ * 查詢硬編碼後備（第 2 層）
+ */
+function queryFallback(text) {
+  const normalizedText = normalize(text);
+  
+  for (const keyword of KEYWORDS) {
+    // 匹配主關鍵字
+    if (normalizedText === normalize(keyword.keyword)) {
+      fallbackCount++;
+      logger.warn(`⚠️  [硬編碼後備] 匹配: ${keyword.keyword} (計數: ${fallbackCount})`);
+      
+      return {
+        type: 'template',
+        altText: keyword.replyPayload.altText,
+        template: {
+          type: 'buttons',
+          text: keyword.replyPayload.text,
+          actions: [{
+            type: 'uri',
+            label: keyword.replyPayload.label,
+            uri: buildLiffUrl(keyword)
+          }]
+        }
+      };
+    }
+    
+    // 匹配別名
+    if (keyword.aliases && Array.isArray(keyword.aliases)) {
+      for (const alias of keyword.aliases) {
+        if (normalizedText === normalize(alias)) {
+          fallbackCount++;
+          logger.warn(`⚠️  [硬編碼後備別名] ${alias} → ${keyword.keyword} (計數: ${fallbackCount})`);
+          
+          return {
+            type: 'template',
+            altText: keyword.replyPayload.altText,
+            template: {
+              type: 'buttons',
+              text: keyword.replyPayload.text,
+              actions: [{
+                type: 'uri',
+                label: keyword.replyPayload.label,
+                uri: buildLiffUrl(keyword)
+              }]
+            }
+          };
+        }
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * 處理文字訊息（3 層查詢）
  */
 async function handleTextMessage(text) {
-  const originalText = text.trim();
-  text = originalText.toLowerCase();
-
+  const userInput = text.trim();
+  const normalized = userInput.toLowerCase();
+  
   // 幫助訊息（優先處理）
-  if (text === '幫助' || text === 'help' || text === '?' || text === '指令') {
+  if (normalized === '幫助' || normalized === 'help' || normalized === '?' || normalized === '指令') {
     return {
       type: 'text',
       text: '📱 龜馬山 goLine 平台\n\n' +
@@ -149,109 +216,28 @@ async function handleTextMessage(text) {
             '📋 平台功能：\n' +
             '• 「簽到」- 奉香簽到系統\n' +
             '• 「排班」- 排班系統\n' +
-            '• 「幫助」- 顯示此訊息',
+            '• 「幫助」- 顯示此訊息'
     };
   }
-
+  
   // 忽略系統自動產生的訊息
-  if (text.startsWith('✅') || text.startsWith('❌') || text.startsWith('⚠️')) {
+  if (userInput.startsWith('✅') || userInput.startsWith('❌') || userInput.startsWith('⚠️')) {
     return null;
   }
-
-  // === 1. Firestore 動態關鍵詞比對（優先）===
-  try {
-    const keywords = await loadKeywords();
-    
-    for (const keyword of keywords) {
-      if (matchKeyword(originalText, keyword)) {
-        logger.info(`Firestore 關鍵詞匹配: ${keyword.keyword}`);
-        
-        if (keyword.replyType === 'template' && keyword.liffUrl) {
-          return {
-            type: 'template',
-            altText: keyword.replyPayload?.altText || keyword.keyword,
-            template: {
-              type: 'buttons',
-              text: keyword.replyPayload?.text || keyword.keyword,
-              actions: [
-                {
-                  type: 'uri',
-                  label: keyword.replyPayload?.label || '立即開啟',
-                  uri: keyword.liffUrl,
-                },
-              ],
-            },
-          };
-        } else if (keyword.replyType === 'text' && keyword.replyPayload?.text) {
-          return {
-            type: 'text',
-            text: keyword.replyPayload.text,
-          };
-        }
-      }
-    }
-  } catch (error) {
-    logger.error('Firestore 查詢失敗，切換至硬編碼後備:', error);
+  
+  // === 第 1 層：Firestore 動態關鍵字 ===
+  const firestoreResult = await queryFirestore(userInput);
+  if (firestoreResult) {
+    return firestoreResult;
   }
-
-  // === 2. 硬編碼後備系統（使用共享模組）===
-  try {
-    for (const keyword of KEYWORDS) {
-      // 檢查主關鍵字
-      if (normalizeText(originalText) === normalizeText(keyword.keyword)) {
-        fallbackUsageCount++;
-        logger.warn(`使用硬編碼後備: ${keyword.keyword} (計數: ${fallbackUsageCount})`);
-        
-        const liffUrl = buildLiffUrl(keyword);
-        return {
-          type: 'template',
-          altText: keyword.replyPayload.altText,
-          template: {
-            type: 'buttons',
-            text: keyword.replyPayload.text,
-            actions: [
-              {
-                type: 'uri',
-                label: keyword.replyPayload.label,
-                uri: liffUrl,
-              },
-            ],
-          },
-        };
-      }
-      
-      // 檢查別名
-      if (keyword.aliases && keyword.aliases.length > 0) {
-        for (const alias of keyword.aliases) {
-          if (normalizeText(originalText) === normalizeText(alias)) {
-            fallbackUsageCount++;
-            logger.warn(`使用硬編碼後備別名: ${alias} → ${keyword.keyword} (計數: ${fallbackUsageCount})`);
-            
-            const liffUrl = buildLiffUrl(keyword);
-            return {
-              type: 'template',
-              altText: keyword.replyPayload.altText,
-              template: {
-                type: 'buttons',
-                text: keyword.replyPayload.text,
-                actions: [
-                  {
-                    type: 'uri',
-                    label: keyword.replyPayload.label,
-                    uri: liffUrl,
-                  },
-                ],
-              },
-            };
-          }
-        }
-      }
-    }
-  } catch (error) {
-    logger.error('硬編碼後備處理失敗:', error);
+  
+  // === 第 2 層：硬編碼後備 ===
+  const fallbackResult = queryFallback(userInput);
+  if (fallbackResult) {
+    return fallbackResult;
   }
-
-  // === 3. 預設回覆 ===
+  
+  // === 第 3 層：預設說明訊息 ===
   return {
     type: 'text',
     text: '🙏 歡迎使用龜馬山 goLine 平台\n\n' +
@@ -264,91 +250,93 @@ async function handleTextMessage(text) {
 }
 
 /**
- * LINE Messaging API Webhook 處理器
+ * 回覆訊息給用戶
+ */
+async function replyMessage(replyToken, messages, accessToken) {
+  const response = await fetch('https://api.line.me/v2/bot/message/reply', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${accessToken}`
+    },
+    body: JSON.stringify({
+      replyToken,
+      messages
+    })
+  });
+  
+  if (!response.ok) {
+    const error = await response.text();
+    logger.error('❌ 回覆失敗:', error);
+    throw new Error('Failed to reply message');
+  }
+  
+  return await response.json();
+}
+
+/**
+ * 驗證 LINE Webhook 簽名
+ */
+function validateSignature(body, signature, channelSecret) {
+  const hash = crypto
+    .createHmac('sha256', channelSecret)
+    .update(body)
+    .digest('base64');
+  
+  return hash === signature;
+}
+
+/**
+ * Webhook 處理器
  */
 async function handleWebhook(req, res, channelSecret, accessToken) {
   try {
-    logger.info('收到 Webhook 請求');
-
-    // 只接受 POST 請求
+    // 只接受 POST
     if (req.method !== 'POST') {
       res.status(405).send('Method Not Allowed');
       return;
     }
-
-    // 獲取簽名
+    
+    // 驗證簽名
     const signature = req.headers['x-line-signature'];
-
     if (!signature) {
-      logger.error('缺少 x-line-signature header');
+      logger.error('❌ 缺少簽名');
       res.status(401).send('Unauthorized: Missing signature');
       return;
     }
-
-    // 驗證 LINE webhook 簽名
-    try {
-      if (!channelSecret) {
-        logger.error('Channel Secret 未設定');
-        res.status(500).send('Internal Server Error: Missing channel secret');
-        return;
-      }
-
-      const body = req.rawBody.toString('utf-8');
-      const hash = crypto
-          .createHmac('sha256', channelSecret)
-          .update(body)
-          .digest('base64');
-
-      if (hash !== signature) {
-        logger.error('簽名驗證失敗');
-        res.status(401).send('Unauthorized: Invalid signature');
-        return;
-      }
-    } catch (error) {
-      logger.error('簽名驗證錯誤:', error);
-      res.status(500).send('Internal Server Error');
+    
+    const body = req.rawBody.toString('utf-8');
+    if (!validateSignature(body, signature, channelSecret)) {
+      logger.error('❌ 簽名驗證失敗');
+      res.status(401).send('Unauthorized: Invalid signature');
       return;
     }
-
-    // 解析請求內容
+    
+    // 處理事件
     const events = req.body.events || [];
-    logger.info(`收到 ${events.length} 個事件`);
-
-    // 處理每個事件
+    logger.info(`📥 收到 ${events.length} 個事件`);
+    
     for (const event of events) {
       try {
-        logger.info('事件類型:', event.type);
-
-        // 只處理訊息事件
-        if (event.type === 'message') {
-          const message = event.message;
-          logger.info('訊息類型:', message.type);
-
-          // 只處理文字訊息
-          if (message.type === 'text') {
-            const userMessage = message.text;
-            logger.info('用戶訊息:', userMessage);
-
-            // 處理訊息並取得回覆
-            const replyMsg = await handleTextMessage(userMessage);
-
-            if (replyMsg) {
-              // 回覆訊息
-              await replyMessage(event.replyToken, [replyMsg], accessToken);
-              logger.info('已回覆訊息');
-            } else {
-              logger.info('無需回覆');
-            }
+        if (event.type === 'message' && event.message.type === 'text') {
+          const userMessage = event.message.text;
+          logger.info(`💬 用戶訊息: ${userMessage}`);
+          
+          const replyMsg = await handleTextMessage(userMessage);
+          
+          if (replyMsg) {
+            await replyMessage(event.replyToken, [replyMsg], accessToken);
+            logger.info('✅ 已回覆訊息');
           }
         }
       } catch (error) {
-        logger.error('處理事件時發生錯誤:', error);
+        logger.error('❌ 處理事件失敗:', error);
       }
     }
-
+    
     res.status(200).send('OK');
   } catch (error) {
-    logger.error('Webhook 處理失敗:', error);
+    logger.error('❌ Webhook 處理失敗:', error);
     res.status(500).send('Internal Server Error');
   }
 }
@@ -357,15 +345,17 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
  * Cloud Function 進入點
  */
 exports.lineMessaging = onRequest(
-    {
-      region: 'asia-east2',
-      secrets: [lineChannelSecret, lineChannelAccessToken],
-      cors: true,
-    },
-    async (req, res) => {
-      const channelSecret = lineChannelSecret.value();
-      const accessToken = lineChannelAccessToken.value();
-
-      await handleWebhook(req, res, channelSecret, accessToken);
-    },
+  {
+    region: 'asia-east2',
+    secrets: [lineChannelSecret, lineChannelAccessToken],
+    cors: true
+  },
+  async (req, res) => {
+    await handleWebhook(
+      req,
+      res,
+      lineChannelSecret.value(),
+      lineChannelAccessToken.value()
+    );
+  }
 );
