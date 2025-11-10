@@ -1,8 +1,95 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-09 完成雙保險關鍵字管理系統（方案 A：硬編碼 + Firestore 動態系統）
+**最近更新**: 2025-11-10 完成混合架構關鍵字系統（共享模組 + 雙保險機制）
 
-## 重要實現記錄 (2025-11-09) - 雙保險關鍵字管理系統
+## 重要實現記錄 (2025-11-10) - 混合架構關鍵字系統
+
+### 專案目標
+建立「龜馬山整合服務平台」混合架構關鍵字管理系統：
+- **共享模組**：`functions/src/shared/keywords.js` 統一定義 19 個關鍵字
+- **雙保險機制**：
+  1. Firestore 動態查詢（優先，5分鐘快取）
+  2. 硬編碼後備（使用共享模組，監控使用頻率）
+  3. 預設說明訊息
+- **混合LIFF架構**：
+  - 16 個共用 LIFF App（需轉發器）
+  - 3 個獨立 LIFF App（直接URL）
+
+### 系統架構
+
+#### 核心組件
+1. **共享關鍵字模組** (`functions/src/shared/keywords.js`)：
+   - 定義 19 個關鍵字配置
+   - 支援兩種模式：`liffUrl`（獨立）或 `liffApp + path`（共用）
+   - 提供 `buildLiffUrl()` 自動生成正確 LIFF URL
+   - 提供 `normalizeKeyword()` 正規化關鍵字
+
+2. **重建腳本** (`functions/src/admin/rebuild.js`)：
+   - 導入共享模組
+   - 清空並重建 Firestore 關鍵字
+   - 顯示架構統計（共用/獨立 LIFF App 數量）
+
+3. **訊息處理** (`functions/src/messaging/index.js`)：
+   - 3 層查詢機制（Firestore → 硬編碼後備 → 預設訊息）
+   - 後備使用計數器（監控 Firestore 健康）
+   - 動態硬編碼後備（遍歷共享模組 KEYWORDS）
+
+4. **轉發器** (`public/liff/*.html`)：
+   - 簡化版轉發器（支援 `liff.state` 路由）
+   - 保持 16 個共用 LIFF App 關鍵字運作
+
+#### 19 個關鍵字配置
+
+**Checkin 簽到（2個）**：
+- 奉香簽到 → /checkin/index.html（別名：簽到、奉香、打卡、打卡簽到）
+- 簽到管理 → /checkin/history.html（別名：奉香管理、1111）
+
+**Service 神務（11個）**：
+- 龜馬山一點靈 → /service/DD.html
+- 年斗法會 → /service/ND.html
+- 禮斗法會 → /service/LD.html
+- 中元法會 → /service/ZY.html
+- 普施法會 → /service/PS.html
+- 秋祭法會 → /service/QJ.html
+- 建宮廟款 → /service/BG.html
+- 添香油 → /service/XY.html
+- 福田會 → /service/ft.html
+- 神務服務 → /service/index.html
+
+**Schedule 排班（4個）**：
+- 本週班表 → /schedule/week.html
+- 本月班表 → /schedule/month.html
+- 班表 → /schedule/roste.html
+- 志工排班 → /schedule/schedule.html
+
+**獨立 LIFF App（3個）**：
+- 福田Young會 → 獨立 LIFF URL (2008269293-XPgaLra8)
+- 企業團體 → 獨立 LIFF URL (2008269293-LKR2Nr2x)
+- 信眾個人 → 獨立 LIFF URL (2008269293-71e3y43M)
+
+### 部署步驟
+
+1. **部署 Cloud Functions**：
+   ```bash
+   cd functions
+   npm run deploy
+   ```
+
+2. **清空 Firestore 舊關鍵字**：
+   訪問：`https://asia-east2-platform-bc783.cloudfunctions.net/clearKeywords`
+
+3. **重建 Firestore 關鍵字**：
+   訪問：`https://asia-east2-platform-bc783.cloudfunctions.net/rebuildKeywords`
+
+4. **測試關鍵字**：
+   - 簽到、奉香、打卡
+   - 點燈、年斗、福田會
+   - 福田Young會、企業團體、信眾個人
+   - 排班、本週班表
+
+---
+
+## 歷史記錄 (2025-11-09) - 雙保險關鍵字管理系統
 
 ### 專案目標
 建立「龜馬山整合服務平台」雙保險關鍵字管理架構：
