@@ -8,57 +8,59 @@
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <div class="manage-container">
-        <div class="page-header">
-            <div class="header-left">
-                <h1>🙏 奉香簽到管理</h1>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 5px 0 0 0;">管理巡邏點、查看統計、管理使用者</p>
+    <div class="manage-layout">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>🙏 奉香簽到管理</h1>
+                    <p>管理巡邏點、查看統計、管理使用者</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
+                </div>
             </div>
-            <div class="header-actions">
-                <button class="header-btn" onclick="window.location.href='/'">
-                    回首頁
-                </button>
-                <button id="logoutBtn" class="header-btn">登出</button>
+        </header>
+
+        <main class="manage-main">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>載入管理功能...</p>
             </div>
-        </div>
 
-        <div id="loadingIndicator" class="loading">
-            <div class="spinner"></div>
-            <p>載入管理功能...</p>
-        </div>
-
-        <div id="userInfo" class="user-info" style="display: none;">
-            <img id="userAvatar" class="user-avatar" alt="使用者頭像">
-            <div class="user-details">
-                <h3 id="userName"></h3>
-                <div id="userRoles" class="user-roles"></div>
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+                <div class="user-details">
+                    <h3 id="userName"></h3>
+                    <div id="userRoles" class="user-roles"></div>
+                </div>
             </div>
-        </div>
 
-        <div id="manageContent" class="manage-content" style="display: none;">
-            <div class="function-grid">
-                <a href="/checkin/manage/dashboard.html" class="function-card">
-                    <div class="function-icon">📊</div>
-                    <div class="function-title">儀表板</div>
-                    <div class="function-badge">✓ 已上線</div>
-                    <div class="function-desc">簽到統計與數據分析</div>
-                </a>
+            <div id="manageContent" class="manage-content" style="display: none;">
+                <div class="function-grid">
+                    <a href="/checkin/manage/dashboard.html" class="function-card">
+                        <div class="function-icon">📊</div>
+                        <div class="function-title">儀表板</div>
+                        <div class="function-badge">✓ 已上線</div>
+                        <div class="function-desc">簽到統計與數據分析</div>
+                    </a>
 
-                <a href="/checkin/manage/patrol.html" class="function-card">
-                    <div class="function-icon">📍</div>
-                    <div class="function-title">巡邏點管理</div>
-                    <div class="function-badge">✓ 已上線</div>
-                    <div class="function-desc">新增、編輯、刪除巡邏點</div>
-                </a>
+                    <a href="/checkin/manage/patrol.html" class="function-card">
+                        <div class="function-icon">📍</div>
+                        <div class="function-title">巡邏點管理</div>
+                        <div class="function-badge">✓ 已上線</div>
+                        <div class="function-desc">新增、編輯、刪除巡邏點</div>
+                    </a>
 
-                <a href="/checkin/manage/user.html" class="function-card">
-                    <div class="function-icon">👥</div>
-                    <div class="function-title">使用者管理</div>
-                    <div class="function-badge">✓ 已上線</div>
-                    <div class="function-desc">管理使用者角色權限</div>
-                </a>
+                    <a href="/checkin/manage/user.html" class="function-card">
+                        <div class="function-icon">👥</div>
+                        <div class="function-title">使用者管理</div>
+                        <div class="function-badge">✓ 已上線</div>
+                        <div class="function-desc">管理使用者角色權限</div>
+                    </a>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script type="module">

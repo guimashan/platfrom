@@ -8,57 +8,59 @@
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <div class="manage-container">
-        <div class="page-header">
-            <div class="header-left">
-                <h1>🏯 神務服務管理</h1>
-                <p style="color: rgba(255, 255, 255, 0.9); margin: 5px 0 0 0;">管理線上點燈、法會報名等神務服務訂單</p>
-            </div>
-            <div class="header-actions">
-                <button class="header-btn" onclick="window.location.href='/'">
-                    回首頁
-                </button>
-                <button id="logoutBtn" class="header-btn">登出</button>
-            </div>
-        </div>
-
-        <div id="loadingIndicator" class="loading">
-            <div class="spinner"></div>
-            <p>載入管理功能...</p>
-        </div>
-
-        <div id="userInfo" class="user-info" style="display: none;">
-            <img id="userAvatar" class="user-avatar" alt="使用者頭像">
-            <div class="user-details">
-                <h3 id="userName"></h3>
-                <div id="userRoles" class="user-roles"></div>
-            </div>
-        </div>
-
-        <div id="manageContent" class="manage-content" style="display: none;">
-            <div class="function-grid">
-                <a href="/service/manage/orders.html" class="function-card">
-                    <div class="function-icon">📋</div>
-                    <div class="function-title">訂單管理</div>
-                    <div class="function-badge">✓ 已上線</div>
-                    <div class="function-desc">查看報名訂單、處理付款</div>
-                </a>
-
-                <div class="function-card disabled">
-                    <div class="function-icon">📊</div>
-                    <div class="function-title">統計分析</div>
-                    <div class="function-badge coming-soon">即將推出</div>
-                    <div class="function-desc">服務報名統計與分析</div>
+    <div class="manage-layout">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>🏯 神務服務管理</h1>
+                    <p>管理線上點燈、法會報名等神務服務訂單</p>
                 </div>
-
-                <div class="function-card disabled">
-                    <div class="function-icon">⚙️</div>
-                    <div class="function-title">服務設定</div>
-                    <div class="function-badge coming-soon">即將推出</div>
-                    <div class="function-desc">管理服務項目與價格</div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
                 </div>
             </div>
-        </div>
+        </header>
+
+        <main class="manage-main">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>載入管理功能...</p>
+            </div>
+
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+                <div class="user-details">
+                    <h3 id="userName"></h3>
+                    <div id="userRoles" class="user-roles"></div>
+                </div>
+            </div>
+
+            <div id="manageContent" class="manage-content" style="display: none;">
+                <div class="function-grid">
+                    <a href="/service/manage/orders.html" class="function-card">
+                        <div class="function-icon">📋</div>
+                        <div class="function-title">訂單管理</div>
+                        <div class="function-badge">✓ 已上線</div>
+                        <div class="function-desc">查看報名訂單、處理付款</div>
+                    </a>
+
+                    <div class="function-card disabled">
+                        <div class="function-icon">📊</div>
+                        <div class="function-title">統計分析</div>
+                        <div class="function-badge coming-soon">即將推出</div>
+                        <div class="function-desc">服務報名統計與分析</div>
+                    </div>
+
+                    <div class="function-card disabled">
+                        <div class="function-icon">⚙️</div>
+                        <div class="function-title">服務設定</div>
+                        <div class="function-badge coming-soon">即將推出</div>
+                        <div class="function-desc">管理服務項目與價格</div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script type="module">
