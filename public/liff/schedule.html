@@ -120,10 +120,15 @@
                 const targetUrl = SCHEDULE_PATHS[cleanState];
                 console.log('短格式，導航到:', targetUrl);
                 window.location.replace(targetUrl);
+            } else if (cleanState.startsWith('schedule/')) {
+                // 檢查是否是新格式（無 /liff 前綴）：/schedule/week.html
+                const targetUrl = `${BASE_URL}/liff/${cleanState}`;
+                console.log('新格式（無 /liff 前綴），導航到:', targetUrl);
+                window.location.replace(targetUrl);
             } else if (cleanState.startsWith('liff/schedule/')) {
-                // 檢查是否是完整路徑
+                // 檢查是否是舊格式（有 /liff 前綴）：/liff/schedule/week.html
                 const targetUrl = `${BASE_URL}/${cleanState}`;
-                console.log('完整路徑格式，導航到:', targetUrl);
+                console.log('舊格式（有 /liff 前綴），導航到:', targetUrl);
                 window.location.replace(targetUrl);
             } else {
                 console.log('無法識別的 liff.state 格式，顯示主頁面');

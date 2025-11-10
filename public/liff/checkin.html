@@ -281,10 +281,18 @@
                     return;
                 }
                 
-                // 檢查是否是完整路徑（/liff/checkin/dashboard.html）
+                // 檢查是否是新格式（無 /liff 前綴）：/checkin/index.html
+                if (cleanState.startsWith('checkin/')) {
+                    const targetUrl = `${BASE_URL}/liff/${cleanState}`;
+                    console.log('新格式（無 /liff 前綴），導航到:', targetUrl);
+                    window.location.replace(targetUrl);
+                    return;
+                }
+                
+                // 檢查是否是舊格式（有 /liff 前綴）：/liff/checkin/dashboard.html
                 if (cleanState.startsWith('liff/checkin/')) {
                     const targetUrl = `${BASE_URL}/${cleanState}`;
-                    console.log('完整路徑格式，導航到:', targetUrl);
+                    console.log('舊格式（有 /liff 前綴），導航到:', targetUrl);
                     window.location.replace(targetUrl);
                     return;
                 }
