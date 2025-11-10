@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用戶管理 - 簽到管理後台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .user-table-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .user-table thead {
+            background: #f8f9fa;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-table th {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .user-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .role-checkbox {
+            margin-right: 5px;
+        }
+
+        .role-item {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .activity-log-section {
+            margin-top: 30px;
+        }
+
+        .log-item {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .log-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .log-operator {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .log-time {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .log-details {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .badge-added {
+            background: #d4edda;
+            color: #155724;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 0 3px;
+        }
+
+        .badge-removed {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 0 3px;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body class="theme-admin">
+    <!-- 登入提示畫面 -->
+    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
+        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
+            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
+            <h2 style="margin: 0 0 10px 0; font-size: 24px;">簽到管理後台</h2>
+            <p style="margin: 0; opacity: 0.9;">驗證權限中...</p>
+        </div>
+    </div>
+
+    <!-- 主要內容 -->
+    <div id="mainApp" class="manage-container" style="display: none;">
+        <!-- 側邊欄 -->
+        <aside class="manage-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/guimashan-logo.png" alt="龜馬山" class="sidebar-logo">
+                <h2 class="sidebar-title">簽到管理</h2>
+                <p class="sidebar-subtitle">龜馬山整合服務平台</p>
+            </div>
+            <nav id="manageSidebar" class="sidebar-nav">
+                <!-- 由 JS 動態生成 -->
+            </nav>
+        </aside>
+
+        <!-- 主內容區 -->
+        <main class="manage-main">
+            <!-- 頂部導航 -->
+            <header class="manage-header">
+                <div class="header-left">
+                    <h1>👥 用戶管理</h1>
+                    <p class="header-breadcrumb">
+                        <a href="/">首頁</a> / 
+                        <a href="/checkin/checkin.html">簽到</a> / 
+                        <span>用戶管理</span>
+                    </p>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <p id="userName" class="user-name">載入中...</p>
+                        <p id="userRole" class="user-role">-</p>
+                    </div>
+                    <button id="logoutBtn" class="btn-manage btn-secondary btn-sm">登出</button>
+                </div>
+            </header>
+
+            <!-- 內容區域 -->
+            <div class="manage-content">
+                <!-- 用戶列表 -->
+                <div class="manage-card">
+                    <div class="card-header">
+                        <h2 class="card-title">用戶列表</h2>
+                        <div class="card-actions">
+                            <button id="refreshBtn" class="btn-manage btn-primary btn-sm">🔄 重新整理</button>
+                        </div>
+                    </div>
+
+                    <div class="user-table-container">
+                        <table class="user-table">
+                            <thead>
+                                <tr>
+                                    <th>頭像</th>
+                                    <th>姓名</th>
+                                    <th>Email</th>
+                                    <th>角色權限</th>
+                                    <th>最後登入</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <tr>
+                                    <td colspan="6" class="no-data">載入中...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 操作日誌 -->
+                <div class="manage-card activity-log-section">
+                    <div class="card-header">
+                        <h2 class="card-title">操作日誌</h2>
+                        <div class="card-actions">
+                            <button id="refreshLogBtn" class="btn-manage btn-outline btn-sm">🔄 重新整理</button>
+                        </div>
+                    </div>
+                    <div id="activityLogContainer">
+                        <div class="no-data">載入中...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 角色編輯 Modal -->
+    <div id="roleModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 10000; justify-content: center; align-items: center;">
+        <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+            <h3 style="margin: 0 0 20px 0; font-size: 20px; color: #333;">編輯用戶角色</h3>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="margin: 0 0 10px 0; font-weight: 600;">用戶：<span id="modalUserName"></span></p>
+                <p style="margin: 0; color: #666; font-size: 14px;">用戶 ID：<span id="modalUserId"></span></p>
+            </div>
+
+            <div style="margin-bottom: 25px;">
+                <p style="margin: 0 0 10px 0; font-weight: 600;">角色權限：</p>
+                <div class="role-item">
+                    <input type="checkbox" id="roleSuperadmin" class="role-checkbox" value="superadmin">
+                    <label for="roleSuperadmin">超級管理員</label>
+                </div>
+                <div class="role-item">
+                    <input type="checkbox" id="roleAdmin" class="role-checkbox" value="admin_checkin">
+                    <label for="roleAdmin">簽到管理員</label>
+                </div>
+                <div class="role-item">
+                    <input type="checkbox" id="rolePoweruser" class="role-checkbox" value="poweruser_checkin">
+                    <label for="rolePoweruser">簽到進階用戶</label>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="cancelRoleBtn" class="btn-manage btn-secondary">取消</button>
+                <button id="saveRoleBtn" class="btn-manage btn-primary">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 載入中 -->
+    <div id="globalLoading" class="global-loading">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- 訊息提示 -->
+    <div id="globalMessage" class="global-message"></div>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="/js/firebase-init.js"></script>
+    <script src="/checkin/manage/js/manage-common.js"></script>
+    <script src="/checkin/manage/js/user.js"></script>
+</body>
+</html>
