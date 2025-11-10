@@ -1,6 +1,39 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 16:15 清理舊版福田會檔案 + 優化 Replit 環境
+**最近更新**: 2025-11-10 08:30 專案大掃除完成 - 精簡 98% 檔案
+
+## 🎊 專案大掃除完成 (2025-11-10 08:30)
+
+**清理成果：**
+- 📦 專案從 110MB+ 精簡到 2.1MB（減少 98%）
+- 🗑️ 刪除 230+ 個無用檔案
+- ✅ 保留 67 個必要檔案（32 HTML + 25 JS + 1 CSS + 其他）
+- 🔒 移除泄露的 Firebase credentials（安全修復）
+
+**已刪除的檔案：**
+1. ✅ `public/service/donation.html`（孤立的 HTML，未被引用）
+2. ✅ `public/.vercel/` 目錄（Vercel 部署配置，不應在 git 中）
+3. ✅ `attached_assets/` 整個目錄（110MB）
+   - 297 個檔案（截圖、草稿文檔、生成的圖片）
+   - 包含泄露的 Firebase service-account JSON（嚴重安全問題已修復）
+   - 完全沒有被應用程式引用
+
+**已修復的問題：**
+- ✅ 修復「建宮廟款」別名：`jg/JG` → `bg/BG`（對應 BG.html）
+- ✅ 修復「添香油」別名：`tx/TX` → `xy/XY`（對應 XY.html）
+- ✅ 驗證所有 19 個關鍵字別名配置正確
+
+**檔案使用驗證：**
+- ✅ 32 個 HTML 檔案：全部有明確用途
+- ✅ 25 個 JS 檔案：全部被對應的 HTML 引用
+- ✅ 1 個 CSS 檔案：全域 common.css
+- ✅ 無 LSP 錯誤
+- ✅ 無死代碼
+
+**⚠️ 重要提醒：**
+因為 Firebase service-account credentials 曾在 attached_assets 中泄露，建議輪換 Firebase credentials 確保安全。
+
+---
 
 ## 🧹 系統清理完成 (2025-11-10 16:15)
 

@@ -124,7 +124,7 @@ const KEYWORDS = [
       text: '🏛️ 建宮廟款',
       label: '了解詳情'
     },
-    aliases: ['建廟', '建宮', 'jg', 'JG'],
+    aliases: ['建廟', '建宮', 'bg', 'BG'],
     priority: 92
   },
   {
@@ -136,7 +136,7 @@ const KEYWORDS = [
       text: '🕯️ 添香油',
       label: '了解詳情'
     },
-    aliases: ['香油', 'tx', 'TX'],
+    aliases: ['香油', 'xy', 'XY'],
     priority: 91
   },
   {
