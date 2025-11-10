@@ -9,13 +9,12 @@ const platformFunctions = require('./src/platform');
 const checkinFunctions = require('./src/checkin');
 const messagingFunctions = require('./src/messaging');
 const serviceFunctions = require('./src/service');
-const clearFunctions = require('./src/admin/clear-keywords');
 
 // 取得當前專案 ID（部署時由 Firebase 自動設定）
 const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT;
 
 // === Platform 專案 (platform-bc783) ===
-// 功能：LINE Bot + 用戶管理 + 關鍵字管理
+// 功能：LINE Bot + 用戶管理
 if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
   // Platform Functions - 用戶登入與權限管理
   exports.generateCustomToken = platformFunctions.generateCustomToken;
@@ -24,9 +23,6 @@ if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
 
   // LINE Messaging API Functions - LINE Bot Webhook
   exports.lineMessaging = messagingFunctions.lineMessaging;
-
-  // Admin Functions - 資料清理工具
-  exports.clearKeywords = clearFunctions.clearKeywords;
 }
 
 // === Check-in 專案 (checkin-76c77) ===
