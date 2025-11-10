@@ -618,7 +618,33 @@ const LIFF_IDS = {
 
 ## 開發環境
 
-### 已安裝
+### Replit 配置 (.replit)
+
+**已安裝模組：**
+- `nodejs-20` - Node.js 20.x (主要開發語言)
+- `python-3.11` - Python 3.11 (輔助工具)
+- `postgresql-16` - PostgreSQL 16 (資料庫)
+
+**Workflow 配置：**
+- **前端伺服器**（frontend）
+  - 命令：`cd public && npx http-server -p 5000 --cors -c-1`
+  - 端口：5000（對應外部端口 80）
+  - 輸出類型：webview（網頁預覽）
+  - CORS：已啟用
+  - 快取：已禁用（-c-1，便於開發）
+
+**部署配置：**
+- 部署目標：`autoscale`（自動擴展）
+- 運行命令：`npx http-server public -p 5000 --cors -c-1`
+
+**Nix 配置：**
+- Channel：stable-25_05
+- 額外套件：vlang, google-cloud-sdk-gce
+
+**整合：**
+- GitHub Integration (1.0.0) - 已啟用
+
+### 已安裝工具
 - Node.js 20.19.3
 - Firebase Tools
 - http-server (前端開發伺服器)
