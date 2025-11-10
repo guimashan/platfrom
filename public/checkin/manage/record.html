@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>簽到紀錄 - 簽到管理後台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/checkin/manage/css/manage.css">
+    <style>
+        .filter-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 15px;
+        }
+
+        .records-table-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .records-table thead {
+            background: #f8f9fa;
+        }
+
+        .records-table th,
+        .records-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .records-table th {
+            font-weight: 600;
+            color: #333;
+            white-space: nowrap;
+        }
+
+        .records-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .mode-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .mode-badge.gps {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .mode-badge.qr {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .mode-badge.both {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .test-mode-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            background: #fff3cd;
+            color: #856404;
+            margin-left: 5px;
+        }
+
+        .anomaly-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .photo-thumbnail {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .pagination-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .location-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .location-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .records-table {
+                font-size: 12px;
+            }
+
+            .records-table th,
+            .records-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 側邊欄 -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <h2>🏛️ 簽到管理</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/checkin/manage/dashboard.html" class="nav-item">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-text">儀表板</span>
+                </a>
+                <a href="/checkin/manage/record.html" class="nav-item active">
+                    <span class="nav-icon">📋</span>
+                    <span class="nav-text">簽到紀錄</span>
+                </a>
+                <a href="/checkin/manage/patrol.html" class="nav-item">
+                    <span class="nav-icon">📍</span>
+                    <span class="nav-text">巡邏點管理</span>
+                </a>
+                <a href="/checkin/manage/user.html" class="nav-item">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-text">用戶管理</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button onclick="logout()" class="btn btn-secondary btn-block">登出</button>
+            </div>
+        </aside>
+
+        <!-- 主要內容區 -->
+        <main class="admin-main">
+            <div class="admin-header">
+                <div>
+                    <h1 class="admin-title">📋 簽到紀錄</h1>
+                    <p class="admin-subtitle">查詢與導出簽到記錄</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="refreshRecords()" class="btn btn-secondary">
+                        🔄 重新整理
+                    </button>
+                    <button onclick="exportToExcel()" class="btn btn-primary">
+                        📑 導出 Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="admin-content">
+                <!-- 統計卡片 -->
+                <div class="stats-row">
+                    <div class="stat-card">
+                        <div class="stat-label">總簽到數</div>
+                        <div class="stat-value" id="totalCount">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">今日簽到</div>
+                        <div class="stat-value" id="todayCount">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">測試模式</div>
+                        <div class="stat-value" id="testModeCount">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">異常簽到</div>
+                        <div class="stat-value" id="anomalyCount" style="color: #e74c3c;">-</div>
+                    </div>
+                </div>
+
+                <!-- 篩選面板 -->
+                <div class="filter-panel">
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label for="filterStartDate">開始日期</label>
+                            <input type="date" id="filterStartDate">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterEndDate">結束日期</label>
+                            <input type="date" id="filterEndDate">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterPatrol">巡邏點</label>
+                            <select id="filterPatrol">
+                                <option value="">全部巡邏點</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterMode">簽到方式</label>
+                            <select id="filterMode">
+                                <option value="">全部方式</option>
+                                <option value="gps">GPS 定位</option>
+                                <option value="qr">QR Code</option>
+                                <option value="both">雙重驗證</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterTestMode">測試模式</label>
+                            <select id="filterTestMode">
+                                <option value="">全部</option>
+                                <option value="true">僅測試</option>
+                                <option value="false">正式簽到</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterUserId">用戶 ID</label>
+                            <input type="text" id="filterUserId" placeholder="輸入用戶 ID">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filterAnomaly">異常狀態</label>
+                            <select id="filterAnomaly">
+                                <option value="">全部</option>
+                                <option value="false">正常簽到</option>
+                                <option value="true">異常簽到</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button onclick="resetFilters()" class="btn btn-secondary">
+                            重置篩選
+                        </button>
+                        <button onclick="applyFilters()" class="btn btn-primary">
+                            套用篩選
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 簽到紀錄表格 -->
+                <div class="records-table-container">
+                    <table class="records-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th>用戶 ID</th>
+                                <th>巡邏點</th>
+                                <th>簽到方式</th>
+                                <th>距離 (m)</th>
+                                <th>位置</th>
+                                <th>照片</th>
+                                <th>狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTableBody">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <div class="empty-state-icon">📭</div>
+                                    <div>載入中...</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- 分頁控制 -->
+                    <div class="pagination">
+                        <div class="pagination-info" id="paginationInfo">
+                            顯示 0 - 0 筆，共 0 筆
+                        </div>
+                        <div class="pagination-controls">
+                            <button onclick="previousPage()" class="btn btn-secondary" id="prevBtn" disabled>
+                                上一頁
+                            </button>
+                            <button onclick="nextPage()" class="btn btn-secondary" id="nextBtn" disabled>
+                                下一頁
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Firebase 和相關腳本 -->
+    <script type="module" src="/js/firebase-init.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script type="module" src="/checkin/manage/js/manage-common.js"></script>
+    <script type="module" src="/checkin/manage/js/record.js"></script>
+</body>
+</html>
