@@ -1,6 +1,57 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 完成混合架構關鍵字系統（共享模組 + 雙保險機制）
+**最近更新**: 2025-11-10 15:30 完成第三版系統部署（硬編碼 + Firebase + 網站後台）
+
+## ✅ 第三版系統部署成功 (2025-11-10 15:30)
+
+**部署狀態：** 🟢 已上線運行
+
+**核心 Cloud Functions：**
+- ✅ `lineMessaging` - LINE Bot Webhook (新)
+  - URL: `https://asia-east2-platform-bc783.cloudfunctions.net/lineMessaging`
+  - 狀態：已部署並運行
+  
+- ✅ `clearKeywords` - 清空關鍵字工具 (新)
+  - URL: `https://asia-east2-platform-bc783.cloudfunctions.net/clearKeywords`
+  - 狀態：已執行（刪除 18 個舊關鍵字）
+  
+- ✅ `rebuildKeywords` - 重建關鍵字工具 (更新)
+  - URL: `https://rebuildkeywords-4yprhpbawa-df.a.run.app`
+  - 狀態：已執行（創建 19 個新關鍵字）
+
+**已清理的舊系統：**
+- ❌ `lineWebhook` (asia-east2) - 已刪除
+- ❌ `migrateKeywords` (asia-east2) - 已刪除
+- ❌ `migrateAllKeywords` (asia-east2) - 已刪除
+- ❌ `fixLiffUrls` (us-central1) - 已刪除
+- ❌ `scripts/migrate-keywords.js` - 已刪除
+
+**Firestore 狀態：**
+- ✅ 19 個關鍵字已重建完成
+- ✅ 架構：16 個共用 LIFF App + 3 個獨立 LIFF App
+- ✅ 雙保險機制已啟動（Firestore + 硬編碼後備）
+
+**⚠️ 重要：LINE Webhook URL 設定**
+
+如果您之前使用的是 `lineWebhook`，請更新 LINE Developers Console：
+
+1. 前往：https://developers.line.biz/console/
+2. 選擇您的 Messaging API Channel
+3. 更新 Webhook URL 為：
+   ```
+   https://asia-east2-platform-bc783.cloudfunctions.net/lineMessaging
+   ```
+4. 啟用 Webhook
+5. 測試連接
+
+**測試關鍵字：**
+- 簽到、打卡 → 奉香簽到
+- 點燈、DD → 龜馬山一點靈
+- 福田會、FT → 福田會入會
+- 福田Young會 → 獨立 LIFF
+- 排班、SC → 志工排班
+
+---
 
 ## 重要實現記錄 (2025-11-10) - 混合架構關鍵字系統
 
