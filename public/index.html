@@ -6,7 +6,7 @@
     <title>龜馬山整合服務平台</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
@@ -90,7 +90,52 @@
         </div>
     </div>
 
-    <script type="module" src="/js/firebase-init.js"></script>
-    <script type="module" src="/js/auth.js"></script>
+    <script type="module">
+        let firebaseLoaded = false;
+        let authModule = null;
+
+        async function loadFirebase() {
+            if (firebaseLoaded) return authModule;
+            
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            loadingIndicator.classList.remove('hidden');
+            
+            try {
+                await import('/js/firebase-init.js');
+                authModule = await import('/js/auth.js');
+                firebaseLoaded = true;
+                return authModule;
+            } catch (error) {
+                console.error('Firebase 載入失敗:', error);
+                alert('系統載入失敗，請重新整理頁面');
+                throw error;
+            } finally {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('lineLoginBtn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const auth = await loadFirebase();
+            if (auth && auth.handleLineLogin) {
+                auth.handleLineLogin();
+            }
+        });
+
+        (async function checkAuth() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasAuthParams = urlParams.has('code') || urlParams.has('state') || 
+                                  document.referrer.includes('line.me') ||
+                                  sessionStorage.getItem('firebase_loaded');
+            
+            if (hasAuthParams) {
+                sessionStorage.setItem('firebase_loaded', 'true');
+                await loadFirebase();
+            } else {
+                document.getElementById('loginCard').style.display = 'block';
+                document.getElementById('moduleGrid').style.opacity = '0.6';
+            }
+        })();
+    </script>
 </body>
 </html>
