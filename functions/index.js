@@ -1,6 +1,8 @@
 /**
- * Cloud Functions 主入口點
+ * Cloud Functions 主入口點 - 微服務架構
  * 龜馬山 goLine 平台
+ * 
+ * 根據專案 ID 條件導出對應的 Functions，避免重複部署
  */
 
 const platformFunctions = require('./src/platform');
@@ -11,34 +13,53 @@ const rebuildFunctions = require('./src/admin/rebuild');
 const clearFunctions = require('./src/admin/clear-keywords');
 const exportFunctions = require('./src/admin/export-keywords');
 
-// 導出 Platform Functions
-exports.generateCustomToken = platformFunctions.generateCustomToken;
-exports.generateCustomTokenFromLiff = platformFunctions.generateCustomTokenFromLiff;
-exports.updateUserRole = platformFunctions.updateUserRole;
+// 取得當前專案 ID（部署時由 Firebase 自動設定）
+const PROJECT_ID = process.env.GCLOUD_PROJECT || process.env.GCP_PROJECT;
 
-// 導出 Check-in Functions
-exports.initializeDefaultPatrols = checkinFunctions.initializeDefaultPatrols;
-exports.verifyCheckinDistance = checkinFunctions.verifyCheckinDistance;
-exports.verifyCheckinV2 = checkinFunctions.verifyCheckinV2;
-exports.getPatrols = checkinFunctions.getPatrols;
-exports.getCheckinHistory = checkinFunctions.getCheckinHistory;
-exports.getTestModeStatus = checkinFunctions.getTestModeStatus;
-exports.updateTestMode = checkinFunctions.updateTestMode;
-exports.savePatrol = checkinFunctions.savePatrol;
-exports.deletePatrol = checkinFunctions.deletePatrol;
-exports.getDashboardStats = checkinFunctions.getDashboardStats;
+// === Platform 專案 (platform-bc783) ===
+// 功能：LINE Bot + 用戶管理 + 關鍵字管理
+if (!PROJECT_ID || PROJECT_ID === 'platform-bc783') {
+  // Platform Functions - 用戶登入與權限管理
+  exports.generateCustomToken = platformFunctions.generateCustomToken;
+  exports.generateCustomTokenFromLiff = platformFunctions.generateCustomTokenFromLiff;
+  exports.updateUserRole = platformFunctions.updateUserRole;
 
-// 導出 LINE Messaging API Functions
-exports.lineMessaging = messagingFunctions.lineMessaging;
+  // LINE Messaging API Functions - LINE Bot Webhook
+  exports.lineMessaging = messagingFunctions.lineMessaging;
 
-// 導出 Service Functions (神務服務)
-exports.submitRegistration = serviceFunctions.submitRegistration;
-exports.getRegistrations = serviceFunctions.getRegistrations;
-exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
-exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
-exports.confirmPayment = serviceFunctions.confirmPayment;
+  // Admin Functions - 關鍵字管理工具
+  exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
+  exports.clearKeywords = clearFunctions.clearKeywords;
+  exports.exportKeywordsToCode = exportFunctions.exportKeywordsToCode;
+}
 
-// 導出 Admin Functions (管理功能)
-exports.rebuildKeywords = rebuildFunctions.rebuildKeywords;
-exports.clearKeywords = clearFunctions.clearKeywords;
-exports.exportKeywordsToCode = exportFunctions.exportKeywordsToCode;
+// === Check-in 專案 (checkin-76c77) ===
+// 功能：GPS 簽到系統
+if (!PROJECT_ID || PROJECT_ID === 'checkin-76c77') {
+  exports.initializeDefaultPatrols = checkinFunctions.initializeDefaultPatrols;
+  exports.verifyCheckinDistance = checkinFunctions.verifyCheckinDistance;
+  exports.verifyCheckinV2 = checkinFunctions.verifyCheckinV2;
+  exports.getPatrols = checkinFunctions.getPatrols;
+  exports.getCheckinHistory = checkinFunctions.getCheckinHistory;
+  exports.getTestModeStatus = checkinFunctions.getTestModeStatus;
+  exports.updateTestMode = checkinFunctions.updateTestMode;
+  exports.savePatrol = checkinFunctions.savePatrol;
+  exports.deletePatrol = checkinFunctions.deletePatrol;
+  exports.getDashboardStats = checkinFunctions.getDashboardStats;
+}
+
+// === Service 專案 (service-b9d4a) ===
+// 功能：神務服務（法會報名、訂單管理、付款確認）
+if (!PROJECT_ID || PROJECT_ID === 'service-b9d4a') {
+  exports.submitRegistration = serviceFunctions.submitRegistration;
+  exports.getRegistrations = serviceFunctions.getRegistrations;
+  exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
+  exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
+  exports.confirmPayment = serviceFunctions.confirmPayment;
+}
+
+// === Schedule 專案 (schedule-48ff9) ===
+// 功能：志工排班系統（待開發）
+// if (!PROJECT_ID || PROJECT_ID === 'schedule-48ff9') {
+//   // 排班相關 functions 將在此處導出
+// }

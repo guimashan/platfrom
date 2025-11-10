@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "emulators": "firebase emulators:start",
-    "deploy:platform": "firebase deploy --project platform-bc783 --only functions",
-    "deploy:checkin": "firebase deploy --project checkin-29f7f --only functions",
+    "deploy:platform": "cd functions && firebase deploy --project platform-bc783 --only functions",
+    "deploy:checkin": "cd functions && firebase deploy --project checkin-76c77 --only functions",
+    "deploy:service": "cd functions && firebase deploy --project service-b9d4a --only functions",
+    "deploy:all": "npm run deploy:platform && npm run deploy:checkin && npm run deploy:service",
     "serve": "cd public && python3 -m http.server 5000"
   },
   "keywords": [
