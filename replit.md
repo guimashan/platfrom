@@ -1,6 +1,42 @@
 # 龜馬山整合服務平台 - 開發專案
 
-**最近更新**: 2025-11-10 08:30 專案大掃除完成 - 精簡 98% 檔案
+**最近更新**: 2025-11-10 17:56 恢復福田會表單文件（FTY/FTC/FTP）
+
+## ✅ 福田會表單文件恢復完成 (2025-11-10 17:56)
+
+**背景：**
+今天早上在專案大掃除時，誤判三個福田會表單文件為「死代碼」而刪除。但實際上這些文件是三個獨立 LIFF App 的 Endpoint URL，需要在 LINE Developers Console 中配置使用。
+
+**已恢復的文件：**
+1. ✅ `public/service/FTY.html` (17KB) - 福田Young會入會表單
+2. ✅ `public/service/FTC.html` (12KB) - 企業團體入會表單
+3. ✅ `public/service/FTP.html` (16KB) - 信眾個人入會表單
+4. ✅ `public/service/js/FTY.js` (24KB) - 福田Young會控制器
+5. ✅ `public/service/js/FTC.js` (15KB) - 企業團體控制器
+6. ✅ `public/service/js/FTP.js` (23KB) - 信眾個人控制器
+
+**功能完整性：**
+- ✅ LINE 登入（LIFF OAuth）
+- ✅ Firebase 資料庫整合
+- ✅ NewebPay 信用卡付款
+- ✅ 表單驗證與提交
+- ✅ 成功頁面導向
+
+**部署狀態：**
+- ✅ 已部署到 Vercel (https://go.guimashan.org.tw)
+- ✅ 通過 Architect 審查（功能完整）
+
+**重要提醒：**
+1. **LINE Developers Console 配置**：需要確認三個獨立 LIFF App 的 Endpoint URL：
+   - 福田Young會 (2008269293-XPgaLra8) → `https://go.guimashan.org.tw/service/FTY.html`
+   - 企業團體 (2008269293-LKR2Nr2x) → `https://go.guimashan.org.tw/service/FTC.html`
+   - 信眾個人 (2008269293-71e3y43M) → `https://go.guimashan.org.tw/service/FTP.html`
+
+2. **Vercel Bot Protection**：curl 等自動化工具會被 Vercel Security Checkpoint 攔截（403），但真實用戶用瀏覽器訪問不會受影響。如需關閉，請到 Vercel Dashboard → Firewall → Bot Management → Attack Challenge Mode → Disable。
+
+3. **端到端測試**：建議進行完整測試：LINE 登入 → 表單填寫 → 付款資訊 → 提交成功。
+
+---
 
 ## 🎊 專案大掃除完成 (2025-11-10 08:30)
 
