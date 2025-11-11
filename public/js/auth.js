@@ -59,28 +59,22 @@ export async function handleLineLogin() {
             return;
         }
         
-        // 🔒 產生密碼學安全的隨機 state 用於 CSRF 防護
+        // 🔒 產生 state 並用 localStorage 儲存（最可靠）
         const state = crypto.randomUUID();
+        const returnUrl = window.location.pathname + window.location.search;
         
-        // 💾 使用混合儲存策略（Cookie + sessionStorage 雙重後備）
-        setStorage('line_login_state', state, 600); // 10分鐘過期
+        // 使用 localStorage（最簡單可靠，不受跳轉影響）
+        localStorage.setItem('line_state', state);
+        localStorage.setItem('line_return', returnUrl);
         
-        // 💾 記住用戶原本想去的頁面（只在還沒記錄時儲存，避免覆蓋）
-        if (!getStorage('line_login_return_url')) {
-            const returnUrl = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnUrl, 600);
-            console.log('💾 [auth.js] 儲存返回URL:', returnUrl);
-        } else {
-            console.log('💾 [auth.js] 已有返回URL，不覆蓋:', getStorage('line_login_return_url'));
+        // 立即驗證
+        const verify = localStorage.getItem('line_state');
+        if (verify !== state) {
+            alert('瀏覽器不支援儲存功能，請檢查設定');
+            return;
         }
-
-        // 驗證儲存已正確設置
-        const verifyState = getStorage('line_login_state');
-        console.log('💾 [auth.js] 設置登入 state:', {
-            state: state.substring(0, 8) + '...',
-            verified: verifyState === state,
-            returnUrl: getStorage('line_login_return_url')
-        });
+        
+        console.log('✅ State 已儲存:', state.substring(0, 8));
 
         // 構建 LINE 授權 URL
         const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');

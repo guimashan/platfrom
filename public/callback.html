@@ -55,7 +55,6 @@
     <script type="module">
         import { platformAuth } from '/js/firebase-init.js';
         import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getStorage, removeStorage } from '/js/cookie-utils.js';
 
         // 顯示診斷信息
         const debugUrl = document.getElementById('debugUrl');
@@ -84,12 +83,11 @@
                     throw new Error('未收到授權碼');
                 }
 
-                // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
-                // 💾 使用混合儲存策略（Cookie + sessionStorage 雙重後備）
-                const savedState = getStorage('line_login_state');
+                // 🔒 從 localStorage 讀取 state（最可靠）
+                const savedState = localStorage.getItem('line_state');
                 debugState.textContent = `🔐 State: URL=${state?.substring(0,8)}... / 儲存=${savedState?.substring(0,8)}... / 匹配=${savedState === state ? '✓' : '✗'}`;
                 
-                console.log('🔍 [callback] State 驗證 (混合儲存):', {
+                console.log('🔍 State 驗證:', {
                     urlState: state,
                     savedState: savedState,
                     match: savedState === state
@@ -102,12 +100,12 @@
                 }
                 
                 if (savedState !== state) {
-                    removeStorage('line_login_state');
-                    throw new Error(`安全驗證失敗：state 參數不匹配 (期望: ${savedState?.substring(0,8)}..., 收到: ${state?.substring(0,8)}...)。請重新登入。`);
+                    localStorage.removeItem('line_state');
+                    throw new Error('安全驗證失敗：state 不匹配，請重新登入。');
                 }
 
-                // 驗證成功後立即清除 state（防止重複使用）
-                removeStorage('line_login_state');
+                // 驗證成功，清除 state
+                localStorage.removeItem('line_state');
 
                 console.log('State 驗證通過，準備交換 Firebase Token...');
                 statusMessage.textContent = '驗證通過！正在與 LINE 伺服器交換憑證...';
@@ -146,23 +144,19 @@
                     throw new Error(`Firebase 登入失敗: ${authError.message}`);
                 }
 
-                // 導向用戶原本想去的頁面，如果沒有則導向首頁
-                const returnUrl = getStorage('line_login_return_url');
-                console.log('✅ [callback] 登入成功！讀取返回URL:', returnUrl);
-                console.log('💾 [callback] 登入完成，清理儲存');
+                // 導向用戶原本想去的頁面
+                const returnUrl = localStorage.getItem('line_return') || '/';
+                console.log('✅ 登入成功！跳轉到:', returnUrl);
                 
                 statusTitle.textContent = '✅ 登入成功！';
-                statusMessage.textContent = `正在跳轉到：${returnUrl || '首頁'}`;
+                statusMessage.textContent = `正在跳轉到：${returnUrl === '/' ? '首頁' : returnUrl}`;
                 
-                // 清除已使用的返回URL
-                removeStorage('line_login_return_url');
+                // 清除返回URL
+                localStorage.removeItem('line_return');
                 
-                const finalUrl = returnUrl || '/';
-                console.log('🟢 [callback] 最終跳轉到:', finalUrl);
-                
-                // 延遲 500ms 讓用戶看到成功訊息，然後跳轉
+                // 延遲 500ms 讓用戶看到成功訊息
                 setTimeout(() => {
-                    window.location.href = finalUrl;
+                    window.location.href = returnUrl;
                 }, 500);
 
             } catch (error) {
