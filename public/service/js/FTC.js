@@ -1,4 +1,5 @@
 import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
+import { handleLineLogin } from '/js/auth.js';
 
 // -----------------------------------------
 // FTC.js - 重構為動態載入模式
@@ -95,55 +96,6 @@ export async function init() {
     initializeApp();
 
     // --- LINE 登入處理 ---
-    function handleLineLogin() {
-        // 🔒 確保在正式域名上執行 OAuth（避免跨域問題）
-        const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
-        const currentOrigin = window.location.origin;
-        
-        if (currentOrigin !== CANONICAL_ORIGIN) {
-            console.log(`🔄 [FTC] 重定向到正式域名: ${CANONICAL_ORIGIN}`);
-            const returnPath = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnPath, 600);
-            window.location.href = CANONICAL_ORIGIN + returnPath;
-            return;
-        }
-        
-        const LINE_CHANNEL_ID = '2008269293';
-        const LINE_CALLBACK_URL = 'https://go.guimashan.org.tw/callback.html';
-    
-        try {
-            const state = crypto.randomUUID();
-            setStorage('line_login_state', state, 600); // 10分鐘過期
-        
-            const returnUrl = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnUrl, 600);
-            
-            // 驗證 sessionStorage 已正確設置
-            const verifyState = getStorage('line_login_state');
-            console.log('💾 [FTC] 設置登入 state:', {
-                state: state.substring(0, 8) + '...',
-                verified: verifyState === state,
-                returnUrl: returnUrl
-            });
-            
-            if (!verifyState || verifyState !== state) {
-                throw new Error('無法保存登入會話，請檢查瀏覽器設定是否阻止 Cookie/儲存空間');
-            }
-        
-            const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
-            lineAuthUrl.searchParams.append('response_type', 'code');
-            lineAuthUrl.searchParams.append('client_id', LINE_CHANNEL_ID);
-            lineAuthUrl.searchParams.append('redirect_uri', LINE_CALLBACK_URL);
-            lineAuthUrl.searchParams.append('state', state);
-            lineAuthUrl.searchParams.append('scope', 'profile openid email');
-        
-            window.location.href = lineAuthUrl.toString();
-        
-        } catch (error) {
-            console.error('LINE 登入失敗:', error);
-            alert('登入失敗: ' + error.message);
-        }
-    }
 
     // --- 事件監聽 ---
     function setupEventListeners() {

@@ -1,4 +1,5 @@
 import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
+import { handleLineLogin } from '/js/auth.js';
 
 // -----------------------------------------
 // DD.js - 重構為動態載入模式
@@ -94,65 +95,6 @@ export async function init() {
     
     // 立即執行初始化
     initializeApp();
-
-    // --- LINE 登入處理 ---
-    function handleLineLogin() {
-        // 🔒 確保在正式域名上執行 OAuth（避免跨域問題）
-        const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
-        const currentOrigin = window.location.origin;
-        
-        if (currentOrigin !== CANONICAL_ORIGIN) {
-            console.log(`🔄 [DD] 重定向到正式域名: ${CANONICAL_ORIGIN}`);
-            // 保存當前路徑，稍後導回
-            const returnPath = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnPath, 600);
-            // 導向正式域名
-            window.location.href = CANONICAL_ORIGIN + returnPath;
-            return;
-        }
-        
-        // 使用與 auth.js 相同的邏輯
-        const LINE_CHANNEL_ID = '2008269293';
-        const LINE_CALLBACK_URL = 'https://go.guimashan.org.tw/callback.html';
-    
-        try {
-            // 產生隨機 state 用於 CSRF 防護
-            const state = crypto.randomUUID();
-            setStorage('line_login_state', state, 600); // 10分鐘過期
-        
-            // 記住用戶想去的頁面
-            const returnUrl = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnUrl, 600);
-            
-            // 驗證 sessionStorage 已正確設置
-            const verifyState = getStorage('line_login_state');
-            console.log('💾 [DD] 設置登入 state:', {
-                state: state.substring(0, 8) + '...',
-                verified: verifyState === state,
-                returnUrl: returnUrl
-            });
-            
-            if (!verifyState || verifyState !== state) {
-                throw new Error('無法保存登入會話，請檢查瀏覽器設定是否阻止 Cookie/儲存空間');
-            }
-        
-            // 構建 LINE 授權 URL
-            const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
-            lineAuthUrl.searchParams.append('response_type', 'code');
-            lineAuthUrl.searchParams.append('client_id', LINE_CHANNEL_ID);
-            lineAuthUrl.searchParams.append('redirect_uri', LINE_CALLBACK_URL);
-            lineAuthUrl.searchParams.append('state', state);
-            lineAuthUrl.searchParams.append('scope', 'profile openid email');
-        
-            // 導向 LINE 授權頁面
-            console.log('🚀 [DD] 導向 LINE 授權頁面');
-            window.location.href = lineAuthUrl.toString();
-        
-        } catch (error) {
-            console.error('LINE 登入失敗:', error);
-            alert('登入失敗: ' + error.message);
-        }
-    }
 
     // --- 事件監聽 ---
     function setupEventListeners() {
