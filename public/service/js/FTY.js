@@ -1,4 +1,4 @@
-import { setCookie, getCookie, removeCookie } from '/js/cookie-utils.js';
+import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
 
 // -----------------------------------------
 // FTY.js - 重構為動態載入模式
@@ -114,14 +114,14 @@ export async function init() {
     
         try {
             const state = crypto.randomUUID();
-            setCookie('line_login_state', state, 600); // 10分鐘過期
+            setStorage('line_login_state', state, 600); // 10分鐘過期
         
             const returnUrl = window.location.pathname + window.location.search;
-            setCookie('line_login_return_url', returnUrl, 600);
+            setStorage('line_login_return_url', returnUrl, 600);
             
             // 驗證 sessionStorage 已正確設置
-            const verifyState = getCookie('line_login_state');
-            console.log('🍪 [FTY] 設置登入 state:', {
+            const verifyState = getStorage('line_login_state');
+            console.log('💾 [FTY] 設置登入 state:', {
                 state: state.substring(0, 8) + '...',
                 verified: verifyState === state,
                 returnUrl: returnUrl
