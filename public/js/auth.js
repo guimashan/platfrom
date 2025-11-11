@@ -54,7 +54,7 @@ export async function handleLineLogin() {
             console.log(`🔄 重定向到正式域名: ${CANONICAL_ORIGIN}`);
             // 保存當前路徑，稍後導回
             const returnPath = window.location.pathname + window.location.search;
-            setStorage('line_login_return_url', returnPath, 600);
+            localStorage.setItem('line_login_return_url', returnPath);
             // 導向正式域名，讓用戶從正式域名啟動 OAuth
             window.location.href = CANONICAL_ORIGIN + returnPath;
             return;
