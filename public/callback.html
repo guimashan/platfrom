@@ -49,6 +49,7 @@
     <script type="module">
         import { platformAuth } from '/js/firebase-init.js';
         import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getCookie, removeCookie } from '/js/cookie-utils.js';
 
         async function handleCallback() {
             try {
@@ -67,24 +68,27 @@
                 }
 
                 // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
-                const savedState = sessionStorage.getItem('line_login_state');
-                console.log('🔍 [callback] State 驗證:', {
+                // 🍪 改用 Cookie 儲存 state（無痕模式下更可靠）
+                const savedState = getCookie('line_login_state');
+                console.log('🔍 [callback] State 驗證 (使用 Cookie):', {
                     urlState: state,
                     savedState: savedState,
-                    match: savedState === state
+                    match: savedState === state,
+                    isIncognito: window.navigator.userAgent.includes('Incognito')
                 });
                 
                 if (!savedState) {
-                    throw new Error('安全驗證失敗：找不到登入會話，請重新登入。');
+                    throw new Error('安全驗證失敗：找不到登入會話，請重新登入。\n' +
+                        '💡 提示：如使用無痕模式，請確認瀏覽器允許 Cookie。');
                 }
                 
                 if (savedState !== state) {
-                    sessionStorage.removeItem('line_login_state');
+                    removeCookie('line_login_state');
                     throw new Error(`安全驗證失敗：state 參數不匹配 (期望: ${savedState?.substring(0,8)}..., 收到: ${state?.substring(0,8)}...)。請重新登入。`);
                 }
 
                 // 驗證成功後立即清除 state（防止重複使用）
-                sessionStorage.removeItem('line_login_state');
+                removeCookie('line_login_state');
 
                 console.log('State 驗證通過，準備交換 Firebase Token...');
 
