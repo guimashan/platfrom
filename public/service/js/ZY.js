@@ -1,3 +1,5 @@
+import { setCookie, getCookie, removeCookie } from '/js/cookie-utils.js';
+
 // -----------------------------------------
 // ZY.js - 重構為動態載入模式
 // Firebase 只在需要時才載入
@@ -90,14 +92,14 @@ export async function init() {
     
         try {
             const state = crypto.randomUUID();
-            sessionStorage.setItem('line_login_state', state);
+            setCookie('line_login_state', state, 600); // 10分鐘過期
         
             const returnUrl = window.location.pathname + window.location.search;
-            sessionStorage.setItem('line_login_return_url', returnUrl);
+            setCookie('line_login_return_url', returnUrl, 600);
             
             // 驗證 sessionStorage 已正確設置
-            const verifyState = sessionStorage.getItem('line_login_state');
-            console.log('🔐 [ZY] 設置登入 state:', {
+            const verifyState = getCookie('line_login_state');
+            console.log('🍪 [ZY] 設置登入 state:', {
                 state: state.substring(0, 8) + '...',
                 verified: verifyState === state,
                 returnUrl: returnUrl

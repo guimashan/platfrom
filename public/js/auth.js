@@ -24,6 +24,8 @@ import {
     httpsCallable
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 
+import { setCookie, getCookie, removeCookie } from './cookie-utils.js';
+
 // LINE Login Web API 設定
 const LINE_CHANNEL_ID = '2008269293';
 const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
@@ -43,13 +45,13 @@ onAuthStateChanged(platformAuth, async (user) => {
 // 處理 LINE 登入
 async function handleLineLogin() {
     try {
-        // 🔒 確保在正式域名上執行 OAuth（避免 sessionStorage 跨域問題）
+        // 🔒 確保在正式域名上執行 OAuth（避免跨域問題）
         const currentOrigin = window.location.origin;
         if (currentOrigin !== CANONICAL_ORIGIN) {
             console.log(`🔄 重定向到正式域名: ${CANONICAL_ORIGIN}`);
             // 保存當前路徑，稍後導回
             const returnPath = window.location.pathname + window.location.search;
-            sessionStorage.setItem('line_login_return_url', returnPath);
+            setCookie('line_login_return_url', returnPath, 600);
             // 導向正式域名，讓用戶從正式域名啟動 OAuth
             window.location.href = CANONICAL_ORIGIN + returnPath;
             return;
@@ -57,15 +59,27 @@ async function handleLineLogin() {
         
         // 🔒 產生密碼學安全的隨機 state 用於 CSRF 防護
         const state = crypto.randomUUID();
-        sessionStorage.setItem('line_login_state', state);
+        setCookie('line_login_state', state, 600); // 10分鐘過期
         
         // 💾 記住用戶原本想去的頁面（只在還沒記錄時儲存，避免覆蓋）
-        if (!sessionStorage.getItem('line_login_return_url')) {
+        if (!getCookie('line_login_return_url')) {
             const returnUrl = window.location.pathname + window.location.search;
-            sessionStorage.setItem('line_login_return_url', returnUrl);
-            console.log('🔵 [auth.js] 儲存返回URL:', returnUrl);
+            setCookie('line_login_return_url', returnUrl, 600);
+            console.log('🍪 [auth.js] 儲存返回URL:', returnUrl);
         } else {
-            console.log('🔵 [auth.js] 已有返回URL，不覆蓋:', sessionStorage.getItem('line_login_return_url'));
+            console.log('🍪 [auth.js] 已有返回URL，不覆蓋:', getCookie('line_login_return_url'));
+        }
+
+        // 驗證 Cookie 已正確設置
+        const verifyState = getCookie('line_login_state');
+        console.log('🍪 [auth.js] 設置登入 state:', {
+            state: state.substring(0, 8) + '...',
+            verified: verifyState === state,
+            returnUrl: getCookie('line_login_return_url')
+        });
+        
+        if (!verifyState || verifyState !== state) {
+            throw new Error('無法保存登入會話，請檢查瀏覽器設定是否阻止 Cookie');
         }
 
         // 構建 LINE 授權 URL
@@ -77,6 +91,7 @@ async function handleLineLogin() {
         lineAuthUrl.searchParams.append('scope', 'profile openid email');
 
         // 導向 LINE 授權頁面
+        console.log('🚀 [auth.js] 導向 LINE 授權頁面');
         window.location.href = lineAuthUrl.toString();
         
     } catch (error) {

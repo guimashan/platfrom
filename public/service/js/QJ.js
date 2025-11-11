@@ -1,3 +1,5 @@
+import { setCookie, getCookie, removeCookie } from '/js/cookie-utils.js';
+
 // -----------------------------------------
 // QJ.js - 重構為動態載入模式
 // Firebase 只在需要時才載入
@@ -102,15 +104,15 @@ export async function init() {
         try {
             // 產生隨機 state 用於 CSRF 防護
             const state = crypto.randomUUID();
-            sessionStorage.setItem('line_login_state', state);
+            setCookie('line_login_state', state, 600); // 10分鐘過期
         
             // 記住用戶想去的頁面
             const returnUrl = window.location.pathname + window.location.search;
-            sessionStorage.setItem('line_login_return_url', returnUrl);
+            setCookie('line_login_return_url', returnUrl, 600);
             
             // 驗證 sessionStorage 已正確設置
-            const verifyState = sessionStorage.getItem('line_login_state');
-            console.log('🔐 [QJ] 設置登入 state:', {
+            const verifyState = getCookie('line_login_state');
+            console.log('🍪 [QJ] 設置登入 state:', {
                 state: state.substring(0, 8) + '...',
                 verified: verifyState === state,
                 returnUrl: returnUrl

@@ -126,13 +126,15 @@
                 }
 
                 // 導向用戶原本想去的頁面，如果沒有則導向首頁
-                const returnUrl = sessionStorage.getItem('line_login_return_url');
-                console.log('🟢 [callback] 登入成功！讀取返回URL:', returnUrl);
-                console.log('🟢 [callback] sessionStorage 所有內容:', 
-                    Object.keys(sessionStorage).map(k => `${k}=${sessionStorage.getItem(k)}`).join(', '));
+                const returnUrl = getCookie('line_login_return_url');
+                console.log('🍪 [callback] 登入成功！讀取返回URL:', returnUrl);
+                console.log('🍪 [callback] 所有登入相關 Cookie:', {
+                    returnUrl: returnUrl,
+                    stateCleared: !getCookie('line_login_state')
+                });
                 
                 // 清除已使用的返回URL
-                sessionStorage.removeItem('line_login_return_url');
+                removeCookie('line_login_return_url');
                 
                 const finalUrl = returnUrl || '/';
                 console.log('🟢 [callback] 最終跳轉到:', finalUrl);
