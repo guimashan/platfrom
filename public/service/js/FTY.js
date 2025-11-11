@@ -109,6 +109,18 @@ export async function init() {
 
     // --- LINE 登入處理 ---
     function handleLineLogin() {
+        // 🔒 確保在正式域名上執行 OAuth（避免跨域問題）
+        const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
+        const currentOrigin = window.location.origin;
+        
+        if (currentOrigin !== CANONICAL_ORIGIN) {
+            console.log(`🔄 [FTY] 重定向到正式域名: ${CANONICAL_ORIGIN}`);
+            const returnPath = window.location.pathname + window.location.search;
+            setStorage('line_login_return_url', returnPath, 600);
+            window.location.href = CANONICAL_ORIGIN + returnPath;
+            return;
+        }
+        
         const LINE_CHANNEL_ID = '2008269293';
         const LINE_CALLBACK_URL = 'https://go.guimashan.org.tw/callback.html';
     
