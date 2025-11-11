@@ -174,8 +174,8 @@
         };
         
         window.testSessionStorage = testSessionStorage;
-
-        function testCrypto() {
+        
+        window.testCrypto = function() {
             const result = document.getElementById('cryptoResult');
             try {
                 if (!crypto || !crypto.randomUUID) {
@@ -201,9 +201,9 @@
                     '1. 請使用現代瀏覽器（Chrome 92+, Safari 15.4+, Firefox 95+）<br>' +
                     '2. 確保網站使用 HTTPS 或 localhost';
             }
-        }
+        };
 
-        function testFullFlow() {
+        window.testFullFlow = function() {
             const result = document.getElementById('fullFlowResult');
             const steps = [];
             
@@ -256,9 +256,9 @@
                     steps.join('<br>') + '<br><br>' +
                     '<strong>請執行上方的個別測試找出問題所在。</strong>';
             }
-        }
+        };
 
-        function checkExistingData() {
+        window.checkExistingData = function() {
             const result = document.getElementById('existingDataResult');
             const state = sessionStorage.getItem('line_login_state');
             const returnUrl = sessionStorage.getItem('line_login_return_url');
@@ -279,16 +279,16 @@
             
             result.className = 'result info';
             result.innerHTML = html;
-        }
+        };
 
-        function clearData() {
+        window.clearData = function() {
             sessionStorage.removeItem('line_login_state');
             sessionStorage.removeItem('line_login_return_url');
             document.getElementById('existingDataResult').className = 'result success';
             document.getElementById('existingDataResult').innerHTML = '✅ 所有登入資料已清除';
-        }
+        };
 
-        function realLogin() {
+        window.realLogin = function() {
             try {
                 const state = crypto.randomUUID();
                 sessionStorage.setItem('line_login_state', state);
@@ -321,7 +321,7 @@
                 alert('登入失敗: ' + error.message);
                 console.error('登入錯誤:', error);
             }
-        }
+        };
 
         // 頁面載入時自動檢查
         window.addEventListener('load', () => {
