@@ -1,6 +1,6 @@
 # 龜馬山整合服務平台 - 系統文檔
 
-**最近更新**: 2025-11-10 (管理介面 UI 統一化完成)
+**最近更新**: 2025-11-11 (Firebase 完整延遲載入優化完成)
 
 ## 系統概述
 
@@ -328,6 +328,98 @@ auth.setCustomUserClaims(uid, { role: 'admin' })
 ---
 
 ## 技術決策記錄
+
+### 2025-11-11: Firebase 完整延遲載入優化（方案 B）
+
+**決策：** 實施全站 Firebase 延遲載入策略
+
+**優化成果：**
+- **首頁：** 1360ms → 110ms（**92% 速度提升**）
+- **服務列表頁：** 完全不載入 Firebase
+- **服務申請表：** 僅在點擊登入時載入 Firebase
+
+**架構變更：**
+
+1. **創建統一延遲載入 Helper**
+   - 檔案：`public/js/firebase-lazy.js`
+   - 功能：提供記憶化的 `loadFirebaseCore()`, `ensureAuth()`, `ensureFirestore()` 等函數
+
+2. **優化 17 個頁面**
+   - 首頁：`index.html` - 點擊登入時才載入
+   - 簽到系統：`checkin.html`, `history.html` - 使用 Auth Guard
+   - 管理介面：`manage/index.html` - 使用 Auth Guard
+   - 服務列表：`service/index.html` - 完全不載入 Firebase
+   - 11 個服務申請表：DD, LD, ND, PS, QJ, ZY, BG, FTC, FTP, FTY, XY
+
+3. **重構 11 個服務 JS 模組**
+   - 移除靜態 `import Firebase`
+   - 改為動態 `await import()` 載入
+   - 使用 `export async function init()` 包裹所有邏輯
+   - 導出 `{ triggerLogin }` 實現一鍵登入
+
+**實作模式：**
+
+```javascript
+// HTML - 延遲載入模式
+async function loadModule() {
+    if (!moduleLoaded) {
+        const module = await import('/service/js/DD.js');
+        moduleInstance = await module.init(); // 捕獲返回值
+        moduleLoaded = true;
+    }
+    return moduleInstance;
+}
+
+document.addEventListener('click', async (e) => {
+    if (e.target.id === 'loginBtn') {
+        const module = await loadModule();
+        if (module && module.triggerLogin) {
+            module.triggerLogin(); // 一鍵登入
+        }
+    }
+});
+
+// JS 模組 - 動態載入 Firebase
+export async function init() {
+    // 動態載入 Firebase
+    const firebaseInit = await import('../../js/firebase-init.js');
+    const { platformAuth, platformDb } = firebaseInit;
+    
+    // 立即執行初始化邏輯
+    const initializeApp = () => {
+        // 設置事件監聽器和認證狀態監聽
+    };
+    
+    initializeApp();
+    
+    // 導出觸發登入函數
+    return { triggerLogin: handleLineLogin };
+}
+```
+
+**技術挑戰與解決：**
+
+1. **DOMContentLoaded 時序問題**
+   - 問題：模組載入後 DOMContentLoaded 已觸發，監聽器失效
+   - 解決：改為立即執行函數 `initializeApp()`
+
+2. **一鍵登入流程**
+   - 問題：第一次點擊不觸發認證，需點擊兩次
+   - 解決：JS 導出 `triggerLogin`，HTML 載入後立即調用
+
+3. **返回值捕獲**
+   - 問題：`loadModule()` 未捕獲 `init()` 返回值
+   - 解決：`moduleInstance = await module.init()`
+
+**效能驗證：**
+- 所有測試頁面載入時控制台日誌為空（Firebase 未載入）
+- Architect 審查通過，確認延遲載入正確實施
+- 一鍵登入流程正常運作
+
+**維護要點：**
+- 新增服務頁面時須遵循相同的延遲載入模式
+- `init()` 函數必須返回 `{ triggerLogin }` 對象
+- HTML 的 `loadModule()` 必須捕獲 `init()` 返回值
 
 ### 2025-11-10: 移除 LINE Bot 關鍵字系統
 
