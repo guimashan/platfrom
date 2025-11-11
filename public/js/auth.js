@@ -196,7 +196,7 @@ function showModuleGrid(roles) {
 function handleModuleClick(module) {
     const routes = {
         'checkin': '/checkin/checkin.html',
-        'service': '/service/index.html',
+        'service': '/service/service.html',
         'schedule': '/schedule/index.html',
         'manage': '/manage/index.html'
     };

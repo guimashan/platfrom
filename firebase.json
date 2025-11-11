@@ -29,7 +29,7 @@
       },
       {
         "source": "/service/**",
-        "destination": "/service/index.html"
+        "destination": "/service/service.html"
       },
       {
         "source": "/schedule/**",

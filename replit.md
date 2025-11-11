@@ -348,7 +348,7 @@ auth.setCustomUserClaims(uid, { role: 'admin' })
    - 首頁：`index.html` - 點擊登入時才載入
    - 簽到系統：`checkin.html`, `history.html` - 使用 Auth Guard
    - 管理介面：`manage/index.html` - 使用 Auth Guard
-   - 服務列表：`service/index.html` - 完全不載入 Firebase
+   - 服務列表：`service/service.html` - 完全不載入 Firebase
    - 11 個服務申請表：DD, LD, ND, PS, QJ, ZY, BG, FTC, FTP, FTY, XY
 
 3. **重構 11 個服務 JS 模組**

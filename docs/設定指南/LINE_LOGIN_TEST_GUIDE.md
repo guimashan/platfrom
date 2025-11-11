@@ -168,7 +168,7 @@
 #### 預期結果（根據角色）
 - `superadmin` → `/admin/dashboard.html`
 - `admin_checkin` → `/admin/index.html`
-- `poweruser` → `/service/index.html`
+- `poweruser` → `/service/service.html`
 - `user` → `/checkin/index.html`
 
 ---
