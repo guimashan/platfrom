@@ -185,7 +185,8 @@
 
     <script src="../lib/lunar.js"></script>
     <script type="module">
-        // 導入統一的登入處理函數（v2 強制刷新緩存）
+        // 導入認證守衛和登入處理函數
+        import { checkAuth } from '/js/auth-guard.js';
         import { handleLineLogin } from '/js/auth.js?v=2';
         
         // Firebase 延遲載入 - 只在需要時才載入
@@ -212,9 +213,14 @@
             loginBtnBound = true;
         }
 
-        // 永遠載入模組檢查登入狀態
-        console.log('📦 載入 ZY 模組...');
-        loadModule();
+        // 🔒 頁面載入時立即檢查登入狀態
+        // 未登入會自動跳轉到首頁
+        checkAuth().then(() => {
+            console.log('✅ [ZY.html] 已登入，載入 ZY 模組...');
+            loadModule();
+        }).catch((error) => {
+            console.log('❌ [ZY.html] 未登入，即將跳轉...');
+        });
     </script>
 </body>
 </html>

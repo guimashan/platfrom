@@ -274,14 +274,12 @@
 
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
-        // 導入統一的登入處理函數（v2 強制刷新緩存）
+        import { checkAuth } from '/js/auth-guard.js';
         import { handleLineLogin } from '/js/auth.js?v=2';
         
-        // Firebase 延遲載入 - 只在需要時才載入
         let loginBtnBound = false;
         let moduleLoaded = false;
 
-        // 載入並初始化模組
         async function loadModule() {
             if (!moduleLoaded) {
                 const module = await import('/service/js/FTP.js');
@@ -290,20 +288,16 @@
             }
         }
 
-        // 綁定登入按鈕 - 防重複綁定
         const loginBtn = document.getElementById('loginBtn');
         if (loginBtn && !loginBtnBound) {
             loginBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                console.log('🔐 [FTP.html] 觸發登入');
                 await handleLineLogin();
             });
             loginBtnBound = true;
         }
 
-        // 永遠載入模組檢查登入狀態
-        console.log('📦 載入 FTP 模組...');
-        loadModule();
+        checkAuth().then(() => loadModule()).catch(() => {});
     </script>
 </body>
 </html>
