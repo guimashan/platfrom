@@ -411,7 +411,4 @@ export async function init() {
 
 }
     
-    // 導出觸發登入函數供外部使用
-    return {
-        triggerLogin: handleLineLogin
-    };
+    // 不需要導出任何內容，登入已在 HTML 中處理

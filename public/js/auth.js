@@ -306,31 +306,5 @@ export async function logout() {
     }
 }
 
-// 綁定事件（支援模組延遲載入）
-function bindEvents() {
-    const loginBtn = document.getElementById('lineLoginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    
-    if (loginBtn) {
-        loginBtn.addEventListener('click', handleLineLogin);
-        console.log('✅ LINE 登入按鈕已綁定');
-    } else {
-        console.warn('⚠️ 找不到 LINE 登入按鈕');
-    }
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
-        console.log('✅ 登出按鈕已綁定');
-    }
-}
-
-// 確保 DOM 已載入再綁定事件
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bindEvents);
-} else {
-    // DOM 已經載入完成，直接綁定
-    bindEvents();
-}
-
 // 導出認證相關函數
 export { platformAuth };
