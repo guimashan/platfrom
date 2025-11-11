@@ -161,14 +161,23 @@
 
             } catch (error) {
                 console.error('處理回調失敗:', error);
+                
+                statusTitle.textContent = '❌ 登入失敗';
+                statusMessage.textContent = '';
+                
                 const errorDiv = document.getElementById('errorMessage');
-                errorDiv.textContent = error.message;
+                errorDiv.innerHTML = `
+                    <div style="margin-bottom: 20px;">${error.message}</div>
+                    <button onclick="window.location.href='/service/DD.html'" 
+                            style="background: var(--primary-gold); color: white; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600;">
+                        返回並重新登入
+                    </button>
+                `;
                 errorDiv.style.display = 'block';
-
-                // 3 秒後導回登入頁
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 3000);
+                
+                // 清除失敗的狀態
+                localStorage.removeItem('line_state');
+                localStorage.removeItem('line_return');
             }
         }
 

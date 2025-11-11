@@ -1,6 +1,9 @@
 /**
- * 認證模組
+ * 認證模組 v2.0 - localStorage 版本
  * 處理 LINE 登入與角色導向
+ * 
+ * 變更歷史：
+ * v2.0 (2025-11-11) - 改用 localStorage 取代 Cookie 混合策略，解決跨頁面儲存問題
  */
 
 import { 
@@ -23,8 +26,6 @@ import {
 import {
     httpsCallable
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
-
-import { setStorage, getStorage, removeStorage } from './cookie-utils.js';
 
 // LINE Login Web API 設定
 const LINE_CHANNEL_ID = '2008269293';
