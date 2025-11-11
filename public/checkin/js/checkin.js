@@ -15,21 +15,27 @@ let currentMode = 'gps';
 // 初始化頁面
 (async function init() {
     try {
-        const { user, userData } = await checkAuth({
-            requiredRoles: ['user', 'poweruser_checkin', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
-            onSuccess: ({ user, userData }) => {
-                currentUser = user;
-                
-                // 認證成功：隱藏登入提示，顯示主要內容
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
-                const userName = document.getElementById('userName');
-                if (userName) {
-                    userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
-                }
-            }
-        });
+        const { platformAuth } = await import('/js/firebase-init.js');
+        
+        // 獲取當前用戶（HTML 已確保認證完成）
+        const user = platformAuth.currentUser;
+        if (!user) {
+            console.error('❌ 用戶未登入，這不應該發生');
+            return;
+        }
+        
+        currentUser = user;
+        
+        // 顯示主要內容
+        const mainApp = document.getElementById('mainApp');
+        if (mainApp) {
+            mainApp.style.display = 'block';
+        }
+        
+        const userName = document.getElementById('userName');
+        if (userName) {
+            userName.textContent = `歡迎，${user.displayName || '使用者'}`;
+        }
         
         await loadPatrols();
         initializeModeSwitch();

@@ -3,26 +3,30 @@
  */
 
 import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 
-// 監聽認證狀態
-onAuthStateChanged(platformAuth, async (user) => {
+// 初始化頁面
+(async function init() {
+    // 獲取當前用戶（HTML 已確保認證完成）
+    const user = platformAuth.currentUser;
     if (!user) {
-        window.location.href = '/';
+        console.error('❌ 用戶未登入，這不應該發生');
         return;
     }
+    
     currentUser = user;
     
-    // 認證成功：隱藏登入提示，顯示主要內容
-    document.getElementById('loginPrompt').style.display = 'none';
-    document.getElementById('mainApp').style.display = 'block';
+    // 顯示主要內容
+    const mainApp = document.getElementById('mainApp');
+    if (mainApp) {
+        mainApp.style.display = 'block';
+    }
     
     await loadHistory();
-});
+})();
 
 // 載入簽到紀錄
 async function loadHistory() {
