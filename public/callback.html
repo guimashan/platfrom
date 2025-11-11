@@ -49,7 +49,7 @@
     <script type="module">
         import { platformAuth } from '/js/firebase-init.js';
         import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { getCookie, removeCookie } from '/js/cookie-utils.js';
+        import { getStorage, removeStorage } from '/js/cookie-utils.js';
 
         async function handleCallback() {
             try {
@@ -68,27 +68,25 @@
                 }
 
                 // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
-                // 🍪 改用 Cookie 儲存 state（無痕模式下更可靠）
-                const savedState = getCookie('line_login_state');
-                console.log('🔍 [callback] State 驗證 (使用 Cookie):', {
+                // 💾 使用混合儲存策略（Cookie + sessionStorage 雙重後備）
+                const savedState = getStorage('line_login_state');
+                console.log('🔍 [callback] State 驗證 (混合儲存):', {
                     urlState: state,
                     savedState: savedState,
-                    match: savedState === state,
-                    isIncognito: window.navigator.userAgent.includes('Incognito')
+                    match: savedState === state
                 });
                 
                 if (!savedState) {
-                    throw new Error('安全驗證失敗：找不到登入會話，請重新登入。\n' +
-                        '💡 提示：如使用無痕模式，請確認瀏覽器允許 Cookie。');
+                    throw new Error('安全驗證失敗：找不到登入會話，請重新登入。');
                 }
                 
                 if (savedState !== state) {
-                    removeCookie('line_login_state');
+                    removeStorage('line_login_state');
                     throw new Error(`安全驗證失敗：state 參數不匹配 (期望: ${savedState?.substring(0,8)}..., 收到: ${state?.substring(0,8)}...)。請重新登入。`);
                 }
 
                 // 驗證成功後立即清除 state（防止重複使用）
-                removeCookie('line_login_state');
+                removeStorage('line_login_state');
 
                 console.log('State 驗證通過，準備交換 Firebase Token...');
 
@@ -126,15 +124,12 @@
                 }
 
                 // 導向用戶原本想去的頁面，如果沒有則導向首頁
-                const returnUrl = getCookie('line_login_return_url');
-                console.log('🍪 [callback] 登入成功！讀取返回URL:', returnUrl);
-                console.log('🍪 [callback] 所有登入相關 Cookie:', {
-                    returnUrl: returnUrl,
-                    stateCleared: !getCookie('line_login_state')
-                });
+                const returnUrl = getStorage('line_login_return_url');
+                console.log('✅ [callback] 登入成功！讀取返回URL:', returnUrl);
+                console.log('💾 [callback] 登入完成，清理儲存');
                 
                 // 清除已使用的返回URL
-                removeCookie('line_login_return_url');
+                removeStorage('line_login_return_url');
                 
                 const finalUrl = returnUrl || '/';
                 console.log('🟢 [callback] 最終跳轉到:', finalUrl);
