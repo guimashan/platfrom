@@ -7,7 +7,7 @@
     --bg-cream: #F5F0E8;
     --bg-white: #FFFFFF;
     --bg-card: #FFF9F0;
-    --text-primary: #2C2416;
+    --text-primary: #2C2416; /* 主要文字色 (深棕) */
     --text-secondary: #6B5D4F;
     --shadow-sm: 0 2px 8px rgba(212, 175, 55, 0.1);
     --shadow-md: 0 4px 16px rgba(212, 175, 55, 0.15);
@@ -125,7 +125,7 @@ body {
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-    color: white;
+    color: var(--text-primary); /* <--- ★★★ 這是我唯一修改的地方 ★★★ */
     margin-top: 1.5rem;
 }
 
