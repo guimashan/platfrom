@@ -52,7 +52,19 @@ export function getCookie(name) {
  * @param {string} name - Cookie 名稱
  */
 export function removeCookie(name) {
-    document.cookie = `${encodeURIComponent(name)}=; path=/; max-age=0`;
+    const cookieOptions = [
+        `${encodeURIComponent(name)}=`,
+        'path=/',
+        'SameSite=Lax',
+        'max-age=0'
+    ];
+    
+    // 如果是 HTTPS，必須添加 Secure 屬性才能正確刪除
+    if (window.location.protocol === 'https:') {
+        cookieOptions.push('Secure');
+    }
+    
+    document.cookie = cookieOptions.join('; ');
     console.log(`🍪 [Cookie] 刪除: ${name}`);
 }
 
