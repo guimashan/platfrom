@@ -275,16 +275,43 @@
 
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
-        // Firebase 延遲載入 - 只在點擊登入時才載入
-        import { loadAuthModule } from '/js/firebase-lazy.js';
-        
-        document.getElementById('loginBtn')?.addEventListener('click', async () => {
-            const authModule = await loadAuthModule();
-            authModule.handleLineLogin();
+        // Firebase 延遲載入 - 只在需要時才載入
+        let moduleLoaded = false;
+        let moduleInstance = null;
+
+        // 載入並初始化模組
+        async function loadModule() {
+            if (!moduleLoaded) {
+                const module = await import('/service/js/FTP.js');
+                moduleInstance = await module.init(); // 捕獲返回值
+                moduleLoaded = true;
+            }
+            return moduleInstance;
+        }
+
+        // 綁定登入按鈕
+        document.addEventListener('click', async (e) => {
+            if (e.target.id === 'loginBtn' || e.target.closest('#loginBtn')) {
+                e.preventDefault();
+                // 載入模組
+                const module = await loadModule();
+                // 立即觸發登入（解決首次點擊問題）
+                if (module && module.triggerLogin) {
+                    module.triggerLogin();
+                }
+            }
         });
-        
-        // 動態載入頁面功能模組
-        import('/service/js/FTP.js');
+
+        // 檢查是否應該自動載入（用戶可能是從 LINE 登入返回）
+        const urlParams = new URLSearchParams(window.location.search);
+        const hasAuthParams = urlParams.has('code') || urlParams.has('state');
+        const hasReturnUrl = sessionStorage.getItem('line_login_return_url');
+        const fromLine = document.referrer.includes('line.me');
+
+        if (hasAuthParams || hasReturnUrl || fromLine) {
+            // 用戶可能已登入或正在登入流程中，載入模組檢查狀態
+            loadModule();
+        }
     </script>
 </body>
 </html>
