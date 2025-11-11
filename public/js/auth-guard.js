@@ -17,6 +17,13 @@ import {
     getDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
+import { 
+    showAuthUI, 
+    hideAuthUI, 
+    showMainContent, 
+    showAuthError 
+} from './auth-ui.js';
+
 /**
  * 檢查使用者認證狀態
  * @param {Object} options - 設定選項
@@ -185,8 +192,177 @@ export function displayUserInfo(userData, elements = {}) {
     }
 }
 
+/**
+ * 檢查認證狀態並使用 UI 提示（不跳轉）
+ * @param {Object} options - 設定選項
+ * @param {Function} options.onAuthenticated - 認證成功回調
+ * @param {Function} options.onUnauthenticated - 未認證回調
+ * @param {string[]} options.requiredRoles - 必要角色（可選）
+ * @returns {Promise<void>}
+ */
+export async function checkAuthWithUI(options = {}) {
+    const {
+        onAuthenticated = null,
+        onUnauthenticated = null,
+        requiredRoles = null
+    } = options;
+
+    return new Promise((resolve) => {
+        onAuthStateChanged(platformAuth, async (user) => {
+            try {
+                // 未登入：顯示登入 UI
+                if (!user) {
+                    const { handleLineLogin } = await import('./auth.js?v=2');
+                    showAuthUI({
+                        title: '請先登入',
+                        message: '請使用 LINE 帳號登入系統',
+                        onLogin: handleLineLogin
+                    });
+                    if (onUnauthenticated) onUnauthenticated();
+                    resolve({ authenticated: false });
+                    return;
+                }
+
+                // 檢查用戶資料
+                const userRef = doc(platformDb, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists()) {
+                    showAuthUI({
+                        title: '資料錯誤',
+                        message: '使用者資料不存在，請重新登入',
+                        errorMessage: '無法取得您的資料，請重新登入',
+                        onLogin: async () => {
+                            await platformAuth.signOut();
+                            const { handleLineLogin } = await import('./auth.js?v=2');
+                            handleLineLogin();
+                        }
+                    });
+                    if (onUnauthenticated) onUnauthenticated();
+                    resolve({ authenticated: false });
+                    return;
+                }
+
+                const userData = userSnap.data();
+                const userRoles = userData.roles || ['user'];
+
+                // 檢查權限（如果有要求）
+                if (requiredRoles && requiredRoles.length > 0) {
+                    const hasRequiredRole = requiredRoles.some(role => 
+                        userRoles.includes(role)
+                    );
+
+                    if (!hasRequiredRole) {
+                        showAuthUI({
+                            title: '權限不足',
+                            message: '您沒有存取此頁面的權限',
+                            errorMessage: `需要以下權限之一: ${requiredRoles.join(', ')}`,
+                            onLogin: () => {
+                                window.location.href = '/';
+                            }
+                        });
+                        if (onUnauthenticated) onUnauthenticated();
+                        resolve({ authenticated: false, insufficientPermissions: true });
+                        return;
+                    }
+                }
+
+                // 認證成功：顯示主要內容
+                showMainContent();
+                
+                const result = {
+                    authenticated: true,
+                    user,
+                    userData,
+                    roles: userRoles
+                };
+
+                if (onAuthenticated) onAuthenticated(result);
+                resolve(result);
+
+            } catch (error) {
+                console.error('認證檢查失敗:', error);
+                showAuthUI({
+                    title: '認證失敗',
+                    message: '系統發生錯誤，請稍後再試',
+                    errorMessage: error.message,
+                    onLogin: () => window.location.reload()
+                });
+                if (onUnauthenticated) onUnauthenticated();
+                resolve({ authenticated: false, error });
+            }
+        });
+    });
+}
+
+/**
+ * 檢查管理員權限（專用於管理後台）
+ * @param {string[]} requiredAdminRoles - 必要的管理員角色（預設: 檢查是否為任何管理員）
+ * @returns {Promise<Object>} 認證結果
+ */
+export async function checkAdminAuth(requiredAdminRoles = null) {
+    // 預設管理員角色列表
+    const defaultAdminRoles = [
+        'superadmin',
+        'admin_checkin',
+        'admin_service',
+        'admin_schedule',
+        'poweruser_checkin',
+        'poweruser_service',
+        'poweruser_schedule'
+    ];
+
+    const rolesToCheck = requiredAdminRoles || defaultAdminRoles;
+
+    return checkAuthWithUI({
+        requiredRoles: rolesToCheck,
+        onAuthenticated: (result) => {
+            console.log('✅ 管理員認證成功:', result.roles);
+        },
+        onUnauthenticated: () => {
+            console.log('❌ 管理員認證失敗');
+        }
+    });
+}
+
+/**
+ * 設置自動登入狀態監聽
+ * 當用戶登入/登出時自動更新 UI
+ * @param {Function} onAuthChange - 狀態變化回調
+ */
+export function setupAuthListener(onAuthChange = null) {
+    onAuthStateChanged(platformAuth, async (user) => {
+        if (user) {
+            // 用戶已登入
+            const userRef = doc(platformDb, 'users', user.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                showMainContent();
+                if (onAuthChange) {
+                    onAuthChange({
+                        authenticated: true,
+                        user,
+                        userData,
+                        roles: userData.roles || ['user']
+                    });
+                }
+            }
+        } else {
+            // 用戶未登入
+            if (onAuthChange) {
+                onAuthChange({ authenticated: false });
+            }
+        }
+    });
+}
+
 export default {
     checkAuth,
+    checkAuthWithUI,
+    checkAdminAuth,
+    setupAuthListener,
     hasRole,
     logout,
     displayUserInfo

@@ -10,32 +10,26 @@
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div>
-                <h1>龜馬山整合服務平台</h1>
-            </div>
-            <button id="logoutBtn" class="btn-logout" style="display: none;">登出</button>
-        </header>
-
-        <main class="main-content">
-            <div id="userInfo" class="user-info" style="display: none;">
-                <img id="userAvatar" class="user-avatar" alt="使用者頭像">
-                <div class="user-details">
-                    <h3 id="userName"></h3>
-                    <div id="userRoles" class="user-roles"></div>
+    <!-- 主要內容區（登入後才顯示） -->
+    <div id="mainApp" style="display: none;">
+        <div class="container">
+            <header class="header">
+                <div>
+                    <h1>龜馬山整合服務平台</h1>
                 </div>
-            </div>
+                <button id="logoutBtn" class="btn-logout" style="display: none;">登出</button>
+            </header>
 
-            <div id="loginCard" class="welcome-card">
-                <h2>歡迎</h2>
-                <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
-                <button id="lineLoginBtn" class="btn btn-primary">
-                    LINE 登入
-                </button>
-            </div>
+            <main class="main-content">
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+                    <div class="user-details">
+                        <h3 id="userName"></h3>
+                        <div id="userRoles" class="user-roles"></div>
+                    </div>
+                </div>
 
-            <div id="moduleGrid" class="module-grid">
+                <div id="moduleGrid" class="module-grid">
                 <div class="module-card" data-module="checkin">
                     <div class="module-icon">🙏</div>
                     <div class="module-title">奉香簽到</div>
@@ -60,91 +54,147 @@
                     <div class="module-title">系統管理</div>
                     <div class="module-desc">使用者與權限管理</div>
                 </div>
-            </div>
+                </div>
 
-            <div id="loadingIndicator" class="loading hidden">
-                <div class="spinner"></div>
-                <p>登入中...</p>
-            </div>
-        </main>
+                <div id="loadingIndicator" class="loading hidden">
+                    <div class="spinner"></div>
+                    <p>登入中...</p>
+                </div>
+            </main>
 
-        <div class="bottom-nav">
-            <div class="bottom-nav-items">
-                <a href="/" class="bottom-nav-item active">
-                    <span class="icon">🏠</span>
-                    <span>首頁</span>
-                </a>
-                <a href="/checkin/checkin.html" class="bottom-nav-item">
-                    <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
-                    <span>簽到</span>
-                </a>
-                <a href="/checkin/history.html" class="bottom-nav-item">
-                    <span class="icon">📋</span>
-                    <span>歷程表</span>
-                </a>
-                <a href="/manage/index.html" class="bottom-nav-item">
-                    <span class="icon">🔔</span>
-                    <span>通知中心</span>
-                </a>
+            <div class="bottom-nav">
+                <div class="bottom-nav-items">
+                    <a href="/" class="bottom-nav-item active">
+                        <span class="icon">🏠</span>
+                        <span>首頁</span>
+                    </a>
+                    <a href="/checkin/checkin.html" class="bottom-nav-item">
+                        <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                        <span>簽到</span>
+                    </a>
+                    <a href="/checkin/history.html" class="bottom-nav-item">
+                        <span class="icon">📋</span>
+                        <span>歷程表</span>
+                    </a>
+                    <a href="/manage/index.html" class="bottom-nav-item">
+                        <span class="icon">🔔</span>
+                        <span>通知中心</span>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
+    </div> <!-- 關閉 mainApp -->
 
     <script type="module">
-        let firebaseLoaded = false;
-        let authModule = null;
+        import { checkAuthWithUI } from '/js/auth-guard.js';
+        import { logout } from '/js/auth.js';
 
-        async function loadFirebase() {
-            if (firebaseLoaded) return authModule;
-            
-            // 立即標記為已載入，防止並發調用
-            firebaseLoaded = true;
-            
-            const loadingIndicator = document.getElementById('loadingIndicator');
-            loadingIndicator.classList.remove('hidden');
-            
-            try {
-                await import('/js/firebase-init.js');
-                authModule = await import('/js/auth.js');
+        // 頁面載入時檢查認證狀態
+        checkAuthWithUI({
+            onAuthenticated: async (result) => {
+                console.log('✅ [index.html] 使用者已登入:', result.userData.displayName);
                 
-                // 僅在首頁初始化認證狀態監聽（只執行一次）
-                if (authModule.initAuthStateListener) {
-                    authModule.initAuthStateListener();
+                // 顯示使用者資訊
+                const userInfo = document.getElementById('userInfo');
+                const userName = document.getElementById('userName');
+                const userAvatar = document.getElementById('userAvatar');
+                const userRoles = document.getElementById('userRoles');
+                const logoutBtn = document.getElementById('logoutBtn');
+                
+                if (userName) userName.textContent = result.userData.displayName || '使用者';
+                if (userAvatar) {
+                    userAvatar.src = result.userData.pictureUrl || '/images/default-avatar.svg';
+                    userAvatar.alt = result.userData.displayName || '使用者頭像';
+                }
+                if (userRoles) {
+                    const roleNames = {
+                        'user': '一般使用者',
+                        'poweruser_checkin': '簽到幹部',
+                        'poweruser_service': '神務幹部',
+                        'poweruser_schedule': '排班幹部',
+                        'admin_checkin': '簽到管理員',
+                        'admin_service': '神務管理員',
+                        'admin_schedule': '排班管理員',
+                        'superadmin': '超級管理員'
+                    };
+                    const roleText = result.roles.map(r => roleNames[r] || r).join(', ');
+                    userRoles.textContent = roleText;
                 }
                 
-                return authModule;
-            } catch (error) {
-                console.error('Firebase 載入失敗:', error);
-                alert('系統載入失敗，請重新整理頁面');
-                firebaseLoaded = false; // 失敗時重置，允許重試
-                throw error;
-            } finally {
-                loadingIndicator.classList.add('hidden');
-            }
-        }
-
-        document.getElementById('lineLoginBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const auth = await loadFirebase();
-            if (auth && auth.handleLineLogin) {
-                auth.handleLineLogin();
+                if (userInfo) userInfo.style.display = 'flex';
+                if (logoutBtn) logoutBtn.style.display = 'block';
+                
+                // 顯示模組選單
+                const moduleGrid = document.getElementById('moduleGrid');
+                if (moduleGrid) {
+                    moduleGrid.classList.add('active');
+                    
+                    // 根據角色控制模組可見性
+                    const modules = document.querySelectorAll('.module-card');
+                    modules.forEach(card => {
+                        const module = card.dataset.module;
+                        
+                        if (!module) {
+                            card.style.display = 'block';
+                            return;
+                        }
+                        
+                        let canAccess = false;
+                        let isVisible = false;
+                        
+                        if (module === 'checkin' || module === 'service') {
+                            canAccess = true;
+                            isVisible = true;
+                        } else if (module === 'schedule') {
+                            canAccess = false;
+                            isVisible = true;
+                        } else if (module === 'manage') {
+                            const isAdmin = result.roles.some(role => 
+                                role === 'poweruser' ||
+                                role === 'admin' ||
+                                role.startsWith('poweruser_') || 
+                                role.startsWith('admin_') || 
+                                role === 'superadmin'
+                            );
+                            canAccess = isAdmin;
+                            isVisible = isAdmin;
+                        }
+                        
+                        if (isVisible) {
+                            card.style.display = 'block';
+                            if (canAccess && !card.classList.contains('module-card-locked')) {
+                                card.style.cursor = 'pointer';
+                                card.addEventListener('click', () => handleModuleClick(module));
+                            }
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                }
+            },
+            onUnauthenticated: () => {
+                console.log('❌ [index.html] 使用者未登入');
             }
         });
 
-        (async function checkAuth() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const hasAuthParams = urlParams.has('code') || urlParams.has('state') || 
-                                  document.referrer.includes('line.me') ||
-                                  sessionStorage.getItem('firebase_loaded');
+        // 模組點擊處理
+        function handleModuleClick(module) {
+            const routes = {
+                'checkin': '/checkin/checkin.html',
+                'service': '/service/DD.html',
+                'manage': '/manage/index.html'
+            };
             
-            if (hasAuthParams) {
-                sessionStorage.setItem('firebase_loaded', 'true');
-                await loadFirebase();
-            } else {
-                document.getElementById('loginCard').style.display = 'block';
-                document.getElementById('moduleGrid').style.opacity = '0.6';
+            if (routes[module]) {
+                window.location.href = routes[module];
             }
-        })();
+        }
+
+        // 登出按鈕
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', logout);
+        }
     </script>
 </body>
 </html>
