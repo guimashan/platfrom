@@ -8,17 +8,6 @@
     <link rel="stylesheet" href="/styles/common.css">
     </head>
 <body>
-    <!-- 未登入畫面 (預設顯示) -->
-    <div id="loginPrompt" class="login-prompt">
-        <div class="welcome-card">
-            <h2>歡迎</h2>
-            <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
-            <button id="loginBtn" class="btn btn-primary">
-                LINE 登入
-            </button>
-        </div>
-    </div>
-
     <!-- 主要內容 (預設隱藏，登入後才顯示) -->
     <div id="mainApp" style="display: none;">
         <header class="header">
@@ -172,15 +161,10 @@
 
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
-        // 導入認證守衛和登入處理函數
-        import { checkAuth } from '/js/auth-guard.js';
-        import { handleLineLogin } from '/js/auth.js?v=2';
+        import { checkAuthWithUI } from '/js/auth-guard.js';
         
-        // Firebase 延遲載入 - 只在需要時才載入
         let moduleLoaded = false;
-        let loginBtnBound = false;
 
-        // 載入並初始化模組
         async function loadModule() {
             if (!moduleLoaded) {
                 const module = await import('/service/js/DD.js');
@@ -189,26 +173,15 @@
             }
         }
 
-        // 綁定登入按鈕 - 防重複綁定
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn && !loginBtnBound) {
-            loginBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                console.log('🔐 [DD.html] 觸發登入');
-                await handleLineLogin();
-            });
-            loginBtnBound = true;
-        }
-
-        // 🔒 頁面載入時立即檢查登入狀態
-        // 未登入會自動跳轉到首頁
-        checkAuth().then(() => {
-            // 已登入，載入模組
-            console.log('✅ [DD.html] 已登入，載入 DD 模組...');
-            loadModule();
-        }).catch((error) => {
-            // 未登入，checkAuth 會自動跳轉到首頁
-            console.log('❌ [DD.html] 未登入，即將跳轉...');
+        // 使用新的認證 UI 守衛
+        checkAuthWithUI({
+            onAuthenticated: (result) => {
+                console.log('✅ [DD.html] 已登入，載入模組');
+                loadModule();
+            },
+            onUnauthenticated: () => {
+                console.log('❌ [DD.html] 未登入，顯示登入 UI');
+            }
         });
     </script>
 </body>

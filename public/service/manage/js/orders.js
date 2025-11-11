@@ -1,4 +1,3 @@
-import { checkAuth, logout } from '/js/auth-guard.js';
 import { platformAuth } from '/js/firebase-init.js';
 
 let currentUser = null;
@@ -132,17 +131,7 @@ function loadLunarLibrary() {
 
 (async function init() {
     try {
-        const { user } = await checkAuth({
-            requiredRoles: ['poweruser_service', 'admin_service', 'superadmin']
-        });
-        
-        currentUser = user;
-        
-        // 認證成功：隱藏登入提示，顯示主要內容
-        document.getElementById('loginPrompt').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+        currentUser = platformAuth.currentUser;
         
         document.getElementById('filterServiceType').addEventListener('change', applyFilters);
         document.getElementById('filterStatus').addEventListener('change', applyFilters);
@@ -152,8 +141,7 @@ function loadLunarLibrary() {
         
     } catch (error) {
         console.error('初始化失敗:', error);
-        alert('權限不足或載入失敗: ' + error.message);
-        window.location.href = '/';
+        alert('載入失敗: ' + error.message);
     }
 })();
 

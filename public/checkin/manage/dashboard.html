@@ -8,18 +8,6 @@
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <!-- 登入提示畫面（預設顯示） -->
-    <div id="loginPrompt" style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); flex-direction: column;">
-        <div style="text-align: center; color: white; padding: 40px; background: rgba(255,255,255,0.1); border-radius: 16px; backdrop-filter: blur(10px);">
-            <div style="font-size: 64px; margin-bottom: 20px;">🔐</div>
-            <h2 style="margin: 0 0 10px 0; font-size: 24px;">簽到儀表板</h2>
-            <p style="margin: 0; opacity: 0.9;">請使用 LINE 帳號登入以存取管理功能</p>
-            <div style="margin-top: 30px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
-                <p style="margin: 0; font-size: 14px;">驗證中...</p>
-            </div>
-        </div>
-    </div>
-
     <!-- 主要內容（預設隱藏） -->
     <div id="mainApp" class="manage-layout" style="display: none;">
         <header class="manage-header">
@@ -75,6 +63,13 @@
         </main>
     </div>
 
-    <script type="module" src="/checkin/manage/js/dashboard.js"></script>
+    <script type="module">
+        import { checkAdminAuth } from '/js/auth-guard.js';
+        
+        checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin']).then(async (result) => {
+            console.log('✅ 簽到儀表板 管理員認證成功');
+            await import('/checkin/manage/js/dashboard.js');
+        });
+    </script>
 </body>
 </html>

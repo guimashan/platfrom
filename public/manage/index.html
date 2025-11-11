@@ -162,38 +162,40 @@
     </style>
 </head>
 <body>
-    <div class="manage-container">
-        <div class="page-header">
-            <div class="header-left">
-                <h1>⚙️ 系統管理</h1>
-                <p style="color: #666; margin: 0;">選擇要管理的模組</p>
+    <div id="mainApp" style="display: none;">
+        <div class="manage-container">
+            <div class="page-header">
+                <div class="header-left">
+                    <h1>⚙️ 系統管理</h1>
+                    <p style="color: #666; margin: 0;">選擇要管理的模組</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-home" onclick="window.location.href='/'">
+                        回首頁
+                    </button>
+                    <button id="logoutBtn" class="btn btn-logout">登出</button>
+                </div>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-home" onclick="window.location.href='/'">
-                    回首頁
-                </button>
-                <button id="logoutBtn" class="btn btn-logout">登出</button>
+
+            <div id="userInfo" class="user-info" style="display: none;">
+                <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+                <div class="user-details">
+                    <h3 id="userName"></h3>
+                    <div id="userRoles" class="user-roles"></div>
+                </div>
             </div>
-        </div>
 
-        <div id="userInfo" class="user-info" style="display: none;">
-            <img id="userAvatar" class="user-avatar" alt="使用者頭像">
-            <div class="user-details">
-                <h3 id="userName"></h3>
-                <div id="userRoles" class="user-roles"></div>
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                <p>載入管理模組...</p>
             </div>
-        </div>
 
-        <div id="loadingIndicator" class="loading">
-            <div class="spinner"></div>
-            <p>載入管理模組...</p>
+            <div id="moduleGrid" class="module-grid" style="display: none;"></div>
         </div>
-
-        <div id="moduleGrid" class="module-grid" style="display: none;"></div>
     </div>
 
     <script type="module">
-        import { ensureAuth, ensureFirestore } from '/js/firebase-lazy.js';
+        import { checkAdminAuth, logout } from '/js/auth-guard.js';
 
         const modules = [
             {
@@ -202,7 +204,7 @@
                 icon: '<img src="/images/temple-icon.png" alt="廟宇" style="width: 48px; height: 48px; object-fit: contain;">',
                 badge: '已上線',
                 desc: '管理巡邏點、查看簽到統計、管理使用者角色',
-                requiredRoles: ['admin_checkin', 'superadmin'],
+                requiredRoles: ['admin_checkin', 'poweruser_checkin', 'superadmin'],
                 links: [
                     { name: '儀表板', url: '/checkin/manage/dashboard.html' },
                     { name: '巡邏點管理', url: '/checkin/manage/patrol.html' },
@@ -215,7 +217,7 @@
                 icon: '🙏',
                 badge: '待開發',
                 desc: '管理法會報名、服務單審核、參與統計',
-                requiredRoles: ['admin_service', 'superadmin'],
+                requiredRoles: ['admin_service', 'poweruser_service', 'superadmin'],
                 links: [
                     { name: '服務單管理', url: '#', disabled: true },
                     { name: '法會報名', url: '#', disabled: true }
@@ -227,7 +229,7 @@
                 icon: '📅',
                 badge: '待開發',
                 desc: '管理志工排班、出勤統計、班表調整',
-                requiredRoles: ['admin_schedule', 'superadmin'],
+                requiredRoles: ['admin_schedule', 'poweruser_schedule', 'superadmin'],
                 links: [
                     { name: '班表管理', url: '#', disabled: true },
                     { name: '出勤統計', url: '#', disabled: true }
@@ -235,39 +237,22 @@
             }
         ];
 
-        // 延遲載入 Firebase Auth
         (async function init() {
-            const { platformAuth, onAuthStateChanged } = await ensureAuth();
-            
-            onAuthStateChanged(platformAuth, async (user) => {
-                if (!user) {
-                    // 💾 保存當前頁面，登入後返回
-                    const returnUrl = window.location.pathname + window.location.search;
-                    sessionStorage.setItem('line_login_return_url', returnUrl);
-                    console.log('🔵 [/manage/] 未登入，儲存返回URL:', returnUrl);
+            try {
+                checkAdminAuth().then((result) => {
+                    console.log('✅ [通知中心] 管理員認證成功');
                     
-                    setTimeout(() => {
-                        window.location.href = '/';
-                    }, 100);
-                    return;
-                }
+                    loadManageModules(result);
+                });
 
-                await loadManageModules(user);
-            });
+            } catch (error) {
+                console.error('初始化失敗:', error);
+            }
         })();
 
-        async function loadManageModules(user) {
+        function loadManageModules(result) {
             try {
-                const { platformDb, doc, getDoc } = await ensureFirestore();
-                const userRef = doc(platformDb, 'users', user.uid);
-                const userSnap = await getDoc(userRef);
-
-                if (!userSnap.exists()) {
-                    throw new Error('使用者資料不存在');
-                }
-
-                const userData = userSnap.data();
-                const userRoles = userData.roles || ['user'];
+                const { userData, roles: userRoles } = result;
 
                 displayUserInfo(userData);
 
@@ -314,13 +299,16 @@
             if (userAvatar) userAvatar.src = userData.pictureUrl || '/images/default-avatar.svg';
             if (userRoles) {
                 const roleNames = {
+                    'poweruser_checkin': '簽到幹部',
+                    'poweruser_service': '神務幹部',
+                    'poweruser_schedule': '排班幹部',
                     'admin_checkin': '簽到管理員',
                     'admin_service': '神務管理員',
                     'admin_schedule': '排班管理員',
                     'superadmin': '超級管理員'
                 };
                 const roles = userData.roles || [];
-                const adminRoles = roles.filter(r => r.includes('admin') || r === 'superadmin');
+                const adminRoles = roles.filter(r => r.includes('admin') || r.includes('poweruser') || r === 'superadmin');
                 const roleText = adminRoles.map(r => roleNames[r] || r).join(', ');
                 userRoles.textContent = `管理權限: ${roleText}`;
             }
@@ -356,15 +344,7 @@
             moduleGrid.style.display = 'grid';
         }
 
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            try {
-                const { platformAuth } = await ensureAuth();
-                await platformAuth.signOut();
-                window.location.href = '/';
-            } catch (error) {
-                console.error('登出失敗:', error);
-            }
-        });
+        document.getElementById('logoutBtn').addEventListener('click', logout);
     </script>
 </body>
 </html>

@@ -8,17 +8,6 @@
     <link rel="stylesheet" href="/styles/common.css">
     </head>
 <body>
-    <!-- 未登入畫面 (預設顯示) -->
-    <div id="loginPrompt" class="login-prompt">
-        <div class="welcome-card">
-            <h2>歡迎</h2>
-            <p style="color: #6B5D4F; margin-bottom: 2rem;">請使用 LINE 帳號登入系統</p>
-            <button id="loginBtn" class="btn btn-primary">
-                LINE 登入
-            </button>
-        </div>
-    </div>
-
     <!-- 主要內容 (預設隱藏，登入後才顯示) -->
     <div id="mainApp" style="display: none;">
         <header class="header">
@@ -301,10 +290,8 @@
     </div> <!-- 關閉 mainApp -->
 
     <script type="module">
-        import { checkAuth } from '/js/auth-guard.js';
-        import { handleLineLogin } from '/js/auth.js?v=2';
+        import { checkAuthWithUI } from '/js/auth-guard.js';
         
-        let loginBtnBound = false;
         let moduleLoaded = false;
 
         async function loadModule() {
@@ -315,16 +302,15 @@
             }
         }
 
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn && !loginBtnBound) {
-            loginBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                await handleLineLogin();
-            });
-            loginBtnBound = true;
-        }
-
-        checkAuth().then(() => loadModule()).catch(() => {});
+        checkAuthWithUI({
+            onAuthenticated: (result) => {
+                console.log('✅ [FTY.html] 已登入，載入模組');
+                loadModule();
+            },
+            onUnauthenticated: () => {
+                console.log('❌ [FTY.html] 未登入，顯示登入 UI');
+            }
+        });
     </script>
 </body>
 </html>
