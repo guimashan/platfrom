@@ -160,8 +160,8 @@
 
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
-        // 導入統一的登入處理函數
-        import { handleLineLogin } from '/js/auth.js';
+        // 導入統一的登入處理函數（v2 強制刷新緩存）
+        import { handleLineLogin } from '/js/auth.js?v=2';
         
         // Firebase 延遲載入 - 只在需要時才載入
         let loginBtnBound = false;
