@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>信眾奉獻 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .card {
+            padding-bottom: 15px;
+        }
+
+        .service-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .service-item {
+            display: block;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 2px solid #d4af37;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .service-item:hover {
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            border-color: var(--primary-gold);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .service-item:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 767px) {
+            .service-item {
+                padding: 1.1rem 1.25rem;
+                font-size: 1.05rem;
+            }
+        }
+
+        @media (max-width: 479px) {
+            .service-item {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>信眾奉獻</h1>
+            <p>選擇您的奉獻項目</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-logout" onclick="window.location.href='/'">
+                返回首頁
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            
+            <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
+                <h2 class="card-title" style="color: #8B6914; margin-bottom: 1.5rem;">信眾奉獻</h2>
+                <div style="line-height: 2; color: #4A3C2F; font-size: 15px;">
+                    <p>本宮目前正在辦理第二期、第三期工程，未來規劃有露天廣場、中小型教室、禪修室、演講廳、圖書館，藏經閣、展覽廳等。以上規劃可供中小型玄帝信仰佈道、正信講座、藝文展演等活動，並可深耕祖庭武當山文化與在地文化結合，宣揚玄帝正信文化及正統道教精神。</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">奉獻項目</h2>
+                <div class="service-grid">
+                    <a href="/service/BG.html" class="service-item">建宮廟款</a>
+                    <a href="/service/XY.html" class="service-item">添香油</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        console.log('✅ 信眾奉獻選單頁面已載入');
+    </script>
+</body>
+</html>

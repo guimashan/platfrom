@@ -30,16 +30,28 @@
                 </div>
 
                 <div id="moduleGrid" class="module-grid">
-                <div class="module-card" data-module="checkin">
-                    <div class="module-icon">🙏</div>
-                    <div class="module-title">奉香簽到</div>
-                    <div class="module-desc">簽到打卡與歷程紀錄</div>
-                </div>
-                
                 <div class="module-card" data-module="service">
-                    <div class="module-icon">⚡</div>
+                    <div class="module-icon">🕯️</div>
                     <div class="module-title">神務服務</div>
                     <div class="module-desc">法會報名與服務管理</div>
+                </div>
+                
+                <div class="module-card" data-module="bx">
+                    <div class="module-icon">🏮</div>
+                    <div class="module-title">信眾奉獻</div>
+                    <div class="module-desc">建宮廟款與添香油</div>
+                </div>
+                
+                <div class="module-card" data-module="ft">
+                    <div class="module-icon">🙏</div>
+                    <div class="module-title">福田會</div>
+                    <div class="module-desc">福田會入會申請</div>
+                </div>
+                
+                <div class="module-card" data-module="checkin">
+                    <div class="module-icon">✅</div>
+                    <div class="module-title">奉香簽到</div>
+                    <div class="module-desc">簽到打卡與歷程紀錄</div>
                 </div>
                 
                 <div class="module-card module-card-locked" data-module="schedule">
@@ -142,7 +154,7 @@
                         let canAccess = false;
                         let isVisible = false;
                         
-                        if (module === 'checkin' || module === 'service') {
+                        if (module === 'checkin' || module === 'service' || module === 'bx' || module === 'ft') {
                             canAccess = true;
                             isVisible = true;
                         } else if (module === 'schedule') {
@@ -181,7 +193,9 @@
         function handleModuleClick(module) {
             const routes = {
                 'checkin': '/checkin/checkin.html',
-                'service': '/service/DD.html',
+                'service': '/service/service.html',
+                'bx': '/service/bx.html',
+                'ft': '/service/ft.html',
                 'manage': '/manage/index.html'
             };
             
