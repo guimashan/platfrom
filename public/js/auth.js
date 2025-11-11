@@ -333,4 +333,4 @@ if (document.readyState === 'loading') {
 }
 
 // 導出認證相關函數
-export { platformAuth, handleLineLogin };
+export { platformAuth };
