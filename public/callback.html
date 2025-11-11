@@ -40,8 +40,14 @@
     <div class="container">
         <div class="callback-container">
             <div class="spinner"></div>
-            <h2>LINE 登入處理中...</h2>
-            <p>請稍候，正在完成登入流程</p>
+            <h2 id="statusTitle">LINE 登入處理中...</h2>
+            <p id="statusMessage">請稍候，正在完成登入流程</p>
+            <div id="debugInfo" style="background: #f0f0f0; padding: 15px; margin: 20px 0; border-radius: 8px; font-family: monospace; font-size: 12px; text-align: left; max-width: 600px;">
+                <div>🔍 診斷資訊：</div>
+                <div id="debugUrl"></div>
+                <div id="debugParams"></div>
+                <div id="debugState"></div>
+            </div>
             <div id="errorMessage" class="error-message" style="display: none;"></div>
         </div>
     </div>
@@ -51,6 +57,15 @@
         import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
         import { getStorage, removeStorage } from '/js/cookie-utils.js';
 
+        // 顯示診斷信息
+        const debugUrl = document.getElementById('debugUrl');
+        const debugParams = document.getElementById('debugParams');
+        const debugState = document.getElementById('debugState');
+        const statusTitle = document.getElementById('statusTitle');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        debugUrl.textContent = `📍 當前 URL: ${window.location.href}`;
+
         async function handleCallback() {
             try {
                 // 從 URL 取得授權碼和狀態
@@ -58,6 +73,8 @@
                 const code = urlParams.get('code');
                 const state = urlParams.get('state');
                 const error = urlParams.get('error');
+                
+                debugParams.textContent = `🔑 參數: code=${code ? '✓' : '✗'}, state=${state ? '✓' : '✗'}, error=${error || '無'}`;
 
                 if (error) {
                     throw new Error(`LINE 授權失敗: ${error}`);
@@ -70,11 +87,15 @@
                 // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
                 // 💾 使用混合儲存策略（Cookie + sessionStorage 雙重後備）
                 const savedState = getStorage('line_login_state');
+                debugState.textContent = `🔐 State: URL=${state?.substring(0,8)}... / 儲存=${savedState?.substring(0,8)}... / 匹配=${savedState === state ? '✓' : '✗'}`;
+                
                 console.log('🔍 [callback] State 驗證 (混合儲存):', {
                     urlState: state,
                     savedState: savedState,
                     match: savedState === state
                 });
+                
+                statusMessage.textContent = '正在驗證安全參數...';
                 
                 if (!savedState) {
                     throw new Error('安全驗證失敗：找不到登入會話，請重新登入。');
@@ -89,6 +110,7 @@
                 removeStorage('line_login_state');
 
                 console.log('State 驗證通過，準備交換 Firebase Token...');
+                statusMessage.textContent = '驗證通過！正在與 LINE 伺服器交換憑證...';
 
                 // 呼叫 Cloud Function 交換 Firebase Custom Token (2nd Gen)
                 const functionUrl = 'https://asia-east2-platform-bc783.cloudfunctions.net/generateCustomToken';
@@ -112,6 +134,7 @@
                 }
 
                 console.log('Firebase Custom Token 已取得，準備登入...');
+                statusMessage.textContent = '已取得登入憑證！正在登入 Firebase...';
 
                 // 使用 Custom Token 登入 Firebase
                 // Firebase SDK 本身有內建的超時處理，移除自訂超時以避免過早中斷
@@ -128,14 +151,19 @@
                 console.log('✅ [callback] 登入成功！讀取返回URL:', returnUrl);
                 console.log('💾 [callback] 登入完成，清理儲存');
                 
+                statusTitle.textContent = '✅ 登入成功！';
+                statusMessage.textContent = `正在跳轉到：${returnUrl || '首頁'}`;
+                
                 // 清除已使用的返回URL
                 removeStorage('line_login_return_url');
                 
                 const finalUrl = returnUrl || '/';
                 console.log('🟢 [callback] 最終跳轉到:', finalUrl);
                 
-                // 立即跳轉
-                window.location.href = finalUrl;
+                // 延遲 500ms 讓用戶看到成功訊息，然後跳轉
+                setTimeout(() => {
+                    window.location.href = finalUrl;
+                }, 500);
 
             } catch (error) {
                 console.error('處理回調失敗:', error);
