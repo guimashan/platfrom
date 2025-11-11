@@ -1,6 +1,6 @@
 # 龜馬山整合服務平台 - 系統文檔
 
-**最近更新**: 2025-11-11 (Firebase 完整延遲載入優化完成)
+**最近更新**: 2025-11-11 (ServiceFormEngine 重構架構規劃完成)
 
 ## 系統概述
 
@@ -328,6 +328,90 @@ auth.setCustomUserClaims(uid, { role: 'admin' })
 ---
 
 ## 技術決策記錄
+
+### 2025-11-11: ServiceFormEngine 重構架構規劃完成
+
+**決策：** 設計配置驅動架構以減少服務表單 48% 重複代碼
+
+**背景：**
+- 11 個服務表單（DD, LD, ND, PS, QJ, ZY, BG, FTC, FTP, FTY, XY）共 6,344 行代碼
+- 70-85% 代碼重複（認證、驗證、卡片管理、提交流程）
+- 差異僅在：SERVICE_TYPE、定價（LAMP_PRICE/DOU_PRICE）、項目選項
+
+**完成的規劃文件：**
+
+1. **ServiceFormEngine-Architecture.md** - 核心架構設計
+   - 配置驅動引擎（ServiceFormEngine）
+   - 5 個可重用模組：AuthManager, FormValidator, PaymentHandler, CardManager, SubmitHandler
+   - UI 模板策略：從現有 HTML 克隆或動態生成
+   - 入口檔案簡化：577 行 → 25 行（減少 96%）
+   - 經 3 輪 Architect 審查通過
+
+2. **ServiceFormEngine-Migration.md** - 遷移步驟規劃
+   - 4 階段計劃（預估 20 天，2-3 位工程師）
+   - 階段 1：基礎設施建設（引擎 + 5 模組）
+   - 階段 2：首個服務遷移（DD 作為範本）
+   - 階段 3：批次遷移 10 個服務
+   - 階段 4：清理與優化
+   - ⚠️ 需要建立測試框架（Vitest, Playwright）才能執行
+
+3. **ServiceFormEngine-RiskAssessment.md** - 風險評估與測試策略
+   - 識別 8 個主要風險（含優先級和緩解措施）
+   - 測試金字塔：單元測試 60% + 整合測試 30% + E2E 10%
+   - 41 項回歸測試清單
+   - 金絲雀部署策略
+   - P0/P1 故障應對計劃（10 分鐘回滾 SLA）
+   - ⚠️ 需要配置監控工具才能執行
+
+**預期成果**（實作後）：
+- 代碼量：6,344 行 → 3,300 行（減少 48%）
+- 新增服務：4 小時 → 30 分鐘（減少 88%）
+- 修改業務邏輯：2 小時 → 10 分鐘（減少 92%）
+- Bug 修復：11 次修改 → 1 次修改（減少 91%）
+
+**當前狀態：** 
+- ✅ 架構設計完成（可實作）
+- ✅ 遷移計劃完成（參考指南）
+- ✅ 風險評估完成（參考指南）
+- ❌ 測試基礎設施尚未建立
+- ❌ 監控工具尚未配置
+- ❌ 尚未實際執行重構
+
+**維護要點：**
+- 這些是**規劃文件**，供未來實作參考
+- 實作前需先建立測試和監控基礎設施
+- 根據實際團隊人力調整時程
+- 保持文件與實作同步
+
+---
+
+### 2025-11-11: 代碼清理階段完成
+
+**決策：** 清理未使用的死代碼和冗餘日誌
+
+**清理成果：**
+
+1. **firebase-lazy.js 死代碼清理**（68 行）
+   - 刪除 3 個未使用函數：`hasCachedAuth()`, `toggleLoadingIndicator()`, `createLazyFormHandler()`
+   - 經 Architect 審查確認無其他模組引用
+
+2. **console.log 清理**（22 條）
+   - `auth.js`: 刪除 11 條調試日誌（保留錯誤日誌和關鍵流程）
+   - `storage-simple.js`: 刪除 8 條重複日誌
+   - `firebase-init.js`: 刪除 2 條調試日誌
+   - `callback.html`: 刪除 1 條調試日誌
+
+3. **callback.html 調試優化**
+   - debugInfo 區塊改為開發模式控制
+   - 條件：`location.hostname === 'localhost'` 或 `?debug=true` 參數
+   - 生產環境自動隱藏調試信息
+
+**影響：**
+- 代碼更精簡易讀
+- 生產環境控制台更乾淨
+- 保留關鍵診斷日誌供故障排查
+
+---
 
 ### 2025-11-11: Firebase 完整延遲載入優化（方案 B）
 
