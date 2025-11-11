@@ -24,16 +24,12 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd public && npx http-server -p 5000 --cors -c60"
+args = "cd public && npx http-server -p 5000 --cors -c-1"
 waitForPort = 5000
 
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 8034
-externalPort = 4200
 
 [[ports]]
 localPort = 8035
