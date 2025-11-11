@@ -261,13 +261,15 @@
             loginBtnBound = true;
         }
 
-        // 檢查是否應該自動載入（用戶可能是從 LINE 登入返回）
+        // 檢查是否應該自動載入模組
+        // 注意：不要基於 referrer 自動載入，因為這會導致從 LINE 回來後的無限循環
         const urlParams = new URLSearchParams(window.location.search);
         const hasAuthParams = urlParams.has('code') || urlParams.has('state');
-        const hasReturnUrl = sessionStorage.getItem('line_login_return_url');
-        const fromLine = document.referrer.includes('line.me');
 
-        if (hasAuthParams || hasReturnUrl || fromLine) {
+        
+        // 只在真正有認證參數時才載入（表示正在處理回調）
+        if (hasAuthParams) {
+            console.log('🔄 檢測到認證參數，載入模組...');
             // 用戶可能已登入或正在登入流程中，載入模組檢查狀態
             loadModule();
         }
