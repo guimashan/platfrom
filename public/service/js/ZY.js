@@ -1,4 +1,4 @@
-import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
+import { setStorage, getStorage, removeStorage } from '/js/storage-simple.js';
 import { handleLineLogin } from '/js/auth.js';
 
 // -----------------------------------------
@@ -49,9 +49,7 @@ export async function init() {
     // --- 程式進入點 ---
     // 立即執行初始化邏輯（不使用 DOMContentLoaded）
     const initializeApp = () => {
-        // 1. 綁定登入按鈕
-        // 登入按鈕已在 HTML 中綁定，此處不需要重複綁定
-        }
+        // 1. 綁定登入按鈕 - 登入按鈕已在 HTML 中綁定，此處不需要重複綁定
 
         // 2. 檢查登入狀態
         if (!platformAuth) {
@@ -932,6 +930,5 @@ export async function init() {
         }
     }
 
+    // init() 函數結束 - 登入已在 HTML 中處理
 }
-    
-    // 不需要導出任何內容，登入已在 HTML 中處理

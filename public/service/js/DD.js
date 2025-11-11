@@ -1,4 +1,4 @@
-import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
+import { setStorage, getStorage, removeStorage } from '/js/storage-simple.js';
 import { handleLineLogin } from '/js/auth.js';
 
 // -----------------------------------------
@@ -884,6 +884,5 @@ export async function init() {
         }
     }
 
+    // init() 函數結束 - 登入已在 HTML 中處理
 }
-    
-    // 不需要導出任何內容，登入已在 HTML 中處理
