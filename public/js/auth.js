@@ -31,16 +31,18 @@ const LINE_CHANNEL_ID = '2008269293';
 const CANONICAL_ORIGIN = 'https://go.guimashan.org.tw';
 const LINE_CALLBACK_URL = CANONICAL_ORIGIN + '/callback.html';
 
-// 監聽認證狀態
-onAuthStateChanged(platformAuth, async (user) => {
-    if (user) {
-        console.log('使用者已登入:', user.uid);
-        await handleUserLogin(user);
-    } else {
-        console.log('使用者未登入');
-        showLoginPage();
-    }
-});
+// 初始化認證狀態監聽（僅供首頁使用）
+export function initAuthStateListener() {
+    onAuthStateChanged(platformAuth, async (user) => {
+        if (user) {
+            console.log('使用者已登入:', user.uid);
+            await handleUserLogin(user);
+        } else {
+            console.log('使用者未登入');
+            showLoginPage();
+        }
+    });
+}
 
 // 處理 LINE 登入（導出供服務頁面使用）
 export async function handleLineLogin() {

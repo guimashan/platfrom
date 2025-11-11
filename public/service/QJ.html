@@ -164,14 +164,20 @@
         import { handleLineLogin } from '/js/auth.js';
         
         // Firebase 延遲載入 - 只在需要時才載入
+        let loginBtnBound = false;
         let moduleLoaded = false;
         async function loadModule() {
                 await module.init();
-        // 綁定登入按鈕 - 直接調用統一的登入函數
-        document.getElementById('loginBtn')?.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await handleLineLogin();
-        });
+        // 綁定登入按鈕 - 防重複綁定
+        const loginBtn = document.getElementById('loginBtn');
+        if (loginBtn && !loginBtnBound) {
+            loginBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                console.log('🔐 [QJ.html] 觸發登入');
+                await handleLineLogin();
+            });
+            loginBtnBound = true;
+        }
 
         // 檢查是否應該自動載入（用戶可能是從 LINE 登入返回）
         const urlParams = new URLSearchParams(window.location.search);

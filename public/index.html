@@ -97,17 +97,26 @@
         async function loadFirebase() {
             if (firebaseLoaded) return authModule;
             
+            // 立即標記為已載入，防止並發調用
+            firebaseLoaded = true;
+            
             const loadingIndicator = document.getElementById('loadingIndicator');
             loadingIndicator.classList.remove('hidden');
             
             try {
                 await import('/js/firebase-init.js');
                 authModule = await import('/js/auth.js');
-                firebaseLoaded = true;
+                
+                // 僅在首頁初始化認證狀態監聽（只執行一次）
+                if (authModule.initAuthStateListener) {
+                    authModule.initAuthStateListener();
+                }
+                
                 return authModule;
             } catch (error) {
                 console.error('Firebase 載入失敗:', error);
                 alert('系統載入失敗，請重新整理頁面');
+                firebaseLoaded = false; // 失敗時重置，允許重試
                 throw error;
             } finally {
                 loadingIndicator.classList.add('hidden');
