@@ -155,31 +155,17 @@
     </div> <!-- 關閉 mainApp -->
 
     <script type="module">
+        // 導入統一的登入處理函數
+        import { handleLineLogin } from '/js/auth.js';
+        
         // Firebase 延遲載入 - 只在需要時才載入
         let moduleLoaded = false;
-        let moduleInstance = null;
-
-        // 載入並初始化模組
         async function loadModule() {
-            if (!moduleLoaded) {
-                const module = await import('/service/js/XY.js');
-                moduleInstance = await module.init(); // 捕獲返回值
-                moduleLoaded = true;
-            }
-            return moduleInstance;
-        }
-
-        // 綁定登入按鈕
-        document.addEventListener('click', async (e) => {
-            if (e.target.id === 'loginBtn' || e.target.closest('#loginBtn')) {
-                e.preventDefault();
-                // 載入模組
-                const module = await loadModule();
-                // 立即觸發登入（解決首次點擊問題）
-                if (module && module.triggerLogin) {
-                    module.triggerLogin();
-                }
-            }
+                await module.init();
+        // 綁定登入按鈕 - 直接調用統一的登入函數
+        document.getElementById('loginBtn')?.addEventListener('click', async (e) => {
+            e.preventDefault();
+            await handleLineLogin();
         });
 
         // 檢查是否應該自動載入（用戶可能是從 LINE 登入返回）

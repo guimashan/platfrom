@@ -53,12 +53,9 @@ export async function init() {
     // --- 程式進入點 ---
     // 立即執行初始化邏輯（不使用 DOMContentLoaded）
     const initializeApp = () => {
-        // 1. 綁定登入按鈕
-        if (loginBtnEl) {
-            loginBtnEl.addEventListener('click', handleLineLogin);
-        }
-
-        // 2. 檢查登入狀態 (這是非同步的)
+        // 登入按鈕已在 HTML 中綁定，此處不需要重複綁定
+        
+        // 檢查登入狀態 (這是非同步的)
         if (!platformAuth) {
             alert("Firebase Auth 載入失敗。");
             return;
