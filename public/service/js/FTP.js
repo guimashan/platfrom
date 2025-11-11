@@ -115,6 +115,18 @@ export async function init() {
         
             const returnUrl = window.location.pathname + window.location.search;
             sessionStorage.setItem('line_login_return_url', returnUrl);
+            
+            // 驗證 sessionStorage 已正確設置
+            const verifyState = sessionStorage.getItem('line_login_state');
+            console.log('🔐 [FTP] 設置登入 state:', {
+                state: state.substring(0, 8) + '...',
+                verified: verifyState === state,
+                returnUrl: returnUrl
+            });
+            
+            if (!verifyState || verifyState !== state) {
+                throw new Error('無法保存登入會話，請檢查瀏覽器設定是否阻止 Cookie/儲存空間');
+            }
         
             const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
             lineAuthUrl.searchParams.append('response_type', 'code');

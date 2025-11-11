@@ -68,9 +68,19 @@
 
                 // 🔒 安全驗證：檢查 state 參數防止 CSRF 攻擊
                 const savedState = sessionStorage.getItem('line_login_state');
-                if (!savedState || savedState !== state) {
-                    sessionStorage.removeItem('line_login_state'); // 清除已使用的 state
-                    throw new Error('安全驗證失敗：state 參數不匹配。可能遭受 CSRF 攻擊。');
+                console.log('🔍 [callback] State 驗證:', {
+                    urlState: state,
+                    savedState: savedState,
+                    match: savedState === state
+                });
+                
+                if (!savedState) {
+                    throw new Error('安全驗證失敗：找不到登入會話，請重新登入。');
+                }
+                
+                if (savedState !== state) {
+                    sessionStorage.removeItem('line_login_state');
+                    throw new Error(`安全驗證失敗：state 參數不匹配 (期望: ${savedState?.substring(0,8)}..., 收到: ${state?.substring(0,8)}...)。請重新登入。`);
                 }
 
                 // 驗證成功後立即清除 state（防止重複使用）
