@@ -97,7 +97,7 @@ export async function init() {
     // --- LINE 登入處理 ---
     function handleLineLogin() {
         const LINE_CHANNEL_ID = '2008269293';
-        const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
+        const LINE_CALLBACK_URL = 'https://go.guimashan.org.tw/callback.html';
     
         try {
             const state = crypto.randomUUID();

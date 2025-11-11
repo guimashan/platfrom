@@ -66,14 +66,21 @@
     </div>
 
     <div class="test-box">
-        <h2>3. 完整登入流程測試</h2>
+        <h2>3. 混合儲存測試（Cookie + sessionStorage）</h2>
+        <p>測試新的混合儲存策略是否正常工作</p>
+        <button onclick="testHybridStorage()">執行測試</button>
+        <div id="hybridStorageResult"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>4. 完整登入流程測試</h2>
         <p>模擬完整的 LINE 登入流程（不會真的跳轉到 LINE）</p>
         <button onclick="testFullFlow()">執行測試</button>
         <div id="fullFlowResult"></div>
     </div>
 
     <div class="test-box">
-        <h2>4. 檢查現有 sessionStorage 資料</h2>
+        <h2>5. 檢查現有 sessionStorage 資料</h2>
         <p>查看目前儲存的登入狀態資料</p>
         <button onclick="checkExistingData()">檢查資料</button>
         <button onclick="clearData()">清除所有資料</button>
@@ -81,12 +88,14 @@
     </div>
 
     <div class="test-box">
-        <h2>5. 真實登入測試</h2>
+        <h2>6. 真實登入測試</h2>
         <p>⚠️ 這會真的跳轉到 LINE 登入頁面</p>
         <button onclick="realLogin()">前往 LINE 登入</button>
     </div>
 
-    <script>
+    <script type="module">
+        import { setStorage, getStorage, removeStorage } from '/js/cookie-utils.js';
+        
         function testSessionStorage() {
             const result = document.getElementById('sessionStorageResult');
             try {
@@ -121,6 +130,50 @@
                     '3. 嘗試清除瀏覽器快取後重試';
             }
         }
+        
+        window.testHybridStorage = function() {
+            const result = document.getElementById('hybridStorageResult');
+            try {
+                console.log('🧪 開始測試混合儲存...');
+                
+                const testKey = 'test_hybrid_' + Date.now();
+                const testValue = 'hybrid_value_' + Math.random();
+                
+                // 測試 setStorage
+                console.log('📝 測試 setStorage...');
+                setStorage(testKey, testValue, 60);
+                
+                // 測試 getStorage  
+                console.log('📖 測試 getStorage...');
+                const retrieved = getStorage(testKey);
+                
+                // 測試 removeStorage
+                console.log('🗑️ 測試 removeStorage...');
+                removeStorage(testKey);
+                
+                // 驗證已刪除
+                const shouldBeNull = getStorage(testKey);
+                
+                if (retrieved === testValue && shouldBeNull === null) {
+                    result.className = 'result success';
+                    result.innerHTML = '✅ <strong>混合儲存測試通過！</strong><br>' +
+                        '設置值: ' + testValue + '<br>' +
+                        '讀取值: ' + retrieved + '<br>' +
+                        '刪除後: ' + (shouldBeNull === null ? '已清除' : '未清除') + '<br><br>' +
+                        '請查看控制台（F12）查看詳細日誌';
+                } else {
+                    throw new Error('混合儲存讀寫不一致');
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = '❌ <strong>混合儲存測試失敗</strong><br>' +
+                    '錯誤: ' + error.message + '<br><br>' +
+                    '請查看控制台（F12）查看詳細錯誤';
+                console.error('混合儲存測試失敗:', error);
+            }
+        };
+        
+        window.testSessionStorage = testSessionStorage;
 
         function testCrypto() {
             const result = document.getElementById('cryptoResult');

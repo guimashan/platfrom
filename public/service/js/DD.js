@@ -99,7 +99,7 @@ export async function init() {
     function handleLineLogin() {
         // 使用與 auth.js 相同的邏輯
         const LINE_CHANNEL_ID = '2008269293';
-        const LINE_CALLBACK_URL = window.location.origin + '/callback.html';
+        const LINE_CALLBACK_URL = 'https://go.guimashan.org.tw/callback.html';
     
         try {
             // 產生隨機 state 用於 CSRF 防護
