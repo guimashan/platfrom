@@ -56,24 +56,38 @@
         import { platformAuth } from '/js/firebase-init.js';
         import { signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 
-        // 顯示診斷信息
+        // 檢測開發模式（localhost 或 ?debug=true 參數）
+        const urlParams = new URLSearchParams(window.location.search);
+        const isDebugMode = window.location.hostname === 'localhost' || 
+                           window.location.hostname.includes('replit') ||
+                           urlParams.has('debug');
+
+        // 控制診斷信息顯示
+        const debugInfo = document.getElementById('debugInfo');
+        if (!isDebugMode) {
+            debugInfo.style.display = 'none';
+        }
+
         const debugUrl = document.getElementById('debugUrl');
         const debugParams = document.getElementById('debugParams');
         const debugState = document.getElementById('debugState');
         const statusTitle = document.getElementById('statusTitle');
         const statusMessage = document.getElementById('statusMessage');
         
-        debugUrl.textContent = `📍 當前 URL: ${window.location.href}`;
+        if (isDebugMode) {
+            debugUrl.textContent = `📍 當前 URL: ${window.location.href}`;
+        }
 
         async function handleCallback() {
             try {
                 // 從 URL 取得授權碼和狀態
-                const urlParams = new URLSearchParams(window.location.search);
                 const code = urlParams.get('code');
                 const state = urlParams.get('state');
                 const error = urlParams.get('error');
                 
-                debugParams.textContent = `🔑 參數: code=${code ? '✓' : '✗'}, state=${state ? '✓' : '✗'}, error=${error || '無'}`;
+                if (isDebugMode) {
+                    debugParams.textContent = `🔑 參數: code=${code ? '✓' : '✗'}, state=${state ? '✓' : '✗'}, error=${error || '無'}`;
+                }
 
                 if (error) {
                     throw new Error(`LINE 授權失敗: ${error}`);
@@ -85,13 +99,15 @@
 
                 // 🔒 從 localStorage 讀取 state（最可靠）
                 const savedState = localStorage.getItem('line_state');
-                debugState.textContent = `🔐 State: URL=${state?.substring(0,8)}... / 儲存=${savedState?.substring(0,8)}... / 匹配=${savedState === state ? '✓' : '✗'}`;
                 
-                console.log('🔍 State 驗證:', {
-                    urlState: state,
-                    savedState: savedState,
-                    match: savedState === state
-                });
+                if (isDebugMode) {
+                    debugState.textContent = `🔐 State: URL=${state?.substring(0,8)}... / 儲存=${savedState?.substring(0,8)}... / 匹配=${savedState === state ? '✓' : '✗'}`;
+                    console.log('🔍 State 驗證:', {
+                        urlState: state,
+                        savedState: savedState,
+                        match: savedState === state
+                    });
+                }
                 
                 statusMessage.textContent = '正在驗證安全參數...';
                 

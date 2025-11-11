@@ -84,7 +84,4 @@ export const API_ENDPOINTS = {
 // 開發環境設定 - 使用 Emulator
 if (window.location.hostname === 'localhost' || window.location.hostname.includes('replit')) {
     // 注意: Emulator 設定需要在實際部署時移除
-    console.log('開發環境 - Firebase 已初始化');
 }
-
-console.log('Firebase 四個專案實例已初始化完成');

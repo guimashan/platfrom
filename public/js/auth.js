@@ -36,10 +36,8 @@ const LINE_CALLBACK_URL = CANONICAL_ORIGIN + '/callback.html';
 export function initAuthStateListener() {
     onAuthStateChanged(platformAuth, async (user) => {
         if (user) {
-            console.log('使用者已登入:', user.uid);
             await handleUserLogin(user);
         } else {
-            console.log('使用者未登入');
             showLoginPage();
         }
     });
@@ -74,8 +72,6 @@ export async function handleLineLogin() {
             alert('瀏覽器不支援儲存功能，請檢查設定');
             return;
         }
-        
-        console.log('✅ State 已儲存:', state.substring(0, 8));
 
         // 構建 LINE 授權 URL
         const lineAuthUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
@@ -86,7 +82,6 @@ export async function handleLineLogin() {
         lineAuthUrl.searchParams.append('scope', 'profile openid email');
 
         // 導向 LINE 授權頁面
-        console.log('🚀 [auth.js] 導向 LINE 授權頁面');
         window.location.href = lineAuthUrl.toString();
         
     } catch (error) {
@@ -104,14 +99,11 @@ async function handleUserLogin(user) {
         const userSnap = await getDoc(userRef);
         
         if (!userSnap.exists()) {
-            console.log('使用者資料不存在,等待建立...');
             return;
         }
         
         const userData = userSnap.data();
         const roles = userData.roles || ['user'];
-        
-        console.log('使用者角色:', roles);
         
         // 根據角色導向不同頁面
         redirectByRole(roles);
@@ -133,7 +125,6 @@ function redirectByRole(roles) {
     
     // 其他頁面：用戶已經在目標頁面，不需要重定向
     // 各頁面的 auth-guard 會自行處理權限檢查
-    console.log('使用者已在頁面:', currentPath);
 }
 
 // 顯示模組選單

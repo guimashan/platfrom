@@ -72,37 +72,6 @@ export async function loadAuthModule() {
 }
 
 /**
- * 檢查是否有快取的登入狀態（用於判斷是否需要載入 Firebase）
- * @returns {boolean} 是否可能已登入
- */
-export function hasCachedAuth() {
-    // 檢查 sessionStorage 是否有登入相關資訊
-    const hasReturnUrl = sessionStorage.getItem('line_login_return_url');
-    const hasAuthState = sessionStorage.getItem('line_login_state');
-    
-    // 檢查 URL 是否有認證參數
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasAuthParams = urlParams.has('code') || urlParams.has('state');
-    
-    // 檢查 referrer 是否來自 LINE
-    const fromLine = document.referrer.includes('line.me');
-    
-    return !!(hasReturnUrl || hasAuthState || hasAuthParams || fromLine);
-}
-
-/**
- * 顯示載入指示器
- * @param {string} elementId 載入指示器的 DOM ID
- * @param {boolean} show 是否顯示
- */
-export function toggleLoadingIndicator(elementId = 'loadingIndicator', show = true) {
-    const indicator = document.getElementById(elementId);
-    if (indicator) {
-        indicator.classList.toggle('hidden', !show);
-    }
-}
-
-/**
  * 為需要認證的頁面建立延遲載入 guard
  * 只在檢測到使用者可能已登入時才載入 Firebase
  * 
@@ -128,43 +97,4 @@ export async function createAuthGuard(onAuthenticated, onUnauthenticated) {
             await onUnauthenticated();
         }
     }
-}
-
-/**
- * 為服務申請頁面建立互動時載入的 handler
- * 只在使用者點擊提交時才載入 Firebase
- * 
- * @param {string} formId 表單 ID
- * @param {Function} onSubmit 提交時的處理函數
- */
-export function createLazyFormHandler(formId, onSubmit) {
-    const form = document.getElementById(formId);
-    if (!form) {
-        console.warn(`找不到表單: ${formId}`);
-        return;
-    }
-    
-    let firebaseLoaded = false;
-    
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        // 第一次提交時載入 Firebase
-        if (!firebaseLoaded) {
-            toggleLoadingIndicator('loadingIndicator', true);
-            try {
-                await loadFirebaseCore();
-                firebaseLoaded = true;
-            } catch (error) {
-                console.error('Firebase 載入失敗:', error);
-                alert('系統載入失敗，請重新整理頁面');
-                return;
-            } finally {
-                toggleLoadingIndicator('loadingIndicator', false);
-            }
-        }
-        
-        // 執行提交處理
-        await onSubmit(e);
-    });
 }
