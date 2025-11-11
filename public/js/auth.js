@@ -42,8 +42,8 @@ onAuthStateChanged(platformAuth, async (user) => {
     }
 });
 
-// 處理 LINE 登入
-async function handleLineLogin() {
+// 處理 LINE 登入（導出供服務頁面使用）
+export async function handleLineLogin() {
     try {
         // 🔒 確保在正式域名上執行 OAuth（避免跨域問題）
         const currentOrigin = window.location.origin;
