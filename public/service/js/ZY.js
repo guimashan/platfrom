@@ -1,4 +1,3 @@
-import { setStorage, getStorage, removeStorage } from '/js/storage-simple.js';
 import { handleLineLogin } from '/js/auth.js';
 
 // -----------------------------------------
