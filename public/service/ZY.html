@@ -191,8 +191,16 @@
         // Firebase 延遲載入 - 只在需要時才載入
         let loginBtnBound = false;
         let moduleLoaded = false;
+
+        // 載入並初始化模組
         async function loadModule() {
+            if (!moduleLoaded) {
+                const module = await import('/service/js/ZY.js');
                 await module.init();
+                moduleLoaded = true;
+            }
+        }
+
         // 綁定登入按鈕 - 防重複綁定
         const loginBtn = document.getElementById('loginBtn');
         if (loginBtn && !loginBtnBound) {
