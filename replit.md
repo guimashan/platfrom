@@ -329,6 +329,83 @@ auth.setCustomUserClaims(uid, { role: 'admin' })
 
 ## 技術決策記錄
 
+### 2025-11-11: 統一登入 UI 系統實作完成
+
+**決策：** 實作全站統一登入介面，提升用戶體驗一致性
+
+**背景：**
+- 23 個頁面使用不同的登入提示樣式
+- 服務表單使用舊的 `<div id="loginPrompt">` 本地登入按鈕
+- 管理頁面缺少統一的權限檢查機制
+- 用戶體驗不一致，維護困難
+
+**實作內容：**
+
+1. **創建統一登入 UI 組件**（`auth-ui.js`）
+   - 全螢幕淺金色背景（#F5F0E8）
+   - 居中白色卡片設計
+   - 金色標題「請先登入」（#D4AF37）
+   - 綠色 LINE 登入按鈕（#06C755）
+   - 響應式設計，支援行動裝置
+
+2. **增強認證守衛**（`auth-guard.js`）
+   - 新增 `checkAuthWithUI()` - 一般用戶認證（停留在頁面顯示登入 UI）
+   - 新增 `checkAdminAuth()` - 管理員權限檢查（支援角色陣列）
+   - 整合 `auth-ui.js` 提供統一登入介面
+   - 登入成功後自動隱藏登入 UI，顯示主要內容
+   - 權限不足時顯示友善錯誤訊息
+
+3. **更新所有 23 個頁面**
+   - **首頁（1）**: 使用 `checkAuthWithUI()`
+   - **服務表單（11）**: DD, LD, ND, PS, QJ, ZY, BG, FTC, FTP, FTY, XY
+     - 移除舊的 `<div id="loginPrompt">` HTML
+     - 使用 `checkAuthWithUI()`
+     - 登入成功後動態載入服務模組
+   - **服務管理（2）**: service/manage/index.html, orders.html
+     - 使用 `checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin'])`
+   - **簽到系統（2）**: checkin/checkin.html, history.html
+     - 使用 `checkAuthWithUI()`
+   - **簽到管理（5）**: checkin/manage/ 下 5 個頁面
+     - 使用 `checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin'])`
+   - **管理系統（2）**: manage/index.html, schedule/index.html
+     - 使用適當的管理員權限配置
+
+4. **角色權限架構**
+   - `admin_service` - 神務服務管理員
+   - `admin_checkin` - 簽到系統管理員
+   - `admin_schedule` - 排班系統管理員
+   - `poweruser_*` - 各模組進階用戶
+   - `superadmin` - 超級管理員（所有權限）
+
+**技術亮點：**
+- 所有頁面主要內容包裹在 `<div id="mainApp" style="display: none;">`
+- 未登入時統一顯示登入 UI 覆蓋層
+- 登入成功後動態切換 UI（無需重新載入頁面）
+- 使用 Firebase `onAuthStateChanged` 監聽認證狀態
+- 管理頁面支援多角色權限檢查
+
+**用戶體驗改善：**
+- ✅ 所有頁面登入介面一致（金色 + 白色卡片）
+- ✅ 停留在當前頁面（不會跳轉到首頁）
+- ✅ 登入一次，跨頁面保持登入狀態
+- ✅ 管理頁面自動檢查權限
+- ✅ 權限不足時顯示友善提示
+- ✅ 流暢的 UI 切換動畫
+
+**維護成本降低：**
+- 單一登入 UI 組件（`auth-ui.js`）
+- 統一認證邏輯（`auth-guard.js`）
+- 新增頁面只需呼叫 `checkAuthWithUI()` 或 `checkAdminAuth()`
+- 未來修改登入 UI 只需修改一個檔案
+
+**經 Architect 審查確認：**
+- 所有頁面移除舊的登入提示 HTML
+- 認證流程符合規格要求
+- 權限控制正確實作
+- 用戶體驗一致性達成
+
+---
+
 ### 2025-11-11: ServiceFormEngine 重構架構規劃完成
 
 **決策：** 設計配置驅動架構以減少服務表單 48% 重複代碼
