@@ -3,15 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>排班管理 - 龜馬山整合服務平台</title>
+    <title>排班儀表板 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h1 style="text-align: center; color: #8A2BE2; margin-bottom: 1rem;">排班管理測試網頁</h1>
-            <p style="text-align: center; color: #666; font-size: 1.1rem;">此頁面為測試用途</p>
-        </div>
+    <div id="mainApp" class="manage-layout" style="display: none;">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>📅 排班管理</h1>
+                    <p>排班儀表板 - 查看統計總覽</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/schedule/manage/dashboard.html" class="manage-subnav-link active">儀表板</a>
+                <a href="/schedule/manage/user_schedule.html" class="manage-subnav-link">排班用戶</a>
+            </div>
+        </nav>
+
+        <main class="manage-main">
+            <div class="manage-card" style="text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📅</div>
+                <h2 style="color: #333; margin-bottom: 1rem;">排班系統建置中</h2>
+                <p style="color: #666; font-size: 1.1rem; margin-bottom: 2rem;">
+                    排班統計功能正在規劃與開發中<br>
+                    未來將提供：班表統計、排班分析、出勤記錄等功能
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <button onclick="window.location.href='/schedule/manage/user_schedule.html'" class="btn btn-primary">管理排班用戶</button>
+                    <button onclick="window.location.href='/schedule/manage/index.html'" class="btn btn-secondary">返回管理首頁</button>
+                </div>
+            </div>
+
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>未來功能規劃</h2>
+                </div>
+                <div style="padding: 1.5rem;">
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                            <strong>📊 排班統計</strong>
+                            <p style="color: #666; margin: 0.5rem 0 0 0;">總排班次數、本月排班、活躍用戶等統計數據</p>
+                        </li>
+                        <li style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                            <strong>📋 班表管理</strong>
+                            <p style="color: #666; margin: 0.5rem 0 0 0;">建立、編輯、刪除班表，設定排班規則</p>
+                        </li>
+                        <li style="padding: 0.75rem 0; border-bottom: 1px solid #eee;">
+                            <strong>👥 出勤記錄</strong>
+                            <p style="color: #666; margin: 0.5rem 0 0 0;">查看歷史出勤記錄，匯出報表</p>
+                        </li>
+                        <li style="padding: 0.75rem 0;">
+                            <strong>🔔 提醒通知</strong>
+                            <p style="color: #666; margin: 0.5rem 0 0 0;">排班提醒、換班通知、缺勤警示</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
     </div>
+
+    <script type="module">
+        import { checkAdminAuth, logout } from '/js/auth-guard.js';
+        
+        checkAdminAuth(['admin_schedule', 'poweruser_schedule', 'superadmin']).then(async (result) => {
+            console.log('✅ 排班儀表板 管理員認證成功');
+            
+            const mainApp = document.getElementById('mainApp');
+            if (mainApp) {
+                mainApp.style.display = 'block';
+            }
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+        });
+    </script>
 </body>
 </html>

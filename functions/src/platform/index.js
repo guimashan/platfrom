@@ -354,8 +354,8 @@ exports.updateUserRole = onRequest(
           return;
         }
 
-        // 更新目標使用者的角色
-        const {targetUserId, roles} = req.body;
+        // 更新目標使用者的角色和狀態
+        const {targetUserId, roles, active} = req.body;
 
         if (!targetUserId || !Array.isArray(roles)) {
           res.status(400).json({
@@ -366,13 +366,20 @@ exports.updateUserRole = onRequest(
           return;
         }
 
+        const updateData = {
+          roles: roles,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedBy: requestorUid,
+        };
+
+        if (typeof active === 'boolean') {
+          updateData.active = active;
+        }
+
         await admin.firestore()
             .collection('users')
             .doc(targetUserId)
-            .update({
-              roles: roles,
-              updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-            });
+            .update(updateData);
 
         // 同時更新 Auth custom claims
         await admin.auth().setCustomUserClaims(targetUserId, {

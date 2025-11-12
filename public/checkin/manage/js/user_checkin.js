@@ -247,16 +247,15 @@ async function saveUserChanges(event) {
     }
     
     try {
-        await updateDoc(doc(platformDb, 'users', editingUserId), {
+        await callAPI('updateUserRole', {
+            targetUserId: editingUserId,
             roles: selectedRoles,
-            active,
-            updatedAt: new Date(),
-            updatedBy: currentUser.uid
+            active
         });
         
         closeEditModal();
         await loadUsers();
-        alert('儲存成功');
+        alert('儲存成功（已更新認證權限）');
         
     } catch (error) {
         console.error('儲存失敗:', error);

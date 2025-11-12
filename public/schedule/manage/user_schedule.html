@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班用戶管理 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div id="mainApp" style="display: none;">
+        <div class="manage-layout">
+            <header class="manage-header">
+                <div class="manage-header-content">
+                    <div class="manage-header-left">
+                        <h1>📅 排班管理</h1>
+                        <p>排班用戶管理 - 管理排班使用者角色與權限</p>
+                    </div>
+                    <div class="manage-header-actions">
+                        <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                        <button id="logoutBtn" class="manage-header-btn">登出</button>
+                    </div>
+                </div>
+            </header>
+
+            <nav class="manage-subnav">
+                <div class="manage-subnav-content">
+                    <a href="/schedule/manage/dashboard.html" class="manage-subnav-link">儀表板</a>
+                    <a href="/schedule/manage/user_schedule.html" class="manage-subnav-link active">排班用戶</a>
+                </div>
+            </nav>
+
+            <main class="manage-main">
+                <div class="manage-card">
+                    <div class="card-header">
+                        <h2>排班用戶列表</h2>
+                        <div style="display: flex; gap: 1rem;">
+                            <input type="text" id="searchInput" placeholder="搜尋用戶名稱..." style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; min-width: 250px;">
+                            <button id="searchBtn" class="btn btn-secondary">查詢</button>
+                        </div>
+                    </div>
+                    <div id="usersList">
+                        <p class="loading">載入用戶資料中...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="editUserModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>編輯用戶權限</h3>
+                <button onclick="closeEditModal()" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>用戶名稱</label>
+                    <div style="padding: 0.5rem; background: #f5f5f5; border-radius: 6px;">
+                        <strong id="editUserName">-</strong>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>用戶 ID</label>
+                    <div style="padding: 0.5rem; background: #f5f5f5; border-radius: 6px; font-family: monospace; font-size: 0.9rem;">
+                        <span id="editUserId">-</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>角色權限</label>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="superadmin" style="margin-right: 0.5rem;">
+                            <span><strong>超級管理員</strong> - 所有權限</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="admin_schedule" style="margin-right: 0.5rem;">
+                            <span><strong>排班管理員</strong> - 管理班表與排班用戶</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="poweruser_schedule" style="margin-right: 0.5rem;">
+                            <span><strong>排班幹部</strong> - 編輯班表與查看記錄</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="user_schedule" style="margin-right: 0.5rem;">
+                            <span><strong>排班使用者</strong> - 查看班表與打卡</span>
+                        </label>
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" class="role-checkbox" value="user" style="margin-right: 0.5rem;">
+                            <span><strong>一般用戶</strong> - 基本權限</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="checkbox" id="userActive" style="margin-right: 0.5rem;">
+                        <span><strong>啟用帳號</strong></span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeEditModal()" class="btn btn-secondary">取消</button>
+                <button id="saveUserBtn" class="btn btn-primary">儲存變更</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAdminAuth } from '/js/auth-guard.js';
+        import { logout } from '/js/auth.js';
+
+        window.closeEditModal = function() {
+            const userModule = window.userScheduleModule;
+            if (userModule && userModule.closeEditModal) {
+                userModule.closeEditModal();
+            }
+        };
+
+        window.editUser = function(userId) {
+            const userModule = window.userScheduleModule;
+            if (userModule && userModule.editUser) {
+                userModule.editUser(userId);
+            }
+        };
+
+        checkAdminAuth(['admin_schedule', 'poweruser_schedule', 'superadmin']).then(async (result) => {
+            console.log('✅ 排班用戶管理 管理員認證成功');
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            
+            const userModule = await import('/schedule/manage/js/user_schedule.js');
+            window.userScheduleModule = userModule;
+            await userModule.init();
+        });
+    </script>
+</body>
+</html>

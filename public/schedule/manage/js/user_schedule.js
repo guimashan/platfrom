@@ -1,13 +1,11 @@
-import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, platformDb } from '/js/firebase-init.js';
 import { 
     collection, 
     doc,
     getDocs,
-    getDoc,
     updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
-import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allUsers = [];
@@ -66,13 +64,13 @@ async function loadUsers() {
             return aName.localeCompare(bName, 'zh-TW');
         });
         
-        const serviceRelatedRoles = ['poweruser_service', 'admin_service', 'superadmin'];
+        const scheduleRelatedRoles = ['user_schedule', 'poweruser_schedule', 'admin_schedule', 'superadmin'];
         filteredUsers = allUsers.filter(user => {
             const userRoles = user.roles || [];
-            return userRoles.some(role => serviceRelatedRoles.includes(role));
+            return userRoles.some(role => scheduleRelatedRoles.includes(role));
         });
         
-        console.log(`篩選後顯示 ${filteredUsers.length} 個神務相關用戶（總用戶 ${allUsers.length} 個）`);
+        console.log(`篩選後顯示 ${filteredUsers.length} 個排班相關用戶（總用戶 ${allUsers.length} 個）`);
         renderUsers();
         
     } catch (error) {
@@ -106,7 +104,6 @@ function renderUsers() {
     
     filteredUsers.forEach(user => {
         const roles = user.roles || [];
-        const roleNames = roles.map(r => getRoleName(r)).join(', ') || '一般用戶';
         const roleBadges = roles.length > 0 
             ? roles.map(r => getRoleBadge(r)).join(' ') 
             : '<span class="badge">一般用戶</span>';
@@ -120,7 +117,7 @@ function renderUsers() {
                 <td data-label="頭像" style="padding: 0.5rem; text-align: center;">
                     <img src="${avatarUrl}" 
                          alt="${displayName}" 
-                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #8A2BE2;"
+                         style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #D4AF37;"
                          onerror="this.src='/images/default-avatar.svg'">
                 </td>
                 <td data-label="用戶名稱">
@@ -147,22 +144,6 @@ function renderUsers() {
     usersList.innerHTML = html;
 }
 
-function getRoleName(role) {
-    const roleNames = {
-        'superadmin': '超級管理員',
-        'admin_checkin': '簽到管理員',
-        'admin_service': '神務管理員',
-        'admin_schedule': '排班管理員',
-        'poweruser_checkin': '簽到幹部',
-        'poweruser_service': '神務專員',
-        'poweruser_schedule': '排班幹部',
-        'user_checkin': '簽到使用者',
-        'user_schedule': '排班使用者',
-        'user': '一般用戶'
-    };
-    return roleNames[role] || role;
-}
-
 function getRoleBadge(role) {
     const badges = {
         'superadmin': '<span class="badge danger">超級管理員</span>',
@@ -181,17 +162,17 @@ function getRoleBadge(role) {
 
 function filterUsers() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const serviceRelatedRoles = ['poweruser_service', 'admin_service', 'superadmin'];
+    const scheduleRelatedRoles = ['user_schedule', 'poweruser_schedule', 'admin_schedule', 'superadmin'];
     
-    let serviceUsers = allUsers.filter(user => {
+    let scheduleUsers = allUsers.filter(user => {
         const userRoles = user.roles || [];
-        return userRoles.some(role => serviceRelatedRoles.includes(role));
+        return userRoles.some(role => scheduleRelatedRoles.includes(role));
     });
     
     if (!searchTerm) {
-        filteredUsers = serviceUsers;
+        filteredUsers = scheduleUsers;
     } else {
-        filteredUsers = serviceUsers.filter(user => {
+        filteredUsers = scheduleUsers.filter(user => {
             const name = (user.displayName || '').toLowerCase();
             const email = (user.email || '').toLowerCase();
             const id = user.id.toLowerCase();
@@ -238,8 +219,8 @@ async function saveUser() {
         const roles = Array.from(checkboxes).map(cb => cb.value);
         const active = document.getElementById('userActive').checked;
         
-        await callAPI('updateUserRole', {
-            targetUserId: editingUserId,
+        const userRef = doc(platformDb, 'users', editingUserId);
+        await updateDoc(userRef, {
             roles: roles,
             active: active
         });
@@ -253,7 +234,7 @@ async function saveUser() {
         closeEditModal();
         filterUsers();
         
-        alert('用戶權限已更新（已更新認證權限）');
+        alert('用戶權限已更新');
         
     } catch (error) {
         console.error('更新用戶失敗:', error);

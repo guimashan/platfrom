@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排班管理 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div id="mainApp" style="display: none;">
+        <div class="manage-layout">
+            <header class="manage-header">
+                <div class="manage-header-content">
+                    <div class="manage-header-left">
+                        <h1>📅 排班管理</h1>
+                        <p>管理排班用戶與班表設定</p>
+                    </div>
+                    <div class="manage-header-actions">
+                        <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                        <button id="logoutBtn" class="manage-header-btn">登出</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="manage-main">
+                <div id="loadingIndicator" class="loading">
+                    <div class="spinner"></div>
+                    <p>載入管理功能...</p>
+                </div>
+
+                <div id="userInfo" class="user-info" style="display: none;">
+                    <img id="userAvatar" class="user-avatar" alt="使用者頭像">
+                    <div class="user-details">
+                        <h3 id="userName"></h3>
+                        <div id="userRoles" class="user-roles"></div>
+                    </div>
+                </div>
+
+                <div id="manageContent" class="manage-content" style="display: none;">
+                    <div class="function-grid">
+                        <a href="/schedule/manage/dashboard.html" class="function-card">
+                            <div class="function-icon">📊</div>
+                            <div class="function-title">儀表板</div>
+                            <div class="function-badge">✓ 已上線</div>
+                            <div class="function-desc">排班統計與數據分析</div>
+                        </a>
+
+                        <a href="/schedule/manage/user_schedule.html" class="function-card">
+                            <div class="function-icon">👥</div>
+                            <div class="function-title">排班用戶管理</div>
+                            <div class="function-badge">✓ 已上線</div>
+                            <div class="function-desc">管理排班使用者角色權限</div>
+                        </a>
+
+                        <div class="function-card disabled">
+                            <div class="function-icon">📋</div>
+                            <div class="function-title">班表管理</div>
+                            <div class="function-badge coming-soon">即將推出</div>
+                            <div class="function-desc">排班表編輯與管理</div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAdminAuth, logout, displayUserInfo } from '/js/auth-guard.js';
+
+        checkAdminAuth(['admin_schedule', 'poweruser_schedule', 'superadmin']).then((result) => {
+            console.log('✅ 排班管理首頁 管理員認證成功');
+            
+            const userInfo = document.getElementById('userInfo');
+            const userName = document.getElementById('userName');
+            const userAvatar = document.getElementById('userAvatar');
+            const userRoles = document.getElementById('userRoles');
+
+            displayUserInfo(result.userData, {
+                nameElement: userName,
+                avatarElement: userAvatar,
+                rolesElement: userRoles
+            });
+
+            userInfo.style.display = 'flex';
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('manageContent').style.display = 'block';
+            document.getElementById('mainApp').style.display = 'block';
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>
