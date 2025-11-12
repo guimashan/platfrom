@@ -104,14 +104,34 @@ https://go.guimashan.org.tw
 
 ### 4. 權限管理 (Platform)
 **角色系統：**
-- `user` - 一般用戶
-- `staff` - 工作人員
-- `admin` - 管理員
+
+**一般角色：**
+- `user` - 一般用戶（預設角色）
+
+**簽到系統角色：**
+- `user_checkin` - 簽到使用者（可使用簽到功能）
+- `poweruser_checkin` - 簽到專員（進階簽到功能）
+- `admin_checkin` - 簽到管理員（全部簽到管理功能）
+
+**神務服務角色：**
+- `admin_service` - 神務服務管理員
+- `poweruser_service` - 神務服務專員
+
+**排班系統角色：**
+- `admin_schedule` - 排班系統管理員
+
+**超級管理員：**
+- `superadmin` - 超級管理員（所有權限）
 
 **Cloud Functions：**
 - `generateCustomToken` - 一般登入
 - `generateCustomTokenFromLiff` - LIFF 登入（已停用）
 - `updateUserRole` - 更新用戶角色
+
+**角色檢查機制：**
+- 前端：使用 `checkAdminAuth(['role1', 'role2'])` 檢查必要角色
+- 後端 onCall：使用 `assertHasRequiredRole(context, ['role1', 'role2'])` 檢查必要角色
+- 後端 onRequest：使用 `ensureRequestHasRoles(req, res, ['role1', 'role2'])` 檢查必要角色
 
 ---
 
