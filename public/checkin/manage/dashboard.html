@@ -68,7 +68,8 @@
         
         checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin']).then(async (result) => {
             console.log('✅ 簽到儀表板 管理員認證成功');
-            await import('/checkin/manage/js/dashboard.js');
+            const dashboardModule = await import('/checkin/manage/js/dashboard.js');
+            await dashboardModule.init();
         });
     </script>
 </body>

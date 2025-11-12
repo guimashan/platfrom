@@ -3,7 +3,6 @@
  */
 
 import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
-import { onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { getDoc, doc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
@@ -12,62 +11,47 @@ let currentUser = null;
 let currentUserRoles = [];
 let allRecords = [];
 
-async function handleAuth(user) {
-    if (!user) {
-        window.location.href = '/checkin/manage/index.html';
-        return;
-    }
-    
+// 由 HTML checkAdminAuth 成功後調用此函數初始化
+export async function init() {
     try {
-        const userDoc = await getDoc(doc(platformDb, 'users', user.uid));
-        if (!userDoc.exists()) {
-            alert('找不到用戶資料');
+        // HTML 已經驗證過權限，直接取得當前用戶
+        currentUser = platformAuth.currentUser;
+        
+        if (!currentUser) {
+            console.error('無法取得用戶資訊');
             window.location.href = '/';
             return;
         }
         
-        const userData = userDoc.data();
-        const roles = userData.roles || [];
-        
-        const hasPermission = roles.some(role => 
-            role === 'poweruser_checkin' || role === 'admin_checkin' || role === 'superadmin'
-        );
-        
-        if (!hasPermission) {
-            alert('您沒有權限存取此頁面');
-            window.location.href = '/';
-            return;
+        // 顯示主要內容區域
+        const mainApp = document.getElementById('mainApp');
+        if (mainApp) {
+            mainApp.style.display = 'block';
         }
         
-        currentUser = user;
-        currentUserRoles = roles;
+        // 取得用戶角色
+        const userDoc = await getDoc(doc(platformDb, 'users', currentUser.uid));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            currentUserRoles = userData.roles || [];
+        }
         
-        document.getElementById('loginPrompt').style.display = 'none';
-        document.getElementById('mainApp').style.display = 'block';
-        
-        await init();
-    } catch (error) {
-        console.error('權限檢查失敗:', error);
-        alert('權限驗證失敗');
-        window.location.href = '/';
-    }
-}
-
-onAuthStateChanged(platformAuth, handleAuth);
-
-async function init() {
-    try {
-        document.getElementById('todayCount').textContent = '載入中...';
-        document.getElementById('weekCount').textContent = '載入中...';
-        document.getElementById('activeUsers').textContent = '載入中...';
-        document.getElementById('totalCount').textContent = '載入中...';
-        
-        await loadAllRecords();
-        calculateStats();
+        // 載入資料
+        await loadDashboardData();
     } catch (error) {
         console.error('初始化失敗:', error);
         alert('載入資料失敗，請重新整理頁面');
     }
+}
+
+async function loadDashboardData() {
+    document.getElementById('todayCount').textContent = '載入中...';
+    document.getElementById('weekCount').textContent = '載入中...';
+    document.getElementById('activeUsers').textContent = '載入中...';
+    document.getElementById('totalCount').textContent = '載入中...';
+    
+    await loadAllRecords();
+    calculateStats();
 }
 
 async function loadAllRecords() {

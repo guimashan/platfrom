@@ -141,7 +141,8 @@
         
         checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin']).then(async (result) => {
             console.log('✅ 巡邏點管理 管理員認證成功');
-            await import('/checkin/manage/js/patrol-manage.js');
+            const patrolModule = await import('/checkin/manage/js/patrol-manage.js');
+            await patrolModule.init();
         });
     </script>
 </body>
