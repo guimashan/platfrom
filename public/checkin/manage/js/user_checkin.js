@@ -67,7 +67,13 @@ async function loadUsers() {
             return aName.localeCompare(bName, 'zh-TW');
         });
         
-        filteredUsers = [...allUsers];
+        const checkinRelatedRoles = ['user_checkin', 'poweruser_checkin', 'admin_checkin', 'superadmin'];
+        filteredUsers = allUsers.filter(user => {
+            const userRoles = user.roles || [];
+            return userRoles.some(role => checkinRelatedRoles.includes(role));
+        });
+        
+        console.log(`篩選後顯示 ${filteredUsers.length} 個簽到相關用戶（總用戶 ${allUsers.length} 個）`);
         renderUsers();
         
     } catch (error) {
@@ -177,11 +183,17 @@ function getRoleBadge(role) {
 
 function filterUsers() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const checkinRelatedRoles = ['user_checkin', 'poweruser_checkin', 'admin_checkin', 'superadmin'];
+    
+    let checkinUsers = allUsers.filter(user => {
+        const userRoles = user.roles || [];
+        return userRoles.some(role => checkinRelatedRoles.includes(role));
+    });
     
     if (!searchTerm) {
-        filteredUsers = [...allUsers];
+        filteredUsers = checkinUsers;
     } else {
-        filteredUsers = allUsers.filter(user => {
+        filteredUsers = checkinUsers.filter(user => {
             const name = (user.displayName || '').toLowerCase();
             const email = (user.email || '').toLowerCase();
             const id = user.id.toLowerCase();

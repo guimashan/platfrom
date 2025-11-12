@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用戶管理 - 龜馬山整合服務平台</title>
+    <title>簽到用戶管理 - 龜馬山整合服務平台</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/styles/common.css">
 </head>
@@ -14,7 +14,7 @@
             <div class="manage-header-content">
                 <div class="manage-header-left">
                     <h1>🙏 奉香簽到管理</h1>
-                    <p>用戶管理 - 管理使用者角色與權限</p>
+                    <p>簽到用戶管理 - 管理簽到使用者角色與權限</p>
                 </div>
                 <div class="manage-header-actions">
                     <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
@@ -28,7 +28,7 @@
                 <a href="/checkin/manage/dashboard.html" class="manage-subnav-link">儀表板</a>
                 <a href="/checkin/manage/record.html" class="manage-subnav-link">簽到記錄</a>
                 <a href="/checkin/manage/patrol.html" class="manage-subnav-link">巡邏點管理</a>
-                <a href="/checkin/manage/user.html" class="manage-subnav-link active">用戶管理</a>
+                <a href="/checkin/manage/user_checkin.html" class="manage-subnav-link active">簽到用戶</a>
             </div>
         </nav>
 
@@ -36,7 +36,7 @@
             <!-- 用戶列表 -->
             <div class="manage-card">
                 <div class="card-header">
-                    <h2>用戶列表</h2>
+                    <h2>簽到用戶列表</h2>
                     <div style="display: flex; gap: 1rem;">
                         <input type="text" id="searchInput" placeholder="搜尋用戶名稱..." style="padding: 0.5rem 1rem; border: 1px solid #ddd; border-radius: 6px; min-width: 250px;">
                         <button id="searchBtn" class="btn btn-secondary">查詢</button>
@@ -147,8 +147,8 @@
         import { checkAdminAuth } from '/js/auth-guard.js';
         
         checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin']).then(async (result) => {
-            console.log('✅ 用戶管理 管理員認證成功');
-            const userModule = await import('/checkin/manage/js/user-manage.js');
+            console.log('✅ 簽到用戶管理 管理員認證成功');
+            const userModule = await import('/checkin/manage/js/user_checkin.js');
             await userModule.init();
         });
     </script>
