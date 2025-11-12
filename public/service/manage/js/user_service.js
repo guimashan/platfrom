@@ -7,7 +7,6 @@ import {
     updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
-import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allUsers = [];
@@ -238,11 +237,24 @@ async function saveUser() {
         const roles = Array.from(checkboxes).map(cb => cb.value);
         const active = document.getElementById('userActive').checked;
         
-        await callAPI('updateUserRole', {
-            targetUserId: editingUserId,
-            roles: roles,
-            active: active
+        const idToken = await platformAuth.currentUser.getIdToken();
+        const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/updateUserRole', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                targetUserId: editingUserId,
+                roles: roles,
+                active: active
+            })
         });
+        
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || '更新失敗');
+        }
         
         const userIndex = allUsers.findIndex(u => u.id === editingUserId);
         if (userIndex !== -1) {

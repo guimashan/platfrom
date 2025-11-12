@@ -11,7 +11,6 @@ import {
     updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { logout } from '/js/auth.js';
-import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allUsers = [];
@@ -247,11 +246,24 @@ async function saveUserChanges(event) {
     }
     
     try {
-        await callAPI('updateUserRole', {
-            targetUserId: editingUserId,
-            roles: selectedRoles,
-            active
+        const idToken = await platformAuth.currentUser.getIdToken();
+        const response = await fetch('https://asia-east2-platform-bc783.cloudfunctions.net/updateUserRole', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({
+                targetUserId: editingUserId,
+                roles: selectedRoles,
+                active
+            })
         });
+        
+        const result = await response.json();
+        if (!response.ok) {
+            throw new Error(result.message || '更新失敗');
+        }
         
         closeEditModal();
         await loadUsers();
