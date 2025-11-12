@@ -151,7 +151,9 @@ function getRoleName(role) {
         'admin_schedule': '排班管理員',
         'poweruser_checkin': '簽到幹部',
         'poweruser_service': '神務專員',
+        'poweruser_schedule': '排班幹部',
         'user_checkin': '簽到使用者',
+        'user_schedule': '排班使用者',
         'user': '一般用戶'
     };
     return roleNames[role] || role;
@@ -165,7 +167,9 @@ function getRoleBadge(role) {
         'admin_schedule': '<span class="badge warning">排班管理員</span>',
         'poweruser_checkin': '<span class="badge info">簽到幹部</span>',
         'poweruser_service': '<span class="badge info">神務專員</span>',
+        'poweruser_schedule': '<span class="badge info">排班幹部</span>',
         'user_checkin': '<span class="badge success">簽到使用者</span>',
+        'user_schedule': '<span class="badge success">排班使用者</span>',
         'user': '<span class="badge">一般用戶</span>'
     };
     return badges[role] || `<span class="badge">${role}</span>`;

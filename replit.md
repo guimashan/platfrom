@@ -103,25 +103,37 @@ https://go.guimashan.org.tw
 - `confirmPayment` - 確認付款
 
 ### 4. 權限管理 (Platform)
-**角色系統：**
+**角色系統架構（2025-11-12 標準化）：**
 
-**一般角色：**
-- `user` - 一般用戶（預設角色）
+龜馬山平台採用**模組化角色系統**，每個功能模組有三級權限：user（使用者）→ poweruser（幹部）→ admin（管理員）
+
+**基礎角色：**
+- `user` - 一般用戶（預設角色，可報名法會服務）
 
 **簽到系統角色：**
-- `user_checkin` - 簽到使用者（可使用簽到功能）
-- `poweruser_checkin` - 簽到專員（進階簽到功能）
-- `admin_checkin` - 簽到管理員（全部簽到管理功能）
+- `user_checkin` - 簽到使用者（可使用簽到功能、查看自己的簽到記錄）
+- `poweruser_checkin` - 簽到幹部（進階簽到功能、可查看部分用戶數據）
+- `admin_checkin` - 簽到管理員（完整簽到管理功能、用戶管理、巡查點管理）
 
 **神務服務角色：**
-- `admin_service` - 神務服務管理員
-- `poweruser_service` - 神務服務專員
+- `user` - 一般用戶（可報名法會、查看自己的報名記錄）
+- `poweruser_service` - 神務專員（可查看和管理部分訂單）
+- `admin_service` - 神務管理員（完整訂單管理、神務用戶管理）
 
 **排班系統角色：**
-- `admin_schedule` - 排班系統管理員
+- `user_schedule` - 排班使用者（可查看和管理自己的排班）
+- `poweruser_schedule` - 排班幹部（可查看和管理部分班表）
+- `admin_schedule` - 排班管理員（完整排班系統管理功能）
 
 **超級管理員：**
-- `superadmin` - 超級管理員（所有權限）
+- `superadmin` - 超級管理員（所有權限、全站用戶管理、跨模組操作）
+
+**角色層級說明：**
+1. **user** - 基礎使用權限，可使用一般功能（報名、查詢自己的記錄）
+2. **user_**** - 模組專用使用者，可使用該模組的核心功能（簽到、排班）
+3. **poweruser_**** - 模組幹部，可查看和管理部分數據
+4. **admin_**** - 模組管理員，完整管理該模組的所有功能和用戶
+5. **superadmin** - 全站超級管理員，不受任何限制
 
 **Cloud Functions：**
 - `generateCustomToken` - 一般登入
@@ -132,6 +144,27 @@ https://go.guimashan.org.tw
 - 前端：使用 `checkAdminAuth(['role1', 'role2'])` 檢查必要角色
 - 後端 onCall：使用 `assertHasRequiredRole(context, ['role1', 'role2'])` 檢查必要角色
 - 後端 onRequest：使用 `ensureRequestHasRoles(req, res, ['role1', 'role2'])` 檢查必要角色
+
+**權限檢查範例：**
+```javascript
+// 簽到管理頁面 - 允許簽到管理員、幹部、超級管理員
+checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin'])
+
+// 神務管理頁面 - 允許神務管理員、專員、超級管理員
+checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin'])
+
+// 排班管理頁面 - 允許排班管理員、幹部、超級管理員
+checkAdminAuth(['admin_schedule', 'poweruser_schedule', 'superadmin'])
+
+// 簽到功能 - 允許簽到使用者及以上權限
+checkAdminAuth(['user_checkin', 'poweruser_checkin', 'admin_checkin', 'superadmin'])
+
+// 排班功能 - 允許排班使用者及以上權限
+checkAdminAuth(['user_schedule', 'poweruser_schedule', 'admin_schedule', 'superadmin'])
+
+// 全站管理 - 只允許超級管理員
+checkAdminAuth(['superadmin'])
+```
 
 ---
 
