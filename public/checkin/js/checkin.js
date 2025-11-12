@@ -146,8 +146,13 @@ async function handleCheckin() {
             );
             statusEl.textContent = '簽到完成';
         } else {
+            // 將錯誤碼轉換為友善的中文訊息
+            const errorMessage = result.code === '1001_OUT_OF_RANGE' 
+                ? '目前定位點超出簽到範圍' 
+                : result.code;
+            
             showResult(
-                `簽到失敗: ${result.code}<br>距離: ${result.distanceMeters ? result.distanceMeters.toFixed(1) : 'N/A'} 公尺<br>容許範圍: ${result.allowedMeters || 'N/A'} 公尺`,
+                `簽到失敗: ${errorMessage}<br>距離: ${result.distanceMeters ? result.distanceMeters.toFixed(1) : 'N/A'} 公尺<br>容許範圍: ${result.allowedMeters || 'N/A'} 公尺`,
                 'error'
             );
             statusEl.textContent = '超出簽到範圍';
