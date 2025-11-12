@@ -1,6 +1,6 @@
 # 龜馬山整合服務平台 - 系統文檔
 
-**最近更新**: 2025-11-12 (修復 Firestore 安全規則，允許管理員編輯用戶角色)
+**最近更新**: 2025-11-12 (修復巡邏點編輯功能 - Cloud Functions 2nd Gen 升級與事件綁定問題)
 
 ## 系統概述
 
@@ -403,6 +403,95 @@ LINE Developers Console → Messaging API → Webhook settings
 ---
 
 ## 技術決策記錄
+
+### 2025-11-12: 修復巡邏點編輯功能 - Cloud Functions 2nd Gen 升級與事件綁定
+
+**決策：** 修復巡邏點管理頁面無法儲存編輯的問題
+
+**問題症狀：**
+- 用戶在後台編輯巡邏點（容許距離、測試模式）後點擊「儲存」
+- 沒有任何反應（既沒有成功也沒有失敗訊息）
+- 但在 Firebase Console 手動編輯可以成功顯示在前端
+
+**根本原因（兩個問題）：**
+
+1. **Cloud Functions URL 版本不匹配**
+   - Cloud Functions 已升級為 2nd Gen，使用新的 Cloud Run URL 格式
+   - 前端 `firebase-init.js` 還在呼叫舊的 1st Gen URL
+   - 導致 API 請求發送到不存在的端點
+
+2. **事件監聽器綁定失敗**
+   - `patrol-manage.js` 使用動態 `import` 載入
+   - 事件監聽器在 `DOMContentLoaded` 中綁定
+   - 但動態載入時 `DOMContentLoaded` 事件早已觸發
+   - 導致「儲存」按鈕沒有綁定事件處理器
+
+**解決方案：**
+
+1. **更新 Cloud Functions URL**
+   ```javascript
+   // firebase-init.js - 更新為 2nd Gen URL
+   export const API_ENDPOINTS = {
+     verifyCheckinV2: 'https://verifycheckinv2-tcj2pvviia-df.a.run.app',
+     getPatrols: 'https://getpatrols-tcj2pvviia-df.a.run.app',
+     savePatrol: 'https://savepatrol-tcj2pvviia-df.a.run.app',
+     deletePatrol: 'https://deletepatrol-tcj2pvviia-df.a.run.app',
+     // ... 其他端點
+   }
+   ```
+
+2. **修復事件綁定時機**
+   ```javascript
+   // patrol-manage.js - 將事件監聽器從 DOMContentLoaded 移到 init()
+   export async function init() {
+     // ... 初始化邏輯
+     
+     // 綁定事件監聽器（必須在這裡，因為模組是動態載入的）
+     document.getElementById('patrolForm')?.addEventListener('submit', savePatrol);
+     document.getElementById('addPatrolBtn')?.addEventListener('click', openPatrolModal);
+     // ... 其他事件
+   }
+   
+   // 移除舊的 DOMContentLoaded 監聽器
+   ```
+
+3. **修復變數未定義錯誤**
+   - 移除未定義的 `isLiffEnvironment` 檢查
+   - 管理後台不在 LIFF 環境中運行，直接綁定登出按鈕
+
+**部署步驟：**
+
+1. 重新部署所有 Checkin Cloud Functions（獲取新的 2nd Gen URL）：
+   ```bash
+   cd functions
+   firebase deploy --project checkin-76c77 --only functions:getPatrols,functions:deletePatrol,functions:verifyCheckinV2,functions:getCheckinHistory,functions:getDashboardStats,functions:getTestModeStatus,functions:updateTestMode,functions:savePatrol
+   ```
+
+2. 更新前端配置並部署到 Vercel：
+   ```bash
+   vercel --prod --yes
+   ```
+
+**受影響的檔案：**
+- `public/js/firebase-init.js` - 更新 8 個 Cloud Functions URL
+- `public/checkin/manage/js/patrol-manage.js` - 修復事件綁定時機
+
+**測試確認：**
+- ✅ 巡邏點編輯功能正常（可儲存容許距離、測試模式）
+- ✅ 顯示「儲存成功」提示訊息
+- ✅ 重新整理後數據保留
+- ✅ 所有管理功能正常運作
+
+**經驗教訓：**
+1. **Cloud Functions 升級需同步更新前端 URL** - 2nd Gen 使用 Cloud Run URL 格式
+2. **動態 import 的模組不能依賴 DOMContentLoaded** - 事件監聽器應在模組的 `init()` 函數中綁定
+3. **這個問題與之前 GPS 簽到按鈕相同** - 應統一檢查所有動態載入的管理模組
+
+**潛在風險：**
+- 其他管理模組（`dashboard.js`, `record.js`, `user_checkin.js`）仍引用 `isLiffEnvironment`
+- 如果這些模組也改為動態載入，需要同樣的修復
+
+---
 
 ### 2025-11-12: 修復 Firestore 安全規則 - 允許管理員編輯用戶角色
 
