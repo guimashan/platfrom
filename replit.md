@@ -1,6 +1,6 @@
 # 龜馬山整合服務平台 - 系統文檔
 
-**最近更新**: 2025-11-11 (ServiceFormEngine 重構架構規劃完成)
+**最近更新**: 2025-11-12 (修復 Firestore 安全規則，允許管理員編輯用戶角色)
 
 ## 系統概述
 
@@ -200,6 +200,15 @@ firebase deploy --project checkin-76c77 --only functions:verifyCheckinV2
 firebase deploy --project platform-bc783 --only hosting
 ```
 
+**部署 Firestore 規則：**
+```bash
+# Platform 專案 (使用 firebase.platform.json)
+firebase deploy --project platform-bc783 --only firestore:rules --config firebase.platform.json
+
+# Checkin 專案 (使用預設 firebase.json)
+firebase deploy --project checkin-76c77 --only firestore:rules
+```
+
 ### 驗證步驟
 
 **1. 檢查 functions 狀態：**
@@ -281,15 +290,28 @@ LINE Developers Console → Messaging API → Webhook settings
 
 ### 安全規則
 
-**原則：**
-- 認證用戶才能讀寫自己的資料
-- 管理員可以讀寫所有資料
-- 使用 Firebase Security Rules 保護
+**Platform 專案 (firestore.platform.rules)：**
+- 所有認證用戶可讀取用戶資料
+- 用戶可修改自己的資料
+- 管理員/幹部可修改其他用戶的資料
+- 只有 superadmin 可創建/刪除用戶
+- 部署：`firebase deploy --project platform-bc783 --only firestore:rules --config firebase.platform.json`
+
+**Checkin 專案 (firestore.rules)：**
+- 所有認證用戶可讀取簽到相關資料
+- 寫入權限由前端和 Cloud Functions 控制
+- 部署：`firebase deploy --project checkin-76c77 --only firestore:rules`
 
 **Custom Claims：**
-用戶的 `role` 儲存在 Firebase Auth Custom Claims：
+用戶的角色 (`roles`) 儲存在 Firestore `users` collection：
 ```javascript
-auth.setCustomUserClaims(uid, { role: 'admin' })
+// 範例用戶資料
+{
+  uid: "abc123",
+  displayName: "張三",
+  roles: ["admin_checkin", "poweruser_service"],
+  active: true
+}
 ```
 
 ---
@@ -348,6 +370,62 @@ auth.setCustomUserClaims(uid, { role: 'admin' })
 ---
 
 ## 技術決策記錄
+
+### 2025-11-12: 修復 Firestore 安全規則 - 允許管理員編輯用戶角色
+
+**決策：** 修改 Platform 專案的 Firestore 安全規則，允許 superadmin 和管理員編輯其他用戶的角色
+
+**背景：**
+- 用戶管理頁面無法編輯其他用戶的角色
+- 原始規則只允許用戶修改自己的資料：`allow update: if userId == request.auth.uid`
+- 即使 superadmin 也無法管理其他用戶
+
+**解決方案：**
+
+1. **修改 firestore.platform.rules**
+   - 新增 `getUserData()` - 讀取當前用戶資料
+   - 新增 `hasUserData()` - 檢查用戶資料是否存在
+   - 新增 `isSuperAdmin()` - 檢查超級管理員權限
+   - 新增 `isAnyAdmin()` - 檢查任何管理員/幹部權限
+   - 修改 users 更新規則：`allow update: if userId == request.auth.uid || isAnyAdmin()`
+   - 限制創建/刪除：`allow create, delete: if isSuperAdmin()`
+
+2. **創建 firebase.platform.json**
+   - 為 Platform 專案創建專屬配置
+   - 指向 `firestore.platform.rules`（不是 `firestore.rules`）
+   - 解決多專案部署配置問題
+
+3. **部署命令**
+   ```bash
+   firebase deploy --project platform-bc783 --only firestore:rules --config firebase.platform.json
+   ```
+
+**管理員權限列表（isAnyAdmin）：**
+- `superadmin` - 超級管理員
+- `admin_checkin` - 簽到管理員
+- `admin_service` - 神務管理員
+- `admin_schedule` - 排班管理員
+- `poweruser_checkin` - 簽到幹部
+- `poweruser_service` - 神務專員
+- `poweruser_schedule` - 排班專員
+
+**安全性：**
+- ✅ 一般用戶只能修改自己的資料
+- ✅ 管理員和幹部可以修改其他用戶的角色
+- ✅ 只有 superadmin 可以創建和刪除用戶
+- ✅ 所有操作都需要認證
+
+**測試確認：**
+- ✅ Firebase Console 手動編輯用戶角色 - 成功
+- ✅ 網站後台編輯用戶角色 - 成功
+- ✅ 規則已部署到生產環境
+
+**維護要點：**
+- Platform 專案規則：使用 `firebase.platform.json`
+- Checkin 專案規則：使用 `firebase.json`（預設）
+- 新增管理員角色時需同步更新 `isAnyAdmin()` 函數
+
+---
 
 ### 2025-11-11: 統一登入 UI 系統實作完成
 
