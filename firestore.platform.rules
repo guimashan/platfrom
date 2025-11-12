@@ -13,14 +13,20 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
     
+    // 輔助函數：檢查用戶資料是否存在且有角色
+    function hasUserData() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             'roles' in getUserData();
+    }
+    
     // 輔助函數：檢查是否為超級管理員
     function isSuperAdmin() {
-      return isAuthenticated() && getUserData().roles.hasAny(['superadmin']);
+      return isAuthenticated() && hasUserData() && getUserData().roles.hasAny(['superadmin']);
     }
     
     // 輔助函數：檢查是否為管理員（任一類型）
     function isAnyAdmin() {
-      return isAuthenticated() && getUserData().roles.hasAny([
+      return isAuthenticated() && hasUserData() && getUserData().roles.hasAny([
         'superadmin',
         'admin_checkin',
         'admin_service',
