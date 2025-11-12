@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神務儀表板 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div id="mainApp" class="manage-layout" style="display: none;">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>🏯 神務服務管理</h1>
+                    <p>神務儀表板 - 查看統計總覽</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/service/manage/dashboard.html" class="manage-subnav-link active">儀表板</a>
+                <a href="/service/manage/orders.html" class="manage-subnav-link">訂單管理</a>
+                <a href="/service/manage/user_service.html" class="manage-subnav-link">神務用戶</a>
+            </div>
+        </nav>
+
+        <main class="manage-main">
+            <div class="manage-stats-grid">
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">總報名數</div>
+                    <div class="manage-stat-value" id="totalOrders">-</div>
+                    <div class="manage-stat-trend">歷史累計</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">待處理訂單</div>
+                    <div class="manage-stat-value" id="pendingOrders">-</div>
+                    <div class="manage-stat-trend">需確認付款</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">已付款訂單</div>
+                    <div class="manage-stat-value" id="paidOrders">-</div>
+                    <div class="manage-stat-trend">處理完成</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">總金額</div>
+                    <div class="manage-stat-value" id="totalAmount" style="font-size: 1.8rem;">-</div>
+                    <div class="manage-stat-trend">已付款訂單</div>
+                </div>
+            </div>
+
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>服務類型統計</h2>
+                </div>
+                <div id="serviceStats" style="padding: 1rem;">
+                    <p class="loading">載入中...</p>
+                </div>
+            </div>
+
+            <div class="manage-card" style="text-align: center;">
+                <p style="color: #666; margin-bottom: 1rem;">查看詳細訂單資料？</p>
+                <button onclick="window.location.href='/service/manage/orders.html'" class="btn btn-primary" style="padding: 0.75rem 2rem;">前往訂單管理</button>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAdminAuth } from '/js/auth-guard.js';
+        
+        checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin']).then(async (result) => {
+            console.log('✅ 神務儀表板 管理員認證成功');
+            const dashboardModule = await import('/service/manage/js/dashboard.js');
+            await dashboardModule.init();
+        });
+    </script>
+</body>
+</html>
