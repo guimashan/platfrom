@@ -227,12 +227,13 @@
                 id: 'service',
                 name: '神務服務管理',
                 icon: '🙏',
-                badge: '待開發',
+                badge: '已上線',
                 desc: '管理法會報名、服務單審核、參與統計',
                 requiredRoles: ['admin_service', 'poweruser_service', 'superadmin'],
                 links: [
-                    { name: '服務單管理', url: '#', disabled: true },
-                    { name: '法會報名', url: '#', disabled: true }
+                    { name: '儀表板', url: '/service/manage/dashboard.html' },
+                    { name: '報名訂單', url: '/service/manage/orders.html' },
+                    { name: '使用者管理', url: '/service/manage/user_service.html' }
                 ]
             },
             {
