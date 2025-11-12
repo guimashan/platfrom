@@ -64,23 +64,23 @@ export const serviceFunctions = getFunctions(serviceApp, 'asia-east2');
 export const scheduleDb = getFirestore(scheduleApp);
 export const scheduleFunctions = getFunctions(scheduleApp, 'asia-east2');
 
-// API Endpoints 配置
+// API Endpoints 配置 (使用 2nd Gen Cloud Functions URL)
 export const API_ENDPOINTS = {
     // Platform 用戶管理 API
     updateUserRole: 'https://asia-east2-platform-bc783.cloudfunctions.net/updateUserRole',
     // 跨專案認證簽到 API (HTTP endpoint)
-    verifyCheckinV2: 'https://asia-east2-checkin-76c77.cloudfunctions.net/verifyCheckinV2',
+    verifyCheckinV2: 'https://verifycheckinv2-tcj2pvviia-df.a.run.app',
     // 巡邏點管理 API
-    getPatrols: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getPatrols',
-    savePatrol: 'https://asia-east2-checkin-76c77.cloudfunctions.net/savePatrol',
-    deletePatrol: 'https://asia-east2-checkin-76c77.cloudfunctions.net/deletePatrol',
+    getPatrols: 'https://getpatrols-tcj2pvviia-df.a.run.app',
+    savePatrol: 'https://savepatrol-tcj2pvviia-df.a.run.app',
+    deletePatrol: 'https://deletepatrol-tcj2pvviia-df.a.run.app',
     // 簽到紀錄 API
-    getCheckinHistory: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getCheckinHistory',
+    getCheckinHistory: 'https://getcheckinhistory-tcj2pvviia-df.a.run.app',
     // 儀表板 API
-    getDashboardStats: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getDashboardStats',
+    getDashboardStats: 'https://getdashboardstats-tcj2pvviia-df.a.run.app',
     // 測試模式 API
-    getTestModeStatus: 'https://asia-east2-checkin-76c77.cloudfunctions.net/getTestModeStatus',
-    updateTestMode: 'https://asia-east2-checkin-76c77.cloudfunctions.net/updateTestMode',
+    getTestModeStatus: 'https://gettestmodestatus-tcj2pvviia-df.a.run.app',
+    updateTestMode: 'https://updatetestmode-tcj2pvviia-df.a.run.app',
     // 神務服務 API
     getUserRegistrations: 'https://asia-east2-service-b9d4a.cloudfunctions.net/getUserRegistrations'
 };
