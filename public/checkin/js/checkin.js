@@ -13,23 +13,22 @@ let html5QrcodeScanner = null;
 let currentMode = 'gps';
 
 // 初始化頁面
-(async function init() {
+// 注意：此函數由 HTML 的 checkAuthWithUI() 回調呼叫，確保用戶已認證
+export async function init() {
     try {
-        const { user, userData } = await checkAuth({
-            requiredRoles: ['user', 'poweruser_checkin', 'admin_checkin', 'admin_service', 'admin_schedule', 'superadmin'],
-            onSuccess: ({ user, userData }) => {
-                currentUser = user;
-                
-                // 認證成功：隱藏登入提示，顯示主要內容
-                document.getElementById('loginPrompt').style.display = 'none';
-                document.getElementById('mainApp').style.display = 'block';
-                
-                const userName = document.getElementById('userName');
-                if (userName) {
-                    userName.textContent = `歡迎，${userData.displayName || '使用者'}`;
-                }
-            }
-        });
+        // 取得當前使用者（已由 HTML 中的 checkAuthWithUI 驗證）
+        currentUser = platformAuth.currentUser;
+        
+        if (!currentUser) {
+            console.error('初始化失敗：無法取得使用者資訊');
+            return;
+        }
+        
+        // 顯示使用者名稱
+        const userName = document.getElementById('userName');
+        if (userName && currentUser.displayName) {
+            userName.textContent = `歡迎，${currentUser.displayName}`;
+        }
         
         await loadPatrols();
         initializeModeSwitch();
@@ -38,7 +37,7 @@ let currentMode = 'gps';
     } catch (error) {
         console.error('初始化失敗:', error);
     }
-})();
+}
 
 function initializeLogoutButton() {
     const logoutBtn = document.getElementById('logoutBtn');

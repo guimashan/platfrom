@@ -84,7 +84,8 @@
         checkAuthWithUI({
             onAuthenticated: async (result) => {
                 console.log('✅ 簽到頁面 已登入');
-                await import('/checkin/js/checkin.js');
+                const checkinModule = await import('/checkin/js/checkin.js');
+                await checkinModule.init();
             },
             onUnauthenticated: () => {
                 console.log('❌ 簽到頁面 未登入');
