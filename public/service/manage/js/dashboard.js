@@ -1,9 +1,29 @@
 import { platformAuth } from '/js/firebase-init.js';
 import { logout } from '/js/auth.js';
-import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 let allOrders = [];
+
+const API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
+
+async function callAPI(endpoint, data = {}) {
+    const idToken = await platformAuth.currentUser.getIdToken();
+    const response = await fetch(`${API_BASE}/${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${idToken}`
+        },
+        body: JSON.stringify({ data })
+    });
+    
+    if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || '請求失敗');
+    }
+    
+    return response.json();
+}
 
 export async function init() {
     try {
