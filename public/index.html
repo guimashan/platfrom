@@ -20,80 +20,80 @@
                 <button id="logoutBtn" class="btn-logout" style="display: none;">登出</button>
             </header>
 
-            <main class="main-content">
-                <div id="userInfo" class="user-info" style="display: none;">
+            <main class="main-content" role="main">
+                <section id="userInfo" class="user-info" style="display: none;" aria-label="使用者資訊">
                     <img id="userAvatar" class="user-avatar" alt="使用者頭像">
                     <div class="user-details">
                         <h3 id="userName"></h3>
                         <div id="userRoles" class="user-roles"></div>
                     </div>
-                </div>
+                </section>
 
-                <div id="moduleGrid" class="module-grid">
-                <div class="module-card" data-module="service">
-                    <div class="module-icon">🕯️</div>
+                <section id="moduleGrid" class="module-grid" aria-label="服務模組選單">
+                <div class="module-card" data-module="service" role="button" tabindex="0" aria-label="神務服務：法會報名與服務管理">
+                    <div class="module-icon" aria-hidden="true">🕯️</div>
                     <div class="module-title">神務服務</div>
                     <div class="module-desc">法會報名與服務管理</div>
                 </div>
                 
-                <div class="module-card" data-module="bx">
-                    <div class="module-icon">🏮</div>
+                <div class="module-card" data-module="bx" role="button" tabindex="0" aria-label="信眾奉獻：建宮廟款與添香油">
+                    <div class="module-icon" aria-hidden="true">🏮</div>
                     <div class="module-title">信眾奉獻</div>
                     <div class="module-desc">建宮廟款與添香油</div>
                 </div>
                 
-                <div class="module-card" data-module="ft">
-                    <div class="module-icon">🙏</div>
+                <div class="module-card" data-module="ft" role="button" tabindex="0" aria-label="福田會：福田會入會申請">
+                    <div class="module-icon" aria-hidden="true">🙏</div>
                     <div class="module-title">福田會</div>
                     <div class="module-desc">福田會入會申請</div>
                 </div>
                 
-                <div class="module-card" data-module="checkin">
-                    <div class="module-icon">✅</div>
+                <div class="module-card" data-module="checkin" role="button" tabindex="0" aria-label="奉香簽到：簽到打卡與歷程紀錄">
+                    <div class="module-icon" aria-hidden="true">✅</div>
                     <div class="module-title">奉香簽到</div>
                     <div class="module-desc">簽到打卡與歷程紀錄</div>
                 </div>
                 
-                <div class="module-card module-card-locked" data-module="schedule">
+                <div class="module-card module-card-locked" data-module="schedule" role="button" tabindex="0" aria-label="排班系統：志工排班與班表管理（即將開放）" aria-disabled="true">
                     <div class="module-badge">即將開放</div>
-                    <div class="module-icon">📅</div>
+                    <div class="module-icon" aria-hidden="true">📅</div>
                     <div class="module-title">排班系統</div>
                     <div class="module-desc">志工排班與班表管理</div>
                 </div>
                 
-                <div class="module-card" data-module="manage" style="display: none;">
-                    <div class="module-icon">⚙️</div>
+                <div class="module-card" data-module="manage" style="display: none;" role="button" tabindex="0" aria-label="系統管理：使用者與權限管理">
+                    <div class="module-icon" aria-hidden="true">⚙️</div>
                     <div class="module-title">系統管理</div>
                     <div class="module-desc">使用者與權限管理</div>
                 </div>
-                </div>
+                </section>
 
-                <div id="loadingIndicator" class="loading hidden">
+                <div id="loadingIndicator" class="loading hidden" role="status" aria-live="polite">
                     <div class="spinner"></div>
                     <p>登入中...</p>
                 </div>
             </main>
 
-            <div class="bottom-nav">
+            <nav class="bottom-nav" role="navigation" aria-label="主要導航">
                 <div class="bottom-nav-items">
-                    <a href="/" class="bottom-nav-item active">
-                        <span class="icon">🏠</span>
+                    <a href="/" class="bottom-nav-item active" aria-current="page" aria-label="首頁">
+                        <span class="icon" aria-hidden="true">🏠</span>
                         <span>首頁</span>
                     </a>
-                    <a href="/checkin/checkin.html" class="bottom-nav-item">
-                        <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                    <a href="/checkin/checkin.html" class="bottom-nav-item" aria-label="奉香簽到">
+                        <span class="icon" aria-hidden="true"><img src="/images/temple-icon.png" alt="" style="width: 24px; height: 24px;"></span>
                         <span>簽到</span>
                     </a>
-                    <a href="/checkin/history.html" class="bottom-nav-item">
-                        <span class="icon">📋</span>
+                    <a href="/checkin/history.html" class="bottom-nav-item" aria-label="歷程表">
+                        <span class="icon" aria-hidden="true">📋</span>
                         <span>歷程表</span>
                     </a>
-                    <a href="/manage/index.html" class="bottom-nav-item">
-                        <span class="icon">🔔</span>
+                    <a href="/manage/index.html" class="bottom-nav-item" aria-label="通知中心">
+                        <span class="icon" aria-hidden="true">🔔</span>
                         <span>通知中心</span>
                     </a>
                 </div>
-            </div>
+            </nav>
         </div>
     </div> <!-- 關閉 mainApp -->
 
@@ -203,6 +203,18 @@
                 window.location.href = routes[module];
             }
         }
+
+        // 鍵盤無障礙支援
+        document.addEventListener('keydown', (e) => {
+            const target = e.target;
+            if (target.classList.contains('module-card') && target.getAttribute('role') === 'button') {
+                // 按下 Enter 或 Space 鍵時觸發點擊
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    target.click();
+                }
+            }
+        });
 
         // 登出按鈕
         const logoutBtn = document.getElementById('logoutBtn');

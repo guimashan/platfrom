@@ -204,6 +204,18 @@ body {
     background: white;
 }
 
+.module-card:focus-visible {
+    outline: none;
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.4), var(--shadow-lg);
+    border-color: var(--primary-gold);
+    background: white;
+}
+
+.module-card:active {
+    transform: translateY(-2px);
+}
+
 .module-icon {
     font-size: 3rem;
     margin-bottom: 0.75rem;
