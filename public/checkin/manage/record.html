@@ -91,7 +91,8 @@
         
         checkAdminAuth(['admin_checkin', 'poweruser_checkin', 'superadmin']).then(async (result) => {
             console.log('✅ 簽到記錄管理 管理員認證成功');
-            await import('/checkin/manage/js/record.js');
+            const module = await import('/checkin/manage/js/record.js');
+            module.init();
         });
     </script>
 </body>
