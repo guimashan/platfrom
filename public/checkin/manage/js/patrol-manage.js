@@ -29,10 +29,7 @@ export async function init() {
         }
         
         // 綁定事件監聽器（必須在這裡綁定，因為模組是動態載入的）
-        if (!isLiffEnvironment) {
-            document.getElementById('logoutBtn')?.addEventListener('click', logout);
-        }
-        
+        document.getElementById('logoutBtn')?.addEventListener('click', logout);
         document.getElementById('toggleTestMode')?.addEventListener('click', toggleTestMode);
         document.getElementById('addPatrolBtn')?.addEventListener('click', () => openPatrolModal());
         document.getElementById('closeModal')?.addEventListener('click', closePatrolModal);
