@@ -32,17 +32,33 @@ export async function init() {
         
         await loadPatrols();
         initializeModeSwitch();
-        initializeLogoutButton();
+        initializeButtons();
         
     } catch (error) {
         console.error('初始化失敗:', error);
     }
 }
 
-function initializeLogoutButton() {
+function initializeButtons() {
+    const checkinBtn = document.getElementById('checkinBtn');
     const logoutBtn = document.getElementById('logoutBtn');
+    const startQrBtn = document.getElementById('startQrBtn');
+    const stopQrBtn = document.getElementById('stopQrBtn');
+    
+    if (checkinBtn) {
+        checkinBtn.addEventListener('click', handleCheckin);
+    }
+    
     if (logoutBtn) {
         logoutBtn.addEventListener('click', logout);
+    }
+    
+    if (startQrBtn) {
+        startQrBtn.addEventListener('click', startQRScanner);
+    }
+    
+    if (stopQrBtn) {
+        stopQrBtn.addEventListener('click', stopQRScanner);
     }
 }
 
@@ -353,26 +369,3 @@ async function onQRCodeScanned(decodedText, decodedResult) {
     }
 }
 
-// 綁定事件
-document.addEventListener('DOMContentLoaded', () => {
-    const checkinBtn = document.getElementById('checkinBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const startQrBtn = document.getElementById('startQrBtn');
-    const stopQrBtn = document.getElementById('stopQrBtn');
-    
-    if (checkinBtn) {
-        checkinBtn.addEventListener('click', handleCheckin);
-    }
-    
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', logout);
-    }
-    
-    if (startQrBtn) {
-        startQrBtn.addEventListener('click', startQRScanner);
-    }
-    
-    if (stopQrBtn) {
-        stopQrBtn.addEventListener('click', stopQRScanner);
-    }
-});
