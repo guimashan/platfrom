@@ -28,6 +28,19 @@ export async function init() {
             mainApp.style.display = 'block';
         }
         
+        // 綁定事件監聽器（必須在這裡綁定，因為模組是動態載入的）
+        if (!isLiffEnvironment) {
+            document.getElementById('logoutBtn')?.addEventListener('click', logout);
+        }
+        
+        document.getElementById('toggleTestMode')?.addEventListener('click', toggleTestMode);
+        document.getElementById('addPatrolBtn')?.addEventListener('click', () => openPatrolModal());
+        document.getElementById('closeModal')?.addEventListener('click', closePatrolModal);
+        document.getElementById('cancelBtn')?.addEventListener('click', closePatrolModal);
+        document.getElementById('patrolForm')?.addEventListener('submit', savePatrol);
+        document.getElementById('useLocationBtn')?.addEventListener('click', useCurrentLocation);
+        document.getElementById('closeQrModal')?.addEventListener('click', closeQRModal);
+        
         // 載入資料
         await loadPatrolData();
     } catch (error) {
@@ -343,17 +356,3 @@ function useCurrentLocation() {
 window.editPatrol = openPatrolModal;
 window.deletePatrol = deletePatrol;
 window.showQRCode = showQRCode;
-
-document.addEventListener('DOMContentLoaded', () => {
-    if (!isLiffEnvironment) {
-        document.getElementById('logoutBtn')?.addEventListener('click', logout);
-    }
-    
-    document.getElementById('toggleTestMode')?.addEventListener('click', toggleTestMode);
-    document.getElementById('addPatrolBtn')?.addEventListener('click', () => openPatrolModal());
-    document.getElementById('closeModal')?.addEventListener('click', closePatrolModal);
-    document.getElementById('cancelBtn')?.addEventListener('click', closePatrolModal);
-    document.getElementById('patrolForm')?.addEventListener('submit', savePatrol);
-    document.getElementById('useLocationBtn')?.addEventListener('click', useCurrentLocation);
-    document.getElementById('closeQrModal')?.addEventListener('click', closeQRModal);
-});
