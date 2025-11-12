@@ -199,6 +199,18 @@
 
         const modules = [
             {
+                id: 'global',
+                name: '全站管理',
+                icon: '⚙️',
+                badge: '已上線',
+                desc: '全站用戶管理、系統統計、跨模組操作（僅 superadmin）',
+                requiredRoles: ['superadmin'],
+                links: [
+                    { name: '儀表板', url: '/manage/dashboard.html' },
+                    { name: '用戶總表', url: '/manage/user.html' }
+                ]
+            },
+            {
                 id: 'checkin',
                 name: '奉香簽到管理',
                 icon: '<img src="/images/temple-icon.png" alt="廟宇" style="width: 48px; height: 48px; object-fit: contain;">',

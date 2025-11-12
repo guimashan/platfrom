@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全站儀表板 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+</head>
+<body>
+    <div id="mainApp" class="manage-layout" style="display: none;">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>⚙️ 全站管理</h1>
+                    <p>全站儀表板 - 系統統計總覽</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button id="logoutBtn" class="manage-header-btn">登出</button>
+                </div>
+            </div>
+        </header>
+        
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/manage/dashboard.html" class="manage-subnav-link active">儀表板</a>
+                <a href="/manage/user.html" class="manage-subnav-link">用戶總表</a>
+            </div>
+        </nav>
+
+        <main class="manage-main">
+            <div class="manage-stats-grid">
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">總用戶數</div>
+                    <div class="manage-stat-value" id="totalUsers">-</div>
+                    <div class="manage-stat-trend">平台註冊用戶</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">簽到用戶</div>
+                    <div class="manage-stat-value" id="checkinUsers">-</div>
+                    <div class="manage-stat-trend">具有簽到權限</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">管理員總數</div>
+                    <div class="manage-stat-value" id="adminUsers">-</div>
+                    <div class="manage-stat-trend">所有管理員和幹部</div>
+                </div>
+                <div class="manage-stat-card">
+                    <div class="manage-stat-label">活躍用戶</div>
+                    <div class="manage-stat-value" id="activeUsers">-</div>
+                    <div class="manage-stat-trend">近 30 天有活動</div>
+                </div>
+            </div>
+
+            <div class="manage-card">
+                <h3 style="margin-bottom: 1.5rem; color: #333;">模組快速連結</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <a href="/checkin/manage/dashboard.html" class="btn btn-secondary" style="text-decoration: none; text-align: center;">
+                        📍 簽到管理
+                    </a>
+                    <a href="/service/manage/dashboard.html" class="btn btn-secondary" style="text-decoration: none; text-align: center;">
+                        🙏 神務管理
+                    </a>
+                    <a href="/schedule/manage/dashboard.html" class="btn btn-secondary" style="text-decoration: none; text-align: center;">
+                        📅 排班管理
+                    </a>
+                    <a href="/manage/user.html" class="btn btn-primary" style="text-decoration: none; text-align: center;">
+                        👥 用戶總表
+                    </a>
+                </div>
+            </div>
+
+            <div class="manage-card">
+                <h3 style="margin-bottom: 1.5rem; color: #333;">各模組統計</h3>
+                <div style="display: grid; gap: 1rem;">
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size: 1.1rem;">📍 簽到系統</strong>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0 0 0;">總簽到記錄</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div id="checkinTotal" style="font-size: 1.5rem; font-weight: bold; color: #D4AF37;">-</div>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size: 1.1rem;">🙏 神務服務</strong>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0 0 0;">總報名記錄</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div id="serviceTotal" style="font-size: 1.5rem; font-weight: bold; color: #D4AF37;">-</div>
+                        </div>
+                    </div>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size: 1.1rem;">📅 排班系統</strong>
+                            <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0 0 0;">待開發</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: bold; color: #999;">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { checkAdminAuth, logout } from '/js/auth-guard.js';
+        
+        checkAdminAuth(['superadmin']).then(async (result) => {
+            console.log('✅ 全站儀表板 superadmin 認證成功');
+            const dashboardModule = await import('/manage/js/global.js');
+            await dashboardModule.loadDashboardStats();
+
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+        });
+    </script>
+</body>
+</html>
