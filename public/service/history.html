@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報名記錄 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        
+        .order-id {
+            font-size: 0.85rem;
+            color: #999;
+            font-family: monospace;
+        }
+        
+        .order-body {
+            display: grid;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .order-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .order-value {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .order-amount {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #8A2BE2;
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #999;
+        }
+        
+        .no-orders-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .back-link {
+            margin-bottom: 1.5rem;
+        }
+        
+        .back-link a {
+            color: #8A2BE2;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 640px) {
+            .order-card {
+                padding: 1rem;
+            }
+            
+            .order-header {
+                flex-direction: column;
+            }
+            
+            .order-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="mainApp" class="container" style="display: none;">
+        <header class="header">
+            <h1>報名記錄</h1>
+            <button id="logoutBtn" class="btn-logout">登出</button>
+        </header>
+
+        <main class="main-content">
+            <div class="history-card">
+                <div class="back-link">
+                    <a href="/service/service.html">← 返回神務服務</a>
+                </div>
+                
+                <h2>我的報名記錄</h2>
+                
+                <div id="ordersList">
+                    <p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>
+                </div>
+            </div>
+        </main>
+
+        <div class="bottom-nav">
+            <div class="bottom-nav-items">
+                <a href="/" class="bottom-nav-item">
+                    <span class="icon">🏠</span>
+                    <span>首頁</span>
+                </a>
+                <a href="/checkin/checkin.html" class="bottom-nav-item">
+                    <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
+                    <span>簽到</span>
+                </a>
+                <a href="/service/history.html" class="bottom-nav-item active">
+                    <span class="icon">📋</span>
+                    <span>報名記錄</span>
+                </a>
+                <a href="/manage/index.html" class="bottom-nav-item">
+                    <span class="icon">🔔</span>
+                    <span>通知中心</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { checkAuthWithUI } from '/js/auth-guard.js';
+        
+        checkAuthWithUI({
+            onAuthenticated: async (result) => {
+                console.log('✅ 報名記錄 已登入');
+                const historyModule = await import('/service/js/history.js');
+                await historyModule.init();
+            },
+            onUnauthenticated: () => {
+                console.log('❌ 報名記錄 未登入');
+            }
+        });
+    </script>
+</body>
+</html>

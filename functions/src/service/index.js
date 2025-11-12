@@ -228,6 +228,75 @@ exports.submitRegistration = onRequest({
 });
 
 /**
+ * 查詢當前用戶的訂單列表（一般用戶用）
+ * 只需要登入即可，返回該用戶自己的訂單
+ */
+exports.getUserRegistrations = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+
+        const registrationsSnap = await db.collection('registrations')
+            .where('userId', '==', uid)
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .get();
+
+        const registrations = [];
+        registrationsSnap.forEach(doc => {
+            const data = doc.data();
+            
+            if (data.userId !== uid) {
+                console.warn(`⚠️ 訂單 ${doc.id} 的 userId 不符，跳過`);
+                return;
+            }
+            
+            registrations.push({
+                orderId: doc.id,
+                serviceType: data.serviceType,
+                status: data.status,
+                totalAmount: data.totalAmount,
+                createdAt: data.createdAt,
+                contactInfo: {
+                    name: data.contactInfo?.name || null,
+                    phone: data.contactInfo?.phone || null
+                }
+            });
+        });
+
+        console.log(`使用者 ${uid} 查詢了自己的 ${registrations.length} 筆訂單`);
+        res.status(200).json({ result: { success: true, registrations } });
+
+    } catch (error) {
+        console.error('查詢用戶訂單失敗:', error);
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
+});
+
+/**
  * 查詢訂單列表（管理後台用）
  * 需要 poweruser_service, admin_service 或 superadmin 權限
  */

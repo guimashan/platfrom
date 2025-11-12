@@ -16,7 +16,10 @@
                 <h1>神務服務</h1>
                 <p class="subtitle">選擇您需要的服務項目</p>
             </div>
-            <button class="btn-logout" onclick="window.location.href='/'">返回首頁</button>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="btn-logout" onclick="window.location.href='/service/history.html'" style="background: #8A2BE2;">我的報名記錄</button>
+                <button class="btn-logout" onclick="window.location.href='/'">返回首頁</button>
+            </div>
         </header>
 
         <main class="main-content">
@@ -69,9 +72,9 @@
                     <span class="icon"><img src="/images/temple-icon.png" alt="簽到" style="width: 24px; height: 24px;"></span>
                     <span>簽到</span>
                 </a>
-                <a href="/checkin/history.html" class="bottom-nav-item">
+                <a href="/service/history.html" class="bottom-nav-item">
                     <span class="icon">📋</span>
-                    <span>歷程表</span>
+                    <span>報名記錄</span>
                 </a>
                 <a href="/manage/index.html" class="bottom-nav-item">
                     <span class="icon">🔔</span>
