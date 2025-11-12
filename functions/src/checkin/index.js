@@ -39,6 +39,54 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 /**
+ * 獲取用戶角色
+ * @param {string} userId - 用戶 ID
+ * @returns {Promise<string[]>} 用戶角色陣列
+ */
+async function getUserRoles(userId) {
+  try {
+    const userDoc = await platformDb.collection('users').doc(userId).get();
+    if (!userDoc.exists) {
+      return [];
+    }
+    const userData = userDoc.data();
+    return userData.roles || [];
+  } catch (error) {
+    logger.error('獲取用戶角色失敗', {userId, error: error.message});
+    return [];
+  }
+}
+
+/**
+ * 檢查用戶是否擁有必要角色
+ * @param {string} userId - 用戶 ID
+ * @param {string[]} requiredRoles - 必要角色陣列（任一符合即可）
+ * @throws {HttpsError} 如果用戶沒有必要角色
+ */
+async function assertHasRequiredRole(userId, requiredRoles) {
+  const userRoles = await getUserRoles(userId);
+  const hasPermission = requiredRoles.some(role => userRoles.includes(role));
+  
+  if (!hasPermission) {
+    logger.warn('權限不足', {
+      userId,
+      userRoles,
+      requiredRoles,
+    });
+    throw new HttpsError(
+        'permission-denied',
+        `您沒有權限執行此操作。需要以下角色之一: ${requiredRoles.join(', ')}`,
+    );
+  }
+  
+  logger.info('權限檢查通過', {
+    userId,
+    userRoles,
+    requiredRoles,
+  });
+}
+
+/**
  * 初始化預設巡邏點資料
  * 建立辦公室等預設巡邏點
  */
@@ -53,6 +101,13 @@ exports.initializeDefaultPatrols = onCall(
               'User must be authenticated',
           );
         }
+
+        // 檢查管理員權限
+        await assertHasRequiredRole(request.auth.uid, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
 
         // 檢查是否已有巡邏點資料
         const patrolsSnapshot = await admin.firestore()
@@ -128,6 +183,14 @@ exports.verifyCheckinDistance = onCall(
               'User must be authenticated to check in',
           );
         }
+
+        // 檢查簽到權限
+        await assertHasRequiredRole(request.auth.uid, [
+          'user_checkin',
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
 
         // 使用認證的 UID 作為 userId，忽略傳入的 userId 防止偽造
         const userId = request.auth.uid;
@@ -324,32 +387,14 @@ exports.verifyCheckinV2 = onRequest(
           return;
         }
 
-        // 從 Authorization header 取得 ID Token
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-          res.status(401).json({
-            ok: false,
-            code: '1000_UNAUTHORIZED',
-            message: 'Missing or invalid Authorization header',
-          });
-          return;
-        }
-
-        const idToken = authHeader.split('Bearer ')[1];
-
-        // 使用 Platform Admin 驗證 ID Token
-        let decodedToken;
-        try {
-          decodedToken = await platformAuth.verifyIdToken(idToken);
-        } catch (error) {
-          logger.error('ID Token 驗證失敗', error);
-          res.status(401).json({
-            ok: false,
-            code: '1000_INVALID_TOKEN',
-            message: 'Invalid ID Token',
-          });
-          return;
-        }
+        // 驗證 Token 並檢查簽到權限
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'user_checkin',
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
+        if (!decodedToken) return;
 
         const userId = decodedToken.uid;
         const {patrolId, lat, lng, mode, qrCode} = req.body;
@@ -545,6 +590,42 @@ async function verifyPlatformToken(req, res) {
 }
 
 /**
+ * 驗證請求並檢查必要角色（用於 onRequest 端點）
+ * @param {Object} req - HTTP 請求
+ * @param {Object} res - HTTP 回應
+ * @param {string[]} requiredRoles - 必要角色陣列
+ * @returns {Promise<Object|null>} 驗證成功返回 decodedToken，失敗返回 null
+ */
+async function ensureRequestHasRoles(req, res, requiredRoles) {
+  // 驗證 Token
+  const decodedToken = await verifyPlatformToken(req, res);
+  if (!decodedToken) return null;
+
+  // 檢查角色權限
+  try {
+    await assertHasRequiredRole(decodedToken.uid, requiredRoles);
+    return decodedToken;
+  } catch (error) {
+    // 將 HttpsError 轉換為 HTTP 回應
+    if (error instanceof HttpsError) {
+      const statusCode = error.code === 'permission-denied' ? 403 : 401;
+      res.status(statusCode).json({
+        ok: false,
+        code: error.code.toUpperCase().replace(/-/g, '_'),
+        message: error.message,
+      });
+    } else {
+      res.status(500).json({
+        ok: false,
+        code: 'INTERNAL_ERROR',
+        message: '權限檢查失敗',
+      });
+    }
+    return null;
+  }
+}
+
+/**
  * 獲取巡邏點列表 (HTTP Endpoint)
  */
 exports.getPatrols = onRequest(
@@ -562,7 +643,12 @@ exports.getPatrols = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'user_checkin',
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const patrolsSnapshot = await admin.firestore()
@@ -617,37 +703,22 @@ exports.getCheckinHistory = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'user_checkin',
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const currentUserId = decodedToken.uid;
         const limit = parseInt(req.query.limit) || 50;
         const requestedUserId = req.query.userId;
         
-        // 從 platform 數據庫獲取當前用戶角色
-        let userRoles = [];
-        let userExists = false;
-        try {
-          const userDoc = await platformDb.collection('users').doc(currentUserId).get();
-          userExists = userDoc.exists;
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            userRoles = userData.roles || [];
-            logger.info('用戶角色查詢成功', {
-              userId: currentUserId,
-              roles: userRoles,
-              userData: userData
-            });
-          } else {
-            logger.warn('用戶文檔不存在', {userId: currentUserId});
-          }
-        } catch (error) {
-          logger.error('獲取用戶角色失敗', {userId: currentUserId, error: error.message, stack: error.stack});
-        }
-        
-        // 檢查是否為管理員
+        // 獲取用戶角色以判斷是否為管理員
+        const userRoles = await getUserRoles(currentUserId);
         const isAdmin = userRoles.some(role => 
-          role === 'superadmin' || role === 'admin_checkin'
+          role === 'superadmin' || role === 'admin_checkin' || role === 'poweruser_checkin'
         );
         
         logger.info('權限檢查', {
@@ -760,7 +831,11 @@ exports.getTestModeStatus = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const settingsDoc = await admin.firestore()
@@ -803,7 +878,11 @@ exports.updateTestMode = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const {testMode} = req.body;
@@ -858,7 +937,11 @@ exports.savePatrol = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const {id, name, lat, lng, radius, qr, active, skipDistanceCheck} = req.body;
@@ -931,7 +1014,11 @@ exports.deletePatrol = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const {patrolId} = req.body;
@@ -985,7 +1072,11 @@ exports.getDashboardStats = onRequest(
           return;
         }
 
-        const decodedToken = await verifyPlatformToken(req, res);
+        const decodedToken = await ensureRequestHasRoles(req, res, [
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
         if (!decodedToken) return;
 
         const today = new Date();

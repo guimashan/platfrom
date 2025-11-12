@@ -188,6 +188,7 @@ export function displayUserInfo(userData, elements = {}) {
 
     const roleNames = {
         'user': '一般使用者',
+        'user_checkin': '簽到使用者',
         'poweruser_checkin': '簽到幹部',
         'poweruser_service': '神務幹部',
         'poweruser_schedule': '排班幹部',

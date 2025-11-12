@@ -79,17 +79,12 @@
     <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     
     <script type="module">
-        import { checkAuthWithUI } from '/js/auth-guard.js';
+        import { checkAdminAuth } from '/js/auth-guard.js';
         
-        checkAuthWithUI({
-            onAuthenticated: async (result) => {
-                console.log('✅ 簽到頁面 已登入');
-                const checkinModule = await import('/checkin/js/checkin.js');
-                await checkinModule.init();
-            },
-            onUnauthenticated: () => {
-                console.log('❌ 簽到頁面 未登入');
-            }
+        checkAdminAuth(['user_checkin', 'poweruser_checkin', 'admin_checkin', 'superadmin']).then(async (result) => {
+            console.log('✅ 簽到頁面 權限驗證成功');
+            const checkinModule = await import('/checkin/js/checkin.js');
+            await checkinModule.init();
         });
     </script>
 </body>
