@@ -42,7 +42,17 @@ export async function checkAuth(options = {}) {
     } = options;
 
     return new Promise((resolve, reject) => {
-        onAuthStateChanged(platformAuth, async (user) => {
+        let settled = false;
+        
+        // 輔助函數：確保 Promise 只被 settle 一次
+        const settleOnce = (unsubscribe, settler) => {
+            if (settled) return;
+            settled = true;
+            unsubscribe();
+            settler();
+        };
+
+        const unsubscribe = onAuthStateChanged(platformAuth, async (user) => {
             try {
                 if (!user) {
                     if (redirectToLogin) {
@@ -52,13 +62,14 @@ export async function checkAuth(options = {}) {
                         console.log('🔵 [auth-guard] 未登入，儲存返回URL:', returnUrl);
                         console.log('🔵 [auth-guard] sessionStorage已設定，準備跳轉到首頁');
                         
-                        // 延遲跳轉，確保 sessionStorage 已寫入
+                        // 先 reject Promise，再延遲跳轉確保 sessionStorage 已寫入
+                        settleOnce(unsubscribe, () => reject(new Error('重定向到登入頁')));
                         setTimeout(() => {
                             window.location.href = '/';
                         }, 100);
                     } else {
                         if (onFail) onFail({ error: 'NOT_AUTHENTICATED' });
-                        reject(new Error('使用者未登入'));
+                        settleOnce(unsubscribe, () => reject(new Error('使用者未登入')));
                     }
                     return;
                 }
@@ -73,10 +84,15 @@ export async function checkAuth(options = {}) {
                         // 💾 記住用戶原本想去的頁面（包括首頁）
                         const returnUrl = window.location.pathname + window.location.search;
                         sessionStorage.setItem('line_login_return_url', returnUrl);
-                        window.location.href = '/';
+                        
+                        settleOnce(unsubscribe, () => reject(new Error('使用者資料不存在')));
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 100);
+                    } else {
+                        if (onFail) onFail({ error: 'USER_NOT_FOUND' });
+                        settleOnce(unsubscribe, () => reject(new Error('使用者資料不存在')));
                     }
-                    if (onFail) onFail({ error: 'USER_NOT_FOUND' });
-                    reject(new Error('使用者資料不存在'));
                     return;
                 }
 
@@ -92,14 +108,18 @@ export async function checkAuth(options = {}) {
                         if (redirectToLogin) {
                             alert('您沒有存取此頁面的權限');
                             // 權限不足時不記錄返回URL，因為用戶不應該回到這個頁面
-                            window.location.href = '/';
+                            settleOnce(unsubscribe, () => reject(new Error('權限不足')));
+                            setTimeout(() => {
+                                window.location.href = '/';
+                            }, 100);
+                        } else {
+                            if (onFail) onFail({ 
+                                error: 'INSUFFICIENT_PERMISSIONS',
+                                userRoles,
+                                requiredRoles
+                            });
+                            settleOnce(unsubscribe, () => reject(new Error('權限不足')));
                         }
-                        if (onFail) onFail({ 
-                            error: 'INSUFFICIENT_PERMISSIONS',
-                            userRoles,
-                            requiredRoles
-                        });
-                        reject(new Error('權限不足'));
                         return;
                     }
                 }
@@ -111,16 +131,20 @@ export async function checkAuth(options = {}) {
                 };
 
                 if (onSuccess) onSuccess(result);
-                resolve(result);
+                settleOnce(unsubscribe, () => resolve(result));
 
             } catch (error) {
                 console.error('認證檢查失敗:', error);
                 if (redirectToLogin) {
                     alert('認證檢查失敗: ' + error.message);
-                    window.location.href = '/';
+                    settleOnce(unsubscribe, () => reject(error));
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 100);
+                } else {
+                    if (onFail) onFail({ error: 'CHECK_FAILED', details: error });
+                    settleOnce(unsubscribe, () => reject(error));
                 }
-                if (onFail) onFail({ error: 'CHECK_FAILED', details: error });
-                reject(error);
             }
         });
     });
@@ -208,7 +232,17 @@ export async function checkAuthWithUI(options = {}) {
     } = options;
 
     return new Promise((resolve) => {
-        onAuthStateChanged(platformAuth, async (user) => {
+        let settled = false;
+        
+        // 輔助函數：確保 Promise 只被 resolve 一次並清理監聽器
+        const settleOnce = (unsubscribe, result) => {
+            if (settled) return;
+            settled = true;
+            unsubscribe();
+            resolve(result);
+        };
+
+        const unsubscribe = onAuthStateChanged(platformAuth, async (user) => {
             try {
                 // 未登入：顯示登入 UI
                 if (!user) {
@@ -219,7 +253,7 @@ export async function checkAuthWithUI(options = {}) {
                         onLogin: handleLineLogin
                     });
                     if (onUnauthenticated) onUnauthenticated();
-                    resolve({ authenticated: false });
+                    settleOnce(unsubscribe, { authenticated: false });
                     return;
                 }
 
@@ -239,7 +273,7 @@ export async function checkAuthWithUI(options = {}) {
                         }
                     });
                     if (onUnauthenticated) onUnauthenticated();
-                    resolve({ authenticated: false });
+                    settleOnce(unsubscribe, { authenticated: false });
                     return;
                 }
 
@@ -262,7 +296,7 @@ export async function checkAuthWithUI(options = {}) {
                             }
                         });
                         if (onUnauthenticated) onUnauthenticated();
-                        resolve({ authenticated: false, insufficientPermissions: true });
+                        settleOnce(unsubscribe, { authenticated: false, insufficientPermissions: true });
                         return;
                     }
                 }
@@ -278,7 +312,7 @@ export async function checkAuthWithUI(options = {}) {
                 };
 
                 if (onAuthenticated) onAuthenticated(result);
-                resolve(result);
+                settleOnce(unsubscribe, result);
 
             } catch (error) {
                 console.error('認證檢查失敗:', error);
@@ -289,7 +323,7 @@ export async function checkAuthWithUI(options = {}) {
                     onLogin: () => window.location.reload()
                 });
                 if (onUnauthenticated) onUnauthenticated();
-                resolve({ authenticated: false, error });
+                settleOnce(unsubscribe, { authenticated: false, error });
             }
         });
     });
@@ -329,9 +363,10 @@ export async function checkAdminAuth(requiredAdminRoles = null) {
  * 設置自動登入狀態監聽
  * 當用戶登入/登出時自動更新 UI
  * @param {Function} onAuthChange - 狀態變化回調
+ * @returns {Function} 清理函數 - 呼叫以停止監聽
  */
 export function setupAuthListener(onAuthChange = null) {
-    onAuthStateChanged(platformAuth, async (user) => {
+    const unsubscribe = onAuthStateChanged(platformAuth, async (user) => {
         if (user) {
             // 用戶已登入
             const userRef = doc(platformDb, 'users', user.uid);
@@ -356,6 +391,9 @@ export function setupAuthListener(onAuthChange = null) {
             }
         }
     });
+    
+    // 返回清理函數
+    return unsubscribe;
 }
 
 export default {
