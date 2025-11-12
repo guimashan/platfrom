@@ -12,34 +12,48 @@ let currentUser = null;
 let currentUserRoles = [];
 let allRecords = [];
 
-// 初始化（HTML checkAdminAuth 已確保認證完成）
-(async function initModule() {
-    const user = platformAuth.currentUser;
+async function handleAuth(user) {
     if (!user) {
-        console.error('❌ 用戶未登入，這不應該發生');
+        window.location.href = '/checkin/manage/index.html';
         return;
     }
     
-    currentUser = user;
-    
-    // 載入用戶角色
     try {
         const userDoc = await getDoc(doc(platformDb, 'users', user.uid));
-        if (userDoc.exists()) {
-            currentUserRoles = userDoc.data().roles || [];
+        if (!userDoc.exists()) {
+            alert('找不到用戶資料');
+            window.location.href = '/';
+            return;
         }
+        
+        const userData = userDoc.data();
+        const roles = userData.roles || [];
+        
+        const hasPermission = roles.some(role => 
+            role === 'poweruser_checkin' || role === 'admin_checkin' || role === 'superadmin'
+        );
+        
+        if (!hasPermission) {
+            alert('您沒有權限存取此頁面');
+            window.location.href = '/';
+            return;
+        }
+        
+        currentUser = user;
+        currentUserRoles = roles;
+        
+        document.getElementById('loginPrompt').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+        
+        await init();
     } catch (error) {
-        console.error('載入用戶資料失敗:', error);
+        console.error('權限檢查失敗:', error);
+        alert('權限驗證失敗');
+        window.location.href = '/';
     }
-    
-    // 顯示主要內容
-    const mainApp = document.getElementById('mainApp');
-    if (mainApp) {
-        mainApp.style.display = 'block';
-    }
-    
-    await init();
-})();
+}
+
+onAuthStateChanged(platformAuth, handleAuth);
 
 async function init() {
     try {

@@ -28,7 +28,9 @@ export async function init() {
     let userData = null;
 
     // --- DOM 元素 ---
+    const loginPromptEl = document.getElementById('loginPrompt');
     const mainAppEl = document.getElementById('mainApp');
+    const loginBtnEl = document.getElementById('loginBtn');
     const contactNameEl = document.getElementById('contactName');
     const contactPhoneEl = document.getElementById('contactPhone');
     const contactEmailEl = document.getElementById('contactEmail');
@@ -46,40 +48,38 @@ export async function init() {
     const submitBtnEl = document.getElementById('submitBtn');
 
     // --- 程式進入點 ---
-    // 立即執行初始化邏輯
-    const initializeApp = async () => {
-        // 檢查 Firebase Auth
+    // 立即執行初始化邏輯（不使用 DOMContentLoaded）
+    const initializeApp = () => {
+        // 1. 綁定登入按鈕 - 登入按鈕已在 HTML 中綁定，此處不需要重複綁定
+
+        // 2. 檢查登入狀態
         if (!platformAuth) {
             alert("Firebase Auth 載入失敗。");
             return;
         }
 
-        // 獲取當前用戶（HTML 已確保認證完成）
-        const user = platformAuth.currentUser;
-        if (!user) {
-            console.error('❌ 用戶未登入，這不應該發生');
-            return;
-        }
+        platformAuth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                const userRef = doc(platformDb, 'users', user.uid);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    userData = userSnap.data();
+                    contactNameEl.value = userData.displayName || '';
+                    contactPhoneEl.value = userData.phone || '';
+                    contactEmailEl.value = userData.email || '';
+                }
 
-        currentUser = user;
-        
-        // 載入用戶資料
-        const userRef = doc(platformDb, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-            userData = userSnap.data();
-            // 自動填入聯絡人資訊
-            contactNameEl.value = userData.displayName || '';
-            contactPhoneEl.value = userData.phone || '';
-            contactEmailEl.value = userData.email || '';
-        }
-
-        // 顯示主要內容
-        mainAppEl.style.display = 'block';
-        
-        // 初始化功能
-        setupEventListeners();
-        updateMode();
+                loginPromptEl.style.display = 'none';
+                mainAppEl.style.display = 'block';
+            
+                setupEventListeners();
+                updateMode();
+            } else {
+                loginPromptEl.style.display = 'flex';
+                mainAppEl.style.display = 'none';
+            }
+        });
     };
     
     // 立即執行初始化
