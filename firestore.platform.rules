@@ -8,14 +8,37 @@ service cloud.firestore {
       return request.auth != null;
     }
     
+    // 輔助函數：取得用戶資料
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    
+    // 輔助函數：檢查是否為超級管理員
+    function isSuperAdmin() {
+      return isAuthenticated() && getUserData().roles.hasAny(['superadmin']);
+    }
+    
+    // 輔助函數：檢查是否為管理員（任一類型）
+    function isAnyAdmin() {
+      return isAuthenticated() && getUserData().roles.hasAny([
+        'superadmin',
+        'admin_checkin',
+        'admin_service',
+        'admin_schedule',
+        'poweruser_checkin',
+        'poweruser_service',
+        'poweruser_schedule'
+      ]);
+    }
+    
     // 用戶資料 (users)
     match /users/{userId} {
       // 所有已登入用戶可以讀取所有用戶資料（管理頁面需要）
       allow read: if isAuthenticated();
-      // 本人可以更新自己的基本資料
-      allow update: if isAuthenticated() && userId == request.auth.uid;
-      // 允許創建和刪除（由前端 JavaScript 控制實際權限）
-      allow create, delete: if isAuthenticated();
+      // 本人可以更新自己的基本資料，或是管理員可以更新其他用戶
+      allow update: if isAuthenticated() && (userId == request.auth.uid || isAnyAdmin());
+      // 只有超級管理員可以創建和刪除用戶
+      allow create, delete: if isSuperAdmin();
     }
     
     // LINE 登入資料 (lineUsers)
