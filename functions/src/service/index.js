@@ -808,6 +808,12 @@ exports.cleanupOldOrders = onRequest({
     region: 'asia-east2'
 }, async (req, res) => {
     return cors(req, res, async () => {
+        // 處理 OPTIONS preflight 請求
+        if (req.method === 'OPTIONS') {
+            res.status(204).send('');
+            return;
+        }
+
         try {
             // 驗證管理員權限
             const authHeader = req.headers.authorization;
