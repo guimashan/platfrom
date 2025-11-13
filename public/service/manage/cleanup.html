@@ -186,7 +186,7 @@
     </style>
 </head>
 <body>
-    <div class="cleanup-container">
+    <div class="cleanup-container" style="display: none;">
         <h1>🗑️ 清理舊格式訂單</h1>
         
         <div class="warning-box">
@@ -234,16 +234,9 @@
     </div>
 
     <script type="module">
+        import { checkAdminAuth } from '/js/auth-guard.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
-        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
         import { getFirestore, collection, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
-
-        // Platform Firebase 配置（用於認證）
-        const platformConfig = {
-            apiKey: "AIzaSyCViTkj-aIMqIp7Ov3Wv7iSKEB5-L96zNA",
-            authDomain: "platform-bc783.firebaseapp.com",
-            projectId: "platform-bc783"
-        };
 
         // Service Firebase 配置（用於資料）
         const serviceConfig = {
@@ -252,9 +245,6 @@
             projectId: "service-b9d4a"
         };
 
-        const platformApp = initializeApp(platformConfig);
-        const platformAuth = getAuth(platformApp);
-        
         const serviceApp = initializeApp(serviceConfig, 'service');
         const serviceDb = getFirestore(serviceApp);
 
@@ -266,20 +256,41 @@
             'bg', 'xy', 'ftp', 'ftc', 'fty'
         ];
 
-        onAuthStateChanged(platformAuth, (user) => {
-            if (user) {
-                currentUser = user;
-            } else {
-                alert('請先登入');
-                window.location.href = '/platform/login.html';
-            }
-        });
-
+        // 返回按鈕事件（不需要權限即可返回）
         document.getElementById('backBtn').addEventListener('click', () => {
             window.location.href = '/service/manage/dashboard.html';
         });
 
-        document.getElementById('cleanupBtn').addEventListener('click', async () => {
+        // 檢查管理員權限（只允許 superadmin 和 admin）
+        checkAdminAuth(['superadmin', 'admin']).then((result) => {
+            console.log('✅ 系統維護 權限驗證成功:', result.role);
+            
+            // 確認用戶和角色都存在
+            if (!result.user || !result.role) {
+                throw new Error('用戶資訊不完整');
+            }
+            
+            // 再次確認角色
+            if (!['superadmin', 'admin'].includes(result.role)) {
+                throw new Error('權限不足');
+            }
+            
+            currentUser = result.user;
+            
+            // 顯示頁面內容
+            document.querySelector('.cleanup-container').style.display = 'block';
+            
+            // 權限驗證成功後才綁定清理按鈕事件
+            setupCleanupHandler();
+        }).catch((error) => {
+            console.error('❌ 權限驗證失敗:', error);
+            alert('⛔ 權限不足\n\n系統維護功能僅限 superadmin 和 admin 角色使用。\n\n如需協助，請聯繫系統管理員。');
+            window.location.href = '/service/manage/dashboard.html';
+        });
+
+        // 清理處理函數（只在權限驗證成功後調用）
+        function setupCleanupHandler() {
+            document.getElementById('cleanupBtn').addEventListener('click', async () => {
             if (!currentUser) {
                 alert('請先登入');
                 return;
@@ -312,13 +323,27 @@
                 
                 let deleteCount = 0;
                 let validCount = 0;
+                let skippedCount = 0;
                 const oldServiceTypes = new Set();
                 const deletedOrders = [];
+                const skippedOrders = [];
                 
                 // 檢查並刪除舊格式訂單
                 for (const docSnapshot of snapshot.docs) {
                     const data = docSnapshot.data();
                     const serviceType = data.serviceType;
+                    
+                    // 如果 serviceType 為 null 或 undefined，跳過（需要人工檢查）
+                    if (!serviceType) {
+                        skippedOrders.push({
+                            id: docSnapshot.id,
+                            orderId: data.orderId || 'N/A',
+                            reason: 'serviceType 為空'
+                        });
+                        skippedCount++;
+                        console.log(`⚠️ 跳過: ${docSnapshot.id} (serviceType 為空，需人工檢查)`);
+                        continue;
+                    }
                     
                     // 如果 serviceType 不在標準列表中
                     if (!VALID_SERVICE_TYPES.includes(serviceType)) {
@@ -351,6 +376,7 @@
                         總訂單數：${snapshot.size} 筆<br>
                         ✅ 保留訂單：${validCount} 筆<br>
                         ❌ 刪除訂單：${deleteCount} 筆<br>
+                        ⚠️  跳過訂單：${skippedCount} 筆 (serviceType 為空，需人工檢查)<br>
                         <br>
                         <strong>發現的舊格式 serviceType：</strong><br>
                         ${oldServiceTypes.size > 0 ? Array.from(oldServiceTypes).map(t => `  • ${t}`).join('<br>') : '  無'}
@@ -360,6 +386,13 @@
                     content += `<br><br><strong>已刪除的訂單明細：</strong><br>`;
                     deletedOrders.forEach(order => {
                         content += `  • ${order.orderId} (${order.serviceType})<br>`;
+                    });
+                }
+                
+                if (skippedOrders.length > 0) {
+                    content += `<br><br><strong>⚠️ 跳過的訂單（需人工檢查）：</strong><br>`;
+                    skippedOrders.forEach(order => {
+                        content += `  • ${order.orderId} (${order.reason})<br>`;
                     });
                 }
                 
@@ -389,7 +422,8 @@
                 loading.style.display = 'none';
                 cleanupBtn.disabled = false;
             }
-        });
+            });
+        }
     </script>
 </body>
 </html>
