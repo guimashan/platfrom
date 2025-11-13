@@ -1,4 +1,4 @@
-import { auth, db } from '/js/firebase-init.js';
+import { platformAuth, serviceDb } from '/js/firebase-init.js';
 
 const SERVICE_API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
 
@@ -12,7 +12,7 @@ const serviceNames = {
 };
 
 async function callAPI(endpoint, data = null) {
-    const user = auth.currentUser;
+    const user = platformAuth.currentUser;
     if (!user) throw new Error('未登入');
     
     const token = await user.getIdToken();
