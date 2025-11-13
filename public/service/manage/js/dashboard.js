@@ -78,9 +78,17 @@ function renderServiceStats() {
     const statsContainer = document.getElementById('serviceStats');
     
     const serviceTypes = {
-        'light': '點燈服務',
-        'douType': '斗燈服務',
-        'business': '安神明供奉'
+        'dd': '龜馬山一點靈',
+        'nd': '年斗法會',
+        'ld': '禮斗法會',
+        'zy': '中元法會',
+        'ps': '普施法會',
+        'qj': '秋祭法會',
+        'bg': '建宮廟款',
+        'xy': '添香油',
+        'ftp': '福田_信眾個人',
+        'ftc': '福田_企業團體',
+        'fty': '福田_Youth 會'
     };
     
     const stats = {};
