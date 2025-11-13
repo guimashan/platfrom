@@ -91,7 +91,13 @@ function renderServiceStats() {
         'fty': '福田_Youth 會'
     };
     
+    // 初始化所有服務類型的統計（確保全部 11 個都顯示）
     const stats = {};
+    Object.keys(serviceTypes).forEach(type => {
+        stats[type] = { count: 0, amount: 0 };
+    });
+    
+    // 統計實際訂單數據
     allOrders.forEach(order => {
         const type = order.serviceType || 'unknown';
         if (!stats[type]) {
@@ -107,8 +113,9 @@ function renderServiceStats() {
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
     `;
     
-    Object.entries(stats).forEach(([type, data]) => {
-        const typeName = serviceTypes[type] || type;
+    // 顯示所有標準服務類型（包括 0 筆訂單的）
+    Object.entries(serviceTypes).forEach(([type, typeName]) => {
+        const data = stats[type] || { count: 0, amount: 0 };
         html += `
             <div style="background: #f5f5f5; padding: 1rem; border-radius: 8px; border-left: 4px solid #8A2BE2;">
                 <div style="font-size: 1.5rem; font-weight: bold; color: #333; margin-bottom: 0.5rem;">${data.count}</div>
@@ -119,10 +126,6 @@ function renderServiceStats() {
     });
     
     html += `</div>`;
-    
-    if (Object.keys(stats).length === 0) {
-        html = '<p class="no-data">暫無報名資料</p>';
-    }
     
     statsContainer.innerHTML = html;
 }
