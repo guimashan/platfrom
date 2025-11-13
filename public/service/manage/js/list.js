@@ -1,4 +1,5 @@
 import { platformAuth, serviceDb } from '/js/firebase-init.js';
+import { showSuccess, showError } from '/js/notification.js';
 
 const SERVICE_API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
 
@@ -78,10 +79,23 @@ function formatDate(timestamp) {
     return date.toISOString().split('T')[0];
 }
 
+const lastSavedConfigs = {};
+
 function renderServiceTable(configs) {
     const tableContainer = document.getElementById('serviceConfigTable');
     
     const serviceTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj', 'ftp', 'ftc', 'fty', 'bg', 'xy'];
+    
+    serviceTypes.forEach(type => {
+        lastSavedConfigs[type] = configs[type] || {
+            serviceType: type,
+            serviceName: serviceNames[type],
+            isOpen: true,
+            startDate: null,
+            endDate: null,
+            closedMessage: ''
+        };
+    });
     
     let html = `
         <table class="manage-table">
@@ -92,7 +106,7 @@ function renderServiceTable(configs) {
                     <th style="width: 150px;">開始日期</th>
                     <th style="width: 150px;">結束日期</th>
                     <th style="width: 200px;">關閉提示訊息</th>
-                    <th style="width: 100px;">操作</th>
+                    <th style="width: 100px;">狀態</th>
                 </tr>
             </thead>
             <tbody>
@@ -134,9 +148,9 @@ function renderServiceTable(configs) {
                            style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
                 </td>
                 <td>
-                    <button onclick="window.saveServiceConfig('${type}')" class="btn btn-primary" style="padding: 0.4rem 0.8rem;">
-                        保存
-                    </button>
+                    <span id="displayStatus-${type}" style="font-weight: bold; padding: 0.4rem 0.8rem; border-radius: 6px; display: inline-block; ${config.isOpen ? 'color: #4CAF50; background: #E8F5E9;' : 'color: #E74C3C; background: #FFEBEE;'}">
+                        ${config.isOpen ? 'Open' : 'Closed'}
+                    </span>
                 </td>
             </tr>
         `;
@@ -196,48 +210,131 @@ function renderServiceTable(configs) {
     
     tableContainer.innerHTML = html;
     
+    const debounceTimers = {};
+    const savingStatus = {};
+    const pendingSaves = {};
+    
+    const revertToLastSaved = (serviceType) => {
+        const lastConfig = lastSavedConfigs[serviceType];
+        if (!lastConfig) return;
+        
+        const checkbox = document.getElementById(`status-${serviceType}`);
+        const startDateInput = document.getElementById(`startDate-${serviceType}`);
+        const endDateInput = document.getElementById(`endDate-${serviceType}`);
+        const messageInput = document.getElementById(`message-${serviceType}`);
+        const statusText = document.getElementById(`statusText-${serviceType}`);
+        const displayStatus = document.getElementById(`displayStatus-${serviceType}`);
+        
+        checkbox.checked = lastConfig.isOpen;
+        startDateInput.value = formatDate(lastConfig.startDate);
+        endDateInput.value = formatDate(lastConfig.endDate);
+        messageInput.value = lastConfig.closedMessage || '';
+        
+        statusText.textContent = lastConfig.isOpen ? '開放中' : '已關閉';
+        displayStatus.textContent = lastConfig.isOpen ? 'Open' : 'Closed';
+        displayStatus.style.color = lastConfig.isOpen ? '#4CAF50' : '#E74C3C';
+        displayStatus.style.background = lastConfig.isOpen ? '#E8F5E9' : '#FFEBEE';
+    };
+    
+    const executeSave = async (serviceType) => {
+        try {
+            const isOpen = document.getElementById(`status-${serviceType}`).checked;
+            const startDate = document.getElementById(`startDate-${serviceType}`).value;
+            const endDate = document.getElementById(`endDate-${serviceType}`).value;
+            const closedMessage = document.getElementById(`message-${serviceType}`).value;
+            
+            const config = {
+                isOpen,
+                startDate: startDate || null,
+                endDate: endDate || null,
+                closedMessage: closedMessage || ''
+            };
+            
+            await updateServiceConfig(serviceType, config);
+            
+            lastSavedConfigs[serviceType] = {
+                ...lastSavedConfigs[serviceType],
+                ...config
+            };
+            
+            showSuccess(`${serviceNames[serviceType]} 配置已自動保存`);
+            
+        } catch (error) {
+            console.error('自動保存失敗:', error);
+            showError(`${serviceNames[serviceType]} 保存失敗: ${error.message}`);
+            
+            revertToLastSaved(serviceType);
+        } finally {
+            savingStatus[serviceType] = false;
+            
+            if (pendingSaves[serviceType]) {
+                pendingSaves[serviceType] = false;
+                savingStatus[serviceType] = true;
+                executeSave(serviceType);
+            }
+        }
+    };
+    
+    const autoSave = (serviceType, immediate = false) => {
+        if (debounceTimers[serviceType]) {
+            clearTimeout(debounceTimers[serviceType]);
+        }
+        
+        const saveAction = async () => {
+            if (savingStatus[serviceType]) {
+                pendingSaves[serviceType] = true;
+                return;
+            }
+            
+            savingStatus[serviceType] = true;
+            await executeSave(serviceType);
+        };
+        
+        if (immediate) {
+            saveAction();
+        } else {
+            debounceTimers[serviceType] = setTimeout(saveAction, 500);
+        }
+    };
+    
     serviceTypes.forEach(type => {
         const checkbox = document.getElementById(`status-${type}`);
+        const startDateInput = document.getElementById(`startDate-${type}`);
+        const endDateInput = document.getElementById(`endDate-${type}`);
+        const messageInput = document.getElementById(`message-${type}`);
+        const statusText = document.getElementById(`statusText-${type}`);
+        const displayStatus = document.getElementById(`displayStatus-${type}`);
+        
         checkbox.addEventListener('change', (e) => {
-            const statusText = document.getElementById(`statusText-${type}`);
-            statusText.textContent = e.target.checked ? '開放中' : '已關閉';
+            const isOpen = e.target.checked;
+            statusText.textContent = isOpen ? '開放中' : '已關閉';
+            
+            displayStatus.textContent = isOpen ? 'Open' : 'Closed';
+            displayStatus.style.color = isOpen ? '#4CAF50' : '#E74C3C';
+            displayStatus.style.background = isOpen ? '#E8F5E9' : '#FFEBEE';
+            
+            autoSave(type, true);
         });
+        
+        startDateInput.addEventListener('change', () => autoSave(type, false));
+        endDateInput.addEventListener('change', () => autoSave(type, false));
+        messageInput.addEventListener('input', () => autoSave(type, false));
     });
 }
 
-window.saveServiceConfig = async function(serviceType) {
-    try {
-        const isOpen = document.getElementById(`status-${serviceType}`).checked;
-        const startDate = document.getElementById(`startDate-${serviceType}`).value;
-        const endDate = document.getElementById(`endDate-${serviceType}`).value;
-        const closedMessage = document.getElementById(`message-${serviceType}`).value;
-        
-        const config = {
-            isOpen,
-            startDate: startDate || null,
-            endDate: endDate || null,
-            closedMessage: closedMessage || ''
-        };
-        
-        await updateServiceConfig(serviceType, config);
-        
-        alert(`✅ ${serviceNames[serviceType]} 配置已保存`);
-        
-    } catch (error) {
-        console.error('保存失敗:', error);
-        alert(`❌ 保存失敗: ${error.message}`);
-    }
-};
-
 export async function init() {
     try {
+        if (!platformAuth.currentUser) {
+            throw new Error('用戶未認證');
+        }
+        
         const configs = await loadServiceConfigs();
         renderServiceTable(configs);
         
         document.getElementById('mainApp').style.display = 'block';
         
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await auth.signOut();
+            await platformAuth.signOut();
             window.location.href = '/';
         });
         
