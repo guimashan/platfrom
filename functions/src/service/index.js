@@ -102,6 +102,25 @@ async function checkServiceRole(decodedToken) {
     }
 }
 
+async function checkSuperadminRole(decodedToken) {
+    try {
+        const roles = decodedToken.roles || [];
+        
+        console.log('檢查 superadmin 權限 - UID:', decodedToken.uid, '角色:', roles);
+        
+        if (!roles.includes('superadmin')) {
+            console.error('權限不足 - UID:', decodedToken.uid, '現有角色:', roles);
+            throw new HttpsError('permission-denied', '權限不足，需要 superadmin 角色');
+        }
+        
+        return true;
+    } catch (error) {
+        if (error instanceof HttpsError) throw error;
+        console.error('檢查權限失敗:', error);
+        throw new HttpsError('internal', '權限檢查失敗');
+    }
+}
+
 /**
  * 接收所有神務服務的報名
  * 使用 onRequest 並手動驗證 platform-bc783 的 ID Token
@@ -558,6 +577,103 @@ exports.confirmPayment = onRequest({
 
     } catch (error) {
         console.error('確認收款失敗:', error);
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
+});
+
+/**
+ * 刪除訂單（僅限 superadmin）
+ * 用於刪除測試訂單，避免過多測試數據
+ */
+exports.deleteOrder = onRequest({ 
+    region: 'asia-east2',
+    cors: true
+}, async (req, res) => {
+    try {
+        if (req.method !== 'POST') {
+            res.status(405).json({ error: { message: '只接受 POST 請求' } });
+            return;
+        }
+
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            res.status(401).json({ error: { message: '缺少認證 token' } });
+            return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+            decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+            console.error('Token 驗證失敗:', error);
+            res.status(401).json({ error: { message: '認證失敗' } });
+            return;
+        }
+
+        const uid = decodedToken.uid;
+        
+        // 檢查 superadmin 權限
+        await checkSuperadminRole(decodedToken);
+
+        const { orderId, reason } = req.body.data || {};
+        if (!orderId) {
+            res.status(400).json({ error: { message: '缺少訂單編號' } });
+            return;
+        }
+
+        // 檢查訂單是否存在
+        const regDoc = await db.collection('registrations').doc(orderId).get();
+        if (!regDoc.exists) {
+            res.status(404).json({ error: { message: '訂單不存在' } });
+            return;
+        }
+
+        const registration = regDoc.data();
+        const paymentSecretId = registration.paymentSecretId;
+
+        // 使用 batch 原子性刪除
+        const batch = db.batch();
+        
+        // 刪除訂單文檔
+        batch.delete(db.collection('registrations').doc(orderId));
+
+        // 刪除關聯的信用卡機密資料（如果存在）
+        if (paymentSecretId) {
+            batch.delete(db.collection('temp_payment_secrets').doc(paymentSecretId));
+        }
+
+        // 記錄審計日誌
+        const auditLogRef = db.collection('audit_logs').doc();
+        batch.set(auditLogRef, {
+            action: 'delete_order',
+            orderId: orderId,
+            deletedBy: uid,
+            deletedAt: FieldValue.serverTimestamp(),
+            reason: reason || '未提供原因',
+            orderData: {
+                serviceType: registration.serviceType,
+                contactName: registration.contactInfo?.name,
+                totalAmount: registration.totalAmount,
+                status: registration.status,
+                createdAt: registration.createdAt
+            }
+        });
+
+        await batch.commit();
+
+        console.log(`✅ [刪除訂單] 訂單 ${orderId} 已由 superadmin ${uid} 刪除，原因: ${reason || '未提供'}`);
+        res.status(200).json({ result: { success: true } });
+
+    } catch (error) {
+        console.error('刪除訂單失敗:', error);
+        
+        // 處理權限錯誤
+        if (error instanceof HttpsError && error.code === 'permission-denied') {
+            res.status(403).json({ error: { message: error.message } });
+            return;
+        }
+        
         res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
     }
 });

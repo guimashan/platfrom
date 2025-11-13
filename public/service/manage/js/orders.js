@@ -2,12 +2,13 @@ import { platformAuth } from '/js/firebase-init.js';
 import { logout } from '/js/auth.js';
 
 let currentUser = null;
+let userRoles = [];
 let allOrders = [];
 
 const API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
 
-async function callAPI(endpoint, data = {}) {
-    const idToken = await platformAuth.currentUser.getIdToken();
+async function callAPI(endpoint, data = {}, forceRefreshToken = false) {
+    const idToken = await platformAuth.currentUser.getIdToken(forceRefreshToken);
     const response = await fetch(`${API_BASE}/${endpoint}`, {
         method: 'POST',
         headers: {
@@ -18,8 +19,21 @@ async function callAPI(endpoint, data = {}) {
     });
     
     if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || '請求失敗');
+        // 嘗試解析 JSON 錯誤，如果失敗則使用文字內容
+        let errorMessage = '請求失敗';
+        try {
+            const errorData = await response.json();
+            errorMessage = errorData.error?.message || '請求失敗';
+        } catch (parseError) {
+            // 如果無法解析 JSON，嘗試讀取文字內容
+            try {
+                const errorText = await response.text();
+                errorMessage = errorText || `HTTP ${response.status}: ${response.statusText}`;
+            } catch (textError) {
+                errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            }
+        }
+        throw new Error(errorMessage);
     }
     
     return response.json();
@@ -140,6 +154,11 @@ export async function init() {
             return;
         }
         
+        // 獲取用戶角色
+        const idTokenResult = await currentUser.getIdTokenResult();
+        userRoles = idTokenResult.claims.roles || [];
+        console.log('當前用戶角色:', userRoles);
+        
         // 隱藏登入提示，顯示主內容
         const loginPrompt = document.getElementById('loginPrompt');
         const mainApp = document.getElementById('mainApp');
@@ -179,6 +198,73 @@ async function loadOrders() {
         showEmptyState('載入失敗: ' + error.message);
     }
 }
+
+async function deleteOrder(orderId) {
+    // 重新獲取最新的角色資訊，確保權限未被撤銷
+    try {
+        const idTokenResult = await currentUser.getIdTokenResult(true); // 強制刷新 token
+        const latestRoles = idTokenResult.claims.roles || [];
+        
+        if (!latestRoles.includes('superadmin')) {
+            alert('權限不足：只有 superadmin 可以刪除訂單');
+            // 更新全域角色快取
+            userRoles = latestRoles;
+            return;
+        }
+        
+        // 更新全域角色快取
+        userRoles = latestRoles;
+    } catch (error) {
+        console.error('驗證權限失敗:', error);
+        alert('驗證權限失敗，請重新登入');
+        return;
+    }
+    
+    // 找到訂單資料以顯示詳細確認訊息
+    const order = allOrders.find(o => o.orderId === orderId);
+    if (!order) {
+        alert('找不到訂單');
+        return;
+    }
+    
+    const confirmMessage = `⚠️ 確定要刪除此訂單嗎？\n\n訂單編號：${orderId}\n服務類型：${getServiceTypeName(order.serviceType)}\n聯絡人：${order.contactInfo?.name || '-'}\n總金額：NT$ ${order.totalAmount?.toLocaleString() || 0}\n狀態：${getStatusName(order.status)}\n\n此操作無法復原！`;
+    
+    if (!confirm(confirmMessage)) {
+        return;
+    }
+    
+    try {
+        // 調用 deleteOrder API，強制使用刷新的 token
+        await callAPI('deleteOrder', { 
+            orderId,
+            reason: '管理員刪除測試訂單'
+        }, true); // forceRefreshToken = true
+        
+        alert('✅ 訂單已成功刪除');
+        
+        // 重新載入訂單列表
+        await loadOrders();
+        
+    } catch (error) {
+        console.error('刪除訂單失敗:', error);
+        
+        // 如果是權限錯誤，要求重新登入
+        if (error.message.includes('權限') || error.message.includes('permission')) {
+            alert('❌ 權限不足或已過期，請重新登入');
+            await logout();
+        } else {
+            alert('❌ 刪除失敗: ' + error.message);
+        }
+    }
+}
+
+// 檢查是否為 superadmin
+function isSuperadmin() {
+    return userRoles.includes('superadmin');
+}
+
+// 將 deleteOrder 函數暴露為全域函數，供按鈕調用
+window.deleteOrder = deleteOrder;
 
 function applyFilters() {
     const serviceType = document.getElementById('filterServiceType').value;
@@ -224,6 +310,7 @@ function renderOrders(orders) {
             <td>${formatDate(order.createdAt)}</td>
             <td>
                 <button class="btn-view" onclick="viewOrder('${order.orderId}')">查看</button>
+                ${isSuperadmin() ? `<button class="btn-delete" onclick="deleteOrder('${order.orderId}')" title="刪除訂單（僅 superadmin）">🗑️ 刪除</button>` : ''}
             </td>
         </tr>
     `).join('');
