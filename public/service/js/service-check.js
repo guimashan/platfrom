@@ -69,9 +69,15 @@ export function showServiceClosedAlert(config, serviceType = '') {
         message.textContent = '敬請期待開放時間';
     }
     
-    // 判斷返回路徑：福田會服務返回 ft.html，其他返回 service.html
-    const isFutianService = ['ftp', 'ftc', 'fty'].includes(serviceType.toLowerCase());
-    const backUrl = isFutianService ? '/service/ft.html' : '/service/service.html';
+    // 判斷返回路徑：根據服務類型返回對應的選單頁面
+    const serviceType_lower = serviceType.toLowerCase();
+    let backUrl = '/service/service.html'; // 預設返回法會服務頁面
+    
+    if (['ftp', 'ftc', 'fty'].includes(serviceType_lower)) {
+        backUrl = '/service/ft.html'; // 福田會服務
+    } else if (['bg', 'xy'].includes(serviceType_lower)) {
+        backUrl = '/service/bx.html'; // 信眾奉獻服務
+    }
     
     const button = document.createElement('button');
     button.style.cssText = `

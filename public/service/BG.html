@@ -152,11 +152,20 @@
 
     <script type="module">
         import { checkAuthWithUI } from '/js/auth-guard.js';
+        import { checkServiceAvailability, showServiceClosedAlert, disableAllFormInputs } from '/service/js/service-check.js';
         
         let moduleLoaded = false;
 
         async function loadModule() {
             if (!moduleLoaded) {
+                // 檢查服務是否開放
+                const serviceConfig = await checkServiceAvailability('bg');
+                if (!serviceConfig.isOpen) {
+                    showServiceClosedAlert(serviceConfig, 'bg');
+                    disableAllFormInputs();
+                    return;
+                }
+                
                 const module = await import('/service/js/BG.js');
                 await module.init();
                 moduleLoaded = true;
