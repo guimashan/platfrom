@@ -261,8 +261,8 @@
             window.location.href = '/service/manage/dashboard.html';
         });
 
-        // 檢查管理員權限（只允許 superadmin 和 admin）
-        checkAdminAuth(['superadmin', 'admin']).then((result) => {
+        // 檢查管理員權限（只允許 superadmin 和 admin_service）
+        checkAdminAuth(['superadmin', 'admin_service']).then((result) => {
             console.log('✅ 系統維護 權限驗證成功:', result.roles);
             
             // 確認用戶和角色都存在
@@ -284,7 +284,7 @@
             setupCleanupHandler();
         }).catch((error) => {
             console.error('❌ 權限驗證失敗:', error);
-            alert('⛔ 權限不足\n\n系統維護功能僅限 superadmin 和 admin 角色使用。\n\n如需協助，請聯繫系統管理員。');
+            alert('⛔ 權限不足\n\n系統維護功能僅限 superadmin 和 admin_service 角色使用。\n\n如需協助，請聯繫系統管理員。');
             window.location.href = '/service/manage/dashboard.html';
         });
 
