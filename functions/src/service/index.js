@@ -301,6 +301,7 @@ exports.getUserRegistrations = onRequest({
 
             const uid = decodedToken.uid;
 
+            // 使用複合索引查詢（需要先在 Firestore 創建索引）
             const registrationsSnap = await db.collection('registrations')
                 .where('userId', '==', uid)
                 .orderBy('createdAt', 'desc')
