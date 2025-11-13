@@ -807,16 +807,21 @@ exports.updateServiceConfig = onRequest({
 exports.cleanupOldOrders = onRequest({ 
     region: 'asia-east2'
 }, async (req, res) => {
-    return cors(req, res, async () => {
-        // 處理 OPTIONS preflight 請求
-        if (req.method === 'OPTIONS') {
-            res.status(204).send('');
-            return;
-        }
+    // 設置 CORS headers（允許特定 origin）
+    const origin = req.headers.origin || 'https://go.guimashan.org.tw';
+    res.set('Access-Control-Allow-Origin', origin);
+    
+    // 處理 OPTIONS preflight 請求
+    if (req.method === 'OPTIONS') {
+        res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.set('Access-Control-Max-Age', '3600');
+        return res.status(204).send('');
+    }
 
-        try {
-            // 驗證管理員權限
-            const authHeader = req.headers.authorization;
+    try {
+        // 驗證管理員權限
+        const authHeader = req.headers.authorization;
             if (!authHeader || !authHeader.startsWith('Bearer ')) {
                 res.status(401).json({ error: { message: '缺少認證 token' } });
                 return;
@@ -905,15 +910,14 @@ exports.cleanupOldOrders = onRequest({
             
             res.status(200).json({ result });
             
-        } catch (error) {
-            console.error('清理失敗:', error);
-            
-            if (error instanceof HttpsError && error.code === 'permission-denied') {
-                res.status(403).json({ error: { message: error.message } });
-                return;
-            }
-            
-            res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    } catch (error) {
+        console.error('清理失敗:', error);
+        
+        if (error instanceof HttpsError && error.code === 'permission-denied') {
+            res.status(403).json({ error: { message: error.message } });
+            return;
         }
-    });
+        
+        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+    }
 });
