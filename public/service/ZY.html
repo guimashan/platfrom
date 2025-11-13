@@ -175,11 +175,21 @@
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
         import { checkAuthWithUI } from '/js/auth-guard.js';
+        import { checkServiceAvailability, showServiceClosedAlert, disableAllFormInputs } from '/service/js/service-check.js';
         
         let moduleLoaded = false;
 
         async function loadModule() {
             if (!moduleLoaded) {
+                const serviceConfig = await checkServiceAvailability('zy');
+                
+                if (!serviceConfig.isOpen) {
+                    showServiceClosedAlert(serviceConfig);
+                    disableAllFormInputs();
+                    document.getElementById('mainApp').style.display = 'block';
+                    return;
+                }
+                
                 const module = await import('/service/js/ZY.js');
                 await module.init();
                 moduleLoaded = true;

@@ -679,3 +679,123 @@ exports.deleteOrder = onRequest({
         }
     });
 });
+
+/**
+ * 獲取所有服務配置（公開 API）
+ * 用於前端檢查服務開放狀態
+ */
+exports.getServiceConfigs = onRequest({ 
+    region: 'asia-east2'
+}, async (req, res) => {
+    return cors(req, res, async () => {
+        try {
+            const configsSnapshot = await db.collection('service_configs').get();
+            
+            if (configsSnapshot.empty) {
+                const defaultConfigs = {
+                    dd: { serviceType: 'dd', serviceName: '線上點燈', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    nd: { serviceType: 'nd', serviceName: '年斗法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    ld: { serviceType: 'ld', serviceName: '禮斗法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    zy: { serviceType: 'zy', serviceName: '中元法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    ps: { serviceType: 'ps', serviceName: '普施法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    qj: { serviceType: 'qj', serviceName: '秋祭法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' }
+                };
+                
+                const batch = db.batch();
+                for (const [key, config] of Object.entries(defaultConfigs)) {
+                    batch.set(db.collection('service_configs').doc(key), config);
+                }
+                await batch.commit();
+                
+                res.status(200).json({ result: defaultConfigs });
+                return;
+            }
+            
+            const configs = {};
+            configsSnapshot.forEach(doc => {
+                configs[doc.id] = doc.data();
+            });
+            
+            res.status(200).json({ result: configs });
+            
+        } catch (error) {
+            console.error('獲取服務配置失敗:', error);
+            res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+        }
+    });
+});
+
+/**
+ * 更新服務配置（需要管理權限）
+ */
+exports.updateServiceConfig = onRequest({ 
+    region: 'asia-east2'
+}, async (req, res) => {
+    return cors(req, res, async () => {
+        try {
+            if (req.method !== 'POST') {
+                res.status(405).json({ error: { message: '只接受 POST 請求' } });
+                return;
+            }
+
+            const authHeader = req.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                res.status(401).json({ error: { message: '缺少認證 token' } });
+                return;
+            }
+
+            const idToken = authHeader.split('Bearer ')[1];
+            let decodedToken;
+            try {
+                decodedToken = await platformAuth.verifyIdToken(idToken);
+            } catch (error) {
+                console.error('Token 驗證失敗:', error);
+                res.status(401).json({ error: { message: '認證失敗' } });
+                return;
+            }
+
+            const uid = decodedToken.uid;
+            
+            await checkServicePermission(decodedToken);
+
+            const { serviceType, isOpen, startDate, endDate, closedMessage } = req.body.data || {};
+            
+            if (!serviceType) {
+                res.status(400).json({ error: { message: '缺少服務類型' } });
+                return;
+            }
+
+            const validTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj'];
+            if (!validTypes.includes(serviceType)) {
+                res.status(400).json({ error: { message: '無效的服務類型' } });
+                return;
+            }
+
+            const updateData = {
+                serviceType,
+                isOpen: isOpen !== undefined ? isOpen : true,
+                updatedAt: FieldValue.serverTimestamp(),
+                updatedBy: uid
+            };
+
+            if (startDate !== undefined) updateData.startDate = startDate;
+            if (endDate !== undefined) updateData.endDate = endDate;
+            if (closedMessage !== undefined) updateData.closedMessage = closedMessage;
+
+            await db.collection('service_configs').doc(serviceType).set(updateData, { merge: true });
+
+            console.log(`✅ [更新服務配置] ${serviceType} 已由 ${uid} 更新`);
+            res.status(200).json({ result: { success: true } });
+
+        } catch (error) {
+            console.error('更新服務配置失敗:', error);
+            
+            if (error instanceof HttpsError && error.code === 'permission-denied') {
+                res.status(403).json({ error: { message: error.message } });
+                return;
+            }
+            
+            res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+        }
+    });
+});

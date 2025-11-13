@@ -24,37 +24,37 @@
 
         <main class="main-content">
             <div class="module-grid active">
-                <div class="module-card" onclick="window.location.href='DD.html'">
+                <div class="module-card" onclick="checkServiceStatus('dd', 'DD.html')">
                     <div class="module-icon">🕯️</div>
                     <div class="module-title">龜馬山一點靈</div>
                     <div class="module-desc">祈福點燈，光明祈願</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='ND.html'">
+                <div class="module-card" onclick="checkServiceStatus('nd', 'ND.html')">
                     <div class="module-icon">🎊</div>
                     <div class="module-title">年斗法會</div>
                     <div class="module-desc">新春祈福，闔家平安</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='LD.html'">
+                <div class="module-card" onclick="checkServiceStatus('ld', 'LD.html')">
                     <div class="module-icon">⭐</div>
                     <div class="module-title">禮斗法會</div>
                     <div class="module-desc">禮拜星斗，消災延壽</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='ZY.html'">
+                <div class="module-card" onclick="checkServiceStatus('zy', 'ZY.html')">
                     <div class="module-icon">🏮</div>
                     <div class="module-title">中元法會</div>
                     <div class="module-desc">普渡眾生，超薦先靈</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='PS.html'">
+                <div class="module-card" onclick="checkServiceStatus('ps', 'PS.html')">
                     <div class="module-icon">🙏</div>
                     <div class="module-title">普施法會</div>
                     <div class="module-desc">慈悲布施，廣結善緣</div>
                 </div>
                 
-                <div class="module-card" onclick="window.location.href='QJ.html'">
+                <div class="module-card" onclick="checkServiceStatus('qj', 'QJ.html')">
                     <div class="module-icon">🍂</div>
                     <div class="module-title">秋祭法會</div>
                     <div class="module-desc">秋季祭典，感恩祈福</div>
@@ -85,18 +85,58 @@
     </div>
 
     <script type="module">
-        // Firebase 延遲載入 - 只在需要時才載入
-        // 服務頁面允許訪客瀏覽，無需立即載入 Firebase
-        console.log('✅ 神務服務頁面已載入（訪客模式）');
+        console.log('✅ 神務服務頁面已載入');
         
-        // 如果未來需要檢查登入狀態，可以延遲載入：
-        // async function checkLoginStatus() {
-        //     const firebaseInit = await import('/js/firebase-init.js');
-        //     const { onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js');
-        //     onAuthStateChanged(firebaseInit.platformAuth, (user) => {
-        //         console.log(user ? '✅ 已登入' : 'ℹ️ 訪客模式');
-        //     });
-        // }
+        let serviceConfigs = {};
+        const SERVICE_API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
+        
+        async function loadServiceConfigs() {
+            try {
+                const response = await fetch(`${SERVICE_API_BASE}/getServiceConfigs`);
+                const result = await response.json();
+                
+                if (response.ok) {
+                    serviceConfigs = result.result;
+                    console.log('✅ 服務配置已載入', serviceConfigs);
+                } else {
+                    console.error('載入服務配置失敗:', result);
+                }
+            } catch (error) {
+                console.error('載入服務配置失敗:', error);
+            }
+        }
+        
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        }
+        
+        window.checkServiceStatus = function(serviceType, targetPage) {
+            const config = serviceConfigs[serviceType];
+            
+            if (!config) {
+                window.location.href = targetPage;
+                return;
+            }
+            
+            if (!config.isOpen) {
+                let message = '此服務目前未開放報名';
+                
+                if (config.closedMessage) {
+                    message += `\n\n${config.closedMessage}`;
+                } else if (config.startDate) {
+                    message += `\n\n預計 ${formatDate(config.startDate)} 開放`;
+                }
+                
+                alert(message);
+                return;
+            }
+            
+            window.location.href = targetPage;
+        };
+        
+        loadServiceConfigs();
     </script>
 </body>
 </html>
