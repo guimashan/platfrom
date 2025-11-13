@@ -263,16 +263,16 @@
 
         // 檢查管理員權限（只允許 superadmin 和 admin）
         checkAdminAuth(['superadmin', 'admin']).then((result) => {
-            console.log('✅ 系統維護 權限驗證成功:', result.role);
+            console.log('✅ 系統維護 權限驗證成功:', result.roles);
             
             // 確認用戶和角色都存在
-            if (!result.user || !result.role) {
+            if (!result.user || !result.roles || result.roles.length === 0) {
                 throw new Error('用戶資訊不完整');
             }
             
-            // 再次確認角色
-            if (!['superadmin', 'admin'].includes(result.role)) {
-                throw new Error('權限不足');
+            // 確認認證狀態
+            if (!result.authenticated) {
+                throw new Error('認證失敗');
             }
             
             currentUser = result.user;
