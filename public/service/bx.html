@@ -10,53 +10,6 @@
         .card {
             padding-bottom: 15px;
         }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        .service-item {
-            display: block;
-            padding: 1.25rem 1.5rem;
-            background: white;
-            border: 2px solid #d4af37;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #333;
-            text-decoration: none;
-            text-align: center;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-
-        .service-item:hover {
-            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-            border-color: var(--primary-gold);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-        }
-
-        .service-item:active {
-            transform: translateY(0);
-        }
-
-        @media (max-width: 767px) {
-            .service-item {
-                padding: 1.1rem 1.25rem;
-                font-size: 1.05rem;
-            }
-        }
-
-        @media (max-width: 479px) {
-            .service-item {
-                padding: 1rem;
-                font-size: 1rem;
-            }
-        }
     </style>
 </head>
 <body>
@@ -87,9 +40,17 @@
 
             <div class="card">
                 <h2 class="card-title">奉獻項目</h2>
-                <div class="service-grid">
-                    <a href="/service/BG.html" class="service-item">建宮廟款</a>
-                    <a href="/service/XY.html" class="service-item">添香油</a>
+                <div class="module-grid">
+                    <a href="/service/BG.html" class="module-card">
+                        <div class="module-icon">🏛️</div>
+                        <div class="module-title">建宮廟款</div>
+                        <div class="module-desc">護持建廟，功德無量</div>
+                    </a>
+                    <a href="/service/XY.html" class="module-card">
+                        <div class="module-icon">🕯️</div>
+                        <div class="module-title">添香油</div>
+                        <div class="module-desc">奉獻香油，增福添壽</div>
+                    </a>
                 </div>
             </div>
 
