@@ -123,6 +123,28 @@ async function checkSuperadminRole(decodedToken) {
 }
 
 /**
+ * 檢查服務管理權限（admin_service 或 superadmin）
+ */
+async function checkServicePermission(decodedToken) {
+    try {
+        const roles = decodedToken.roles || [];
+        
+        console.log('檢查服務管理權限 - UID:', decodedToken.uid, '角色:', roles);
+        
+        if (!roles.includes('admin_service') && !roles.includes('superadmin')) {
+            console.error('權限不足 - UID:', decodedToken.uid, '現有角色:', roles);
+            throw new HttpsError('permission-denied', '權限不足，需要 admin_service 或 superadmin 角色');
+        }
+        
+        return true;
+    } catch (error) {
+        if (error instanceof HttpsError) throw error;
+        console.error('檢查權限失敗:', error);
+        throw new HttpsError('internal', '權限檢查失敗');
+    }
+}
+
+/**
  * 接收所有神務服務的報名
  * 使用 onRequest 並手動驗證 platform-bc783 的 ID Token
  */
