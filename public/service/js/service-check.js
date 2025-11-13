@@ -90,11 +90,20 @@ export function showServiceClosedAlert(config) {
     alertBox.appendChild(button);
     overlay.appendChild(alertBox);
     document.body.insertBefore(overlay, document.body.firstChild);
+    
+    // 確保按鈕不被 disableAllFormInputs 禁用
+    button.disabled = false;
+    button.style.opacity = '1';
+    button.style.cursor = 'pointer';
 }
 
 export function disableAllFormInputs() {
     const inputs = document.querySelectorAll('input, select, textarea, button');
     inputs.forEach(input => {
+        // 不禁用通知視窗內的按鈕
+        if (input.closest('#serviceClosedOverlay')) {
+            return;
+        }
         input.disabled = true;
         input.style.opacity = '0.5';
         input.style.cursor = 'not-allowed';
