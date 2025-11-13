@@ -11,7 +11,9 @@ const serviceNames = {
     qj: '秋祭法會',
     ftp: '福田_信眾個人',
     ftc: '福田_企業團體',
-    fty: '福田_Youth 會'
+    fty: '福田_Youth 會',
+    bg: '建宮廟款',
+    xy: '添香油'
 };
 
 async function callAPI(endpoint, data = null) {
@@ -79,7 +81,7 @@ function formatDate(timestamp) {
 function renderServiceTable(configs) {
     const tableContainer = document.getElementById('serviceConfigTable');
     
-    const serviceTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj', 'ftp', 'ftc', 'fty'];
+    const serviceTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj', 'ftp', 'ftc', 'fty', 'bg', 'xy'];
     
     let html = `
         <table class="manage-table">
