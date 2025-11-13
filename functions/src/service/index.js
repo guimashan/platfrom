@@ -590,6 +590,12 @@ exports.deleteOrder = onRequest({
     cors: true
 }, async (req, res) => {
     try {
+        // 處理 CORS preflight 請求
+        if (req.method === 'OPTIONS') {
+            res.status(204).send('');
+            return;
+        }
+        
         if (req.method !== 'POST') {
             res.status(405).json({ error: { message: '只接受 POST 請求' } });
             return;
