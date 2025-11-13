@@ -1,4 +1,5 @@
 import { handleLineLogin } from '/js/auth.js';
+import { showError, showWarning } from '/js/notification.js';
 
 // -----------------------------------------
 // QJ.js - 重構為動態載入模式
@@ -56,7 +57,7 @@ export async function init() {
 
         // 2. 檢查登入狀態 (這是非同步的)
         if (!platformAuth) {
-            alert("Firebase Auth 載入失敗。");
+            showError("Firebase Auth 載入失敗。");
             return;
         }
 
@@ -433,7 +434,7 @@ export async function init() {
         // 報名者驗證
         const cards = applicantCardListEl.querySelectorAll('.applicant-card');
         if (cards.length === 0) {
-            alert('請至少新增一位報名者');
+            showWarning('請至少新增一位報名者');
             return false;
         }
 
@@ -446,7 +447,7 @@ export async function init() {
             }
         });
         if (!hasCheckedService) {
-            alert('請至少選擇一項服務');
+            showWarning('請至少選擇一項服務');
             return false;
         }
 
@@ -477,19 +478,19 @@ export async function init() {
         const cardCVV = cardCVVEl.value;
 
         if (!cardHolderNameEl.value.trim()) {
-            alert('請填寫持卡人姓名');
+            showWarning('請填寫持卡人姓名');
             cardHolderNameEl.focus();
             return false;
         }
 
         if (cardNumber.length !== 16) {
-            alert('請輸入有效的 16 碼信用卡號');
+            showWarning('請輸入有效的 16 碼信用卡號');
             cardNumberEl.focus();
             return false;
         }
 
         if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-            alert('請輸入有效的有效期限（格式：MM/YY）');
+            showWarning('請輸入有效的有效期限（格式：MM/YY）');
             cardExpiryEl.focus();
             return false;
         }
@@ -499,13 +500,13 @@ export async function init() {
         const now = new Date();
         const expiry = new Date(2000 + year, month - 1);
         if (expiry < now) {
-            alert('此信用卡已過期');
+            showWarning('此信用卡已過期');
             cardExpiryEl.focus();
             return false;
         }
 
         if (cardCVV.length !== 3) {
-            alert('請輸入有效的 3 碼 CVV');
+            showWarning('請輸入有效的 3 碼 CVV');
             cardCVVEl.focus();
             return false;
         }
@@ -516,7 +517,7 @@ export async function init() {
     // --- 處理表單送出 ---
     async function handleSubmit() {
         if (!currentUser) {
-            alert("您似乎尚未登入，請重新整理頁面。");
+            showWarning("您似乎尚未登入，請重新整理頁面。");
             return;
         }
 
@@ -611,7 +612,7 @@ export async function init() {
 
         } catch (error) {
             console.error("報名失敗:", error);
-            alert(`報名失敗：${error.message}`);
+            showError(`報名失敗：${error.message}`);
         } finally {
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';

@@ -1,4 +1,5 @@
 import { handleLineLogin } from '/js/auth.js';
+import { showError, showWarning } from '/js/notification.js';
 
 // -----------------------------------------
 // ND.js - 重構為動態載入模式
@@ -56,7 +57,7 @@ export async function init() {
 
         // 2. 檢查登入狀態
         if (!platformAuth) {
-            alert("Firebase Auth 載入失敗。");
+            showError("Firebase Auth 載入失敗。");
             return;
         }
 
@@ -571,7 +572,7 @@ export async function init() {
      */
     async function handleSubmit() {
         if (!currentUser) {
-            alert("您似乎尚未登入，請重新整理頁面。");
+            showWarning("您似乎尚未登入，請重新整理頁面。");
             return;
         }
     
@@ -625,7 +626,7 @@ export async function init() {
             const cards = applicantCardListEl.querySelectorAll('.applicant-card');
         
             if (cards.length === 0) {
-                alert('請至少新增一位報名者');
+                showWarning('請至少新增一位報名者');
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
                 return;
@@ -800,7 +801,7 @@ export async function init() {
         
         } catch (error) {
             console.error("報名失敗:", error);
-            alert(`報名失敗：${error.message}`);
+            showError(`報名失敗：${error.message}`);
         } finally {
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';

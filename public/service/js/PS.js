@@ -1,4 +1,5 @@
 import { handleLineLogin } from '/js/auth.js';
+import { showError, showWarning } from '/js/notification.js';
 
 // -----------------------------------------
 // PS.js - 重構為動態載入模式
@@ -54,7 +55,7 @@ export async function init() {
 
         // 2. 檢查登入狀態
         if (!platformAuth) {
-            alert("Firebase Auth 載入失敗。");
+            showError("Firebase Auth 載入失敗。");
             return;
         }
 
@@ -324,7 +325,7 @@ export async function init() {
     // --- 處理表單送出 ---
     async function handleSubmit() {
         if (!currentUser) {
-            alert("您似乎尚未登入，請重新整理頁面。");
+            showWarning("您似乎尚未登入，請重新整理頁面。");
             return;
         }
     
@@ -367,7 +368,7 @@ export async function init() {
             // 2. 驗證報名者與功德金額
             const cards = applicantCardListEl.querySelectorAll('.applicant-card');
             if (cards.length === 0) {
-                alert('請至少新增一位報名者');
+                showWarning('請至少新增一位報名者');
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
                 return;
@@ -393,7 +394,7 @@ export async function init() {
             }
 
             if (!hasAmount) {
-                alert('請至少填寫一項功德金額');
+                showWarning('請至少填寫一項功德金額');
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
                 return;
@@ -405,7 +406,7 @@ export async function init() {
             const cardCVV = cardCVVEl.value;
 
             if (!cardHolderNameEl.value.trim()) {
-                alert('請填寫持卡人姓名');
+                showWarning('請填寫持卡人姓名');
                 cardHolderNameEl.focus();
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
@@ -413,7 +414,7 @@ export async function init() {
             }
 
             if (cardNumber.length !== 16) {
-                alert('請輸入有效的 16 碼信用卡號');
+                showWarning('請輸入有效的 16 碼信用卡號');
                 cardNumberEl.focus();
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
@@ -421,7 +422,7 @@ export async function init() {
             }
 
             if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
-                alert('請輸入有效的有效期限（格式：MM/YY）');
+                showWarning('請輸入有效的有效期限（格式：MM/YY）');
                 cardExpiryEl.focus();
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
@@ -432,7 +433,7 @@ export async function init() {
             const now = new Date();
             const expiry = new Date(2000 + year, month - 1);
             if (expiry < now) {
-                alert('此信用卡已過期');
+                showWarning('此信用卡已過期');
                 cardExpiryEl.focus();
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
@@ -440,7 +441,7 @@ export async function init() {
             }
 
             if (cardCVV.length !== 3) {
-                alert('請輸入有效的 3 碼 CVV');
+                showWarning('請輸入有效的 3 碼 CVV');
                 cardCVVEl.focus();
                 submitBtnEl.disabled = false;
                 submitBtnEl.textContent = '確認報名並送出';
@@ -526,7 +527,7 @@ export async function init() {
 
         } catch (error) {
             console.error("報名失敗:", error);
-            alert(`報名失敗: ${error.message}`);
+            showError(`報名失敗: ${error.message}`);
             submitBtnEl.disabled = false;
             submitBtnEl.textContent = '確認報名並送出';
         }
