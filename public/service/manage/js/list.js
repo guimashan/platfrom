@@ -133,9 +133,15 @@ function renderServiceTable(configs) {
                            style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
                 </td>
                 <td>
-                    <input type="text" id="message-${type}" value="${config.closedMessage || ''}" 
-                           placeholder="預計 3 月開放" 
-                           style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                        <input type="text" id="message-${type}" value="${config.closedMessage || ''}" 
+                               placeholder="預計 3 月開放" 
+                               style="flex: 1; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
+                        <button id="confirmMsg-${type}" 
+                                style="padding: 0.4rem 0.8rem; background: #8A2BE2; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 0.9rem;">
+                            確認
+                        </button>
+                    </div>
                 </td>
                 <td>
                     <label class="toggle-switch">
@@ -294,7 +300,17 @@ function renderServiceTable(configs) {
         const startDateInput = document.getElementById(`startDate-${type}`);
         const endDateInput = document.getElementById(`endDate-${type}`);
         const messageInput = document.getElementById(`message-${type}`);
+        const confirmMsgBtn = document.getElementById(`confirmMsg-${type}`);
         const displayStatus = document.getElementById(`displayStatus-${type}`);
+        
+        const updateConfirmButton = () => {
+            const hasContent = messageInput.value.trim().length > 0;
+            confirmMsgBtn.disabled = !hasContent;
+            confirmMsgBtn.style.opacity = hasContent ? '1' : '0.5';
+            confirmMsgBtn.style.cursor = hasContent ? 'pointer' : 'not-allowed';
+        };
+        
+        updateConfirmButton();
         
         checkbox.addEventListener('change', (e) => {
             const isOpen = e.target.checked;
@@ -308,7 +324,14 @@ function renderServiceTable(configs) {
         
         startDateInput.addEventListener('change', () => autoSave(type, false));
         endDateInput.addEventListener('change', () => autoSave(type, false));
-        messageInput.addEventListener('input', () => autoSave(type, false));
+        
+        messageInput.addEventListener('input', updateConfirmButton);
+        
+        confirmMsgBtn.addEventListener('click', () => {
+            if (messageInput.value.trim().length > 0 || messageInput.value === '') {
+                autoSave(type, true);
+            }
+        });
     });
 }
 
