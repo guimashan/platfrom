@@ -837,16 +837,8 @@ exports.cleanupOldOrders = onRequest({
 
         const uid = decodedToken.uid;
         
-        // 從 platform DB 獲取用戶資料
-        const userDoc = await platformDb.collection('users').doc(uid).get();
-        
-        if (!userDoc.exists) {
-            res.status(404).json({ error: { message: '找不到使用者資料' } });
-            return;
-        }
-        
-        const userData = userDoc.data();
-        const userRoles = userData.roles || [];
+        // 從 JWT token 的 custom claims 中取得角色（避免跨專案查詢）
+        const userRoles = decodedToken.roles || [];
         
         console.log('檢查權限 - UID:', uid, '角色:', userRoles);
         
