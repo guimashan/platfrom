@@ -1,6 +1,7 @@
 # 龜馬山整合服務平台 - 系統文檔
 
 **最近更新**: 2025-11-13
+- **新增服務開放時間管理系統** - 管理員可設定 6 個服務的開放/關閉狀態、開放時間、關閉訊息；用戶訪問關閉的服務時會看到友善提示並無法提交表單
 - **新增 superadmin 刪除訂單功能** - 允許 superadmin 刪除測試訂單，包含審計日誌記錄和安全權限檢查
 - **修復訂單管理頁面初始化問題** - 將 orders.js 改為導出 init 函數，修復頁面卡在「驗證中...」的問題
 - **修復神務服務儀表板 API 調用錯誤** - 添加正確的 Cloud Functions URL 配置
@@ -93,20 +94,37 @@ https://go.guimashan.org.tw
 
 ### 3. 神務服務系統 (Service)
 **功能：**
-- 法會報名（龜馬山一點靈、年斗、禮斗）
+- 法會報名（6 個服務：DD, ND, LD, ZY, PS, QJ）
 - 訂單管理
 - 付款確認
+- **服務開放時間管理**（2025-11-13 新增）
 
 **主要頁面：**
+- `/service/service.html` - 服務列表頁面（顯示服務狀態）
 - `/service/DD.html` - 龜馬山一點靈報名
 - `/service/ND.html` - 年斗法會報名
 - `/service/LD.html` - 禮斗法會報名
-- `/service/orders.html` - 訂單查詢
+- `/service/ZY.html` - 中元法會報名
+- `/service/PS.html` - 普施法會報名
+- `/service/QJ.html` - 秋祭法會報名
+- `/service/manage/orders.html` - 訂單管理
+- `/service/manage/list.html` - **表單設定管理**（2025-11-13 新增）
+
+**服務開放時間管理系統（2025-11-13）：**
+- 管理員可設定每個服務的開放/關閉狀態
+- 可設定開始/結束日期（自動化開放排程）
+- 可自訂服務關閉時的提示訊息
+- 用戶訪問關閉的服務時：
+  - service.html：點擊時彈出提示，不跳轉頁面
+  - 表單頁面：顯示大型警告框，禁用所有輸入和按鈕，不載入模組
 
 **Cloud Functions：**
 - `submitRegistration` - 提交報名表單
 - `getRegistrations` - 取得訂單列表
 - `confirmPayment` - 確認付款
+- `deleteOrder` - 刪除訂單（superadmin 專用）
+- `getServiceConfigs` - 獲取所有服務配置（公開 API）
+- `updateServiceConfig` - 更新服務配置（需權限：admin_service/poweruser_service/superadmin）
 
 ### 4. 權限管理 (Platform)
 **角色系統架構（2025-11-12 標準化）：**
