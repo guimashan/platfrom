@@ -403,16 +403,14 @@
     </div>
 
     <script type="module">
-        import { checkAdminAuth, logout } from '/js/auth-guard.js';
+        import { checkAdminAuth } from '/js/auth-guard.js';
 
         // 檢查管理員權限（只有神務管理員、神務幹部、超級管理員可進入）
-        checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin']).then((result) => {
-            console.log('✅ [訂單管理] 管理員認證成功');
-            
+        checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin']).then(async (result) => {
             if (result.authenticated) {
-                document.getElementById('logoutBtn').addEventListener('click', logout);
-                
-                import('/service/manage/js/orders.js');
+                console.log('✅ [訂單管理] 管理員認證成功');
+                const ordersModule = await import('/service/manage/js/orders.js');
+                await ordersModule.init();
             }
         });
     </script>

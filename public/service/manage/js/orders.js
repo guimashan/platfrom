@@ -1,4 +1,5 @@
 import { platformAuth } from '/js/firebase-init.js';
+import { logout } from '/js/auth.js';
 
 let currentUser = null;
 let allOrders = [];
@@ -129,9 +130,29 @@ function loadLunarLibrary() {
     });
 }
 
-(async function init() {
+export async function init() {
     try {
         currentUser = platformAuth.currentUser;
+        
+        if (!currentUser) {
+            console.error('無法取得用戶資訊');
+            window.location.href = '/';
+            return;
+        }
+        
+        // 隱藏登入提示，顯示主內容
+        const loginPrompt = document.getElementById('loginPrompt');
+        const mainApp = document.getElementById('mainApp');
+        
+        if (loginPrompt) {
+            loginPrompt.style.display = 'none';
+        }
+        if (mainApp) {
+            mainApp.style.display = 'block';
+        }
+        
+        // 綁定登出按鈕
+        document.getElementById('logoutBtn').addEventListener('click', logout);
         
         document.getElementById('filterServiceType').addEventListener('change', applyFilters);
         document.getElementById('filterStatus').addEventListener('change', applyFilters);
@@ -143,7 +164,7 @@ function loadLunarLibrary() {
         console.error('初始化失敗:', error);
         alert('載入失敗: ' + error.message);
     }
-})();
+}
 
 async function loadOrders() {
     try {
