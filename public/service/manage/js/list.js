@@ -142,11 +142,8 @@ function renderServiceTable(configs) {
                         <input type="checkbox" id="status-${type}" ${config.isOpen ? 'checked' : ''}>
                         <span class="toggle-slider"></span>
                     </label>
-                    <span id="statusText-${type}" style="margin-left: 10px; font-size: 0.85rem; color: #666;">
+                    <span id="displayStatus-${type}" style="font-weight: bold; padding: 0.4rem 0.8rem; border-radius: 6px; display: inline-block; margin-left: 10px; ${config.isOpen ? 'color: #4CAF50; background: #E8F5E9;' : 'color: #E74C3C; background: #FFEBEE;'}">
                         ${config.isOpen ? '開放中' : '已關閉'}
-                    </span>
-                    <span id="displayStatus-${type}" style="font-weight: bold; padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block; margin-left: 10px; font-size: 0.85rem; ${config.isOpen ? 'color: #4CAF50; background: #E8F5E9;' : 'color: #E74C3C; background: #FFEBEE;'}">
-                        ${config.isOpen ? 'Open' : 'Closed'}
                     </span>
                 </td>
             </tr>
@@ -219,7 +216,6 @@ function renderServiceTable(configs) {
         const startDateInput = document.getElementById(`startDate-${serviceType}`);
         const endDateInput = document.getElementById(`endDate-${serviceType}`);
         const messageInput = document.getElementById(`message-${serviceType}`);
-        const statusText = document.getElementById(`statusText-${serviceType}`);
         const displayStatus = document.getElementById(`displayStatus-${serviceType}`);
         
         checkbox.checked = lastConfig.isOpen;
@@ -227,8 +223,7 @@ function renderServiceTable(configs) {
         endDateInput.value = formatDate(lastConfig.endDate);
         messageInput.value = lastConfig.closedMessage || '';
         
-        statusText.textContent = lastConfig.isOpen ? '開放中' : '已關閉';
-        displayStatus.textContent = lastConfig.isOpen ? 'Open' : 'Closed';
+        displayStatus.textContent = lastConfig.isOpen ? '開放中' : '已關閉';
         displayStatus.style.color = lastConfig.isOpen ? '#4CAF50' : '#E74C3C';
         displayStatus.style.background = lastConfig.isOpen ? '#E8F5E9' : '#FFEBEE';
     };
@@ -299,14 +294,12 @@ function renderServiceTable(configs) {
         const startDateInput = document.getElementById(`startDate-${type}`);
         const endDateInput = document.getElementById(`endDate-${type}`);
         const messageInput = document.getElementById(`message-${type}`);
-        const statusText = document.getElementById(`statusText-${type}`);
         const displayStatus = document.getElementById(`displayStatus-${type}`);
         
         checkbox.addEventListener('change', (e) => {
             const isOpen = e.target.checked;
-            statusText.textContent = isOpen ? '開放中' : '已關閉';
             
-            displayStatus.textContent = isOpen ? 'Open' : 'Closed';
+            displayStatus.textContent = isOpen ? '開放中' : '已關閉';
             displayStatus.style.color = isOpen ? '#4CAF50' : '#E74C3C';
             displayStatus.style.background = isOpen ? '#E8F5E9' : '#FFEBEE';
             
