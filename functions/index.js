@@ -48,6 +48,7 @@ if (!PROJECT_ID || PROJECT_ID === 'service-b9d4a') {
   exports.getRegistrationDetail = serviceFunctions.getRegistrationDetail;
   exports.getPublicOrderDetail = serviceFunctions.getPublicOrderDetail;
   exports.confirmPayment = serviceFunctions.confirmPayment;
+  exports.deleteOrder = serviceFunctions.deleteOrder;
 }
 
 // === Schedule 專案 (schedule-48ff9) ===

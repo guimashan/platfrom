@@ -7,6 +7,7 @@ const { onCall, onRequest, HttpsError } = require("firebase-functions/v2/https")
 const { initializeApp, getApps, getApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
+const cors = require("cors")({ origin: true });
 
 if (!getApps().length) {
     initializeApp();
@@ -588,29 +589,18 @@ exports.confirmPayment = onRequest({
 exports.deleteOrder = onRequest({ 
     region: 'asia-east2'
 }, async (req, res) => {
-    // 手動設置 CORS 響應頭
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
-    res.set('Access-Control-Max-Age', '3600');
-    
-    try {
-        // 處理 CORS preflight 請求
-        if (req.method === 'OPTIONS') {
-            res.status(204).send('');
-            return;
-        }
-        
-        if (req.method !== 'POST') {
-            res.status(405).json({ error: { message: '只接受 POST 請求' } });
-            return;
-        }
+    return cors(req, res, async () => {
+        try {
+            if (req.method !== 'POST') {
+                res.status(405).json({ error: { message: '只接受 POST 請求' } });
+                return;
+            }
 
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            res.status(401).json({ error: { message: '缺少認證 token' } });
-            return;
-        }
+            const authHeader = req.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                res.status(401).json({ error: { message: '缺少認證 token' } });
+                return;
+            }
 
         const idToken = authHeader.split('Bearer ')[1];
         let decodedToken;
@@ -676,15 +666,16 @@ exports.deleteOrder = onRequest({
         console.log(`✅ [刪除訂單] 訂單 ${orderId} 已由 superadmin ${uid} 刪除，原因: ${reason || '未提供'}`);
         res.status(200).json({ result: { success: true } });
 
-    } catch (error) {
-        console.error('刪除訂單失敗:', error);
-        
-        // 處理權限錯誤
-        if (error instanceof HttpsError && error.code === 'permission-denied') {
-            res.status(403).json({ error: { message: error.message } });
-            return;
+        } catch (error) {
+            console.error('刪除訂單失敗:', error);
+            
+            // 處理權限錯誤
+            if (error instanceof HttpsError && error.code === 'permission-denied') {
+                res.status(403).json({ error: { message: error.message } });
+                return;
+            }
+            
+            res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
         }
-        
-        res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
-    }
+    });
 });
