@@ -264,11 +264,20 @@
     <script src="../lib/lunar.js" defer></script>
     <script type="module">
         import { checkAuthWithUI } from '/js/auth-guard.js';
+        import { checkServiceAvailability, showServiceClosedAlert, disableAllFormInputs } from '/service/js/service-check.js';
         
         let moduleLoaded = false;
 
         async function loadModule() {
             if (!moduleLoaded) {
+                // 檢查服務是否開放
+                const serviceConfig = await checkServiceAvailability('ftp');
+                if (!serviceConfig.isOpen) {
+                    showServiceClosedAlert(serviceConfig);
+                    disableAllFormInputs();
+                    return;
+                }
+                
                 const module = await import('/service/js/FTP.js');
                 await module.init();
                 moduleLoaded = true;
