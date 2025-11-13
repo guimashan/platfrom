@@ -241,7 +241,7 @@
                 // 檢查服務是否開放
                 const serviceConfig = await checkServiceAvailability('ftc');
                 if (!serviceConfig.isOpen) {
-                    showServiceClosedAlert(serviceConfig);
+                    showServiceClosedAlert(serviceConfig, 'ftc');
                     disableAllFormInputs();
                     return;
                 }

@@ -23,7 +23,7 @@ export async function checkServiceAvailability(serviceType) {
     }
 }
 
-export function showServiceClosedAlert(config) {
+export function showServiceClosedAlert(config, serviceType = '') {
     const overlay = document.createElement('div');
     overlay.id = 'serviceClosedOverlay';
     overlay.style.cssText = `
@@ -69,6 +69,10 @@ export function showServiceClosedAlert(config) {
         message.textContent = '敬請期待開放時間';
     }
     
+    // 判斷返回路徑：福田會服務返回 ft.html，其他返回 service.html
+    const isFutianService = ['ftp', 'ftc', 'fty'].includes(serviceType.toLowerCase());
+    const backUrl = isFutianService ? '/service/ft.html' : '/service/service.html';
+    
     const button = document.createElement('button');
     button.style.cssText = `
         background: #8A2BE2;
@@ -81,7 +85,7 @@ export function showServiceClosedAlert(config) {
     `;
     button.textContent = '返回服務列表';
     button.onclick = () => {
-        window.location.href = '/service/service.html';
+        window.location.href = backUrl;
     };
     
     alertBox.appendChild(icon);

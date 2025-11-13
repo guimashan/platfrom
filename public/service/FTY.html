@@ -300,7 +300,7 @@
                 // 檢查服務是否開放
                 const serviceConfig = await checkServiceAvailability('fty');
                 if (!serviceConfig.isOpen) {
-                    showServiceClosedAlert(serviceConfig);
+                    showServiceClosedAlert(serviceConfig, 'fty');
                     disableAllFormInputs();
                     return;
                 }
