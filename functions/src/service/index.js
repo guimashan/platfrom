@@ -799,3 +799,115 @@ exports.updateServiceConfig = onRequest({
         }
     });
 });
+
+/**
+ * 清理舊格式訂單（管理員專用）
+ * 刪除所有 serviceType 不是標準縮寫的訂單
+ */
+exports.cleanupOldOrders = onRequest({ 
+    region: 'asia-east2'
+}, async (req, res) => {
+    return cors(req, res, async () => {
+        try {
+            // 驗證管理員權限
+            const authHeader = req.headers.authorization;
+            if (!authHeader || !authHeader.startsWith('Bearer ')) {
+                res.status(401).json({ error: { message: '缺少認證 token' } });
+                return;
+            }
+
+            const idToken = authHeader.split('Bearer ')[1];
+            let decodedToken;
+            try {
+                decodedToken = await platformAuth.verifyIdToken(idToken);
+            } catch (error) {
+                console.error('Token 驗證失敗:', error);
+                res.status(401).json({ error: { message: '認證失敗' } });
+                return;
+            }
+            
+            // 檢查權限
+            await checkServicePermission(decodedToken);
+
+            // 標準的 11 個服務類型
+            const VALID_SERVICE_TYPES = [
+                'dd',   // 龜馬山一點靈
+                'nd',   // 年斗法會
+                'ld',   // 禮斗法會
+                'zy',   // 中元法會
+                'ps',   // 普施法會
+                'qj',   // 秋祭法會
+                'bg',   // 建宮廟款
+                'xy',   // 添香油
+                'ftp',  // 福田_信眾個人
+                'ftc',  // 福田_企業團體
+                'fty'   // 福田_Youth 會
+            ];
+
+            console.log('🔍 開始查詢舊格式訂單...');
+            
+            // 獲取所有訂單
+            const snapshot = await db.collection('registrations').get();
+            
+            console.log(`📊 總共找到 ${snapshot.size} 筆訂單`);
+            
+            let deleteCount = 0;
+            let validCount = 0;
+            const oldServiceTypes = [];
+            const deletedOrders = [];
+            
+            // 檢查每筆訂單
+            const deletePromises = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                const serviceType = data.serviceType;
+                
+                // 如果 serviceType 不在標準列表中
+                if (!VALID_SERVICE_TYPES.includes(serviceType)) {
+                    if (!oldServiceTypes.includes(serviceType)) {
+                        oldServiceTypes.push(serviceType);
+                    }
+                    deletedOrders.push({
+                        id: doc.id,
+                        serviceType: serviceType,
+                        orderId: data.orderId || 'N/A'
+                    });
+                    deletePromises.push(doc.ref.delete());
+                    deleteCount++;
+                    
+                    console.log(`❌ 刪除: ${doc.id} (serviceType: ${serviceType}, orderId: ${data.orderId})`);
+                } else {
+                    validCount++;
+                }
+            });
+            
+            // 執行刪除
+            await Promise.all(deletePromises);
+            
+            const result = {
+                success: true,
+                summary: {
+                    totalOrders: snapshot.size,
+                    validOrders: validCount,
+                    deletedOrders: deleteCount,
+                    oldServiceTypes: oldServiceTypes
+                },
+                deletedDetails: deletedOrders
+            };
+            
+            console.log('✅ 清理完成:', result.summary);
+            
+            res.status(200).json({ result });
+            
+        } catch (error) {
+            console.error('清理失敗:', error);
+            
+            if (error instanceof HttpsError && error.code === 'permission-denied') {
+                res.status(403).json({ error: { message: error.message } });
+                return;
+            }
+            
+            res.status(500).json({ error: { message: error.message || '伺服器錯誤' } });
+        }
+    });
+});

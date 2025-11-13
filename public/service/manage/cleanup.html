@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>清理舊訂單 - 神務服務管理</title>
+    <link rel="stylesheet" href="../../styles/common.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .cleanup-container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .warning-box ul {
+            margin: 10px 0;
+            padding-left: 30px;
+            color: #856404;
+        }
+        
+        .warning-box li {
+            margin: 8px 0;
+        }
+        
+        .valid-types {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .valid-types h3 {
+            color: #155724;
+            margin-top: 0;
+        }
+        
+        .valid-types .type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .type-item {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #155724;
+        }
+        
+        .type-code {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-cleanup {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-cleanup:hover:not(:disabled) {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+        }
+        
+        .btn-back {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background: #5a6268;
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .result-box.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result-box.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result-details {
+            margin-top: 15px;
+            padding: 20px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .progress-text {
+            color: #667eea;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="cleanup-container">
+        <h1>🗑️ 清理舊格式訂單</h1>
+        
+        <div class="warning-box">
+            <h3>⚠️ 警告：此操作不可逆</h3>
+            <p><strong>此功能將永久刪除所有不符合標準格式的訂單資料：</strong></p>
+            <ul>
+                <li>所有 serviceType 不在下方「標準格式」列表中的訂單將被刪除</li>
+                <li>包含舊的拼音格式（如 xiangyou, lidou 等）的訂單</li>
+                <li>刪除後<strong>無法復原</strong></li>
+                <li>建議先在 Firebase Console 確認這些是測試資料</li>
+            </ul>
+        </div>
+        
+        <div class="valid-types">
+            <h3>✅ 標準格式（將保留）</h3>
+            <div class="type-grid">
+                <div class="type-item"><span class="type-code">dd</span> - 龜馬山一點靈</div>
+                <div class="type-item"><span class="type-code">nd</span> - 年斗法會</div>
+                <div class="type-item"><span class="type-code">ld</span> - 禮斗法會</div>
+                <div class="type-item"><span class="type-code">zy</span> - 中元法會</div>
+                <div class="type-item"><span class="type-code">ps</span> - 普施法會</div>
+                <div class="type-item"><span class="type-code">qj</span> - 秋祭法會</div>
+                <div class="type-item"><span class="type-code">bg</span> - 建宮廟款</div>
+                <div class="type-item"><span class="type-code">xy</span> - 添香油</div>
+                <div class="type-item"><span class="type-code">ftp</span> - 福田_信眾個人</div>
+                <div class="type-item"><span class="type-code">ftc</span> - 福田_企業團體</div>
+                <div class="type-item"><span class="type-code">fty</span> - 福田_Youth 會</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="backBtn" class="btn btn-back">← 返回儀表板</button>
+            <button id="cleanupBtn" class="btn btn-cleanup">執行清理</button>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p class="progress-text">正在清理中，請稍候...</p>
+        </div>
+        
+        <div id="resultBox" class="result-box">
+            <h3 id="resultTitle"></h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js';
+        import { getFirestore, collection, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+
+        // Platform Firebase 配置（用於認證）
+        const platformConfig = {
+            apiKey: "AIzaSyCViTkj-aIMqIp7Ov3Wv7iSKEB5-L96zNA",
+            authDomain: "platform-bc783.firebaseapp.com",
+            projectId: "platform-bc783"
+        };
+
+        // Service Firebase 配置（用於資料）
+        const serviceConfig = {
+            apiKey: "AIzaSyBXOjf0pY7hB31JWaZ3v_zaPx9EIRzzqhY",
+            authDomain: "service-b9d4a.firebaseapp.com",
+            projectId: "service-b9d4a"
+        };
+
+        const platformApp = initializeApp(platformConfig);
+        const platformAuth = getAuth(platformApp);
+        
+        const serviceApp = initializeApp(serviceConfig, 'service');
+        const serviceDb = getFirestore(serviceApp);
+
+        let currentUser = null;
+
+        // 標準的 11 個服務類型
+        const VALID_SERVICE_TYPES = [
+            'dd', 'nd', 'ld', 'zy', 'ps', 'qj',
+            'bg', 'xy', 'ftp', 'ftc', 'fty'
+        ];
+
+        onAuthStateChanged(platformAuth, (user) => {
+            if (user) {
+                currentUser = user;
+            } else {
+                alert('請先登入');
+                window.location.href = '/platform/login.html';
+            }
+        });
+
+        document.getElementById('backBtn').addEventListener('click', () => {
+            window.location.href = '/service/manage/dashboard.html';
+        });
+
+        document.getElementById('cleanupBtn').addEventListener('click', async () => {
+            if (!currentUser) {
+                alert('請先登入');
+                return;
+            }
+
+            if (!confirm('⚠️ 確定要執行清理嗎？\n\n此操作將永久刪除所有舊格式的訂單資料，無法復原！')) {
+                return;
+            }
+            
+            if (!confirm('🔴 最後確認：\n\n這將刪除所有 serviceType 不是標準縮寫的訂單。\n\n確定繼續嗎？')) {
+                return;
+            }
+
+            const cleanupBtn = document.getElementById('cleanupBtn');
+            const loading = document.getElementById('loading');
+            const resultBox = document.getElementById('resultBox');
+            
+            cleanupBtn.disabled = true;
+            loading.style.display = 'block';
+            resultBox.style.display = 'none';
+
+            try {
+                console.log('🔍 開始查詢所有訂單...');
+                
+                // 獲取所有訂單
+                const registrationsRef = collection(serviceDb, 'registrations');
+                const snapshot = await getDocs(registrationsRef);
+                
+                console.log(`📊 總共找到 ${snapshot.size} 筆訂單`);
+                
+                let deleteCount = 0;
+                let validCount = 0;
+                const oldServiceTypes = new Set();
+                const deletedOrders = [];
+                
+                // 檢查並刪除舊格式訂單
+                for (const docSnapshot of snapshot.docs) {
+                    const data = docSnapshot.data();
+                    const serviceType = data.serviceType;
+                    
+                    // 如果 serviceType 不在標準列表中
+                    if (!VALID_SERVICE_TYPES.includes(serviceType)) {
+                        oldServiceTypes.add(serviceType);
+                        deletedOrders.push({
+                            id: docSnapshot.id,
+                            serviceType: serviceType,
+                            orderId: data.orderId || 'N/A'
+                        });
+                        
+                        // 刪除訂單
+                        await deleteDoc(doc(serviceDb, 'registrations', docSnapshot.id));
+                        deleteCount++;
+                        
+                        console.log(`❌ 已刪除: ${docSnapshot.id} (serviceType: ${serviceType})`);
+                    } else {
+                        validCount++;
+                    }
+                }
+                
+                // 顯示成功結果
+                resultBox.className = 'result-box success';
+                resultBox.style.display = 'block';
+                document.getElementById('resultTitle').textContent = '✅ 清理完成！';
+                
+                let content = `
+                    <div class="result-details">
+                        <strong>清理摘要：</strong><br>
+                        ━━━━━━━━━━━━━━━━━━━━━━<br>
+                        總訂單數：${snapshot.size} 筆<br>
+                        ✅ 保留訂單：${validCount} 筆<br>
+                        ❌ 刪除訂單：${deleteCount} 筆<br>
+                        <br>
+                        <strong>發現的舊格式 serviceType：</strong><br>
+                        ${oldServiceTypes.size > 0 ? Array.from(oldServiceTypes).map(t => `  • ${t}`).join('<br>') : '  無'}
+                `;
+                
+                if (deletedOrders.length > 0) {
+                    content += `<br><br><strong>已刪除的訂單明細：</strong><br>`;
+                    deletedOrders.forEach(order => {
+                        content += `  • ${order.orderId} (${order.serviceType})<br>`;
+                    });
+                }
+                
+                content += `<br>━━━━━━━━━━━━━━━━━━━━━━</div>`;
+                
+                document.getElementById('resultContent').innerHTML = content;
+                
+                console.log('✅ 清理成功完成');
+
+            } catch (error) {
+                console.error('清理失敗:', error);
+                resultBox.className = 'result-box error';
+                resultBox.style.display = 'block';
+                document.getElementById('resultTitle').textContent = '❌ 清理失敗';
+                document.getElementById('resultContent').innerHTML = `
+                    <div class="result-details">
+                        <strong>錯誤訊息：</strong><br>
+                        ${error.message}<br>
+                        <br>
+                        請檢查：<br>
+                        • 是否有管理員權限<br>
+                        • 網路連線是否正常<br>
+                        • Firebase 服務是否正常
+                    </div>
+                `;
+            } finally {
+                loading.style.display = 'none';
+                cleanupBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
