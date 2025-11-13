@@ -586,9 +586,14 @@ exports.confirmPayment = onRequest({
  * 用於刪除測試訂單，避免過多測試數據
  */
 exports.deleteOrder = onRequest({ 
-    region: 'asia-east2',
-    cors: true
+    region: 'asia-east2'
 }, async (req, res) => {
+    // 手動設置 CORS 響應頭
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+    
     try {
         // 處理 CORS preflight 請求
         if (req.method === 'OPTIONS') {
