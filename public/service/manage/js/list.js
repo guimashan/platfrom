@@ -105,6 +105,7 @@ function renderServiceTable(configs) {
                     <th style="width: 150px;">開始日期</th>
                     <th style="width: 150px;">結束日期</th>
                     <th style="width: 200px;">關閉提示訊息</th>
+                    <th style="width: 80px;">操作</th>
                     <th style="width: 200px;">開放狀態</th>
                 </tr>
             </thead>
@@ -133,15 +134,15 @@ function renderServiceTable(configs) {
                            style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
                 </td>
                 <td>
-                    <div style="display: flex; gap: 0.5rem; align-items: center;">
-                        <input type="text" id="message-${type}" value="${config.closedMessage || ''}" 
-                               placeholder="預計 3 月開放" 
-                               style="flex: 1; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <button id="confirmMsg-${type}" 
-                                style="padding: 0.4rem 0.8rem; background: #8A2BE2; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 0.9rem;">
-                            確認
-                        </button>
-                    </div>
+                    <input type="text" id="message-${type}" value="${config.closedMessage || ''}" 
+                           placeholder="預計 3 月開放" 
+                           style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
+                </td>
+                <td style="text-align: center;">
+                    <button id="confirmMsg-${type}" 
+                            style="padding: 0.4rem 0.8rem; background: #8A2BE2; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; font-size: 0.9rem;">
+                        確認
+                    </button>
                 </td>
                 <td>
                     <label class="toggle-switch">
@@ -213,6 +214,7 @@ function renderServiceTable(configs) {
     const debounceTimers = {};
     const savingStatus = {};
     const pendingSaves = {};
+    const pendingManualConfirm = {};
     
     const revertToLastSaved = (serviceType) => {
         const lastConfig = lastSavedConfigs[serviceType];
@@ -234,7 +236,7 @@ function renderServiceTable(configs) {
         displayStatus.style.background = lastConfig.isOpen ? '#E8F5E9' : '#FFEBEE';
     };
     
-    const executeSave = async (serviceType) => {
+    const executeSave = async (serviceType, isManualConfirm = false) => {
         try {
             const isOpen = document.getElementById(`status-${serviceType}`).checked;
             const startDate = document.getElementById(`startDate-${serviceType}`).value;
@@ -255,10 +257,14 @@ function renderServiceTable(configs) {
                 ...config
             };
             
-            showSuccess(`${serviceNames[serviceType]} 配置已自動保存`);
+            if (isManualConfirm) {
+                showSuccess(`${serviceNames[serviceType]} 配置保存成功`);
+            } else {
+                showSuccess(`${serviceNames[serviceType]} 配置已自動保存`);
+            }
             
         } catch (error) {
-            console.error('自動保存失敗:', error);
+            console.error('保存失敗:', error);
             showError(`${serviceNames[serviceType]} 保存失敗: ${error.message}`);
             
             revertToLastSaved(serviceType);
@@ -267,13 +273,15 @@ function renderServiceTable(configs) {
             
             if (pendingSaves[serviceType]) {
                 pendingSaves[serviceType] = false;
+                const wasManualConfirm = pendingManualConfirm[serviceType] || false;
+                pendingManualConfirm[serviceType] = false;
                 savingStatus[serviceType] = true;
-                executeSave(serviceType);
+                executeSave(serviceType, wasManualConfirm);
             }
         }
     };
     
-    const autoSave = (serviceType, immediate = false) => {
+    const autoSave = (serviceType, immediate = false, isManualConfirm = false) => {
         if (debounceTimers[serviceType]) {
             clearTimeout(debounceTimers[serviceType]);
         }
@@ -281,11 +289,12 @@ function renderServiceTable(configs) {
         const saveAction = async () => {
             if (savingStatus[serviceType]) {
                 pendingSaves[serviceType] = true;
+                pendingManualConfirm[serviceType] = pendingManualConfirm[serviceType] || isManualConfirm;
                 return;
             }
             
             savingStatus[serviceType] = true;
-            await executeSave(serviceType);
+            await executeSave(serviceType, isManualConfirm);
         };
         
         if (immediate) {
@@ -297,20 +306,8 @@ function renderServiceTable(configs) {
     
     serviceTypes.forEach(type => {
         const checkbox = document.getElementById(`status-${type}`);
-        const startDateInput = document.getElementById(`startDate-${type}`);
-        const endDateInput = document.getElementById(`endDate-${type}`);
-        const messageInput = document.getElementById(`message-${type}`);
         const confirmMsgBtn = document.getElementById(`confirmMsg-${type}`);
         const displayStatus = document.getElementById(`displayStatus-${type}`);
-        
-        const updateConfirmButton = () => {
-            const hasContent = messageInput.value.trim().length > 0;
-            confirmMsgBtn.disabled = !hasContent;
-            confirmMsgBtn.style.opacity = hasContent ? '1' : '0.5';
-            confirmMsgBtn.style.cursor = hasContent ? 'pointer' : 'not-allowed';
-        };
-        
-        updateConfirmButton();
         
         checkbox.addEventListener('change', (e) => {
             const isOpen = e.target.checked;
@@ -319,18 +316,11 @@ function renderServiceTable(configs) {
             displayStatus.style.color = isOpen ? '#4CAF50' : '#E74C3C';
             displayStatus.style.background = isOpen ? '#E8F5E9' : '#FFEBEE';
             
-            autoSave(type, true);
+            autoSave(type, true, false);
         });
         
-        startDateInput.addEventListener('change', () => autoSave(type, false));
-        endDateInput.addEventListener('change', () => autoSave(type, false));
-        
-        messageInput.addEventListener('input', updateConfirmButton);
-        
         confirmMsgBtn.addEventListener('click', () => {
-            if (messageInput.value.trim().length > 0 || messageInput.value === '') {
-                autoSave(type, true);
-            }
+            autoSave(type, true, true);
         });
     });
 }

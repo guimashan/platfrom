@@ -50,7 +50,7 @@
         
         checkAdminAuth(['admin_service', 'poweruser_service', 'superadmin']).then(async (result) => {
             console.log('✅ 表單設定 管理員認證成功');
-            const listModule = await import('/service/manage/js/list.js?v=20251113e');
+            const listModule = await import('/service/manage/js/list.js?v=20251113i');
             await listModule.init();
         });
     </script>
