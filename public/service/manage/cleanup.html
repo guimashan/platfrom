@@ -235,26 +235,8 @@
 
     <script type="module">
         import { checkAdminAuth } from '/js/auth-guard.js';
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js';
-        import { getFirestore, collection, getDocs, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
-
-        // Service Firebase 配置（用於資料）
-        const serviceConfig = {
-            apiKey: "AIzaSyBXOjf0pY7hB31JWaZ3v_zaPx9EIRzzqhY",
-            authDomain: "service-b9d4a.firebaseapp.com",
-            projectId: "service-b9d4a"
-        };
-
-        const serviceApp = initializeApp(serviceConfig, 'service');
-        const serviceDb = getFirestore(serviceApp);
 
         let currentUser = null;
-
-        // 標準的 11 個服務類型
-        const VALID_SERVICE_TYPES = [
-            'dd', 'nd', 'ld', 'zy', 'ps', 'qj',
-            'bg', 'xy', 'ftp', 'ftc', 'fty'
-        ];
 
         // 返回按鈕事件（不需要權限即可返回）
         document.getElementById('backBtn').addEventListener('click', () => {
@@ -313,56 +295,28 @@
             resultBox.style.display = 'none';
 
             try {
-                console.log('🔍 開始查詢所有訂單...');
+                console.log('🔍 開始清理舊訂單...');
                 
-                // 獲取所有訂單
-                const registrationsRef = collection(serviceDb, 'registrations');
-                const snapshot = await getDocs(registrationsRef);
+                // 獲取 ID Token
+                const idToken = await currentUser.getIdToken();
                 
-                console.log(`📊 總共找到 ${snapshot.size} 筆訂單`);
-                
-                let deleteCount = 0;
-                let validCount = 0;
-                let skippedCount = 0;
-                const oldServiceTypes = new Set();
-                const deletedOrders = [];
-                const skippedOrders = [];
-                
-                // 檢查並刪除舊格式訂單
-                for (const docSnapshot of snapshot.docs) {
-                    const data = docSnapshot.data();
-                    const serviceType = data.serviceType;
-                    
-                    // 如果 serviceType 為 null 或 undefined，跳過（需要人工檢查）
-                    if (!serviceType) {
-                        skippedOrders.push({
-                            id: docSnapshot.id,
-                            orderId: data.orderId || 'N/A',
-                            reason: 'serviceType 為空'
-                        });
-                        skippedCount++;
-                        console.log(`⚠️ 跳過: ${docSnapshot.id} (serviceType 為空，需人工檢查)`);
-                        continue;
+                // 調用 Cloud Function API
+                const response = await fetch('https://asia-east2-service-b9d4a.cloudfunctions.net/cleanupOldOrders', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
                     }
-                    
-                    // 如果 serviceType 不在標準列表中
-                    if (!VALID_SERVICE_TYPES.includes(serviceType)) {
-                        oldServiceTypes.add(serviceType);
-                        deletedOrders.push({
-                            id: docSnapshot.id,
-                            serviceType: serviceType,
-                            orderId: data.orderId || 'N/A'
-                        });
-                        
-                        // 刪除訂單
-                        await deleteDoc(doc(serviceDb, 'registrations', docSnapshot.id));
-                        deleteCount++;
-                        
-                        console.log(`❌ 已刪除: ${docSnapshot.id} (serviceType: ${serviceType})`);
-                    } else {
-                        validCount++;
-                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error?.message || '清理失敗');
                 }
+
+                const summary = data.result.summary;
+                const deletedOrders = data.result.deletedDetails || [];
                 
                 // 顯示成功結果
                 resultBox.className = 'result-box success';
@@ -373,13 +327,14 @@
                     <div class="result-details">
                         <strong>清理摘要：</strong><br>
                         ━━━━━━━━━━━━━━━━━━━━━━<br>
-                        總訂單數：${snapshot.size} 筆<br>
-                        ✅ 保留訂單：${validCount} 筆<br>
-                        ❌ 刪除訂單：${deleteCount} 筆<br>
-                        ⚠️  跳過訂單：${skippedCount} 筆 (serviceType 為空，需人工檢查)<br>
+                        總訂單數：${summary.totalOrders} 筆<br>
+                        ✅ 保留訂單：${summary.validOrders} 筆<br>
+                        ❌ 刪除訂單：${summary.deletedOrders} 筆<br>
                         <br>
                         <strong>發現的舊格式 serviceType：</strong><br>
-                        ${oldServiceTypes.size > 0 ? Array.from(oldServiceTypes).map(t => `  • ${t}`).join('<br>') : '  無'}
+                        ${summary.oldServiceTypes && summary.oldServiceTypes.length > 0 
+                            ? summary.oldServiceTypes.map(t => `  • ${t}`).join('<br>') 
+                            : '  無'}
                 `;
                 
                 if (deletedOrders.length > 0) {
@@ -389,18 +344,11 @@
                     });
                 }
                 
-                if (skippedOrders.length > 0) {
-                    content += `<br><br><strong>⚠️ 跳過的訂單（需人工檢查）：</strong><br>`;
-                    skippedOrders.forEach(order => {
-                        content += `  • ${order.orderId} (${order.reason})<br>`;
-                    });
-                }
-                
                 content += `<br>━━━━━━━━━━━━━━━━━━━━━━</div>`;
                 
                 document.getElementById('resultContent').innerHTML = content;
                 
-                console.log('✅ 清理成功完成');
+                console.log('✅ 清理成功完成:', summary);
 
             } catch (error) {
                 console.error('清理失敗:', error);
