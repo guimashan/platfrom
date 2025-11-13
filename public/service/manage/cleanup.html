@@ -297,26 +297,17 @@
             try {
                 console.log('🔍 開始清理舊訂單...');
                 
-                // 獲取 ID Token
-                const idToken = await currentUser.getIdToken();
+                // 使用 Firebase Callable Function（自動處理 CORS 和認證）
+                const { getFunctions, httpsCallable } = await import('https://www.gstatic.com/firebasejs/9.22.0/firebase-functions.js');
                 
-                // 調用 Cloud Function API
-                const response = await fetch('https://asia-east2-service-b9d4a.cloudfunctions.net/cleanupOldOrders', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.error?.message || '清理失敗');
-                }
-
-                const summary = data.result.summary;
-                const deletedOrders = data.result.deletedDetails || [];
+                const functions = getFunctions(window.firebaseApp, 'asia-east2');
+                const cleanupOldOrders = httpsCallable(functions, 'cleanupOldOrders');
+                
+                // 調用函數（Firebase SDK 會自動添加認證 token）
+                const result = await cleanupOldOrders();
+                
+                const summary = result.data.summary;
+                const deletedOrders = result.data.deletedDetails || [];
                 
                 // 顯示成功結果
                 resultBox.className = 'result-box success';
@@ -352,13 +343,25 @@
 
             } catch (error) {
                 console.error('清理失敗:', error);
+                
+                let errorMessage = error.message || '未知錯誤';
+                
+                // Firebase Functions 錯誤代碼處理
+                if (error.code === 'unauthenticated') {
+                    errorMessage = '請先登入';
+                } else if (error.code === 'permission-denied') {
+                    errorMessage = '您沒有執行此操作的權限（僅限 superadmin 和 admin_service）';
+                } else if (error.code === 'not-found') {
+                    errorMessage = '找不到使用者資料';
+                }
+                
                 resultBox.className = 'result-box error';
                 resultBox.style.display = 'block';
                 document.getElementById('resultTitle').textContent = '❌ 清理失敗';
                 document.getElementById('resultContent').innerHTML = `
                     <div class="result-details">
                         <strong>錯誤訊息：</strong><br>
-                        ${error.message}<br>
+                        ${errorMessage}<br>
                         <br>
                         請檢查：<br>
                         • 是否有管理員權限<br>
