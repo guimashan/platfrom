@@ -37,7 +37,10 @@ async function loadUserOrders() {
     try {
         ordersList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">載入中...</p>';
         
-        const result = await callAPI('getUserRegistrations');
+        const SERVICE_API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
+        const result = await callAPI(`${SERVICE_API_BASE}/getUserRegistrations`, {
+            method: 'POST'
+        });
         userOrders = result.result.registrations || [];
         
         console.log(`載入了 ${userOrders.length} 筆報名記錄`);
