@@ -102,11 +102,10 @@ function renderServiceTable(configs) {
             <thead>
                 <tr>
                     <th>服務名稱</th>
-                    <th style="width: 120px;">開放狀態</th>
                     <th style="width: 150px;">開始日期</th>
                     <th style="width: 150px;">結束日期</th>
                     <th style="width: 200px;">關閉提示訊息</th>
-                    <th style="width: 100px;">狀態</th>
+                    <th style="width: 200px;">開放狀態</th>
                 </tr>
             </thead>
             <tbody>
@@ -126,15 +125,6 @@ function renderServiceTable(configs) {
             <tr id="row-${type}">
                 <td><strong>${config.serviceName || serviceNames[type]}</strong></td>
                 <td>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="status-${type}" ${config.isOpen ? 'checked' : ''}>
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span id="statusText-${type}" style="margin-left: 10px; font-size: 0.85rem;">
-                        ${config.isOpen ? '開放中' : '已關閉'}
-                    </span>
-                </td>
-                <td>
                     <input type="date" id="startDate-${type}" value="${formatDate(config.startDate)}" 
                            style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
                 </td>
@@ -148,7 +138,14 @@ function renderServiceTable(configs) {
                            style="width: 100%; padding: 0.4rem; border: 1px solid #ddd; border-radius: 4px;">
                 </td>
                 <td>
-                    <span id="displayStatus-${type}" style="font-weight: bold; padding: 0.4rem 0.8rem; border-radius: 6px; display: inline-block; ${config.isOpen ? 'color: #4CAF50; background: #E8F5E9;' : 'color: #E74C3C; background: #FFEBEE;'}">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="status-${type}" ${config.isOpen ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span id="statusText-${type}" style="margin-left: 10px; font-size: 0.85rem; color: #666;">
+                        ${config.isOpen ? '開放中' : '已關閉'}
+                    </span>
+                    <span id="displayStatus-${type}" style="font-weight: bold; padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block; margin-left: 10px; font-size: 0.85rem; ${config.isOpen ? 'color: #4CAF50; background: #E8F5E9;' : 'color: #E74C3C; background: #FFEBEE;'}">
                         ${config.isOpen ? 'Open' : 'Closed'}
                     </span>
                 </td>
