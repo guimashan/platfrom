@@ -698,7 +698,10 @@ exports.getServiceConfigs = onRequest({
                     ld: { serviceType: 'ld', serviceName: '禮斗法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
                     zy: { serviceType: 'zy', serviceName: '中元法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
                     ps: { serviceType: 'ps', serviceName: '普施法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
-                    qj: { serviceType: 'qj', serviceName: '秋祭法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' }
+                    qj: { serviceType: 'qj', serviceName: '秋祭法會', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    ftp: { serviceType: 'ftp', serviceName: '福田_信眾個人', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    ftc: { serviceType: 'ftc', serviceName: '福田_企業團體', isOpen: true, startDate: null, endDate: null, closedMessage: '' },
+                    fty: { serviceType: 'fty', serviceName: '福田_Youth 會', isOpen: true, startDate: null, endDate: null, closedMessage: '' }
                 };
                 
                 const batch = db.batch();
@@ -765,7 +768,7 @@ exports.updateServiceConfig = onRequest({
                 return;
             }
 
-            const validTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj'];
+            const validTypes = ['dd', 'nd', 'ld', 'zy', 'ps', 'qj', 'ftp', 'ftc', 'fty'];
             if (!validTypes.includes(serviceType)) {
                 res.status(400).json({ error: { message: '無效的服務類型' } });
                 return;
