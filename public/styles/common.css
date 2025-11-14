@@ -196,6 +196,41 @@ body {
     transform: translateY(-2px);
 }
 
+.btn-cta-purple {
+    background: #8A2BE2;
+    color: white;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: 0 4px 16px rgba(138, 43, 226, 0.3);
+    font-family: 'Noto Sans TC', sans-serif;
+    text-align: center;
+    width: 100%;
+}
+
+.btn-cta-purple:hover:not(:disabled) {
+    background: #7B27C7;
+    box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
+    transform: translateY(-2px);
+}
+
+.btn-cta-purple:active:not(:disabled) {
+    background: #6A1FB8;
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(138, 43, 226, 0.3);
+}
+
+.btn-cta-purple:disabled {
+    background: #B8B8B8;
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
 .btn-secondary {
     background: white;
     color: var(--primary-gold-dark);
@@ -2038,5 +2073,179 @@ body {
     
     .has-summary-footer {
         padding-bottom: 200px !important;
+    }
+}
+
+/* ========================================
+   簽到頁面專用樣式 (Checkin Page Styles)
+   ======================================== */
+
+/* 模式切換標籤容器 */
+.mode-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--primary-gold-lighter);
+}
+
+/* 模式標籤按鈕 */
+.mode-tab {
+    flex: 1;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-white);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-family: 'Noto Sans TC', sans-serif;
+    text-align: center;
+}
+
+.mode-tab:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.mode-tab.active {
+    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
+    color: var(--text-white);
+    border-color: var(--primary-gold-dark);
+    box-shadow: var(--shadow-md);
+    font-weight: 600;
+}
+
+/* 模式內容容器 */
+.mode-content {
+    animation: fadeIn 0.3s ease;
+}
+
+.mode-content.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 定位狀態顯示 */
+.location-status {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #E3F2FD 0%, #F3F9FF 100%);
+    border: 2px solid #90CAF9;
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.location-status p {
+    margin: 0;
+    font-size: 1rem;
+    color: #1976D2;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+.location-status.success {
+    background: linear-gradient(135deg, #E8F5E9 0%, #F1F8F4 100%);
+    border-color: #81C784;
+}
+
+.location-status.success p {
+    color: #2E7D32;
+}
+
+.location-status.error {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFF5F5 100%);
+    border-color: #E57373;
+}
+
+.location-status.error p {
+    color: #C62828;
+}
+
+.location-status.warning {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFFAF0 100%);
+    border-color: #FFB74D;
+}
+
+.location-status.warning p {
+    color: #E65100;
+}
+
+/* 結果顯示區域 */
+.result-area {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 2px solid var(--primary-gold-lighter);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    animation: slideDown 0.3s ease;
+}
+
+.result-area.hidden {
+    display: none;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+}
+
+.result-area h3 {
+    color: var(--primary-gold-dark);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.result-area p {
+    margin: 0.5rem 0;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .mode-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .mode-tab {
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+    }
+    
+    .location-status {
+        padding: 1rem;
+    }
+    
+    .location-status p {
+        font-size: 0.95rem;
     }
 }

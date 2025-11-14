@@ -9,70 +9,84 @@
 </head>
 <body>
     <!-- 主要內容（預設隱藏） -->
-    <div id="mainApp" class="container" style="display: none;">
+    <div id="mainApp" style="display: none;">
         <header class="header">
             <div class="header-left">
-                <h1>🙏 奉香簽到</h1>
-                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: #666;"></p>
+                <h1>奉香簽到</h1>
+                <p id="userName" style="margin: 5px 0 0 0; font-size: 14px; color: rgba(255,255,255,0.9);"></p>
             </div>
             <div class="header-actions">
-                <button class="btn-home" onclick="window.location.href='/'">首頁</button>
+                <button class="btn-logout" onclick="window.location.href='/'">返回首頁</button>
                 <button id="logoutBtn" class="btn-logout">登出</button>
             </div>
         </header>
 
-        <main class="main-content">
-            <div id="checkinCard" class="checkin-card">
-                <h2>奉香簽到</h2>
+        <div class="container">
+            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
                 
-                <!-- 簽到模式切換 -->
-                <div class="mode-tabs">
-                    <button id="gpsModeBtn" class="mode-tab active">📍 GPS 簽到</button>
-                    <button id="qrModeBtn" class="mode-tab">📷 QR Code 簽到</button>
+                <!-- 奉香簽到說明 -->
+                <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
+                    <h2 class="card-title" style="color: #8B6914; margin-bottom: 1.5rem;">🙏 奉香簽到</h2>
+                    <div style="line-height: 2; color: #4A3C2F; font-size: 15px;">
+                        <p>本系統提供兩種簽到方式：<strong style="color: #8B6914;">GPS 定位簽到</strong> 及 <strong style="color: #8B6914;">QR Code 掃描簽到</strong>，請依現場狀況選擇適合的簽到模式。</p>
+                    </div>
                 </div>
 
-                <!-- GPS 簽到模式 -->
-                <div id="gpsMode" class="mode-content">
-                    <div id="patrolSelect" class="patrol-select">
-                        <label for="patrolDropdown">選擇巡邏點:</label>
-                        <select id="patrolDropdown" class="form-select">
-                            <option value="">載入中...</option>
-                        </select>
-                    </div>
-
-                    <div id="locationStatus" class="location-status">
-                        <p>準備開始簽到</p>
-                    </div>
-
-                    <button id="checkinBtn" class="btn btn-primary btn-large">
-                        開始 GPS 簽到
-                    </button>
-                </div>
-
-                <!-- QR Code 簽到模式 -->
-                <div id="qrMode" class="mode-content hidden">
-                    <div id="qrReader" style="width: 100%; max-width: 500px; margin: 20px auto;"></div>
+                <!-- 簽到功能卡片 -->
+                <div id="checkinCard" class="card">
+                    <h2 class="card-title">選擇簽到模式</h2>
                     
-                    <div id="qrStatus" class="location-status">
-                        <p>點擊下方按鈕開始掃描</p>
+                    <!-- 簽到模式切換 -->
+                    <div class="mode-tabs">
+                        <button id="gpsModeBtn" class="mode-tab active">📍 GPS 簽到</button>
+                        <button id="qrModeBtn" class="mode-tab">📷 QR Code 簽到</button>
                     </div>
 
-                    <button id="startQrBtn" class="btn btn-primary btn-large">
-                        📷 開始掃描 QR Code
-                    </button>
-                    <button id="stopQrBtn" class="btn btn-secondary btn-large hidden">
-                        ⏹️ 停止掃描
-                    </button>
+                    <!-- GPS 簽到模式 -->
+                    <div id="gpsMode" class="mode-content">
+                        <div id="patrolSelect" class="form-group">
+                            <label for="patrolDropdown">選擇巡邏點</label>
+                            <select id="patrolDropdown" class="input-field">
+                                <option value="">載入中...</option>
+                            </select>
+                        </div>
+
+                        <div id="locationStatus" class="location-status">
+                            <p>準備開始簽到</p>
+                        </div>
+
+                        <button id="checkinBtn" class="btn-cta-purple">
+                            開始 GPS 簽到
+                        </button>
+                    </div>
+
+                    <!-- QR Code 簽到模式 -->
+                    <div id="qrMode" class="mode-content hidden">
+                        <div id="qrReader" style="width: 100%; max-width: 500px; margin: 20px auto; border-radius: 8px; overflow: hidden;"></div>
+                        
+                        <div id="qrStatus" class="location-status">
+                            <p>點擊下方按鈕開始掃描</p>
+                        </div>
+
+                        <button id="startQrBtn" class="btn-cta-purple">
+                            📷 開始掃描 QR Code
+                        </button>
+                        <button id="stopQrBtn" class="btn-secondary hidden" style="margin-top: 10px;">
+                            ⏹️ 停止掃描
+                        </button>
+                    </div>
+
+                    <div id="result" class="result-area hidden"></div>
                 </div>
 
-                <div id="result" class="result-area hidden"></div>
+                <!-- 查看記錄按鈕 -->
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn-cta-purple" onclick="window.location.href='/checkin/history.html'" style="width: auto; min-width: 200px;">
+                        📋 查看個人簽到紀錄
+                    </button>
+                </div>
             </div>
-
-            <!-- 查看記錄連結 - 卡片外部 -->
-            <div class="history-link-outside">
-                <a href="/checkin/history.html">📋 查看個人簽到紀錄</a>
-            </div>
-        </main>
+        </div>
     </div>
 
     <!-- QR Code Scanner Library -->
