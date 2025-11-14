@@ -5,6 +5,19 @@ let currentUser = null;
 let userRoles = [];
 let allOrders = [];
 
+// 分頁狀態
+let currentOffset = 0;
+let pageSize = 30;
+let hasMore = true;
+let isLoading = false;
+let pendingFilterChange = false; // 標記是否有待處理的篩選變更
+let currentRequestId = 0; // 請求識別碼，用於防止渲染過時資料
+let currentFilters = {
+    serviceType: '',
+    status: '',
+    search: ''
+};
+
 const API_BASE = 'https://asia-east2-service-b9d4a.cloudfunctions.net';
 
 async function callAPI(endpoint, data = {}, forceRefreshToken = false) {
@@ -177,7 +190,7 @@ export async function init() {
         document.getElementById('filterStatus').addEventListener('change', applyFilters);
         document.getElementById('filterSearch').addEventListener('input', applyFilters);
         
-        await loadOrders();
+        await loadOrders(true);
         
     } catch (error) {
         console.error('初始化失敗:', error);
@@ -185,17 +198,91 @@ export async function init() {
     }
 }
 
-async function loadOrders() {
+async function loadOrders(reset = false) {
+    // 如果正在載入且有新的篩選變更請求，標記為待處理
+    if (isLoading) {
+        if (reset) {
+            pendingFilterChange = true;
+        }
+        return;
+    }
+    
     try {
-        const result = await callAPI('getRegistrations');
-        allOrders = result.result.registrations || [];
+        isLoading = true;
+        pendingFilterChange = false;
         
-        console.log('載入訂單:', allOrders.length, '筆');
-        applyFilters();
+        // 記錄當前請求 ID，用於後續檢查回應是否過時
+        const thisRequestId = currentRequestId;
+        
+        // 如果是重新載入（篩選變更），重置分頁狀態
+        if (reset) {
+            currentOffset = 0;
+            allOrders = [];
+            hasMore = true;
+        }
+        
+        updateLoadMoreButton();
+        
+        // 準備 API 參數（包含分頁和篩選）
+        const params = {
+            limit: pageSize,
+            offset: currentOffset
+        };
+        
+        // 加入篩選條件
+        if (currentFilters.serviceType) {
+            params.serviceType = currentFilters.serviceType;
+        }
+        if (currentFilters.status) {
+            params.status = currentFilters.status;
+        }
+        if (currentFilters.search) {
+            params.search = currentFilters.search;
+        }
+        
+        const result = await callAPI('getRegistrations', params);
+        const newOrders = result.result.registrations || [];
+        
+        // 檢查請求 ID，如果不匹配表示這是過時的回應，跳過渲染
+        if (thisRequestId !== currentRequestId) {
+            console.log('跳過過時的回應（請求 ID 不匹配）');
+            return;
+        }
+        
+        // 將新訂單加入現有列表
+        allOrders = [...allOrders, ...newOrders];
+        
+        // 更新分頁狀態
+        currentOffset += newOrders.length;
+        hasMore = newOrders.length === pageSize;
+        
+        console.log(`載入訂單: +${newOrders.length} 筆（總計 ${allOrders.length} 筆），還有更多: ${hasMore}`);
+        
+        renderOrders(allOrders);
+        updateLoadMoreButton();
         
     } catch (error) {
         console.error('載入訂單失敗:', error);
-        showEmptyState('載入失敗: ' + error.message);
+        // 如果是重新載入（篩選改變）且失敗，顯示錯誤訊息
+        if (reset) {
+            showEmptyState('載入失敗: ' + error.message);
+            allOrders = []; // 確保清空資料
+        } else if (allOrders.length === 0) {
+            // 如果是首次載入且失敗
+            showEmptyState('載入失敗: ' + error.message);
+        } else {
+            // 如果是載入更多且失敗，保持現有資料並顯示提示
+            alert('載入更多失敗: ' + error.message);
+        }
+    } finally {
+        isLoading = false;
+        updateLoadMoreButton();
+        
+        // 如果有待處理的篩選變更，重新載入
+        if (pendingFilterChange) {
+            pendingFilterChange = false;
+            await loadOrders(true);
+        }
     }
 }
 
@@ -242,8 +329,9 @@ async function deleteOrder(orderId) {
         
         alert('✅ 訂單已成功刪除');
         
-        // 重新載入訂單列表
-        await loadOrders();
+        // 增加請求 ID 並重新載入訂單列表（從第一頁開始）
+        currentRequestId++;
+        await loadOrders(true);
         
     } catch (error) {
         console.error('刪除訂單失敗:', error);
@@ -271,25 +359,60 @@ function applyFilters() {
     const status = document.getElementById('filterStatus').value;
     const search = document.getElementById('filterSearch').value.toLowerCase();
     
-    let filtered = allOrders;
+    // 檢查篩選條件是否改變
+    const filtersChanged = 
+        currentFilters.serviceType !== serviceType ||
+        currentFilters.status !== status ||
+        currentFilters.search !== search;
     
-    if (serviceType) {
-        filtered = filtered.filter(o => o.serviceType === serviceType);
+    if (filtersChanged) {
+        // 立即增加請求 ID，使正在進行的請求失效
+        currentRequestId++;
+        
+        // 更新當前篩選條件
+        currentFilters = { serviceType, status, search };
+        
+        // 立即清空顯示，避免顯示舊資料
+        const tbody = document.getElementById('ordersTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="empty-state">
+                    <div class="empty-state-icon">⏳</div>
+                    <div>載入中...</div>
+                </td>
+            </tr>
+        `;
+        
+        // 重新載入訂單（重置分頁）
+        loadOrders(true);
     }
-    
-    if (status) {
-        filtered = filtered.filter(o => o.status === status);
-    }
-    
-    if (search) {
-        filtered = filtered.filter(o => {
-            const searchText = `${o.orderId} ${o.contactInfo?.name || ''} ${o.contactInfo?.phone || ''}`.toLowerCase();
-            return searchText.includes(search);
-        });
-    }
-    
-    renderOrders(filtered);
 }
+
+async function loadMoreOrders() {
+    if (!hasMore || isLoading) return;
+    await loadOrders(false);
+}
+
+function updateLoadMoreButton() {
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    
+    if (!loadMoreBtn || !loadMoreContainer) return;
+    
+    if (isLoading) {
+        loadMoreBtn.textContent = '載入中...';
+        loadMoreBtn.disabled = true;
+    } else if (hasMore) {
+        loadMoreBtn.textContent = `載入更多訂單（已顯示 ${allOrders.length} 筆）`;
+        loadMoreBtn.disabled = false;
+        loadMoreContainer.style.display = 'block';
+    } else {
+        loadMoreContainer.style.display = 'none';
+    }
+}
+
+// 暴露載入更多函數給按鈕調用
+window.loadMoreOrders = loadMoreOrders;
 
 function renderOrders(orders) {
     const tbody = document.getElementById('ordersTableBody');
@@ -577,7 +700,9 @@ window.confirmOrderPayment = async function(orderId) {
         alert('收款確認成功！信用卡資訊已刪除。');
         
         closeOrderModal();
-        await loadOrders();
+        // 增加請求 ID 並重新載入訂單列表（從第一頁開始）
+        currentRequestId++;
+        await loadOrders(true);
         
     } catch (error) {
         console.error('確認收款失敗:', error);
