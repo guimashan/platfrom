@@ -30,7 +30,6 @@ export async function init() {
         
         // 綁定事件監聽器（必須在這裡綁定，因為模組是動態載入的）
         document.getElementById('logoutBtn')?.addEventListener('click', logout);
-        document.getElementById('toggleTestMode')?.addEventListener('click', toggleTestMode);
         document.getElementById('addPatrolBtn')?.addEventListener('click', () => openPatrolModal());
         document.getElementById('closeModal')?.addEventListener('click', closePatrolModal);
         document.getElementById('cancelBtn')?.addEventListener('click', closePatrolModal);
@@ -47,68 +46,7 @@ export async function init() {
 }
 
 async function loadPatrolData() {
-    await loadTestModeStatus();
     await loadPatrols();
-}
-
-async function loadTestModeStatus() {
-    try {
-        const result = await callAPI(API_ENDPOINTS.getTestModeStatus, {
-            method: 'GET'
-        });
-        
-        const testMode = result.testMode || false;
-        updateTestModeUI(testMode);
-    } catch (error) {
-        console.error('載入測試模式失敗:', error);
-    }
-}
-
-function updateTestModeUI(enabled) {
-    const statusBadge = document.getElementById('testModeStatus');
-    const toggleBtn = document.getElementById('toggleTestMode');
-    
-    if (enabled) {
-        statusBadge.textContent = '已開啟';
-        statusBadge.className = 'badge warning';
-        toggleBtn.textContent = '關閉測試模式';
-        toggleBtn.className = 'btn btn-secondary';
-    } else {
-        statusBadge.textContent = '已關閉';
-        statusBadge.className = 'badge success';
-        toggleBtn.textContent = '開啟測試模式';
-        toggleBtn.className = 'btn btn-primary';
-    }
-    
-    toggleBtn.disabled = false;
-}
-
-async function toggleTestMode() {
-    const toggleBtn = document.getElementById('toggleTestMode');
-    const currentStatus = document.getElementById('testModeStatus').textContent === '已開啟';
-    
-    if (!confirm(`確定要${currentStatus ? '關閉' : '開啟'}測試模式嗎？`)) {
-        return;
-    }
-    
-    toggleBtn.disabled = true;
-    toggleBtn.textContent = '處理中...';
-    
-    try {
-        const result = await callAPI(API_ENDPOINTS.updateTestMode, {
-            method: 'POST',
-            body: JSON.stringify({
-                testMode: !currentStatus
-            })
-        });
-        
-        updateTestModeUI(result.testMode);
-        alert(`測試模式已${result.testMode ? '開啟' : '關閉'}`);
-    } catch (error) {
-        console.error('切換測試模式失敗:', error);
-        alert('操作失敗，請稍後再試');
-        toggleBtn.disabled = false;
-    }
 }
 
 async function loadPatrols() {
