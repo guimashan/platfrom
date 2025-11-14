@@ -33,6 +33,7 @@ if (!PROJECT_ID || PROJECT_ID === 'checkin-76c77') {
   exports.verifyCheckinV2 = checkinFunctions.verifyCheckinV2;
   exports.getPatrols = checkinFunctions.getPatrols;
   exports.getCheckinHistory = checkinFunctions.getCheckinHistory;
+  exports.getCheckinHistoryCallable = checkinFunctions.getCheckinHistoryCallable;
   exports.getTestModeStatus = checkinFunctions.getTestModeStatus;
   exports.updateTestMode = checkinFunctions.updateTestMode;
   exports.savePatrol = checkinFunctions.savePatrol;

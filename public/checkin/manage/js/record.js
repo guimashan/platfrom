@@ -2,7 +2,7 @@
  * 簽到記錄查詢
  */
 
-import { platformAuth, platformDb, serviceFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, platformDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { getDoc, doc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
@@ -106,8 +106,8 @@ async function loadUsers() {
 
 async function loadAllRecords() {
     try {
-        // 使用 Callable Function (部署在 service-b9d4a)
-        const getCheckinHistory = httpsCallable(serviceFunctions, 'getCheckinHistoryCallable');
+        // 使用 Callable Function (部署在 checkin-76c77)
+        const getCheckinHistory = httpsCallable(checkinFunctions, 'getCheckinHistoryCallable');
         const result = await getCheckinHistory({ limit: 50000 });
         
         allRecords = result.data.checkins || [];

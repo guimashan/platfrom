@@ -19,12 +19,6 @@ const platformApp = admin.initializeApp({
 const platformAuth = platformApp.auth();
 const platformDb = platformApp.firestore();
 
-// 初始化 Checkin Admin (用於訪問簽到數據)
-const checkinApp = admin.initializeApp({
-  projectId: 'checkin-76c77',
-}, 'checkin');
-const checkinDb = checkinApp.firestore();
-
 /**
  * 計算兩個 GPS 座標之間的距離 (公尺)
  * 使用 Haversine 公式
