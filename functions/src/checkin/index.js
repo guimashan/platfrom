@@ -694,6 +694,18 @@ exports.getCheckinHistoryV2 = onRequest(
       cors: true,
     },
     async (req, res) => {
+      // 手動設置 CORS headers
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.set('Access-Control-Max-Age', '3600');
+      
+      // 處理 preflight OPTIONS 請求
+      if (req.method === 'OPTIONS') {
+        res.status(204).send('');
+        return;
+      }
+      
       try {
         if (req.method !== 'GET') {
           res.status(405).json({
