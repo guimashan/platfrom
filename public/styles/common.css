@@ -1595,7 +1595,7 @@ body {
     color: var(--primary-gold-dark);
     border: 2px solid var(--primary-gold) !important;
     font-weight: 600;
-    padding: 0.875rem 1.75rem;
+    padding: 0.625rem 1.5rem;
     box-sizing: border-box;
 }
 
@@ -1610,7 +1610,7 @@ body {
     color: white;
     font-weight: 600;
     border: 2px solid var(--primary-gold) !important;
-    padding: 0.875rem 1.75rem;
+    padding: 0.625rem 1.5rem;
     box-sizing: border-box;
 }
 
