@@ -1395,6 +1395,65 @@ body {
 }
 
 /* ========================================
+   篩選器樣式
+   ======================================== */
+.filter-section {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.filter-group input,
+.filter-group select {
+    padding: 0.625rem 0.875rem;
+    border: 1.5px solid #dee2e6;
+    border-radius: var(--radius-sm);
+    font-size: 0.95rem;
+    background: white;
+    transition: all var(--transition-base);
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+    outline: none;
+    border-color: #8A2BE2;
+    box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+}
+
+.filter-group input::placeholder {
+    color: #adb5bd;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+/* ========================================
    表格樣式 (限定範圍到 .data-table)
    ======================================== */
 .data-table {
