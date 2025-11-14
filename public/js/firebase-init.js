@@ -74,8 +74,8 @@ export const API_ENDPOINTS = {
     getPatrols: 'https://getpatrols-tcj2pvviia-df.a.run.app',
     savePatrol: 'https://savepatrol-tcj2pvviia-df.a.run.app',
     deletePatrol: 'https://deletepatrol-tcj2pvviia-df.a.run.app',
-    // 簽到紀錄 API
-    getCheckinHistory: 'https://getcheckinhistory-tcj2pvviia-df.a.run.app',
+    // 簽到紀錄 API (V2 修復版本)
+    getCheckinHistory: 'https://getcheckinhistoryv2-tcj2pvviia-df.a.run.app',
     // 儀表板 API
     getDashboardStats: 'https://getdashboardstats-tcj2pvviia-df.a.run.app',
     // 測試模式 API

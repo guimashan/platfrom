@@ -686,9 +686,9 @@ exports.getPatrols = onRequest(
 );
 
 /**
- * 獲取簽到紀錄 (HTTP Endpoint)
+ * 獲取簽到紀錄 (HTTP Endpoint) - V2 修復版本
  */
-exports.getCheckinHistory = onRequest(
+exports.getCheckinHistoryV2 = onRequest(
     {
       region: 'asia-east2',
       cors: true,
