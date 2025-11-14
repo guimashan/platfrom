@@ -89,7 +89,7 @@ function renderUsers() {
     }
     
     let html = `
-        <table>
+        <table class="manage-table">
             <thead>
                 <tr>
                     <th style="width: 60px;">頭像</th>

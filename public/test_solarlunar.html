@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>測試 solarlunar.js 輸出格式</title>
+    <script src="https://cdn.jsdelivr.net/npm/solarlunar@2.0.7/lib/solarlunar.min.js"></script>
+</head>
+<body>
+    <h1>測試 solarlunar.js 輸出格式</h1>
+    <div id="output"></div>
+    
+    <script>
+        console.log('腳本開始執行');
+        console.log('solarLunar 存在:', typeof solarLunar);
+        
+        try {
+            if (typeof solarLunar === 'undefined') {
+                document.getElementById('output').innerHTML = '<p style="color: red;">錯誤：solarLunar 未定義！</p>';
+                throw new Error('solarLunar 未定義');
+            }
+            
+            const testDates = [
+                { year: 2024, month: 11, day: 4, label: '2024-11-04（今年）' },
+                { year: 2024, month: 10, day: 4, label: '2024-10-04' },
+                { year: 1990, month: 1, day: 15, label: '1990-01-15' }
+            ];
+            
+            let html = '<table border="1" style="border-collapse: collapse; margin: 20px 0;">';
+            html += '<tr><th>公曆日期</th><th>gzYear</th><th>monthCn</th><th>dayCn</th><th>組合格式</th><th>完整輸出</th></tr>';
+            
+            testDates.forEach(date => {
+                console.log('測試日期:', date);
+                const result = solarLunar.solar2lunar(date.year, date.month, date.day);
+                console.log('結果:', result);
+                const formatted = `${result.gzYear}年 ${result.monthCn}${result.dayCn}日`;
+                
+                html += '<tr>';
+                html += `<td>${date.label}</td>`;
+                html += `<td>${result.gzYear}</td>`;
+                html += `<td>${result.monthCn}</td>`;
+                html += `<td>${result.dayCn}</td>`;
+                html += `<td><strong>${formatted}</strong></td>`;
+                html += `<td><pre style="font-size: 10px;">${JSON.stringify(result, null, 2)}</pre></td>`;
+                html += '</tr>';
+            });
+            
+            html += '</table>';
+            document.getElementById('output').innerHTML = html;
+            console.log('測試完成');
+        } catch (error) {
+            console.error('錯誤:', error);
+            document.getElementById('output').innerHTML = `<p style="color: red;">錯誤：${error.message}</p><pre>${error.stack}</pre>`;
+        }
+    </script>
+</body>
+</html>

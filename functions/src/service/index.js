@@ -343,6 +343,7 @@ exports.getUserRegistrations = onRequest({
 /**
  * 查詢訂單列表（管理後台用）
  * 需要 poweruser_service, admin_service 或 superadmin 權限
+ * 支援分頁參數：limit（每頁筆數，預設30）和 offset（起始位置，預設0）
  */
 exports.getRegistrations = onRequest({ 
     region: 'asia-east2',
@@ -373,19 +374,46 @@ exports.getRegistrations = onRequest({
         const uid = decodedToken.uid;
         await checkServiceRole(decodedToken);
 
+        // 從 request body 取得分頁參數
+        const { limit = 30, offset = 0 } = req.body.data || {};
+        const pageLimit = Math.min(Math.max(1, parseInt(limit) || 30), 100); // 限制在 1-100 之間
+        const pageOffset = Math.max(0, parseInt(offset) || 0);
+
+        // 查詢訂單資料（使用 offset + limit 實現分頁）
         const registrationsSnap = await db.collection('registrations')
             .orderBy('createdAt', 'desc')
-            .limit(100)
+            .offset(pageOffset)
+            .limit(pageLimit)
             .get();
 
-        const registrations = registrationsSnap.docs.map(doc => ({
-            orderId: doc.id,
-            ...doc.data(),
-            paymentSecretId: undefined
-        }));
+        // 只回傳表格需要的欄位，減少資料傳輸量
+        const registrations = registrationsSnap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                orderId: doc.id,
+                serviceType: data.serviceType,
+                status: data.status,
+                totalAmount: data.totalAmount,
+                createdAt: data.createdAt,
+                contactInfo: {
+                    name: data.contactInfo?.name || null,
+                    phone: data.contactInfo?.phone || null
+                }
+            };
+        });
 
-        console.log(`使用者 ${uid} 查詢了 ${registrations.length} 筆訂單`);
-        res.status(200).json({ result: { success: true, registrations } });
+        console.log(`使用者 ${uid} 查詢了 ${registrations.length} 筆訂單（offset: ${pageOffset}, limit: ${pageLimit}）`);
+        res.status(200).json({ 
+            result: { 
+                success: true, 
+                registrations,
+                pagination: {
+                    offset: pageOffset,
+                    limit: pageLimit,
+                    count: registrations.length
+                }
+            } 
+        });
 
     } catch (error) {
         console.error('查詢訂單失敗:', error);
