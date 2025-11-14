@@ -94,7 +94,6 @@ function renderUsers() {
                 <tr>
                     <th style="width: 60px;">頭像</th>
                     <th>用戶名稱</th>
-                    <th>角色</th>
                     <th>Email</th>
                     <th>狀態</th>
                     <th>操作</th>
@@ -104,11 +103,6 @@ function renderUsers() {
     `;
     
     filteredUsers.forEach(user => {
-        const roles = user.roles || [];
-        const roleNames = roles.map(r => getRoleName(r)).join(', ') || '一般用戶';
-        const roleBadges = roles.length > 0 
-            ? roles.map(r => getRoleBadge(r)).join(' ') 
-            : '<span class="badge">一般用戶</span>';
         const statusBadge = user.active !== false ? '<span class="badge success">啟用</span>' : '<span class="badge danger">停用</span>';
         
         const avatarUrl = user.photoURL || '/images/default-avatar.svg';
@@ -128,11 +122,10 @@ function renderUsers() {
                         <small style="color: #666; font-size: 0.8rem; font-family: monospace;">${user.id.substring(0, 12)}...</small>
                     </div>
                 </td>
-                <td data-label="角色">${roleBadges}</td>
                 <td data-label="Email" style="font-size: 0.9rem; color: #666;">${user.email || '-'}</td>
                 <td data-label="狀態">${statusBadge}</td>
                 <td data-label="操作">
-                    <button onclick="editUser('${user.id}')" class="btn btn-sm btn-secondary">編輯</button>
+                    <button onclick="window.editUser('${user.id}')" class="btn btn-sm btn-secondary">編輯</button>
                 </td>
             </tr>
         `;
@@ -144,38 +137,6 @@ function renderUsers() {
     `;
     
     usersList.innerHTML = html;
-}
-
-function getRoleName(role) {
-    const roleNames = {
-        'superadmin': '超級管理員',
-        'admin_checkin': '簽到管理員',
-        'admin_service': '神務管理員',
-        'admin_schedule': '排班管理員',
-        'poweruser_checkin': '簽到幹部',
-        'poweruser_service': '神務專員',
-        'poweruser_schedule': '排班幹部',
-        'user_checkin': '簽到使用者',
-        'user_schedule': '排班使用者',
-        'user': '一般用戶'
-    };
-    return roleNames[role] || role;
-}
-
-function getRoleBadge(role) {
-    const badges = {
-        'superadmin': '<span class="badge danger">超級管理員</span>',
-        'admin_checkin': '<span class="badge warning">簽到管理員</span>',
-        'admin_service': '<span class="badge warning">神務管理員</span>',
-        'admin_schedule': '<span class="badge warning">排班管理員</span>',
-        'poweruser_checkin': '<span class="badge info">簽到幹部</span>',
-        'poweruser_service': '<span class="badge info">神務專員</span>',
-        'poweruser_schedule': '<span class="badge info">排班幹部</span>',
-        'user_checkin': '<span class="badge success">簽到使用者</span>',
-        'user_schedule': '<span class="badge success">排班使用者</span>',
-        'user': '<span class="badge">一般用戶</span>'
-    };
-    return badges[role] || `<span class="badge">${role}</span>`;
 }
 
 function filterUsers() {
@@ -272,3 +233,6 @@ async function saveUser() {
         alert('更新失敗：' + error.message);
     }
 }
+
+window.editUser = editUser;
+window.closeEditModal = closeEditModal;

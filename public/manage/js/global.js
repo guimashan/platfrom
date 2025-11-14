@@ -144,7 +144,6 @@ function renderUsers() {
 
     let html = '<table><thead><tr>';
     html += '<th>用戶名稱</th>';
-    html += '<th>角色</th>';
     html += '<th>Email</th>';
     html += '<th>狀態</th>';
     html += '<th>操作</th>';
@@ -152,8 +151,6 @@ function renderUsers() {
 
     filteredUsers.forEach(user => {
         const displayName = user.displayName || '未設定';
-        const roles = user.roles || ['user'];
-        const roleBadges = roles.map(r => getRoleBadge(r)).join(' ');
         const statusBadge = user.active === false 
             ? '<span class="badge" style="background: #dc3545;">停用</span>' 
             : '<span class="badge" style="background: #28a745;">啟用</span>';
@@ -164,11 +161,6 @@ function renderUsers() {
                     <div style="display: flex; flex-direction: column; gap: 0.25rem;">
                         <strong style="font-size: 1rem;">${displayName}</strong>
                         <small style="color: #666; font-size: 0.8rem; font-family: monospace;">${user.id.substring(0, 12)}...</small>
-                    </div>
-                </td>
-                <td data-label="角色">
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; max-width: 250px;">
-                        ${roleBadges}
                     </div>
                 </td>
                 <td data-label="Email" style="color: ${user.email ? '#333' : '#999'};">${user.email || '未綁定'}</td>
@@ -182,38 +174,6 @@ function renderUsers() {
     
     html += '</tbody></table>';
     usersList.innerHTML = html;
-}
-
-function getRoleName(role) {
-    const roleNames = {
-        'superadmin': '超級管理員',
-        'admin_checkin': '簽到管理員',
-        'admin_service': '神務管理員',
-        'admin_schedule': '排班管理員',
-        'poweruser_checkin': '簽到幹部',
-        'poweruser_service': '神務專員',
-        'poweruser_schedule': '排班幹部',
-        'user_checkin': '簽到使用者',
-        'user_schedule': '排班使用者',
-        'user': '一般用戶'
-    };
-    return roleNames[role] || role;
-}
-
-function getRoleBadge(role) {
-    const badges = {
-        'superadmin': '<span class="badge danger">超級管理員</span>',
-        'admin_checkin': '<span class="badge warning">簽到管理員</span>',
-        'admin_service': '<span class="badge warning">神務管理員</span>',
-        'admin_schedule': '<span class="badge warning">排班管理員</span>',
-        'poweruser_checkin': '<span class="badge info">簽到幹部</span>',
-        'poweruser_service': '<span class="badge info">神務專員</span>',
-        'poweruser_schedule': '<span class="badge info">排班幹部</span>',
-        'user_checkin': '<span class="badge success">簽到使用者</span>',
-        'user_schedule': '<span class="badge success">排班使用者</span>',
-        'user': '<span class="badge">一般用戶</span>'
-    };
-    return badges[role] || `<span class="badge">${role}</span>`;
 }
 
 function editUser(userId) {
