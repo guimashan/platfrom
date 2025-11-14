@@ -60,23 +60,23 @@
             <form id="patrolForm">
                 <div class="form-group">
                     <label for="patrolName">巡邏點名稱 *</label>
-                    <input type="text" id="patrolName" required placeholder="例如: 正殿">
+                    <input type="text" id="patrolName" class="input-field" required placeholder="例如: 正殿">
                 </div>
 
                 <div class="form-group">
                     <label for="patrolLat">緯度 *</label>
-                    <input type="number" id="patrolLat" step="0.000001" required placeholder="25.147924">
+                    <input type="number" id="patrolLat" class="input-field" step="0.000001" required placeholder="25.147924">
                     <small>點擊「使用當前位置」自動填入</small>
                 </div>
 
                 <div class="form-group">
                     <label for="patrolLng">經度 *</label>
-                    <input type="number" id="patrolLng" step="0.000001" required placeholder="121.410296">
+                    <input type="number" id="patrolLng" class="input-field" step="0.000001" required placeholder="121.410296">
                 </div>
 
                 <div class="form-group">
                     <label for="patrolRadius">容許距離 (公尺) *</label>
-                    <input type="number" id="patrolRadius" value="30" required min="10" max="500">
+                    <input type="number" id="patrolRadius" class="input-field" value="30" required min="10" max="500">
                     <small>建議範圍 20-100 公尺</small>
                 </div>
 

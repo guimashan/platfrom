@@ -638,7 +638,8 @@ body {
 }
 
 .input-field,
-.form-select {
+.form-select,
+textarea.input-field {
     width: 100%;
     padding: 0.75rem 1rem;
     border: 2px solid #e0e0e0;
@@ -647,10 +648,12 @@ body {
     font-family: 'Noto Sans TC', sans-serif;
     transition: all var(--transition-base);
     background: white;
+    color: var(--text-primary);
 }
 
 .input-field:focus,
-.form-select:focus {
+.form-select:focus,
+textarea.input-field:focus {
     outline: none;
     border-color: var(--primary-gold);
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
@@ -660,9 +663,22 @@ body {
     border-color: var(--color-error);
 }
 
-.input-field:disabled {
+.input-field:disabled,
+.form-select:disabled,
+textarea.input-field:disabled {
     background: #f5f5f5;
     cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.input-field::placeholder,
+textarea.input-field::placeholder {
+    color: #adb5bd;
+}
+
+textarea.input-field {
+    min-height: 100px;
+    resize: vertical;
 }
 
 .error-message {
@@ -1591,17 +1607,6 @@ body {
     padding: 2rem;
 }
 
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
 .form-group small {
     display: block;
     margin-top: 0.5rem;
@@ -1610,18 +1615,19 @@ body {
     line-height: 1.5;
 }
 
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group input[type="email"],
-.form-group input[type="tel"],
-.form-group input[type="url"],
-.form-group input[type="date"],
-.form-group input[type="time"],
-.form-group select,
-.form-group textarea {
+/* 為 form-group 內的輸入框提供基礎樣式（作為後備） */
+.form-group input[type="text"]:not(.input-field),
+.form-group input[type="number"]:not(.input-field),
+.form-group input[type="email"]:not(.input-field),
+.form-group input[type="tel"]:not(.input-field),
+.form-group input[type="url"]:not(.input-field),
+.form-group input[type="date"]:not(.input-field),
+.form-group input[type="time"]:not(.input-field),
+.form-group select:not(.form-select),
+.form-group textarea:not(.input-field) {
     width: 100%;
     padding: 0.75rem 1rem;
-    border: 1.5px solid #e0e0e0;
+    border: 2px solid #e0e0e0;
     border-radius: var(--radius-sm);
     font-size: 1rem;
     font-family: 'Noto Sans TC', sans-serif;
@@ -1630,29 +1636,29 @@ body {
     color: var(--text-primary);
 }
 
-.form-group input[type="text"]:focus,
-.form-group input[type="number"]:focus,
-.form-group input[type="email"]:focus,
-.form-group input[type="tel"]:focus,
-.form-group input[type="url"]:focus,
-.form-group input[type="date"]:focus,
-.form-group input[type="time"]:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.form-group input[type="text"]:not(.input-field):focus,
+.form-group input[type="number"]:not(.input-field):focus,
+.form-group input[type="email"]:not(.input-field):focus,
+.form-group input[type="tel"]:not(.input-field):focus,
+.form-group input[type="url"]:not(.input-field):focus,
+.form-group input[type="date"]:not(.input-field):focus,
+.form-group input[type="time"]:not(.input-field):focus,
+.form-group select:not(.form-select):focus,
+.form-group textarea:not(.input-field):focus {
     outline: none;
     border-color: var(--primary-gold);
     box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
 }
 
-.form-group input[type="text"]:disabled,
-.form-group input[type="number"]:disabled,
-.form-group input[type="email"]:disabled,
-.form-group input[type="tel"]:disabled,
-.form-group input[type="url"]:disabled,
-.form-group input[type="date"]:disabled,
-.form-group input[type="time"]:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
+.form-group input[type="text"]:not(.input-field):disabled,
+.form-group input[type="number"]:not(.input-field):disabled,
+.form-group input[type="email"]:not(.input-field):disabled,
+.form-group input[type="tel"]:not(.input-field):disabled,
+.form-group input[type="url"]:not(.input-field):disabled,
+.form-group input[type="date"]:not(.input-field):disabled,
+.form-group input[type="time"]:not(.input-field):disabled,
+.form-group select:not(.form-select):disabled,
+.form-group textarea:not(.input-field):disabled {
     background: #f5f5f5;
     cursor: not-allowed;
     opacity: 0.6;
@@ -1661,11 +1667,6 @@ body {
 .form-group input::placeholder,
 .form-group textarea::placeholder {
     color: #adb5bd;
-}
-
-.form-group textarea {
-    min-height: 100px;
-    resize: vertical;
 }
 
 .form-actions {
