@@ -52,28 +52,44 @@ async function loadHistory() {
         const checkins = data.result?.checkins || [];
         
         if (checkins.length === 0) {
-            historyList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
+            historyList.innerHTML = `
+                <div style="text-align: center; padding: 60px 20px; color: #999;">
+                    <div style="font-size: 64px; margin-bottom: 20px;">📋</div>
+                    <div>尚無簽到紀錄</div>
+                </div>
+            `;
             return;
         }
         
-        let html = '<div class="history-table"><table><thead><tr><th>時間</th><th>巡邏點</th><th>模式</th><th>距離</th></tr></thead><tbody>';
+        let html = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="padding: 15px; text-align: left;">簽到時間</th>
+                        <th style="padding: 15px; text-align: left;">巡邏點名稱</th>
+                        <th style="padding: 15px; text-align: left;">簽到方式</th>
+                        <th style="padding: 15px; text-align: left;">距離</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
         
         checkins.forEach(checkin => {
             const timestamp = checkin.timestamp?.toDate ? checkin.timestamp.toDate() : new Date(checkin.timestamp?._seconds * 1000 || Date.now());
             const distance = checkin.distance ? checkin.distance.toFixed(1) : 'N/A';
-            const mode = checkin.mode === 'qr' ? 'QR' : 'GPS';
+            const mode = checkin.mode === 'qr' ? '📱 QR Code' : '📍 GPS 定位';
             
             html += `
                 <tr>
-                    <td>${formatDateTime(timestamp)}</td>
-                    <td>${checkin.patrolName || checkin.patrolId}</td>
-                    <td>${mode}</td>
-                    <td>${distance} m</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;">${formatDateTime(timestamp)}</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;"><strong>${checkin.patrolName || checkin.patrolId}</strong></td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;">${mode}</td>
+                    <td style="padding: 12px 15px; border-bottom: 1px solid #f0f0f0;">${distance} 公尺</td>
                 </tr>
             `;
         });
         
-        html += '</tbody></table></div>';
+        html += '</tbody></table>';
         historyList.innerHTML = html;
         
     } catch (error) {

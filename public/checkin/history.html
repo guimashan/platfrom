@@ -12,20 +12,19 @@
     <!-- 主要內容（預設隱藏） -->
     <div id="mainApp" class="container" style="display: none;">
         <header class="header">
-            <h1>簽到紀錄</h1>
+            <h1>📋 我的簽到紀錄</h1>
             <button id="logoutBtn" class="btn-logout">登出</button>
         </header>
 
         <main class="main-content">
-            <div class="history-card">
-                <div class="back-link">
-                    <a href="/checkin/checkin.html">← 返回簽到</a>
+            <div class="manage-card">
+                <div class="card-header">
+                    <h2>簽到歷史記錄</h2>
+                    <button onclick="window.location.href='/checkin/checkin.html'" class="btn btn-secondary">← 返回簽到</button>
                 </div>
                 
-                <h2>我的簽到紀錄</h2>
-                
-                <div id="historyList" class="history-list">
-                    <p>載入中...</p>
+                <div id="historyList" class="data-table">
+                    <p class="loading">載入中...</p>
                 </div>
             </div>
         </main>
