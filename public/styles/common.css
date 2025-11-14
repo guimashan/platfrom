@@ -1595,8 +1595,10 @@ body {
     color: var(--primary-gold-dark);
     border: 2px solid var(--primary-gold) !important;
     font-weight: 600;
-    padding: 0.625rem 1.5rem;
+    padding: 0.625rem 1.5rem !important;
     box-sizing: border-box;
+    height: auto;
+    line-height: 1.5;
 }
 
 .btn-secondary:hover {
@@ -1610,8 +1612,10 @@ body {
     color: white;
     font-weight: 600;
     border: 2px solid var(--primary-gold) !important;
-    padding: 0.625rem 1.5rem;
+    padding: 0.625rem 1.5rem !important;
     box-sizing: border-box;
+    height: auto;
+    line-height: 1.5;
 }
 
 .btn-primary:hover {
