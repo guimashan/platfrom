@@ -563,13 +563,6 @@ exports.verifyCheckinV2 = onRequest(
  * 驗證 Platform ID Token 的輔助函數
  */
 async function verifyPlatformToken(req, res) {
-  // 確保 CORS headers 已設置
-  if (!res.getHeader('Access-Control-Allow-Origin')) {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  }
-  
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({
@@ -604,13 +597,6 @@ async function verifyPlatformToken(req, res) {
  * @returns {Promise<Object|null>} 驗證成功返回 decodedToken，失敗返回 null
  */
 async function ensureRequestHasRoles(req, res, requiredRoles) {
-  // 確保 CORS headers 已設置
-  if (!res.getHeader('Access-Control-Allow-Origin')) {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  }
-  
   // 驗證 Token
   const decodedToken = await verifyPlatformToken(req, res);
   if (!decodedToken) return null;
@@ -694,145 +680,6 @@ exports.getPatrols = onRequest(
         res.status(500).json({
           ok: false,
           message: `獲取巡邏點列表失敗: ${error.message}`,
-        });
-      }
-    },
-);
-
-/**
- * 獲取簽到紀錄 (HTTP Endpoint) - V2 修復版本
- */
-exports.getCheckinHistoryV2 = onRequest(
-    {
-      region: 'asia-east2',
-      cors: false,
-    },
-    async (req, res) => {
-      // 首先設置 CORS headers（必須在任何其他操作之前）
-      res.set('Access-Control-Allow-Origin', '*');
-      res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
-      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-      res.set('Access-Control-Max-Age', '3600');
-      
-      // 處理 preflight OPTIONS 請求
-      if (req.method === 'OPTIONS') {
-        res.status(204).send('');
-        return;
-      }
-      
-      try {
-        if (req.method !== 'GET') {
-          res.status(405).json({
-            ok: false,
-            message: 'Only GET method is allowed',
-          });
-          return;
-        }
-
-        const decodedToken = await ensureRequestHasRoles(req, res, [
-          'user_checkin',
-          'poweruser_checkin',
-          'admin_checkin',
-          'superadmin',
-        ]);
-        if (!decodedToken) return;
-
-        const currentUserId = decodedToken.uid;
-        const limit = parseInt(req.query.limit) || 50;
-        const requestedUserId = req.query.userId;
-        
-        // 獲取用戶角色以判斷是否為管理員
-        const userRoles = await getUserRoles(currentUserId);
-        const isAdmin = userRoles.some(role => 
-          role === 'superadmin' || role === 'admin_checkin' || role === 'poweruser_checkin'
-        );
-        
-        logger.info('權限檢查', {
-          currentUserId,
-          requestedUserId,
-          userRoles,
-          isAdmin
-        });
-        
-        // 確定要查詢的用戶 ID
-        let targetUserId = currentUserId;
-        if (requestedUserId) {
-          if (!isAdmin) {
-            logger.warn('權限不足', {
-              currentUserId,
-              requestedUserId,
-              userRoles,
-              isAdmin
-            });
-            res.status(403).json({
-              ok: false,
-              message: '您沒有權限查看其他用戶的記錄',
-            });
-            return;
-          }
-          targetUserId = requestedUserId;
-        }
-        
-        // 根據角色查詢簽到記錄
-        let checkinsQuery = admin.firestore().collection('checkins');
-        
-        if (!isAdmin || targetUserId) {
-          // 普通用戶只能看到自己的記錄，或管理員查看指定用戶的記錄
-          checkinsQuery = checkinsQuery.where('userId', '==', targetUserId);
-        }
-        
-        const checkinsSnapshot = await checkinsQuery
-            .orderBy('timestamp', 'desc')
-            .limit(limit)
-            .get();
-
-        // 查詢巡邏點名稱
-        const checkins = await Promise.all(checkinsSnapshot.docs.map(async doc => {
-          const data = doc.data();
-          
-          // 查詢巡邏點名稱
-          let patrolName = data.patrolId;
-          try {
-            const patrolDoc = await admin.firestore()
-                .collection('patrols')
-                .doc(data.patrolId)
-                .get();
-            if (patrolDoc.exists) {
-              patrolName = patrolDoc.data().name || data.patrolId;
-            }
-          } catch (error) {
-            logger.warn('查詢巡邏點名稱失敗', { patrolId: data.patrolId, error: error.message });
-          }
-          
-          return {
-            id: doc.id,
-            userId: data.userId,
-            patrolId: data.patrolId,
-            patrolName: patrolName,
-            timestamp: data.timestamp,
-            mode: data.mode,
-            distance: data.distance,
-            testMode: data.testMode,
-            location: data.location,
-          };
-        }));
-
-        logger.info('簽到紀錄已取得', {
-          currentUserId,
-          targetUserId,
-          isAdmin,
-          count: checkins.length,
-        });
-
-        res.status(200).json({
-          ok: true,
-          checkins: checkins,
-        });
-      } catch (error) {
-        logger.error('獲取簽到紀錄失敗', error);
-        res.status(500).json({
-          ok: false,
-          message: `獲取簽到紀錄失敗: ${error.message}`,
         });
       }
     },
