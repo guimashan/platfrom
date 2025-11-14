@@ -109,14 +109,15 @@ async function handleCheckin() {
     
     try {
         checkinBtn.disabled = true;
-        statusEl.textContent = '正在取得位置資訊...';
-        statusEl.className = 'location-status active';
+        // 重置狀態框為中性狀態
+        statusEl.innerHTML = '<p>正在取得位置資訊...</p>';
+        statusEl.className = 'location-status';
         
         // 取得 GPS 位置
         const position = await getCurrentPosition();
         const { latitude, longitude } = position.coords;
         
-        statusEl.textContent = `位置已取得 (${latitude.toFixed(6)}, ${longitude.toFixed(6)})`;
+        statusEl.innerHTML = `<p>位置已取得 (${latitude.toFixed(6)}, ${longitude.toFixed(6)})</p>`;
         
         // 獲取 Platform ID Token 進行跨專案認證
         const idToken = await platformAuth.currentUser.getIdToken();
@@ -139,12 +140,11 @@ async function handleCheckin() {
         const result = await response.json();
         
         if (result.ok) {
-            const testModeText = result.testMode ? '<br>(測試模式)' : '';
+            const testModeText = result.testMode ? '<br><small>(測試模式)</small>' : '';
             showResult(
-                `簽到成功!<br>距離: ${result.distanceMeters.toFixed(1)} 公尺${testModeText}`,
+                `✅ <strong>簽到成功！</strong><br>距離：${result.distanceMeters.toFixed(1)} 公尺${testModeText}`,
                 'success'
             );
-            statusEl.textContent = '簽到完成';
         } else {
             // 將錯誤碼轉換為友善的中文訊息
             const errorMessage = result.code === '1001_OUT_OF_RANGE' 
@@ -152,18 +152,14 @@ async function handleCheckin() {
                 : result.code;
             
             showResult(
-                `簽到失敗: ${errorMessage}<br>距離: ${result.distanceMeters ? result.distanceMeters.toFixed(1) : 'N/A'} 公尺<br>容許範圍: ${result.allowedMeters || 'N/A'} 公尺`,
+                `❌ <strong>簽到失敗</strong><br>${errorMessage}<br>距離：${result.distanceMeters ? result.distanceMeters.toFixed(1) : 'N/A'} 公尺<br>容許範圍：${result.allowedMeters || 'N/A'} 公尺`,
                 'error'
             );
-            statusEl.textContent = '超出簽到範圍';
-            statusEl.className = 'location-status error';
         }
         
     } catch (error) {
         console.error('簽到失敗:', error);
-        showResult('簽到失敗: ' + error.message, 'error');
-        statusEl.textContent = '簽到失敗';
-        statusEl.className = 'location-status error';
+        showResult(`❌ <strong>簽到失敗</strong><br>${error.message}`, 'error');
     } finally {
         checkinBtn.disabled = false;
     }
@@ -203,12 +199,17 @@ function getCurrentPosition() {
     });
 }
 
-// 顯示結果
+// 顯示結果（整合到狀態框）
 function showResult(message, type) {
-    const resultEl = document.getElementById('result');
-    resultEl.innerHTML = message;
-    resultEl.className = `result-area ${type}`;
-    resultEl.classList.remove('hidden');
+    // 根據當前模式更新對應的狀態框
+    const statusEl = currentMode === 'gps' 
+        ? document.getElementById('locationStatus') 
+        : document.getElementById('qrStatus');
+    
+    if (statusEl) {
+        statusEl.innerHTML = `<p>${message}</p>`;
+        statusEl.className = `location-status ${type}`;
+    }
 }
 
 // 初始化模式切換
@@ -310,8 +311,9 @@ async function onQRCodeScanned(decodedText, decodedResult) {
     await stopQRScanner();
     
     const qrStatus = document.getElementById('qrStatus');
+    // 重置狀態框為中性狀態
     qrStatus.innerHTML = '<p>QR Code 已掃描，正在驗證...</p>';
-    qrStatus.className = 'location-status active';
+    qrStatus.className = 'location-status';
     
     try {
         // 解析 QR Code 內容
@@ -352,25 +354,19 @@ async function onQRCodeScanned(decodedText, decodedResult) {
         
         if (result.ok) {
             showResult(
-                `✅ QR Code 簽到成功!<br>巡邏點: ${patrol.name}`,
+                `✅ <strong>QR Code 簽到成功！</strong><br>巡邏點：${patrol.name}`,
                 'success'
             );
-            qrStatus.innerHTML = '<p>簽到完成</p>';
-            qrStatus.className = 'location-status';
         } else {
             showResult(
-                `❌ 簽到失敗: ${result.message || result.code}`,
+                `❌ <strong>簽到失敗</strong><br>${result.message || result.code}`,
                 'error'
             );
-            qrStatus.innerHTML = '<p>簽到失敗</p>';
-            qrStatus.className = 'location-status error';
         }
         
     } catch (error) {
         console.error('QR Code 簽到失敗:', error);
-        showResult(`❌ 簽到失敗: ${error.message}`, 'error');
-        qrStatus.innerHTML = '<p>簽到失敗</p>';
-        qrStatus.className = 'location-status error';
+        showResult(`❌ <strong>簽到失敗</strong><br>${error.message}`, 'error');
     }
 }
 
