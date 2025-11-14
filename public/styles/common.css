@@ -2217,6 +2217,18 @@ body {
     display: none;
 }
 
+.result-area.success {
+    background: linear-gradient(135deg, #E8F5E9 0%, #F1F8F4 100%);
+    border-color: #4CAF50;
+    color: #2E7D32;
+}
+
+.result-area.error {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFF5F5 100%);
+    border-color: #F44336;
+    color: #C62828;
+}
+
 @keyframes slideDown {
     from {
         opacity: 0;
