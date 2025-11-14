@@ -2,9 +2,10 @@
  * 簽到記錄查詢
  */
 
-import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, platformDb, serviceFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { getDoc, doc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
 
@@ -105,11 +106,11 @@ async function loadUsers() {
 
 async function loadAllRecords() {
     try {
-        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=50000', {
-            method: 'GET'
-        });
+        // 使用 Callable Function (部署在 service-b9d4a)
+        const getCheckinHistory = httpsCallable(serviceFunctions, 'getCheckinHistoryCallable');
+        const result = await getCheckinHistory({ limit: 50000 });
         
-        allRecords = result.checkins || [];
+        allRecords = result.data.checkins || [];
         
         console.log(`已載入 ${allRecords.length} 筆簽到記錄`);
     } catch (error) {

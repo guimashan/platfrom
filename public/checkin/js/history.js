@@ -2,7 +2,7 @@
  * 簽到紀錄頁面
  */
 
-import { platformAuth, checkinFunctions } from '/js/firebase-init.js';
+import { platformAuth, serviceFunctions } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 import { logout } from '/js/auth.js';
@@ -33,8 +33,8 @@ async function loadHistory() {
     try {
         historyList.innerHTML = '<p>載入中...</p>';
         
-        // 使用 Callable Function 而不是 HTTP endpoint (解決 CORS 問題)
-        const getCheckinHistory = httpsCallable(checkinFunctions, 'getCheckinHistoryCallable');
+        // 使用 Callable Function (部署在 service-b9d4a)
+        const getCheckinHistory = httpsCallable(serviceFunctions, 'getCheckinHistoryCallable');
         const result = await getCheckinHistory({ limit: 50 });
         
         const checkins = result.data.checkins || [];
