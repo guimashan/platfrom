@@ -563,6 +563,13 @@ exports.verifyCheckinV2 = onRequest(
  * 驗證 Platform ID Token 的輔助函數
  */
 async function verifyPlatformToken(req, res) {
+  // 確保 CORS headers 已設置
+  if (!res.getHeader('Access-Control-Allow-Origin')) {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+  
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     res.status(401).json({
@@ -597,6 +604,13 @@ async function verifyPlatformToken(req, res) {
  * @returns {Promise<Object|null>} 驗證成功返回 decodedToken，失敗返回 null
  */
 async function ensureRequestHasRoles(req, res, requiredRoles) {
+  // 確保 CORS headers 已設置
+  if (!res.getHeader('Access-Control-Allow-Origin')) {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  }
+  
   // 驗證 Token
   const decodedToken = await verifyPlatformToken(req, res);
   if (!decodedToken) return null;
@@ -691,10 +705,10 @@ exports.getPatrols = onRequest(
 exports.getCheckinHistoryV2 = onRequest(
     {
       region: 'asia-east2',
-      cors: true,
+      cors: false,
     },
     async (req, res) => {
-      // 手動設置 CORS headers
+      // 首先設置 CORS headers（必須在任何其他操作之前）
       res.set('Access-Control-Allow-Origin', '*');
       res.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
       res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
