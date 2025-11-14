@@ -186,12 +186,19 @@ body {
 
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
-    color: var(--text-primary);
-    margin-top: 1.5rem;
+    color: white;
+    margin-top: 0;
+    border: 2px solid var(--primary-gold);
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--primary-gold-light), var(--primary-gold));
+    background: linear-gradient(135deg, var(--primary-gold-dark), #6b5000);
     box-shadow: var(--shadow-lg);
     transform: translateY(-2px);
 }
@@ -235,11 +242,16 @@ body {
     background: white;
     color: var(--primary-gold-dark);
     border: 2px solid var(--primary-gold);
-    padding: calc(0.875rem - 2px) calc(1.75rem - 2px);
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.5;
+    min-height: 44px;
+    box-sizing: border-box;
 }
 
 .btn-secondary:hover:not(:disabled) {
-    background: var(--bg-card);
+    background: var(--primary-gold-lighter);
     box-shadow: var(--shadow-md);
 }
 
@@ -1588,40 +1600,6 @@ body {
 .btn-sm {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
-}
-
-.btn-secondary {
-    background: white;
-    color: var(--primary-gold-dark);
-    border: 2px solid var(--primary-gold) !important;
-    font-weight: 600;
-    padding: 0.625rem 1.5rem !important;
-    box-sizing: border-box;
-    height: auto;
-    line-height: 1.5;
-}
-
-.btn-secondary:hover {
-    background: var(--primary-gold-lighter);
-    border-color: var(--primary-gold-dark) !important;
-    color: var(--primary-gold-dark);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
-    color: white;
-    font-weight: 600;
-    border: 2px solid var(--primary-gold) !important;
-    padding: 0.625rem 1.5rem !important;
-    box-sizing: border-box;
-    height: auto;
-    line-height: 1.5;
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, var(--primary-gold-dark) 0%, #6b5000 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(218, 165, 32, 0.3);
 }
 
 .card-header {
