@@ -96,5 +96,6 @@ channel = "stable-25_05"
 packages = ["vlang", "google-cloud-sdk-gce"]
 
 [deployment]
-deploymentTarget = "autoscale"
+deploymentTarget = "static"
 run = ["npx", "http-server", "public", "-p", "5000", "--cors", "-c-1"]
+publicDir = "public"
