@@ -1593,13 +1593,15 @@ body {
 .btn-secondary {
     background: white;
     color: var(--primary-gold-dark);
-    border: 2px solid var(--primary-gold);
+    border: 2px solid var(--primary-gold) !important;
     font-weight: 600;
+    padding: 0.875rem 1.75rem;
+    box-sizing: border-box;
 }
 
 .btn-secondary:hover {
     background: var(--primary-gold-lighter);
-    border-color: var(--primary-gold-dark);
+    border-color: var(--primary-gold-dark) !important;
     color: var(--primary-gold-dark);
 }
 
@@ -1607,7 +1609,9 @@ body {
     background: linear-gradient(135deg, var(--primary-gold) 0%, var(--primary-gold-dark) 100%);
     color: white;
     font-weight: 600;
-    border: 2px solid transparent;
+    border: 2px solid var(--primary-gold) !important;
+    padding: 0.875rem 1.75rem;
+    box-sizing: border-box;
 }
 
 .btn-primary:hover {
