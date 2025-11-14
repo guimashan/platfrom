@@ -23,7 +23,7 @@
         </header>
 
         <div class="container">
-            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            <div class="main-content has-summary-footer" style="max-width: 800px; margin: 0 auto; padding: 20px;">
             
             <!-- I. 報名聯絡資訊 -->
             <div class="card">
@@ -129,22 +129,24 @@
             </div>
         </div>
 
-        <!-- 浮動總結欄位 -->
-        <div id="floatingFooter">
-        <div class="footer-content">
-            <div class="footer-summary">
-                <div class="summary-item">
-                    <span class="summary-label">報名總斗數：</span>
-                    <span id="totalDous" class="summary-value">0 斗</span>
+        <!-- 固定底部總計區域 -->
+        <div class="summary-footer">
+            <div class="summary-footer-content">
+                <div class="summary-footer-left">
+                    <div class="summary-item">
+                        <div class="summary-label">報名總斗數</div>
+                        <div id="totalDous" class="summary-value">0 斗</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">應繳總金額</div>
+                        <div id="totalAmount" class="summary-value highlight">NT$ 0</div>
+                    </div>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-label">應繳總金額：</span>
-                    <span id="totalAmount" class="summary-value total-price">NT$ 0</span>
+                <div class="summary-footer-right">
+                    <button id="submitBtn" class="btn-primary">確認報名並送出</button>
                 </div>
             </div>
-            <button id="submitBtn" class="btn-submit">確認報名並送出</button>
         </div>
-    </div>
     </div> <!-- 關閉 mainApp -->
 
     <script src="../lib/lunar.js" defer></script>

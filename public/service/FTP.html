@@ -23,7 +23,7 @@
         </header>
 
         <div class="container">
-            <div class="main-content" style="max-width: 800px; margin: 0 auto; padding: 20px;">
+            <div class="main-content has-summary-footer" style="max-width: 800px; margin: 0 auto; padding: 20px;">
             
             <!-- 福田會說明 -->
             <div class="card" style="background: linear-gradient(135deg, #FFF9E6 0%, #FFFEF9 100%); border: 2px solid var(--primary-gold);">
@@ -243,20 +243,22 @@
             </div>
         </div>
 
-        <!-- 浮動總結欄位 -->
-        <div id="floatingFooter">
-            <div class="footer-content">
-                <div class="footer-summary">
+        <!-- 固定底部總計區域 -->
+        <div class="summary-footer">
+            <div class="summary-footer-content">
+                <div class="summary-footer-left">
                     <div class="summary-item">
-                        <span class="summary-label">三年期總額：</span>
-                        <span class="summary-value total-price">NT$ 30,000</span>
+                        <div class="summary-label">三年期總額</div>
+                        <div class="summary-value">NT$ 30,000</div>
                     </div>
                     <div class="summary-item">
-                        <span class="summary-label">首期扣款：</span>
-                        <span id="footerFirstPayment" class="summary-value">NT$ 2,500</span>
+                        <div class="summary-label">首期扣款</div>
+                        <div id="footerFirstPayment" class="summary-value highlight">NT$ 2,500</div>
                     </div>
                 </div>
-                <button id="submitBtn" class="btn-submit">確認報名並送出</button>
+                <div class="summary-footer-right">
+                    <button id="submitBtn" class="btn-primary">確認報名並送出</button>
+                </div>
             </div>
         </div>
     </div> <!-- 關閉 mainApp -->
