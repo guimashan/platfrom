@@ -2080,6 +2080,21 @@ body {
    簽到頁面專用樣式 (Checkin Page Styles)
    ======================================== */
 
+/* 棕色文字連結 */
+.link-brown {
+    color: #8B6914;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.link-brown:hover {
+    color: #6A4F0F;
+    text-decoration: underline;
+}
+
 /* 模式切換標籤容器 */
 .mode-tabs {
     display: flex;
