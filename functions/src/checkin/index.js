@@ -724,7 +724,6 @@ exports.getCheckinHistory = onRequest(
         logger.info('權限檢查', {
           currentUserId,
           requestedUserId,
-          userExists,
           userRoles,
           isAdmin
         });
