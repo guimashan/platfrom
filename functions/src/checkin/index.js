@@ -839,6 +839,124 @@ exports.getCheckinHistoryV2 = onRequest(
 );
 
 /**
+ * 獲取簽到紀錄 (Callable Function) - CORS 問題解決方案
+ */
+exports.getCheckinHistoryCallable = onCall(
+    {region: 'asia-east2'},
+    async (request) => {
+      try {
+        // 驗證使用者是否已登入
+        if (!request.auth || !request.auth.uid) {
+          throw new HttpsError(
+              'unauthenticated',
+              'User must be authenticated',
+          );
+        }
+
+        // 檢查權限
+        await assertHasRequiredRole(request.auth.uid, [
+          'user_checkin',
+          'poweruser_checkin',
+          'admin_checkin',
+          'superadmin',
+        ]);
+
+        const currentUserId = request.auth.uid;
+        const limit = request.data.limit || 50;
+        const requestedUserId = request.data.userId;
+        
+        // 獲取用戶角色以判斷是否為管理員
+        const userRoles = await getUserRoles(currentUserId);
+        const isAdmin = userRoles.some(role => 
+          role === 'superadmin' || role === 'admin_checkin' || role === 'poweruser_checkin'
+        );
+        
+        logger.info('權限檢查', {
+          currentUserId,
+          requestedUserId,
+          userRoles,
+          isAdmin
+        });
+        
+        // 確定要查詢的用戶 ID
+        let targetUserId = currentUserId;
+        if (requestedUserId) {
+          if (!isAdmin) {
+            throw new HttpsError(
+                'permission-denied',
+                '您沒有權限查看其他用戶的記錄',
+            );
+          }
+          targetUserId = requestedUserId;
+        }
+        
+        // 根據角色查詢簽到記錄
+        let checkinsQuery = admin.firestore().collection('checkins');
+        
+        if (!isAdmin || targetUserId) {
+          checkinsQuery = checkinsQuery.where('userId', '==', targetUserId);
+        }
+        
+        const checkinsSnapshot = await checkinsQuery
+            .orderBy('timestamp', 'desc')
+            .limit(limit)
+            .get();
+
+        // 查詢巡邏點名稱
+        const checkins = await Promise.all(checkinsSnapshot.docs.map(async doc => {
+          const data = doc.data();
+          
+          let patrolName = data.patrolId;
+          if (data.patrolId) {
+            try {
+              const patrolDoc = await admin.firestore()
+                  .collection('patrols')
+                  .doc(data.patrolId)
+                  .get();
+              if (patrolDoc.exists) {
+                patrolName = patrolDoc.data().name;
+              }
+            } catch (error) {
+              logger.error('查詢巡邏點名稱失敗', error);
+            }
+          }
+          
+          return {
+            id: doc.id,
+            userId: data.userId,
+            userName: data.userName,
+            patrolId: data.patrolId,
+            patrolName: patrolName,
+            timestamp: data.timestamp,
+            testMode: data.testMode,
+            location: data.location,
+          };
+        }));
+
+        logger.info('簽到紀錄已取得', {
+          currentUserId,
+          targetUserId,
+          isAdmin,
+          count: checkins.length,
+        });
+
+        return {
+          ok: true,
+          checkins: checkins,
+        };
+      } catch (error) {
+        logger.error('獲取簽到紀錄失敗', error);
+        
+        if (error instanceof HttpsError) {
+          throw error;
+        }
+        
+        throw new HttpsError('internal', `獲取簽到紀錄失敗: ${error.message}`);
+      }
+    },
+);
+
+/**
  * 獲取測試模式狀態 (HTTP Endpoint)
  */
 exports.getTestModeStatus = onRequest(

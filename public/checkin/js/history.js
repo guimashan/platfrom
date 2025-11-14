@@ -2,10 +2,10 @@
  * 簽到紀錄頁面
  */
 
-import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, checkinFunctions } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 import { logout } from '/js/auth.js';
-import { callAPI } from '/js/api-helper.js';
 
 let currentUser = null;
 
@@ -33,11 +33,11 @@ async function loadHistory() {
     try {
         historyList.innerHTML = '<p>載入中...</p>';
         
-        const result = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=50', {
-            method: 'GET'
-        });
+        // 使用 Callable Function 而不是 HTTP endpoint (解決 CORS 問題)
+        const getCheckinHistory = httpsCallable(checkinFunctions, 'getCheckinHistoryCallable');
+        const result = await getCheckinHistory({ limit: 50 });
         
-        const checkins = result.checkins || [];
+        const checkins = result.data.checkins || [];
         
         if (checkins.length === 0) {
             historyList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
