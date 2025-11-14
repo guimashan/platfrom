@@ -839,31 +839,54 @@ exports.getCheckinHistoryV2 = onRequest(
 );
 
 /**
- * 獲取簽到紀錄 (Callable Function) - CORS 問題解決方案
+ * 獲取簽到紀錄 (HTTP Endpoint) - 支援跨專案認證 V3
  */
-exports.getCheckinHistoryCallable = onCall(
-    {region: 'asia-east2'},
-    async (request) => {
+exports.getCheckinHistoryV3 = onRequest(
+    {
+      region: 'asia-east2',
+      cors: true,
+    },
+    async (req, res) => {
       try {
-        // 驗證使用者是否已登入
-        if (!request.auth || !request.auth.uid) {
-          throw new HttpsError(
-              'unauthenticated',
-              'User must be authenticated',
-          );
+        if (req.method !== 'POST') {
+          res.status(405).json({
+            error: {message: '只接受 POST 請求'},
+          });
+          return;
+        }
+
+        // 手動驗證 Platform ID Token
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          res.status(401).json({
+            error: {message: '缺少認證 token'},
+          });
+          return;
+        }
+
+        const idToken = authHeader.split('Bearer ')[1];
+        let decodedToken;
+        try {
+          decodedToken = await platformAuth.verifyIdToken(idToken);
+        } catch (error) {
+          logger.error('Token 驗證失敗:', error);
+          res.status(401).json({
+            error: {message: '認證失敗'},
+          });
+          return;
         }
 
         // 檢查權限
-        await assertHasRequiredRole(request.auth.uid, [
+        await assertHasRequiredRole(decodedToken.uid, [
           'user_checkin',
           'poweruser_checkin',
           'admin_checkin',
           'superadmin',
         ]);
 
-        const currentUserId = request.auth.uid;
-        const limit = request.data.limit || 50;
-        const requestedUserId = request.data.userId;
+        const currentUserId = decodedToken.uid;
+        const limit = parseInt(req.body.limit) || 50;
+        const requestedUserId = req.body.userId;
         
         // 獲取用戶角色以判斷是否為管理員
         const userRoles = await getUserRoles(currentUserId);
@@ -940,18 +963,25 @@ exports.getCheckinHistoryCallable = onCall(
           count: checkins.length,
         });
 
-        return {
-          ok: true,
-          checkins: checkins,
-        };
+        res.status(200).json({
+          result: {
+            success: true,
+            checkins: checkins,
+          },
+        });
       } catch (error) {
         logger.error('獲取簽到紀錄失敗', error);
         
         if (error instanceof HttpsError) {
-          throw error;
+          const statusCode = error.code === 'permission-denied' ? 403 : 500;
+          res.status(statusCode).json({
+            error: {message: error.message},
+          });
+        } else {
+          res.status(500).json({
+            error: {message: `獲取簽到紀錄失敗: ${error.message}`},
+          });
         }
-        
-        throw new HttpsError('internal', `獲取簽到紀錄失敗: ${error.message}`);
       }
     },
 );

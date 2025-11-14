@@ -2,10 +2,9 @@
  * 簽到記錄查詢
  */
 
-import { platformAuth, platformDb, checkinFunctions, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
 import { getDoc, doc, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 import { logout } from '/js/auth.js';
 import { callAPI } from '/js/api-helper.js';
 
@@ -106,11 +105,24 @@ async function loadUsers() {
 
 async function loadAllRecords() {
     try {
-        // 使用 Callable Function (部署在 checkin-76c77)
-        const getCheckinHistory = httpsCallable(checkinFunctions, 'getCheckinHistoryCallable');
-        const result = await getCheckinHistory({ limit: 50000 });
+        // 手動調用 API（支援跨專案認證）
+        const idToken = await platformAuth.currentUser.getIdToken();
+        const response = await fetch(API_ENDPOINTS.getCheckinHistory, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ limit: 50000 })
+        });
         
-        allRecords = result.data.checkins || [];
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error?.message || '載入失敗');
+        }
+        
+        allRecords = data.result?.checkins || [];
         
         console.log(`已載入 ${allRecords.length} 筆簽到記錄`);
     } catch (error) {

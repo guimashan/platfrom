@@ -2,9 +2,8 @@
  * 簽到紀錄頁面
  */
 
-import { platformAuth, checkinFunctions } from '/js/firebase-init.js';
+import { platformAuth, API_ENDPOINTS } from '/js/firebase-init.js';
 import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-functions.js';
 import { logout } from '/js/auth.js';
 
 let currentUser = null;
@@ -33,11 +32,24 @@ async function loadHistory() {
     try {
         historyList.innerHTML = '<p>載入中...</p>';
         
-        // 使用 Callable Function (部署在 checkin-76c77)
-        const getCheckinHistory = httpsCallable(checkinFunctions, 'getCheckinHistoryCallable');
-        const result = await getCheckinHistory({ limit: 50 });
+        // 手動調用 API（支援跨專案認證）
+        const idToken = await platformAuth.currentUser.getIdToken();
+        const response = await fetch(API_ENDPOINTS.getCheckinHistory, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify({ limit: 50 })
+        });
         
-        const checkins = result.data.checkins || [];
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error?.message || '載入失敗');
+        }
+        
+        const checkins = data.result?.checkins || [];
         
         if (checkins.length === 0) {
             historyList.innerHTML = '<p class="no-data">尚無簽到紀錄</p>';
