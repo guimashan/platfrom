@@ -162,7 +162,18 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       return;
     }
     
-    // 只接受 POST
+    // 處理 GET 請求（用於健康檢查和測試）
+    if (req.method === 'GET') {
+      res.status(200).json({
+        status: 'ok',
+        message: 'LINE Messaging Webhook is running',
+        timestamp: new Date().toISOString(),
+        service: 'Guimashan LINE Bot'
+      });
+      return;
+    }
+    
+    // 只接受 POST 進行實際的 Webhook 處理
     if (req.method !== 'POST') {
       res.status(405).send('Method Not Allowed');
       return;

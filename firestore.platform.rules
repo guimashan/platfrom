@@ -28,6 +28,7 @@ service cloud.firestore {
     function isAnyAdmin() {
       return isAuthenticated() && hasUserData() && getUserData().roles.hasAny([
         'superadmin',
+        'admin',
         'admin_checkin',
         'admin_service',
         'admin_schedule',
