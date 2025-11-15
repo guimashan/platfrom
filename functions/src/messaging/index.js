@@ -84,15 +84,30 @@ function createLiffButtonMessage(config) {
  */
 async function getLiffAppName(liffId) {
   try {
+    logger.info(`🔍 查詢 LIFF 名稱，liffId: ${liffId}`);
     const liffDoc = await admin.firestore().doc('line_bot_settings/liff_apps').get();
-    if (liffDoc.exists()) {
-      const apps = liffDoc.data().apps || [];
-      const app = apps.find(a => a.liffId === liffId);
-      return app ? app.name : null;
+    
+    if (!liffDoc.exists) {
+      logger.warn('⚠️ line_bot_settings/liff_apps 文檔不存在');
+      return null;
     }
-    return null;
+    
+    const data = liffDoc.data();
+    logger.info(`📦 LIFF 文檔資料:`, JSON.stringify(data));
+    
+    const apps = data.apps || [];
+    logger.info(`📱 LIFF 應用數量: ${apps.length}`);
+    
+    const app = apps.find(a => a.liffId === liffId);
+    if (app) {
+      logger.info(`✅ 找到 LIFF 應用: ${app.name}`);
+      return app.name;
+    } else {
+      logger.warn(`⚠️ 找不到 liffId=${liffId} 的 LIFF 應用`);
+      return null;
+    }
   } catch (error) {
-    logger.error('取得 LIFF 名稱失敗:', error);
+    logger.error('❌ 取得 LIFF 名稱失敗:', error);
     return null;
   }
 }
