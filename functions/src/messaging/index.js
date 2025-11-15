@@ -151,6 +151,17 @@ function validateSignature(body, signature, channelSecret) {
  */
 async function handleWebhook(req, res, channelSecret, accessToken) {
   try {
+    // 設置 CORS headers 允許前端訪問
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'Content-Type, x-line-signature');
+    
+    // 處理 OPTIONS 預檢請求
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+    
     // 只接受 POST
     if (req.method !== 'POST') {
       res.status(405).send('Method Not Allowed');

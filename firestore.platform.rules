@@ -52,5 +52,13 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated();
     }
+    
+    // LINE Bot 設定 (line_bot_settings)
+    match /line_bot_settings/{document} {
+      // 所有已登入的管理員可以讀取 LINE Bot 設定
+      allow read: if isAnyAdmin();
+      // 只有管理員可以修改 LINE Bot 設定
+      allow write: if isAnyAdmin();
+    }
   }
 }
