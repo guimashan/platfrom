@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <link rel="icon" type="image/png" href="/images/temple-icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFF 應用管理 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .liff-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 4px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-cream);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            border-radius: 2px;
+        }
+
+        .liff-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .liff-card {
+            background: var(--bg-cream);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            transition: all var(--transition-base);
+            border: 2px solid transparent;
+        }
+
+        .liff-card:hover {
+            border-color: var(--primary-gold-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .liff-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .liff-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .liff-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-used {
+            background: var(--color-success-light);
+            color: var(--color-success);
+        }
+
+        .status-unused {
+            background: var(--color-warning-light);
+            color: var(--color-warning);
+        }
+
+        .liff-info {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .liff-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+
+        .liff-info-label {
+            color: var(--text-secondary);
+            min-width: 80px;
+        }
+
+        .liff-info-value {
+            color: var(--text-primary);
+            font-family: 'Courier New', monospace;
+            font-size: 0.8125rem;
+            word-break: break-all;
+        }
+
+        .liff-keywords {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+
+        .keywords-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .keyword-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            background: white;
+            border: 1px solid var(--primary-gold-light);
+            color: var(--primary-gold-dark);
+            border-radius: var(--radius-sm);
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .liff-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-copy {
+            flex: 1;
+            padding: 8px 16px;
+            background: white;
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+
+        .btn-copy:hover {
+            background: var(--primary-gold-lighter);
+        }
+
+        .btn-edit-keywords {
+            flex: 1;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+
+        .btn-edit-keywords:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: white;
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-gold-lighter);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius-sm);
+            font-size: 0.9375rem;
+        }
+
+        .form-hint {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .keyword-input-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .keyword-input-group input {
+            flex: 1;
+        }
+
+        .btn-remove {
+            padding: 8px 16px;
+            background: var(--color-error-light);
+            color: var(--color-error);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 頂部導航 -->
+        <header class="header">
+            <h1>LIFF 應用管理</h1>
+            <button onclick="window.location.href='/manage/index.html'" class="btn-secondary">返回管理首頁</button>
+        </header>
+
+        <main class="liff-container">
+            <!-- 統計資訊 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalApps">0</div>
+                    <div class="stat-label">LIFF 應用總數</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="usedApps">0</div>
+                    <div class="stat-label">已綁定關鍵字</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="unusedApps">0</div>
+                    <div class="stat-label">未使用</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalKeywords">0</div>
+                    <div class="stat-label">總關鍵字數</div>
+                </div>
+            </div>
+
+            <!-- LIFF 應用列表 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">LIFF 應用列表</h2>
+                    <button onclick="syncLiffApps()" class="btn-primary">🔄 同步 LIFF 列表</button>
+                </div>
+
+                <div id="liffLoading" class="loading">載入中...</div>
+                <div id="liffGrid" class="liff-grid" style="display: none;"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 編輯關鍵字 Modal -->
+    <div id="keywordModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-header">編輯關鍵字</h3>
+            <div style="margin-bottom: 20px;">
+                <strong id="modalLiffName"></strong>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">關鍵字列表</label>
+                <div id="keywordsList"></div>
+                <button type="button" onclick="addKeywordInput()" class="btn-secondary" style="margin-top: 12px; width: 100%;">+ 新增關鍵字</button>
+                <div class="form-hint">設定後，用戶在 LINE 輸入這些關鍵字就會收到此 LIFF 的連結</div>
+            </div>
+
+            <div class="modal-actions">
+                <button onclick="closeKeywordModal()" class="btn-secondary">取消</button>
+                <button onclick="saveKeywords()" class="btn-primary">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { platformAuth, platformDb } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { doc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let currentUser = null;
+        let liffApps = [];
+        let keywords = {};
+        let currentEditingLiff = null;
+
+        // LIFF 應用資料（從您提供的列表）
+        const LIFF_APPS_DATA = [
+            { name: '同仁排班', liffId: '2008269293-Y1akmZkJ' },
+            { name: '神務服務', liffId: '2008269293-o3rL8ZLz' },
+            { name: '簽到記錄', liffId: '2008269293-Y9pEQkEL' },
+            { name: '排班管理', liffId: '2008269293-xjEnOwnj' },
+            { name: '本月班表', liffId: '2008269293-LrRMjAMP' },
+            { name: '本週班表', liffId: '2008269293-RPQ5xL5g' },
+            { name: '班表', liffId: '2008269293-4aLNk0NZ' },
+            { name: '志工排班', liffId: '2008269293-qJmPeWPp' },
+            { name: '福田會_福田 Youth', liffId: '2008269293-XPgaLra8' },
+            { name: '福田會_企業團體', liffId: '2008269293-LKR2Nr2x' },
+            { name: '福田會_信眾個人', liffId: '2008269293-71e3y43M' },
+            { name: '福田會', liffId: '2008269293-qX36NQ6Z' },
+            { name: '添香油', liffId: '2008269293-08nodJoY' },
+            { name: '建宮廟款', liffId: '2008269293-kP3wR7w2' },
+            { name: '秋祭法會', liffId: '2008269293-jJAOXRON' },
+            { name: '普施法會', liffId: '2008269293-JxweaMeq' },
+            { name: '中元法會', liffId: '2008269293-nvWQDYQr' },
+            { name: '禮斗法會', liffId: '2008269293-npEKdxKa' },
+            { name: '年斗法會', liffId: '2008269293-xPnd6gdR' },
+            { name: '線上點燈', liffId: '2008269293-pam9Q09l' },
+            { name: '神務管理', liffId: '2008269293-R1objlb1' },
+            { name: '簽到管理', liffId: '2008269293-VGLP8oPw' },
+            { name: '奉香簽到', liffId: '2008269293-nYBm3JmV' },
+            { name: '排班系統', liffId: '2008269293-N0wnqknr' }
+        ];
+
+        // 初始化
+        onAuthStateChanged(platformAuth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await checkPermission();
+                await loadData();
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // 檢查權限
+        async function checkPermission() {
+            const userDoc = await getDoc(doc(platformDb, 'users', currentUser.uid));
+            if (!userDoc.exists()) {
+                alert('無法取得使用者資料');
+                window.location.href = '/';
+                return;
+            }
+
+            const userData = userDoc.data();
+            const roles = userData.roles || [];
+            const isAdmin = roles.some(role => 
+                role === 'superadmin' || 
+                role === 'admin' || 
+                role.startsWith('admin_')
+            );
+
+            if (!isAdmin) {
+                alert('您沒有權限訪問此頁面');
+                window.location.href = '/';
+            }
+        }
+
+        // 載入資料
+        async function loadData() {
+            // 載入 LIFF 應用列表
+            const liffDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'liff_apps'));
+            if (liffDoc.exists()) {
+                liffApps = liffDoc.data().apps || [];
+            } else {
+                liffApps = LIFF_APPS_DATA;
+                await setDoc(doc(platformDb, 'line_bot_settings', 'liff_apps'), { apps: liffApps });
+            }
+
+            // 載入關鍵字設定
+            const keywordsDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'keywords'));
+            if (keywordsDoc.exists()) {
+                keywords = keywordsDoc.data();
+            } else {
+                keywords = {};
+            }
+
+            renderLiffApps();
+            updateStats();
+        }
+
+        // 渲染 LIFF 應用
+        function renderLiffApps() {
+            const grid = document.getElementById('liffGrid');
+            grid.innerHTML = '';
+
+            liffApps.forEach(app => {
+                // 找出使用此 LIFF 的關鍵字
+                const usedKeywords = Object.values(keywords)
+                    .filter(kw => kw.liffId === app.liffId)
+                    .flatMap(kw => [kw.keyword, ...(kw.aliases || [])]);
+
+                const isUsed = usedKeywords.length > 0;
+                const liffUrl = `https://liff.line.me/${app.liffId}`;
+
+                const card = document.createElement('div');
+                card.className = 'liff-card';
+                card.innerHTML = `
+                    <div class="liff-header">
+                        <div class="liff-name">${app.name}</div>
+                        <span class="liff-status ${isUsed ? 'status-used' : 'status-unused'}">
+                            ${isUsed ? '✓ 已綁定' : '未使用'}
+                        </span>
+                    </div>
+                    <div class="liff-info">
+                        <div class="liff-info-item">
+                            <span class="liff-info-label">LIFF ID:</span>
+                            <span class="liff-info-value">${app.liffId}</span>
+                        </div>
+                        <div class="liff-info-item">
+                            <span class="liff-info-label">LIFF URL:</span>
+                            <span class="liff-info-value">${liffUrl}</span>
+                        </div>
+                    </div>
+                    ${isUsed ? `
+                        <div class="liff-keywords">
+                            <div class="keywords-label">綁定的關鍵字：</div>
+                            <div class="keyword-list">
+                                ${usedKeywords.map(kw => `<span class="keyword-tag">${kw}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="liff-actions">
+                        <button class="btn-copy" onclick="copyLiffUrl('${liffUrl}')">📋 複製 URL</button>
+                        <button class="btn-edit-keywords" onclick="editLiffKeywords('${app.liffId}')">✏️ 編輯關鍵字</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('liffLoading').style.display = 'none';
+            document.getElementById('liffGrid').style.display = 'grid';
+        }
+
+        // 更新統計
+        function updateStats() {
+            const usedLiffs = new Set(Object.values(keywords).map(kw => kw.liffId));
+            const totalKeywordsCount = Object.values(keywords).reduce((sum, kw) => {
+                return sum + 1 + (kw.aliases || []).length;
+            }, 0);
+
+            document.getElementById('totalApps').textContent = liffApps.length;
+            document.getElementById('usedApps').textContent = usedLiffs.size;
+            document.getElementById('unusedApps').textContent = liffApps.length - usedLiffs.size;
+            document.getElementById('totalKeywords').textContent = totalKeywordsCount;
+        }
+
+        // 複製 LIFF URL
+        window.copyLiffUrl = function(url) {
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✓ LIFF URL 已複製到剪貼簿');
+            });
+        }
+
+        // 編輯 LIFF 關鍵字
+        window.editLiffKeywords = function(liffId) {
+            currentEditingLiff = liffApps.find(app => app.liffId === liffId);
+            if (!currentEditingLiff) return;
+
+            document.getElementById('modalLiffName').textContent = currentEditingLiff.name;
+
+            // 找出使用此 LIFF 的關鍵字
+            const usedKeywords = Object.values(keywords)
+                .filter(kw => kw.liffId === liffId)
+                .flatMap(kw => [kw.keyword, ...(kw.aliases || [])]);
+
+            renderKeywordInputs(usedKeywords);
+            document.getElementById('keywordModal').classList.add('active');
+        }
+
+        // 渲染關鍵字輸入框
+        function renderKeywordInputs(keywordList = []) {
+            const container = document.getElementById('keywordsList');
+            container.innerHTML = '';
+
+            if (keywordList.length === 0) {
+                keywordList = [''];
+            }
+
+            keywordList.forEach((kw, index) => {
+                const group = document.createElement('div');
+                group.className = 'keyword-input-group';
+                group.innerHTML = `
+                    <input type="text" class="form-input keyword-input" value="${kw}" placeholder="輸入關鍵字">
+                    ${keywordList.length > 1 ? `<button type="button" class="btn-remove" onclick="removeKeywordInput(${index})">移除</button>` : ''}
+                `;
+                container.appendChild(group);
+            });
+        }
+
+        // 新增關鍵字輸入框
+        window.addKeywordInput = function() {
+            const container = document.getElementById('keywordsList');
+            const group = document.createElement('div');
+            group.className = 'keyword-input-group';
+            const index = container.children.length;
+            group.innerHTML = `
+                <input type="text" class="form-input keyword-input" placeholder="輸入關鍵字">
+                <button type="button" class="btn-remove" onclick="removeKeywordInput(${index})">移除</button>
+            `;
+            container.appendChild(group);
+        }
+
+        // 移除關鍵字輸入框
+        window.removeKeywordInput = function(index) {
+            const container = document.getElementById('keywordsList');
+            const inputs = container.querySelectorAll('.keyword-input-group');
+            if (inputs.length > 1) {
+                inputs[index].remove();
+            }
+        }
+
+        // 儲存關鍵字
+        window.saveKeywords = async function() {
+            if (!currentEditingLiff) return;
+
+            const inputs = document.querySelectorAll('.keyword-input');
+            const newKeywords = Array.from(inputs)
+                .map(input => input.value.trim())
+                .filter(kw => kw);
+
+            if (newKeywords.length === 0) {
+                // 移除所有使用此 LIFF 的關鍵字
+                Object.keys(keywords).forEach(key => {
+                    if (keywords[key].liffId === currentEditingLiff.liffId) {
+                        delete keywords[key];
+                    }
+                });
+            } else {
+                // 先移除舊的關鍵字
+                Object.keys(keywords).forEach(key => {
+                    if (keywords[key].liffId === currentEditingLiff.liffId) {
+                        delete keywords[key];
+                    }
+                });
+
+                // 新增第一個關鍵字為主要關鍵字，其餘為別名
+                const mainKeyword = newKeywords[0];
+                const aliases = newKeywords.slice(1);
+
+                keywords[mainKeyword] = {
+                    keyword: mainKeyword,
+                    aliases: aliases,
+                    liffId: currentEditingLiff.liffId,
+                    replyMessage: `請使用 ${currentEditingLiff.name}`,
+                    buttonText: '開始使用',
+                    enabled: true,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
+            await loadData();
+            closeKeywordModal();
+            alert('關鍵字已儲存');
+        }
+
+        // 關閉 Modal
+        window.closeKeywordModal = function() {
+            document.getElementById('keywordModal').classList.remove('active');
+            currentEditingLiff = null;
+        }
+
+        // 同步 LIFF 列表
+        window.syncLiffApps = async function() {
+            if (!confirm('確定要重新同步 LIFF 列表嗎？這會更新資料庫中的 LIFF 應用資料。')) return;
+
+            liffApps = LIFF_APPS_DATA;
+            await setDoc(doc(platformDb, 'line_bot_settings', 'liff_apps'), { apps: liffApps });
+            await loadData();
+            alert('LIFF 列表已同步');
+        }
+    </script>
+</body>
+</html>

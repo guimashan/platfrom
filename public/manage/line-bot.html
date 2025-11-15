@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <link rel="icon" type="image/png" href="/images/temple-icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LINE Bot 管理 - 龜馬山整合服務平台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles/common.css">
+    <style>
+        .linebot-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--bg-cream);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            border-radius: 2px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            padding: 8px 12px;
+            background: var(--bg-cream);
+            border-radius: var(--radius-sm);
+            font-family: 'Courier New', monospace;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-success {
+            background: var(--color-success-light);
+            color: var(--color-success);
+        }
+
+        .status-error {
+            background: var(--color-error-light);
+            color: var(--color-error);
+        }
+
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .btn-primary {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary-gold), var(--primary-gold-dark));
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            padding: 10px 20px;
+            background: white;
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9375rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-gold-lighter);
+        }
+
+        .keywords-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .keywords-table thead {
+            background: linear-gradient(135deg, #8A2BE2, #6A1BB2);
+            color: white;
+        }
+
+        .keywords-table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 500;
+        }
+
+        .keywords-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--bg-cream);
+        }
+
+        .keywords-table tbody tr:hover {
+            background: var(--bg-cream);
+        }
+
+        .keyword-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--primary-gold-lighter);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            margin: 2px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #ddd;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-size: 0.875rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--bg-cream);
+        }
+
+        .btn-delete {
+            color: var(--color-error);
+            border-color: var(--color-error);
+        }
+
+        .btn-delete:hover {
+            background: var(--color-error-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-overlay);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-2xl);
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius-sm);
+            font-size: 0.9375rem;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-hint {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 頂部導航 -->
+        <header class="header">
+            <h1>LINE Bot 管理</h1>
+            <button onclick="window.location.href='/manage/index.html'" class="btn-secondary">返回管理首頁</button>
+        </header>
+
+        <main class="linebot-container">
+            <!-- 官方帳號資訊 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">官方帳號資訊</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">官方帳號 ID</span>
+                        <span class="info-value">@495fdqrw</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Channel ID</span>
+                        <span class="info-value">2008221557</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">官方帳號名稱</span>
+                        <span class="info-value">龜馬山紫皇天乙真慶宮</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Webhook 狀態 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">Webhook 狀態</h2>
+                    <button onclick="testWebhook()" class="btn-primary">測試連線</button>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Webhook URL</span>
+                        <span class="info-value" style="font-size: 0.875rem;">https://asia-east1-platform-bc783.cloudfunctions.net/lineMessaging</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">連線狀態</span>
+                        <span id="webhookStatus" class="status-indicator status-success">
+                            <span>正常運作</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 關鍵字管理 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">關鍵字管理</h2>
+                    <button onclick="openAddKeywordModal()" class="btn-primary">+ 新增關鍵字</button>
+                </div>
+                
+                <div id="keywordsLoading" class="loading">載入中...</div>
+                
+                <table id="keywordsTable" class="keywords-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>關鍵字</th>
+                            <th>別名</th>
+                            <th>LIFF 應用</th>
+                            <th>狀態</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="keywordsTableBody">
+                    </tbody>
+                </table>
+
+                <div id="keywordsEmpty" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📝</div>
+                    <p>尚未設定任何關鍵字</p>
+                    <p style="font-size: 0.875rem;">點擊上方「新增關鍵字」開始設定</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增/編輯關鍵字 Modal -->
+    <div id="keywordModal" class="modal">
+        <div class="modal-content">
+            <h3 class="modal-header" id="modalTitle">新增關鍵字</h3>
+            <form id="keywordForm">
+                <div class="form-group">
+                    <label class="form-label">主要關鍵字 *</label>
+                    <input type="text" id="mainKeyword" class="form-input" required placeholder="例如：線上點燈">
+                    <div class="form-hint">用戶輸入此關鍵字時會觸發回覆</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">別名（可選）</label>
+                    <input type="text" id="aliases" class="form-input" placeholder="例如：點燈,祈福點燈（用逗號分隔）">
+                    <div class="form-hint">設定其他也能觸發的關鍵字，用逗號分隔</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">選擇 LIFF 應用 *</label>
+                    <select id="liffSelect" class="form-select" required>
+                        <option value="">請選擇...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">回覆訊息 *</label>
+                    <textarea id="replyMessage" class="form-textarea" required placeholder="🪔 線上點燈服務&#10;&#10;請點擊下方按鈕開始點燈"></textarea>
+                    <div class="form-hint">用戶會看到的訊息內容</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">按鈕文字 *</label>
+                    <input type="text" id="buttonText" class="form-input" required placeholder="開始點燈" value="開始使用">
+                    <div class="form-hint">LIFF 按鈕上顯示的文字</div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" onclick="closeKeywordModal()" class="btn-secondary">取消</button>
+                    <button type="submit" class="btn-primary">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { platformAuth, platformDb } from '/js/firebase-init.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { collection, getDocs, doc, setDoc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        let currentUser = null;
+        let liffApps = [];
+        let keywords = {};
+
+        // 初始化
+        onAuthStateChanged(platformAuth, async (user) => {
+            if (user) {
+                currentUser = user;
+                await checkPermission();
+                await loadLiffApps();
+                await loadKeywords();
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // 檢查權限
+        async function checkPermission() {
+            const userDoc = await getDoc(doc(platformDb, 'users', currentUser.uid));
+            if (!userDoc.exists()) {
+                alert('無法取得使用者資料');
+                window.location.href = '/';
+                return;
+            }
+
+            const userData = userDoc.data();
+            const roles = userData.roles || [];
+            const isAdmin = roles.some(role => 
+                role === 'superadmin' || 
+                role === 'admin' || 
+                role.startsWith('admin_')
+            );
+
+            if (!isAdmin) {
+                alert('您沒有權限訪問此頁面');
+                window.location.href = '/';
+            }
+        }
+
+        // 載入 LIFF 應用列表
+        async function loadLiffApps() {
+            const liffDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'liff_apps'));
+            if (liffDoc.exists()) {
+                liffApps = liffDoc.data().apps || [];
+            } else {
+                // 初始化 LIFF 列表
+                liffApps = [];
+            }
+            
+            // 填充下拉選單
+            const select = document.getElementById('liffSelect');
+            select.innerHTML = '<option value="">請選擇...</option>';
+            liffApps.forEach(app => {
+                const option = document.createElement('option');
+                option.value = app.liffId;
+                option.textContent = app.name;
+                select.appendChild(option);
+            });
+        }
+
+        // 載入關鍵字設定
+        async function loadKeywords() {
+            document.getElementById('keywordsLoading').style.display = 'block';
+            document.getElementById('keywordsTable').style.display = 'none';
+            document.getElementById('keywordsEmpty').style.display = 'none';
+
+            const keywordsDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'keywords'));
+            if (keywordsDoc.exists()) {
+                keywords = keywordsDoc.data();
+            } else {
+                keywords = {};
+            }
+
+            renderKeywords();
+        }
+
+        // 渲染關鍵字列表
+        function renderKeywords() {
+            const tbody = document.getElementById('keywordsTableBody');
+            tbody.innerHTML = '';
+
+            const keywordsList = Object.values(keywords);
+            
+            if (keywordsList.length === 0) {
+                document.getElementById('keywordsLoading').style.display = 'none';
+                document.getElementById('keywordsEmpty').style.display = 'block';
+                return;
+            }
+
+            keywordsList.forEach(kw => {
+                const tr = document.createElement('tr');
+                
+                const liffApp = liffApps.find(app => app.liffId === kw.liffId);
+                const aliases = kw.aliases || [];
+                
+                tr.innerHTML = `
+                    <td><strong>${kw.keyword}</strong></td>
+                    <td>
+                        ${aliases.map(a => `<span class="keyword-badge">${a}</span>`).join('')}
+                        ${aliases.length === 0 ? '<span style="color: var(--text-tertiary);">無</span>' : ''}
+                    </td>
+                    <td>${liffApp ? liffApp.name : kw.liffId}</td>
+                    <td><span class="status-indicator status-success">啟用中</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon" onclick="editKeyword('${kw.keyword}')">編輯</button>
+                            <button class="btn-icon btn-delete" onclick="deleteKeyword('${kw.keyword}')">刪除</button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('keywordsLoading').style.display = 'none';
+            document.getElementById('keywordsTable').style.display = 'table';
+        }
+
+        // 開啟新增關鍵字 Modal
+        window.openAddKeywordModal = function() {
+            document.getElementById('modalTitle').textContent = '新增關鍵字';
+            document.getElementById('keywordForm').reset();
+            document.getElementById('keywordModal').classList.add('active');
+        }
+
+        // 關閉 Modal
+        window.closeKeywordModal = function() {
+            document.getElementById('keywordModal').classList.remove('active');
+        }
+
+        // 編輯關鍵字
+        window.editKeyword = function(keyword) {
+            const kw = keywords[keyword];
+            if (!kw) return;
+
+            document.getElementById('modalTitle').textContent = '編輯關鍵字';
+            document.getElementById('mainKeyword').value = kw.keyword;
+            document.getElementById('aliases').value = (kw.aliases || []).join(',');
+            document.getElementById('liffSelect').value = kw.liffId;
+            document.getElementById('replyMessage').value = kw.replyMessage;
+            document.getElementById('buttonText').value = kw.buttonText;
+            
+            document.getElementById('keywordModal').classList.add('active');
+        }
+
+        // 刪除關鍵字
+        window.deleteKeyword = async function(keyword) {
+            if (!confirm(`確定要刪除關鍵字「${keyword}」嗎？`)) return;
+
+            delete keywords[keyword];
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
+            await loadKeywords();
+            alert('關鍵字已刪除');
+        }
+
+        // 表單提交
+        document.getElementById('keywordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const keyword = document.getElementById('mainKeyword').value.trim();
+            const aliasesText = document.getElementById('aliases').value.trim();
+            const aliases = aliasesText ? aliasesText.split(',').map(a => a.trim()).filter(a => a) : [];
+            const liffId = document.getElementById('liffSelect').value;
+            const replyMessage = document.getElementById('replyMessage').value.trim();
+            const buttonText = document.getElementById('buttonText').value.trim();
+
+            if (!keyword || !liffId || !replyMessage || !buttonText) {
+                alert('請填寫所有必填欄位');
+                return;
+            }
+
+            keywords[keyword] = {
+                keyword,
+                aliases,
+                liffId,
+                replyMessage,
+                buttonText,
+                enabled: true,
+                updatedAt: new Date().toISOString()
+            };
+
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
+            await loadKeywords();
+            closeKeywordModal();
+            alert('關鍵字已儲存');
+        });
+
+        // 測試 Webhook
+        window.testWebhook = async function() {
+            const statusEl = document.getElementById('webhookStatus');
+            statusEl.className = 'status-indicator';
+            statusEl.innerHTML = '<span>測試中...</span>';
+
+            try {
+                const response = await fetch('https://asia-east1-platform-bc783.cloudfunctions.net/lineMessaging', {
+                    method: 'GET'
+                });
+
+                if (response.ok || response.status === 405) {
+                    statusEl.className = 'status-indicator status-success';
+                    statusEl.innerHTML = '<span>正常運作</span>';
+                } else {
+                    throw new Error('連線失敗');
+                }
+            } catch (error) {
+                statusEl.className = 'status-indicator status-error';
+                statusEl.innerHTML = '<span>連線失敗</span>';
+            }
+        }
+
+        // 自動測試 Webhook
+        setTimeout(() => {
+            testWebhook();
+        }, 1000);
+    </script>
+</body>
+</html>

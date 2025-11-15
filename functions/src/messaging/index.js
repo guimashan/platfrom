@@ -1,25 +1,102 @@
 /**
- * LINE Messaging API Webhook - 簡化版本
+ * LINE Messaging API Webhook - 智能關鍵字回覆版本
  * 
- * 功能：接收 LINE 訊息並回覆固定的服務資訊
- * 註：關鍵字自動回覆功能已停用（2025-11-10）
+ * 功能：接收 LINE 訊息，根據關鍵字回覆對應的 LIFF 應用
+ * 更新日期：2025-11-15
  */
 
 const { onRequest } = require('firebase-functions/v2/https');
 const { defineSecret } = require('firebase-functions/params');
 const { logger } = require('firebase-functions');
 const crypto = require('crypto');
+const admin = require('firebase-admin');
 
 // LINE Messaging API 密鑰
 const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 
 /**
+ * 從 Firestore 載入關鍵字設定
+ */
+async function loadKeywords() {
+  try {
+    const doc = await admin.firestore().doc('line_bot_settings/keywords').get();
+    if (doc.exists) {
+      return doc.data();
+    }
+    return {};
+  } catch (error) {
+    logger.error('載入關鍵字設定失敗:', error);
+    return {};
+  }
+}
+
+/**
+ * 匹配關鍵字
+ */
+function matchKeyword(text, keywords) {
+  const normalizedText = text.trim().toLowerCase();
+  
+  for (const [key, config] of Object.entries(keywords)) {
+    if (!config.enabled) continue;
+    
+    // 檢查主要關鍵字
+    if (config.keyword.toLowerCase() === normalizedText) {
+      return config;
+    }
+    
+    // 檢查別名
+    if (config.aliases && Array.isArray(config.aliases)) {
+      if (config.aliases.some(alias => alias.toLowerCase() === normalizedText)) {
+        return config;
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
+ * 建立 LIFF 按鈕訊息
+ */
+function createLiffButtonMessage(config) {
+  const liffUrl = `https://liff.line.me/${config.liffId}`;
+  
+  return {
+    type: 'template',
+    altText: config.replyMessage,
+    template: {
+      type: 'buttons',
+      text: config.replyMessage,
+      actions: [
+        {
+          type: 'uri',
+          label: config.buttonText || '開始使用',
+          uri: liffUrl
+        }
+      ]
+    }
+  };
+}
+
+/**
  * 處理文字訊息
  */
-function handleTextMessage(text) {
+async function handleTextMessage(text) {
   logger.info(`收到訊息: ${text}`);
   
+  // 載入關鍵字設定
+  const keywords = await loadKeywords();
+  
+  // 匹配關鍵字
+  const matchedKeyword = matchKeyword(text, keywords);
+  
+  if (matchedKeyword) {
+    logger.info(`匹配到關鍵字: ${matchedKeyword.keyword}`);
+    return createLiffButtonMessage(matchedKeyword);
+  }
+  
+  // 沒有匹配到關鍵字，回覆預設訊息
   return {
     type: 'text',
     text: '🙏 感謝您聯繫龜馬山整合服務平台\n\n' +
@@ -103,7 +180,7 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       
       // 只處理文字訊息
       if (event.type === 'message' && event.message.type === 'text') {
-        const message = handleTextMessage(event.message.text);
+        const message = await handleTextMessage(event.message.text);
         
         if (message && event.replyToken) {
           await replyMessage(event.replyToken, [message], accessToken);
@@ -139,6 +216,7 @@ exports.lineMessaging = onRequest({
     res.status(500).send('Server configuration error');
     return;
   }
+  
   
   await handleWebhook(req, res, channelSecret, accessToken);
 });
