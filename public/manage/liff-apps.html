@@ -399,6 +399,37 @@
                 </div>
             </div>
 
+            <!-- 關鍵字日誌 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">📝 關鍵字日誌</h2>
+                    <button onclick="loadKeywordLogs()" class="btn-primary">🔄 重新載入</button>
+                </div>
+
+                <div id="keywordLogsLoading" class="loading">載入中...</div>
+                <div id="keywordLogsContent" style="display: none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 15%">時間</th>
+                                <th style="width: 20%">用戶</th>
+                                <th style="width: 15%">關鍵字</th>
+                                <th style="width: 30%">LIFF 應用</th>
+                                <th style="width: 10%">狀態</th>
+                            </tr>
+                        </thead>
+                        <tbody id="keywordLogsTableBody"></tbody>
+                    </table>
+
+                    <!-- 分頁控制 -->
+                    <div class="pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
+                        <button id="keywordLogsPrevBtn" onclick="changeKeywordLogsPage(-1)" class="btn-secondary" disabled>← 上一頁</button>
+                        <span id="keywordLogsPageInfo" style="color: #555;">第 1 頁</span>
+                        <button id="keywordLogsNextBtn" onclick="changeKeywordLogsPage(1)" class="btn-secondary" disabled>下一頁 →</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- LIFF 應用列表 -->
             <div class="section-card">
                 <div class="section-header">
@@ -414,22 +445,48 @@
 
     <!-- 編輯關鍵字 Modal -->
     <div id="keywordModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 600px;">
             <h3 class="modal-header">編輯關鍵字</h3>
-            <div style="margin-bottom: 20px;">
-                <strong id="modalLiffName"></strong>
+
+            <div class="form-group">
+                <label class="form-label">LIFF 應用名稱</label>
+                <input type="text" id="modalLiffName" class="form-control" readonly style="background: #f5f5f5; color: #666;">
             </div>
 
             <div class="form-group">
-                <label class="form-label">關鍵字列表</label>
-                <div id="keywordsList"></div>
-                <button type="button" onclick="addKeywordInput()" class="btn-secondary" style="margin-top: 12px; width: 100%;">+ 新增關鍵字</button>
-                <div class="form-hint">設定後，用戶在 LINE 輸入這些關鍵字就會收到此 LIFF 的連結</div>
+                <label class="form-label">LIFF ID</label>
+                <input type="text" id="modalLiffId" class="form-control" readonly style="background: #f5f5f5; color: #666;">
             </div>
 
-            <div class="modal-actions">
+            <div class="form-group">
+                <label class="form-label">LIFF URL</label>
+                <input type="text" id="modalLiffUrl" class="form-control" readonly style="background: #f5f5f5; color: #666; font-size: 12px;">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">主關鍵字</label>
+                <input type="text" id="modalMainKeyword" class="form-control" placeholder="例如：年斗">
+                <div class="form-hint">這是用戶輸入的主要關鍵字</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">別名（逗號分隔）</label>
+                <input type="text" id="modalAliases" class="form-control" placeholder="例如：ND,nd">
+                <div class="form-hint">輸入多個別名時，請用逗號分隔</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">狀態</label>
+                <select id="modalEnabled" class="form-control">
+                    <option value="true">啟用</option>
+                    <option value="false">停用</option>
+                </select>
+            </div>
+
+            <div class="modal-actions" style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button onclick="deleteKeywordSetting()" class="btn-secondary" style="margin-right: auto; background: #dc3545; color: white;">🗑️ 刪除關鍵字</button>
                 <button onclick="closeKeywordModal()" class="btn-secondary">取消</button>
-                <button onclick="saveKeywords()" class="btn-primary">儲存</button>
+                <button onclick="saveKeywordSetting()" class="btn-primary">儲存</button>
             </div>
         </div>
     </div>
@@ -506,6 +563,11 @@
             }
         }
 
+        // 關鍵字日誌相關變數
+        let keywordLogs = [];
+        let keywordLogsCurrentPage = 1;
+        const LOGS_PER_PAGE = 10;
+
         // 載入資料
         async function loadData() {
             // 載入 LIFF 應用列表
@@ -527,6 +589,98 @@
 
             renderLiffApps();
             updateStats();
+            loadKeywordLogs();
+        }
+
+        // 載入關鍵字日誌
+        window.loadKeywordLogs = async function() {
+            document.getElementById('keywordLogsLoading').style.display = 'block';
+            document.getElementById('keywordLogsContent').style.display = 'none';
+
+            try {
+                const { collection, query, orderBy, getDocs, limit } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                const logsRef = collection(platformDb, 'message_logs');
+                // 載入最近 500 筆記錄以提高效能，顯示所有日誌（包括失敗的）
+                const logsQuery = query(logsRef, orderBy('timestamp', 'desc'), limit(500));
+                const logsSnapshot = await getDocs(logsQuery);
+
+                // 不再過濾，顯示所有日誌記錄
+                keywordLogs = logsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                keywordLogsCurrentPage = 1;
+                renderKeywordLogs();
+                
+                document.getElementById('keywordLogsLoading').style.display = 'none';
+                document.getElementById('keywordLogsContent').style.display = 'block';
+            } catch (error) {
+                console.error('載入關鍵字日誌失敗:', error);
+                alert('載入關鍵字日誌失敗');
+            }
+        }
+
+        // 渲染關鍵字日誌
+        function renderKeywordLogs() {
+            const tbody = document.getElementById('keywordLogsTableBody');
+            tbody.innerHTML = '';
+
+            const startIndex = (keywordLogsCurrentPage - 1) * LOGS_PER_PAGE;
+            const endIndex = startIndex + LOGS_PER_PAGE;
+            const pageLogs = keywordLogs.slice(startIndex, endIndex);
+
+            if (pageLogs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: #999;">暫無日誌記錄</td></tr>';
+                return;
+            }
+
+            pageLogs.forEach(log => {
+                const timestamp = log.timestamp?.toDate ? log.timestamp.toDate() : new Date(log.timestamp);
+                const timeStr = timestamp.toLocaleString('zh-TW', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // 判斷狀態（優先使用 status 欄位）
+                let statusBadge = '';
+                const status = log.status || 'unknown';
+                
+                if (status === 'success') {
+                    statusBadge = '<span class="status-badge status-success">✓ 已回覆</span>';
+                } else if (status === 'error') {
+                    statusBadge = '<span class="status-badge status-error">✗ 回覆失敗</span>';
+                } else if (status === 'ignored') {
+                    statusBadge = '<span class="status-badge status-warning">⊘ 已忽略</span>';
+                } else if (log.matchedKeyword) {
+                    statusBadge = '<span class="status-badge status-warning">⚠ 部分匹配</span>';
+                } else {
+                    statusBadge = '<span class="status-badge status-error">✗ 未匹配</span>';
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${timeStr}</td>
+                    <td>${log.displayName || log.userId || '未知用戶'}</td>
+                    <td><span class="keyword-tag">${log.matchedKeyword || '-'}</span></td>
+                    <td>${log.liffApp || '-'}</td>
+                    <td>${statusBadge}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // 更新分頁資訊
+            const totalPages = Math.ceil(keywordLogs.length / LOGS_PER_PAGE);
+            document.getElementById('keywordLogsPageInfo').textContent = `第 ${keywordLogsCurrentPage} / ${totalPages} 頁 (共 ${keywordLogs.length} 筆)`;
+            
+            document.getElementById('keywordLogsPrevBtn').disabled = keywordLogsCurrentPage === 1;
+            document.getElementById('keywordLogsNextBtn').disabled = keywordLogsCurrentPage >= totalPages;
+        }
+
+        // 切換關鍵字日誌頁面
+        window.changeKeywordLogsPage = function(delta) {
+            keywordLogsCurrentPage += delta;
+            renderKeywordLogs();
         }
 
         // 渲染 LIFF 應用
@@ -583,16 +737,59 @@
         }
 
         // 更新統計
-        function updateStats() {
+        async function updateStats() {
             const usedLiffs = new Set(Object.values(keywords).map(kw => kw.liffId));
-            const totalKeywordsCount = Object.values(keywords).reduce((sum, kw) => {
-                return sum + 1 + (kw.aliases || []).length;
-            }, 0);
+            
+            // 計算本週使用次數（台灣時間 UTC+8）
+            let weeklyUsage = 0;
+            try {
+                const { collection, query, where, getDocs, Timestamp } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js');
+                
+                // 獲取當前 UTC 時間
+                const nowUtc = new Date();
+                const nowUtcMs = nowUtc.getTime();
+                
+                // 計算台灣時間的本週開始（週日 00:00:00）
+                // 台灣時間 = UTC + 8小時 = UTC + 28800000ms
+                const taiwanOffset = 8 * 60 * 60 * 1000;
+                const nowTaiwanMs = nowUtcMs + taiwanOffset;
+                
+                // 使用 UTC 方法計算台灣時間的週日
+                const nowTaiwanDate = new Date(nowTaiwanMs);
+                const taiwanDayOfWeek = nowTaiwanDate.getUTCDay();
+                const taiwanHours = nowTaiwanDate.getUTCHours();
+                const taiwanMinutes = nowTaiwanDate.getUTCMinutes();
+                const taiwanSeconds = nowTaiwanDate.getUTCSeconds();
+                const taiwanMillis = nowTaiwanDate.getUTCMilliseconds();
+                
+                // 計算到本週日 00:00:00 的偏移（以台灣時間計算）
+                const msToWeekStart = taiwanDayOfWeek * 24 * 60 * 60 * 1000 +
+                                     taiwanHours * 60 * 60 * 1000 +
+                                     taiwanMinutes * 60 * 1000 +
+                                     taiwanSeconds * 1000 +
+                                     taiwanMillis;
+                
+                // 週開始的台灣時間（毫秒）
+                const weekStartTaiwanMs = nowTaiwanMs - msToWeekStart;
+                
+                // 轉換回 UTC 時間
+                const weekStartUtcMs = weekStartTaiwanMs - taiwanOffset;
+                const weekStartTimestamp = Timestamp.fromMillis(weekStartUtcMs);
+                
+                const logsRef = collection(platformDb, 'message_logs');
+                const weekQuery = query(logsRef, where('timestamp', '>=', weekStartTimestamp));
+                const logsSnapshot = await getDocs(weekQuery);
+                
+                // 只計算有 liffApp 的記錄
+                weeklyUsage = logsSnapshot.docs.filter(doc => doc.data().liffApp).length;
+            } catch (error) {
+                console.error('計算本週使用次數失敗:', error);
+            }
 
             document.getElementById('totalApps').textContent = liffApps.length;
             document.getElementById('usedApps').textContent = usedLiffs.size;
             document.getElementById('unusedApps').textContent = liffApps.length - usedLiffs.size;
-            document.getElementById('totalKeywords').textContent = totalKeywordsCount;
+            document.getElementById('weeklyUsage').textContent = weeklyUsage;
         }
 
         // 複製 LIFF URL
@@ -607,102 +804,90 @@
             currentEditingLiff = liffApps.find(app => app.liffId === liffId);
             if (!currentEditingLiff) return;
 
-            document.getElementById('modalLiffName').textContent = currentEditingLiff.name;
+            const liffUrl = `https://liff.line.me/${liffId}`;
+            document.getElementById('modalLiffName').value = currentEditingLiff.name;
+            document.getElementById('modalLiffId').value = liffId;
+            document.getElementById('modalLiffUrl').value = liffUrl;
 
-            // 找出使用此 LIFF 的關鍵字
-            const usedKeywords = Object.values(keywords)
-                .filter(kw => kw.liffId === liffId)
-                .flatMap(kw => [kw.keyword, ...(kw.aliases || [])]);
+            // 找出使用此 LIFF 的關鍵字設定
+            const keywordSetting = Object.values(keywords).find(kw => kw.liffId === liffId);
+            
+            if (keywordSetting) {
+                document.getElementById('modalMainKeyword').value = keywordSetting.keyword || '';
+                document.getElementById('modalAliases').value = (keywordSetting.aliases || []).join(',');
+                document.getElementById('modalEnabled').value = keywordSetting.enabled !== false ? 'true' : 'false';
+            } else {
+                document.getElementById('modalMainKeyword').value = '';
+                document.getElementById('modalAliases').value = '';
+                document.getElementById('modalEnabled').value = 'true';
+            }
 
-            renderKeywordInputs(usedKeywords);
             document.getElementById('keywordModal').classList.add('active');
         }
 
-        // 渲染關鍵字輸入框
-        function renderKeywordInputs(keywordList = []) {
-            const container = document.getElementById('keywordsList');
-            container.innerHTML = '';
-
-            if (keywordList.length === 0) {
-                keywordList = [''];
-            }
-
-            keywordList.forEach((kw, index) => {
-                const group = document.createElement('div');
-                group.className = 'keyword-input-group';
-                group.innerHTML = `
-                    <input type="text" class="form-input keyword-input" value="${kw}" placeholder="輸入關鍵字">
-                    ${keywordList.length > 1 ? `<button type="button" class="btn-remove" onclick="removeKeywordInput(${index})">移除</button>` : ''}
-                `;
-                container.appendChild(group);
-            });
-        }
-
-        // 新增關鍵字輸入框
-        window.addKeywordInput = function() {
-            const container = document.getElementById('keywordsList');
-            const group = document.createElement('div');
-            group.className = 'keyword-input-group';
-            const index = container.children.length;
-            group.innerHTML = `
-                <input type="text" class="form-input keyword-input" placeholder="輸入關鍵字">
-                <button type="button" class="btn-remove" onclick="removeKeywordInput(${index})">移除</button>
-            `;
-            container.appendChild(group);
-        }
-
-        // 移除關鍵字輸入框
-        window.removeKeywordInput = function(index) {
-            const container = document.getElementById('keywordsList');
-            const inputs = container.querySelectorAll('.keyword-input-group');
-            if (inputs.length > 1) {
-                inputs[index].remove();
-            }
-        }
-
-        // 儲存關鍵字
-        window.saveKeywords = async function() {
+        // 儲存關鍵字設定
+        window.saveKeywordSetting = async function() {
             if (!currentEditingLiff) return;
 
-            const inputs = document.querySelectorAll('.keyword-input');
-            const newKeywords = Array.from(inputs)
-                .map(input => input.value.trim())
-                .filter(kw => kw);
+            const mainKeyword = document.getElementById('modalMainKeyword').value.trim();
+            const aliasesInput = document.getElementById('modalAliases').value.trim();
+            const enabled = document.getElementById('modalEnabled').value === 'true';
 
-            if (newKeywords.length === 0) {
-                // 移除所有使用此 LIFF 的關鍵字
-                Object.keys(keywords).forEach(key => {
-                    if (keywords[key].liffId === currentEditingLiff.liffId) {
-                        delete keywords[key];
-                    }
-                });
-            } else {
-                // 先移除舊的關鍵字
-                Object.keys(keywords).forEach(key => {
-                    if (keywords[key].liffId === currentEditingLiff.liffId) {
-                        delete keywords[key];
-                    }
-                });
-
-                // 新增第一個關鍵字為主要關鍵字，其餘為別名
-                const mainKeyword = newKeywords[0];
-                const aliases = newKeywords.slice(1);
-
-                keywords[mainKeyword] = {
-                    keyword: mainKeyword,
-                    aliases: aliases,
-                    liffId: currentEditingLiff.liffId,
-                    replyMessage: `請使用 ${currentEditingLiff.name}`,
-                    buttonText: '開始使用',
-                    enabled: true,
-                    updatedAt: new Date().toISOString()
-                };
+            if (!mainKeyword) {
+                alert('請輸入主關鍵字');
+                return;
             }
+
+            // 處理別名
+            const aliases = aliasesInput
+                .split(',')
+                .map(a => a.trim())
+                .filter(a => a);
+
+            // 找到現有設定以保留 reply 相關欄位
+            const existingKeyword = Object.values(keywords).find(kw => kw.liffId === currentEditingLiff.liffId);
+            
+            // 先移除此 LIFF 的舊設定
+            Object.keys(keywords).forEach(key => {
+                if (keywords[key].liffId === currentEditingLiff.liffId) {
+                    delete keywords[key];
+                }
+            });
+
+            // 新增或更新關鍵字設定（保留現有的 reply 設定）
+            keywords[mainKeyword] = {
+                keyword: mainKeyword,
+                aliases: aliases,
+                liffId: currentEditingLiff.liffId,
+                replyMessage: existingKeyword?.replyMessage || `請使用 ${currentEditingLiff.name}`,
+                buttonText: existingKeyword?.buttonText || '開始使用',
+                enabled: enabled,
+                updatedAt: new Date().toISOString()
+            };
 
             await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
             await loadData();
             closeKeywordModal();
-            alert('關鍵字已儲存');
+            alert('✓ 關鍵字設定已儲存');
+        }
+
+        // 刪除關鍵字設定
+        window.deleteKeywordSetting = async function() {
+            if (!currentEditingLiff) return;
+
+            if (!confirm('確定要刪除此 LIFF 應用的關鍵字設定嗎？')) return;
+
+            // 移除此 LIFF 的所有關鍵字設定
+            Object.keys(keywords).forEach(key => {
+                if (keywords[key].liffId === currentEditingLiff.liffId) {
+                    delete keywords[key];
+                }
+            });
+
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
+            await loadData();
+            closeKeywordModal();
+            alert('✓ 關鍵字設定已刪除');
         }
 
         // 關閉 Modal
