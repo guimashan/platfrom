@@ -354,12 +354,29 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- 頂部導航 -->
-        <header class="header">
-            <h1>LIFF 應用管理</h1>
-            <button onclick="window.location.href='/manage/index.html'" class="btn-secondary">返回管理首頁</button>
+    <div class="manage-layout">
+        <header class="manage-header">
+            <div class="manage-header-content">
+                <div class="manage-header-left">
+                    <h1>⚙️ 全站管理</h1>
+                    <p>LIFF 應用管理 - 24 個應用與關鍵字設定</p>
+                </div>
+                <div class="manage-header-actions">
+                    <button onclick="window.history.back()" class="manage-header-btn">前一頁</button>
+                    <button onclick="window.location.href='/'" class="manage-header-btn">回首頁</button>
+                    <button onclick="window.location.href='/manage/index.html'" class="manage-header-btn">登出</button>
+                </div>
+            </div>
         </header>
+        
+        <nav class="manage-subnav">
+            <div class="manage-subnav-content">
+                <a href="/manage/dashboard.html" class="manage-subnav-link">儀表板</a>
+                <a href="/manage/user.html" class="manage-subnav-link">用戶總表</a>
+                <a href="/manage/line-bot.html" class="manage-subnav-link">LINE Bot 管理</a>
+                <a href="/manage/liff-apps.html" class="manage-subnav-link active">LIFF 應用管理</a>
+            </div>
+        </nav>
 
         <main class="liff-container">
             <!-- 統計資訊 -->
