@@ -80,6 +80,55 @@ function createLiffButtonMessage(config) {
 }
 
 /**
+ * 取得 LIFF 應用名稱
+ */
+async function getLiffAppName(liffId) {
+  try {
+    const liffDoc = await admin.firestore().doc('line_bot_settings/liff_apps').get();
+    if (liffDoc.exists()) {
+      const apps = liffDoc.data().apps || [];
+      const app = apps.find(a => a.liffId === liffId);
+      return app ? app.name : null;
+    }
+    return null;
+  } catch (error) {
+    logger.error('取得 LIFF 名稱失敗:', error);
+    return null;
+  }
+}
+
+/**
+ * 記錄訊息日誌到 Firestore
+ */
+async function logMessage(messageText, matchedKeyword, replyContent, status, error = null) {
+  try {
+    const liffApp = matchedKeyword && matchedKeyword.liffId 
+      ? await getLiffAppName(matchedKeyword.liffId)
+      : null;
+    
+    const logEntry = {
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      messageText,
+      matchedKeyword: matchedKeyword ? matchedKeyword.keyword : null,
+      liffId: matchedKeyword ? matchedKeyword.liffId : null,
+      liffApp: liffApp,
+      replyContent: replyContent ? JSON.stringify(replyContent) : null,
+      status, // 'success', 'error', or 'ignored'
+      error: error ? (error.stack || error.message || error.toString()) : null
+    };
+    
+    // 寫入 Firestore，使用時間戳記作為文檔 ID
+    const logId = `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    await admin.firestore().collection('line_bot_logs').doc(logId).set(logEntry);
+    
+    logger.info('✅ 日誌已記錄:', logId);
+  } catch (logError) {
+    logger.error('❌ 記錄日誌失敗:', logError);
+    // 不要因為日誌失敗而中斷主流程
+  }
+}
+
+/**
  * 處理文字訊息
  */
 async function handleTextMessage(text) {
@@ -93,17 +142,20 @@ async function handleTextMessage(text) {
   
   if (matchedKeyword) {
     logger.info(`匹配到關鍵字: ${matchedKeyword.keyword}`);
-    return createLiffButtonMessage(matchedKeyword);
+    const replyMessage = createLiffButtonMessage(matchedKeyword);
+    return { message: replyMessage, matchedKeyword };
   }
   
   // 沒有匹配到關鍵字，回覆預設訊息
-  return {
+  const defaultMessage = {
     type: 'text',
     text: '🙏 感謝您聯繫龜馬山整合服務平台\n\n' +
           '請直接瀏覽我們的網站：\n' +
           'https://go.guimashan.org.tw\n\n' +
           '或聯繫服務人員獲取協助。'
   };
+  
+  return { message: defaultMessage, matchedKeyword: null };
 }
 
 /**
@@ -183,6 +235,7 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
     const signature = req.headers['x-line-signature'];
     if (!signature) {
       logger.error('❌ 缺少簽名');
+      await logMessage('(signature missing)', null, null, 'error', new Error('Missing signature header'));
       res.status(401).send('Unauthorized: Missing signature');
       return;
     }
@@ -190,6 +243,7 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
     // 使用 rawBody（Buffer）進行簽名驗證，這是 LINE 發送的原始 payload
     if (!validateSignature(req.rawBody, signature, channelSecret)) {
       logger.error('❌ 簽名驗證失敗');
+      await logMessage('(invalid signature)', null, null, 'error', new Error('Signature validation failed'));
       res.status(403).send('Forbidden: Invalid signature');
       return;
     }
@@ -202,21 +256,46 @@ async function handleWebhook(req, res, channelSecret, accessToken) {
       
       // 只處理文字訊息
       if (event.type === 'message' && event.message.type === 'text') {
-        const message = await handleTextMessage(event.message.text);
-        
-        if (message && event.replyToken) {
-          await replyMessage(event.replyToken, [message], accessToken);
-          logger.info('✅ 已回覆訊息');
+        let result = null;
+        try {
+          result = await handleTextMessage(event.message.text);
+          
+          if (result && result.message && event.replyToken) {
+            await replyMessage(event.replyToken, [result.message], accessToken);
+            logger.info('✅ 已回覆訊息');
+            
+            // 在成功回覆後記錄日誌
+            await logMessage(event.message.text, result.matchedKeyword, result.message, 'success');
+          }
+        } catch (error) {
+          // 記錄錯誤日誌（包含關鍵字資訊如果有的話）
+          logger.error('❌ 處理訊息失敗:', error);
+          await logMessage(
+            event.message.text, 
+            result ? result.matchedKeyword : null, 
+            null, 
+            'error', 
+            error
+          );
         }
       } else {
         // 其他類型的事件，記錄但不回覆
-        logger.info(`忽略非文字訊息事件: ${event.type}`);
+        const eventType = event.type === 'message' ? `message/${event.message.type}` : event.type;
+        logger.info(`忽略非文字訊息事件: ${eventType}`);
+        await logMessage(
+          `(${eventType} event)`, 
+          null, 
+          null, 
+          'ignored', 
+          null
+        );
       }
     }
     
     res.status(200).send('OK');
   } catch (error) {
     logger.error('❌ Webhook 處理失敗:', error);
+    await logMessage('(webhook handler error)', null, null, 'error', error);
     res.status(500).send('Internal Server Error');
   }
 }

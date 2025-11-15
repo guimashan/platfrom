@@ -92,6 +92,11 @@
             color: var(--color-success);
         }
 
+        .status-warning {
+            background: #FFF4E6;
+            color: #D97706;
+        }
+
         .status-error {
             background: var(--color-error-light);
             color: var(--color-error);
@@ -394,6 +399,36 @@
                     <p style="font-size: 0.875rem;">點擊上方「新增關鍵字」開始設定</p>
                 </div>
             </div>
+
+            <!-- 訊息日誌 -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2 class="section-title">📋 訊息日誌</h2>
+                    <button onclick="loadLogs()" class="btn-primary">🔄 重新整理</button>
+                </div>
+                
+                <div id="logsLoading" class="loading">載入中...</div>
+                
+                <table id="logsTable" class="keywords-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th style="width: 150px;">時間</th>
+                            <th>用戶訊息</th>
+                            <th>匹配關鍵字</th>
+                            <th>LIFF 應用</th>
+                            <th>狀態</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                    </tbody>
+                </table>
+
+                <div id="logsEmpty" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📭</div>
+                    <p>尚無訊息記錄</p>
+                    <p style="font-size: 0.875rem;">當用戶傳送訊息時，會顯示在這裡</p>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -444,7 +479,7 @@
     <script type="module">
         import { platformAuth, platformDb } from '/js/firebase-init.js';
         import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
-        import { collection, getDocs, doc, setDoc, deleteDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+        import { collection, getDocs, doc, setDoc, deleteDoc, getDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
         let currentUser = null;
         let liffApps = [];
@@ -457,6 +492,7 @@
                 await checkPermission();
                 await loadLiffApps();
                 await loadKeywords();
+                await loadLogs(); // 載入訊息日誌
             } else {
                 window.location.href = '/';
             }
@@ -561,6 +597,73 @@
 
             document.getElementById('keywordsLoading').style.display = 'none';
             document.getElementById('keywordsTable').style.display = 'table';
+        }
+
+        // 載入訊息日誌
+        window.loadLogs = async function() {
+            document.getElementById('logsLoading').style.display = 'block';
+            document.getElementById('logsTable').style.display = 'none';
+            document.getElementById('logsEmpty').style.display = 'none';
+
+            try {
+                const logsQuery = query(
+                    collection(platformDb, 'line_bot_logs'),
+                    orderBy('timestamp', 'desc'),
+                    limit(20)
+                );
+                const logsSnapshot = await getDocs(logsQuery);
+                
+                const tbody = document.getElementById('logsTableBody');
+                tbody.innerHTML = '';
+
+                if (logsSnapshot.empty) {
+                    document.getElementById('logsLoading').style.display = 'none';
+                    document.getElementById('logsEmpty').style.display = 'block';
+                    return;
+                }
+
+                logsSnapshot.forEach(doc => {
+                    const log = doc.data();
+                    const tr = document.createElement('tr');
+                    
+                    // 處理 Firestore Timestamp 物件
+                    const timestamp = log.timestamp?.toDate ? log.timestamp.toDate() : new Date(log.timestamp);
+                    const timeStr = timestamp.toLocaleString('zh-TW', { 
+                        month: '2-digit', 
+                        day: '2-digit', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                    });
+                    
+                    let statusClass, statusText;
+                    if (log.status === 'success') {
+                        statusClass = 'status-success';
+                        statusText = '✅ 成功';
+                    } else if (log.status === 'ignored') {
+                        statusClass = 'status-warning';
+                        statusText = '⚪ 忽略';
+                    } else {
+                        statusClass = 'status-error';
+                        statusText = '❌ 失敗';
+                    }
+                    
+                    tr.innerHTML = `
+                        <td style="font-size: 0.875rem;">${timeStr}</td>
+                        <td><strong>${log.messageText}</strong></td>
+                        <td>${log.matchedKeyword || '<span style="color: var(--text-tertiary);">未匹配</span>'}</td>
+                        <td>${log.liffApp || '<span style="color: var(--text-tertiary);">-</span>'}</td>
+                        <td><span class="status-indicator ${statusClass}">${statusText}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                document.getElementById('logsLoading').style.display = 'none';
+                document.getElementById('logsTable').style.display = 'table';
+            } catch (error) {
+                console.error('載入日誌失敗:', error);
+                document.getElementById('logsLoading').style.display = 'none';
+                document.getElementById('logsEmpty').style.display = 'block';
+            }
         }
 
         // 開啟新增關鍵字 Modal

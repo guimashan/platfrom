@@ -61,5 +61,13 @@ service cloud.firestore {
       // 只有管理員可以修改 LINE Bot 設定
       allow write: if isAnyAdmin();
     }
+    
+    // LINE Bot 訊息日誌 (line_bot_logs)
+    match /line_bot_logs/{logId} {
+      // 管理員可以讀取訊息日誌
+      allow read: if isAnyAdmin();
+      // 禁止前端直接寫入日誌（只能由 Cloud Function 寫入）
+      allow write: if false;
+    }
   }
 }
