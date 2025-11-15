@@ -117,6 +117,21 @@ async function handleUserLogin(user) {
 function redirectByRole(roles) {
     const currentPath = window.location.pathname;
     
+    // 🔄 檢查是否有儲存的返回 URL（原地登入功能）
+    const returnUrl = sessionStorage.getItem('line_login_return_url');
+    if (returnUrl) {
+        console.log('🔵 [auth] 偵測到返回 URL:', returnUrl);
+        // 清除已使用的返回 URL
+        sessionStorage.removeItem('line_login_return_url');
+        
+        // 如果返回 URL 不是首頁，直接導回該頁面
+        if (returnUrl !== '/' && returnUrl !== '/index.html') {
+            console.log('🔵 [auth] 導回原頁面:', returnUrl);
+            window.location.href = returnUrl;
+            return;
+        }
+    }
+    
     // 如果在首頁,顯示模組選單而不是自動導向
     if (currentPath === '/' || currentPath === '/index.html') {
         showModuleGrid(roles);
