@@ -16,7 +16,23 @@ const lineChannelSecret = defineSecret('LINE_MESSAGING_CHANNEL_SECRET');
 const lineChannelAccessToken = defineSecret('LINE_MESSAGING_ACCESS_TOKEN');
 
 /**
- * 從 Firestore 載入關鍵字設定
+ * 從 Firestore 載入純文字訊息指令（keyphrases）
+ */
+async function loadKeyphrases() {
+  try {
+    const doc = await admin.firestore().doc('line_bot_settings/keyphrases').get();
+    if (doc.exists) {
+      return doc.data();
+    }
+    return {};
+  } catch (error) {
+    logger.error('載入訊息指令設定失敗:', error);
+    return {};
+  }
+}
+
+/**
+ * 從 Firestore 載入 LIFF 關鍵字設定（keywords）
  */
 async function loadKeywords() {
   try {
@@ -149,19 +165,32 @@ async function logMessage(messageText, matchedKeyword, replyContent, status, err
 async function handleTextMessage(text) {
   logger.info(`收到訊息: ${text}`);
   
-  // 載入關鍵字設定
-  const keywords = await loadKeywords();
+  // 同時載入兩個集合
+  const [keyphrases, keywords] = await Promise.all([
+    loadKeyphrases(),
+    loadKeywords()
+  ]);
   
-  // 匹配關鍵字
+  // 先匹配 LIFF 關鍵字（優先處理 LIFF 應用）
   const matchedKeyword = matchKeyword(text, keywords);
-  
   if (matchedKeyword) {
-    logger.info(`匹配到關鍵字: ${matchedKeyword.keyword}`);
+    logger.info(`匹配到 LIFF 關鍵字: ${matchedKeyword.keyword}`);
     const replyMessage = createLiffButtonMessage(matchedKeyword);
-    return { message: replyMessage, matchedKeyword };
+    return { message: replyMessage, matchedKeyword, type: 'liff' };
   }
   
-  // 沒有匹配到關鍵字，回覆預設訊息
+  // 再匹配純文字訊息指令
+  const matchedKeyphrase = matchKeyword(text, keyphrases);
+  if (matchedKeyphrase) {
+    logger.info(`匹配到訊息指令: ${matchedKeyphrase.keyword}`);
+    const replyMessage = {
+      type: 'text',
+      text: matchedKeyphrase.replyMessage
+    };
+    return { message: replyMessage, matchedKeyword: matchedKeyphrase, type: 'text' };
+  }
+  
+  // 沒有匹配到任何指令，回覆預設訊息
   const defaultMessage = {
     type: 'text',
     text: '🙏 感謝您聯繫龜馬山整合服務平台\n\n' +
@@ -170,7 +199,7 @@ async function handleTextMessage(text) {
           '或聯繫服務人員獲取協助。'
   };
   
-  return { message: defaultMessage, matchedKeyword: null };
+  return { message: defaultMessage, matchedKeyword: null, type: 'default' };
 }
 
 /**

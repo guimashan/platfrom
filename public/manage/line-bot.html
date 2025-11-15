@@ -301,6 +301,47 @@
             padding: 20px;
             color: var(--text-secondary);
         }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            padding: 16px 0;
+        }
+
+        .pagination button {
+            padding: 8px 16px;
+            background: white;
+            color: var(--primary-gold);
+            border: 2px solid var(--primary-gold);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all var(--transition-base);
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary-gold-lighter);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-inactive {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
     </style>
 </head>
 <body>
@@ -370,33 +411,34 @@
                 </div>
             </div>
 
-            <!-- 關鍵字管理 -->
+            <!-- 訊息指令管理 -->
             <div class="section-card">
                 <div class="section-header">
-                    <h2 class="section-title">關鍵字管理</h2>
-                    <button onclick="openAddKeywordModal()" class="btn-primary">+ 新增關鍵字</button>
+                    <h2 class="section-title">訊息指令管理</h2>
+                    <button onclick="openAddKeyphraseModal()" class="btn-primary">+ 新增訊息指令</button>
                 </div>
                 
-                <div id="keywordsLoading" class="loading">載入中...</div>
+                <div id="keyphrasesLoading" class="loading">載入中...</div>
                 
-                <table id="keywordsTable" class="keywords-table" style="display: none;">
+                <table id="keyphrasesTable" class="keywords-table" style="display: none;">
                     <thead>
                         <tr>
-                            <th>關鍵字</th>
+                            <th>訊息指令</th>
+                            <th>訊息內文</th>
+                            <th>關鍵詞</th>
                             <th>別名</th>
-                            <th>LIFF 應用</th>
                             <th>狀態</th>
                             <th>操作</th>
                         </tr>
                     </thead>
-                    <tbody id="keywordsTableBody">
+                    <tbody id="keyphrasesTableBody">
                     </tbody>
                 </table>
 
-                <div id="keywordsEmpty" class="empty-state" style="display: none;">
+                <div id="keyphrasesEmpty" class="empty-state" style="display: none;">
                     <div class="empty-state-icon">📝</div>
-                    <p>尚未設定任何關鍵字</p>
-                    <p style="font-size: 0.875rem;">點擊上方「新增關鍵字」開始設定</p>
+                    <p>尚未設定任何訊息指令</p>
+                    <p style="font-size: 0.875rem;">點擊上方「新增訊息指令」開始設定</p>
                 </div>
             </div>
 
@@ -414,14 +456,19 @@
                         <tr>
                             <th style="width: 150px;">時間</th>
                             <th>用戶訊息</th>
-                            <th>匹配關鍵字</th>
-                            <th>LIFF 應用</th>
+                            <th>匹配指令</th>
                             <th>狀態</th>
                         </tr>
                     </thead>
                     <tbody id="logsTableBody">
                     </tbody>
                 </table>
+
+                <div id="logsPagination" class="pagination" style="display: none;">
+                    <button onclick="previousLogsPage()" class="btn-secondary" id="prevLogsBtn">上一頁</button>
+                    <span id="logsPageInfo">第 1 頁</span>
+                    <button onclick="nextLogsPage()" class="btn-secondary" id="nextLogsBtn">下一頁</button>
+                </div>
 
                 <div id="logsEmpty" class="empty-state" style="display: none;">
                     <div class="empty-state-icon">📭</div>
@@ -432,44 +479,39 @@
         </main>
     </div>
 
-    <!-- 新增/編輯關鍵字 Modal -->
-    <div id="keywordModal" class="modal">
+    <!-- 新增/編輯訊息指令 Modal -->
+    <div id="keyphraseModal" class="modal">
         <div class="modal-content">
-            <h3 class="modal-header" id="modalTitle">新增關鍵字</h3>
-            <form id="keywordForm">
+            <h3 class="modal-header" id="modalTitle">新增訊息指令</h3>
+            <form id="keyphraseForm">
                 <div class="form-group">
-                    <label class="form-label">主要關鍵字 *</label>
-                    <input type="text" id="mainKeyword" class="form-input" required placeholder="例如：線上點燈">
+                    <label class="form-label">訊息指令（主關鍵字）*</label>
+                    <input type="text" id="mainKeyword" class="form-input" required placeholder="例如：客服">
                     <div class="form-hint">用戶輸入此關鍵字時會觸發回覆</div>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">別名（可選）</label>
-                    <input type="text" id="aliases" class="form-input" placeholder="例如：點燈,祈福點燈（用逗號分隔）">
+                    <input type="text" id="aliases" class="form-input" placeholder="例如：客戶服務,聯繫客服（用逗號分隔）">
                     <div class="form-hint">設定其他也能觸發的關鍵字，用逗號分隔</div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">選擇 LIFF 應用 *</label>
-                    <select id="liffSelect" class="form-select" required>
-                        <option value="">請選擇...</option>
+                    <label class="form-label">訊息內文 *</label>
+                    <textarea id="replyMessage" class="form-textarea" required placeholder="🙏 感謝您聯繫龜馬山整合服務平台&#10;&#10;請直接瀏覽我們的網站：&#10;https://go.guimashan.org.tw&#10;&#10;或聯繫服務人員獲取協助。" rows="6"></textarea>
+                    <div class="form-hint">用戶會收到的純文字訊息（可換行）</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">狀態 *</label>
+                    <select id="enabled" class="form-select" required>
+                        <option value="true">啟用</option>
+                        <option value="false">停用</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">回覆訊息 *</label>
-                    <textarea id="replyMessage" class="form-textarea" required placeholder="🪔 線上點燈服務&#10;&#10;請點擊下方按鈕開始點燈"></textarea>
-                    <div class="form-hint">用戶會看到的訊息內容</div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">按鈕文字 *</label>
-                    <input type="text" id="buttonText" class="form-input" required placeholder="開始點燈" value="開始使用">
-                    <div class="form-hint">LIFF 按鈕上顯示的文字</div>
-                </div>
-
                 <div class="modal-actions">
-                    <button type="button" onclick="closeKeywordModal()" class="btn-secondary">取消</button>
+                    <button type="button" onclick="closeKeyphraseModal()" class="btn-secondary">取消</button>
                     <button type="submit" class="btn-primary">儲存</button>
                 </div>
             </form>
@@ -482,16 +524,17 @@
         import { collection, getDocs, doc, setDoc, deleteDoc, getDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
 
         let currentUser = null;
-        let liffApps = [];
-        let keywords = {};
+        let keyphrases = {};
+        let currentLogsPage = 1;
+        let allLogs = [];
+        const LOGS_PER_PAGE = 10;
 
         // 初始化
         onAuthStateChanged(platformAuth, async (user) => {
             if (user) {
                 currentUser = user;
                 await checkPermission();
-                await loadLiffApps();
-                await loadKeywords();
+                await loadKeyphrases();
                 await loadLogs(); // 載入訊息日誌
             } else {
                 window.location.href = '/';
@@ -521,144 +564,94 @@
             }
         }
 
-        // 載入 LIFF 應用列表
-        async function loadLiffApps() {
-            const liffDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'liff_apps'));
-            if (liffDoc.exists()) {
-                liffApps = liffDoc.data().apps || [];
-            } else {
-                // 初始化 LIFF 列表
-                liffApps = [];
-            }
-            
-            // 填充下拉選單
-            const select = document.getElementById('liffSelect');
-            select.innerHTML = '<option value="">請選擇...</option>';
-            liffApps.forEach(app => {
-                const option = document.createElement('option');
-                option.value = app.liffId;
-                option.textContent = app.name;
-                select.appendChild(option);
-            });
-        }
+        // 載入訊息指令設定
+        async function loadKeyphrases() {
+            document.getElementById('keyphrasesLoading').style.display = 'block';
+            document.getElementById('keyphrasesTable').style.display = 'none';
+            document.getElementById('keyphrasesEmpty').style.display = 'none';
 
-        // 載入關鍵字設定
-        async function loadKeywords() {
-            document.getElementById('keywordsLoading').style.display = 'block';
-            document.getElementById('keywordsTable').style.display = 'none';
-            document.getElementById('keywordsEmpty').style.display = 'none';
-
-            const keywordsDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'keywords'));
-            if (keywordsDoc.exists()) {
-                keywords = keywordsDoc.data();
+            const keyphrasesDoc = await getDoc(doc(platformDb, 'line_bot_settings', 'keyphrases'));
+            if (keyphrasesDoc.exists()) {
+                keyphrases = keyphrasesDoc.data();
             } else {
-                keywords = {};
+                keyphrases = {};
             }
 
-            renderKeywords();
+            renderKeyphrases();
         }
 
-        // 渲染關鍵字列表
-        function renderKeywords() {
-            const tbody = document.getElementById('keywordsTableBody');
+        // 渲染訊息指令列表
+        function renderKeyphrases() {
+            const tbody = document.getElementById('keyphrasesTableBody');
             tbody.innerHTML = '';
 
-            const keywordsList = Object.values(keywords);
+            const keyphrasesList = Object.values(keyphrases);
             
-            if (keywordsList.length === 0) {
-                document.getElementById('keywordsLoading').style.display = 'none';
-                document.getElementById('keywordsEmpty').style.display = 'block';
+            if (keyphrasesList.length === 0) {
+                document.getElementById('keyphrasesLoading').style.display = 'none';
+                document.getElementById('keyphrasesEmpty').style.display = 'block';
                 return;
             }
 
-            keywordsList.forEach(kw => {
+            keyphrasesList.forEach(kp => {
                 const tr = document.createElement('tr');
                 
-                const liffApp = liffApps.find(app => app.liffId === kw.liffId);
-                const aliases = kw.aliases || [];
+                const aliases = kp.aliases || [];
+                const messagePreview = kp.replyMessage ? kp.replyMessage.substring(0, 50) + '...' : '';
+                const statusClass = kp.enabled ? 'status-success' : 'status-inactive';
+                const statusText = kp.enabled ? '啟用中' : '已停用';
                 
                 tr.innerHTML = `
-                    <td><strong>${kw.keyword}</strong></td>
+                    <td><strong>${kp.keyword}</strong></td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${messagePreview}</td>
+                    <td><strong>${kp.keyword}</strong></td>
                     <td>
                         ${aliases.map(a => `<span class="keyword-badge">${a}</span>`).join('')}
                         ${aliases.length === 0 ? '<span style="color: var(--text-tertiary);">無</span>' : ''}
                     </td>
-                    <td>${liffApp ? liffApp.name : kw.liffId}</td>
-                    <td><span class="status-indicator status-success">啟用中</span></td>
+                    <td><span class="status-indicator ${statusClass}">${statusText}</span></td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn-icon" onclick="editKeyword('${kw.keyword}')">編輯</button>
-                            <button class="btn-icon btn-delete" onclick="deleteKeyword('${kw.keyword}')">刪除</button>
+                            <button class="btn-icon" onclick="editKeyphrase('${kp.keyword.replace(/'/g, "\\'")}')">編輯</button>
+                            <button class="btn-icon btn-delete" onclick="deleteKeyphrase('${kp.keyword.replace(/'/g, "\\'")}')">刪除</button>
                         </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('keywordsLoading').style.display = 'none';
-            document.getElementById('keywordsTable').style.display = 'table';
+            document.getElementById('keyphrasesLoading').style.display = 'none';
+            document.getElementById('keyphrasesTable').style.display = 'table';
         }
 
         // 載入訊息日誌
         window.loadLogs = async function() {
             document.getElementById('logsLoading').style.display = 'block';
             document.getElementById('logsTable').style.display = 'none';
+            document.getElementById('logsPagination').style.display = 'none';
             document.getElementById('logsEmpty').style.display = 'none';
 
             try {
                 const logsQuery = query(
                     collection(platformDb, 'line_bot_logs'),
                     orderBy('timestamp', 'desc'),
-                    limit(20)
+                    limit(100)
                 );
                 const logsSnapshot = await getDocs(logsQuery);
                 
-                const tbody = document.getElementById('logsTableBody');
-                tbody.innerHTML = '';
+                allLogs = [];
+                logsSnapshot.forEach(doc => {
+                    allLogs.push(doc.data());
+                });
 
-                if (logsSnapshot.empty) {
+                if (allLogs.length === 0) {
                     document.getElementById('logsLoading').style.display = 'none';
                     document.getElementById('logsEmpty').style.display = 'block';
                     return;
                 }
 
-                logsSnapshot.forEach(doc => {
-                    const log = doc.data();
-                    const tr = document.createElement('tr');
-                    
-                    // 處理 Firestore Timestamp 物件
-                    const timestamp = log.timestamp?.toDate ? log.timestamp.toDate() : new Date(log.timestamp);
-                    const timeStr = timestamp.toLocaleString('zh-TW', { 
-                        month: '2-digit', 
-                        day: '2-digit', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                    });
-                    
-                    let statusClass, statusText;
-                    if (log.status === 'success') {
-                        statusClass = 'status-success';
-                        statusText = '✅ 成功';
-                    } else if (log.status === 'ignored') {
-                        statusClass = 'status-warning';
-                        statusText = '⚪ 忽略';
-                    } else {
-                        statusClass = 'status-error';
-                        statusText = '❌ 失敗';
-                    }
-                    
-                    tr.innerHTML = `
-                        <td style="font-size: 0.875rem;">${timeStr}</td>
-                        <td><strong>${log.messageText}</strong></td>
-                        <td>${log.matchedKeyword || '<span style="color: var(--text-tertiary);">未匹配</span>'}</td>
-                        <td>${log.liffApp || '<span style="color: var(--text-tertiary);">-</span>'}</td>
-                        <td><span class="status-indicator ${statusClass}">${statusText}</span></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-
-                document.getElementById('logsLoading').style.display = 'none';
-                document.getElementById('logsTable').style.display = 'table';
+                currentLogsPage = 1;
+                renderLogsPage();
             } catch (error) {
                 console.error('載入日誌失敗:', error);
                 document.getElementById('logsLoading').style.display = 'none';
@@ -666,73 +659,140 @@
             }
         }
 
-        // 開啟新增關鍵字 Modal
-        window.openAddKeywordModal = function() {
-            document.getElementById('modalTitle').textContent = '新增關鍵字';
-            document.getElementById('keywordForm').reset();
-            document.getElementById('keywordModal').classList.add('active');
+        // 渲染日誌分頁
+        function renderLogsPage() {
+            const tbody = document.getElementById('logsTableBody');
+            tbody.innerHTML = '';
+
+            const startIndex = (currentLogsPage - 1) * LOGS_PER_PAGE;
+            const endIndex = startIndex + LOGS_PER_PAGE;
+            const logsToShow = allLogs.slice(startIndex, endIndex);
+
+            logsToShow.forEach(log => {
+                const tr = document.createElement('tr');
+                
+                // 處理 Firestore Timestamp 物件
+                const timestamp = log.timestamp?.toDate ? log.timestamp.toDate() : new Date(log.timestamp);
+                const timeStr = timestamp.toLocaleString('zh-TW', { 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let statusClass, statusText;
+                if (log.status === 'success') {
+                    statusClass = 'status-success';
+                    statusText = '✅ 成功';
+                } else if (log.status === 'ignored') {
+                    statusClass = 'status-warning';
+                    statusText = '⚪ 忽略';
+                } else {
+                    statusClass = 'status-error';
+                    statusText = '❌ 失敗';
+                }
+                
+                tr.innerHTML = `
+                    <td style="font-size: 0.875rem;">${timeStr}</td>
+                    <td><strong>${log.messageText}</strong></td>
+                    <td>${log.matchedKeyword || '<span style="color: var(--text-tertiary);">未匹配</span>'}</td>
+                    <td><span class="status-indicator ${statusClass}">${statusText}</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 更新分頁按鈕狀態
+            const totalPages = Math.ceil(allLogs.length / LOGS_PER_PAGE);
+            document.getElementById('logsPageInfo').textContent = `第 ${currentLogsPage} / ${totalPages} 頁`;
+            document.getElementById('prevLogsBtn').disabled = currentLogsPage === 1;
+            document.getElementById('nextLogsBtn').disabled = currentLogsPage >= totalPages;
+
+            document.getElementById('logsLoading').style.display = 'none';
+            document.getElementById('logsTable').style.display = 'table';
+            document.getElementById('logsPagination').style.display = 'flex';
+        }
+
+        // 上一頁
+        window.previousLogsPage = function() {
+            if (currentLogsPage > 1) {
+                currentLogsPage--;
+                renderLogsPage();
+            }
+        }
+
+        // 下一頁
+        window.nextLogsPage = function() {
+            const totalPages = Math.ceil(allLogs.length / LOGS_PER_PAGE);
+            if (currentLogsPage < totalPages) {
+                currentLogsPage++;
+                renderLogsPage();
+            }
+        }
+
+        // 開啟新增訊息指令 Modal
+        window.openAddKeyphraseModal = function() {
+            document.getElementById('modalTitle').textContent = '新增訊息指令';
+            document.getElementById('keyphraseForm').reset();
+            document.getElementById('enabled').value = 'true';
+            document.getElementById('keyphraseModal').classList.add('active');
         }
 
         // 關閉 Modal
-        window.closeKeywordModal = function() {
-            document.getElementById('keywordModal').classList.remove('active');
+        window.closeKeyphraseModal = function() {
+            document.getElementById('keyphraseModal').classList.remove('active');
         }
 
-        // 編輯關鍵字
-        window.editKeyword = function(keyword) {
-            const kw = keywords[keyword];
-            if (!kw) return;
+        // 編輯訊息指令
+        window.editKeyphrase = function(keyword) {
+            const kp = keyphrases[keyword];
+            if (!kp) return;
 
-            document.getElementById('modalTitle').textContent = '編輯關鍵字';
-            document.getElementById('mainKeyword').value = kw.keyword;
-            document.getElementById('aliases').value = (kw.aliases || []).join(',');
-            document.getElementById('liffSelect').value = kw.liffId;
-            document.getElementById('replyMessage').value = kw.replyMessage;
-            document.getElementById('buttonText').value = kw.buttonText;
+            document.getElementById('modalTitle').textContent = '編輯訊息指令';
+            document.getElementById('mainKeyword').value = kp.keyword;
+            document.getElementById('aliases').value = (kp.aliases || []).join(',');
+            document.getElementById('replyMessage').value = kp.replyMessage;
+            document.getElementById('enabled').value = kp.enabled ? 'true' : 'false';
             
-            document.getElementById('keywordModal').classList.add('active');
+            document.getElementById('keyphraseModal').classList.add('active');
         }
 
-        // 刪除關鍵字
-        window.deleteKeyword = async function(keyword) {
-            if (!confirm(`確定要刪除關鍵字「${keyword}」嗎？`)) return;
+        // 刪除訊息指令
+        window.deleteKeyphrase = async function(keyword) {
+            if (!confirm(`確定要刪除訊息指令「${keyword}」嗎？`)) return;
 
-            delete keywords[keyword];
-            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
-            await loadKeywords();
-            alert('關鍵字已刪除');
+            delete keyphrases[keyword];
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keyphrases'), keyphrases);
+            await loadKeyphrases();
+            alert('訊息指令已刪除');
         }
 
         // 表單提交
-        document.getElementById('keywordForm').addEventListener('submit', async (e) => {
+        document.getElementById('keyphraseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const keyword = document.getElementById('mainKeyword').value.trim();
             const aliasesText = document.getElementById('aliases').value.trim();
             const aliases = aliasesText ? aliasesText.split(',').map(a => a.trim()).filter(a => a) : [];
-            const liffId = document.getElementById('liffSelect').value;
             const replyMessage = document.getElementById('replyMessage').value.trim();
-            const buttonText = document.getElementById('buttonText').value.trim();
+            const enabled = document.getElementById('enabled').value === 'true';
 
-            if (!keyword || !liffId || !replyMessage || !buttonText) {
+            if (!keyword || !replyMessage) {
                 alert('請填寫所有必填欄位');
                 return;
             }
 
-            keywords[keyword] = {
+            keyphrases[keyword] = {
                 keyword,
                 aliases,
-                liffId,
                 replyMessage,
-                buttonText,
-                enabled: true,
+                enabled,
                 updatedAt: new Date().toISOString()
             };
 
-            await setDoc(doc(platformDb, 'line_bot_settings', 'keywords'), keywords);
-            await loadKeywords();
-            closeKeywordModal();
-            alert('關鍵字已儲存');
+            await setDoc(doc(platformDb, 'line_bot_settings', 'keyphrases'), keyphrases);
+            await loadKeyphrases();
+            closeKeyphraseModal();
+            alert('訊息指令已儲存');
         });
 
         // 測試 Webhook
