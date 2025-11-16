@@ -69,5 +69,13 @@ service cloud.firestore {
       // 禁止前端直接寫入日誌（只能由 Cloud Function 寫入）
       allow write: if false;
     }
+    
+    // LINE Bot 訊息處理日誌 (message_logs)
+    match /message_logs/{logId} {
+      // 管理員可以讀取訊息處理日誌
+      allow read: if isAnyAdmin();
+      // 禁止前端直接寫入日誌（只能由 Cloud Function 寫入）
+      allow write: if false;
+    }
   }
 }
