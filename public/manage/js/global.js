@@ -2,9 +2,8 @@
  * 全站管理 - 數據處理模組
  */
 
-import { platformAuth, platformDb, checkinDb, serviceDb, API_ENDPOINTS } from '/js/firebase-init.js';
+import { platformAuth, platformDb, checkinDb, serviceDb } from '/js/firebase-init.js';
 import { collection, getDocs, getDoc, doc, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
-import { callAPI } from '/js/api-helper.js';
 
 let allUsers = [];
 let filteredUsers = [];
@@ -49,20 +48,16 @@ export async function loadDashboardStats() {
         activeUsers.textContent = active;
 
         try {
-            const checkinResponse = await callAPI(API_ENDPOINTS.getCheckinHistory + '?limit=10000', {
-                method: 'GET'
-            });
-            checkinTotal.textContent = (checkinResponse.checkins || []).length;
+            const checkinSnapshot = await getDocs(collection(checkinDb, 'checkins'));
+            checkinTotal.textContent = checkinSnapshot.size;
         } catch (error) {
             console.error('載入簽到統計失敗:', error);
             checkinTotal.textContent = '-';
         }
 
         try {
-            const serviceResponse = await callAPI(API_ENDPOINTS.getRegistrations, {
-                method: 'GET'
-            });
-            serviceTotal.textContent = (serviceResponse.registrations || []).length;
+            const serviceSnapshot = await getDocs(collection(serviceDb, 'registrations'));
+            serviceTotal.textContent = serviceSnapshot.size;
         } catch (error) {
             console.error('載入神務統計失敗:', error);
             serviceTotal.textContent = '-';
