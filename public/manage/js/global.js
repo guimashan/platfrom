@@ -2,8 +2,9 @@
  * 全站管理 - 數據處理模組
  */
 
-import { platformAuth, platformDb, checkinDb, serviceDb } from '/js/firebase-init.js';
+import { platformAuth, platformDb, API_ENDPOINTS } from '/js/firebase-init.js';
 import { collection, getDocs, getDoc, doc, query, where, updateDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+import { callAPI } from '/js/api-helper.js';
 
 let allUsers = [];
 let filteredUsers = [];
@@ -48,16 +49,22 @@ export async function loadDashboardStats() {
         activeUsers.textContent = active;
 
         try {
-            const checkinSnapshot = await getDocs(collection(checkinDb, 'checkins'));
-            checkinTotal.textContent = checkinSnapshot.size;
+            const checkinResponse = await callAPI(API_ENDPOINTS.getCheckinHistory, {
+                method: 'POST',
+                body: JSON.stringify({ limit: 10000 })
+            });
+            checkinTotal.textContent = (checkinResponse.checkins || []).length;
         } catch (error) {
             console.error('載入簽到統計失敗:', error);
             checkinTotal.textContent = '-';
         }
 
         try {
-            const serviceSnapshot = await getDocs(collection(serviceDb, 'registrations'));
-            serviceTotal.textContent = serviceSnapshot.size;
+            const serviceResponse = await callAPI(API_ENDPOINTS.getUserRegistrations, {
+                method: 'POST',
+                body: JSON.stringify({ limit: 10000 })
+            });
+            serviceTotal.textContent = (serviceResponse.registrations || []).length;
         } catch (error) {
             console.error('載入神務統計失敗:', error);
             serviceTotal.textContent = '-';
